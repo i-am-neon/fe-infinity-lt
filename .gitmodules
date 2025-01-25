@@ -1,0 +1,3 @@
+[submodule "lt-maker"]
+	path = lt-maker
+	url = https://gitlab.com/rainlash/lt-maker.git
