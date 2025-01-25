@@ -8,6 +8,8 @@ To add in the `lt-maker` submodule, run the following command:
 git submodule update --init --recursive
 ```
 
+### Running the Game
+
 ## Development
 
 ### Making Deno Easier
@@ -17,7 +19,6 @@ alias dr='deno run --allow-all'
 ```
 
 which allows you to call `dr path/to/file.ts` instead of `deno run --allow-all path/to/file.ts`.
-
 
 ### Updating lt-maker
 

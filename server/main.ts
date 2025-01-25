@@ -1,8 +1,21 @@
-export function add(a: number, b: number): number {
-  return a + b;
+import createNewProject from "./create-new-project/create-new-project.ts";
+import runGame from "./run-game.ts";
+
+export default async function run() {
+  const projectName = "_new";
+
+  // Create new project
+  await createNewProject(projectName);
+
+  // Modify project files
+
+  console.log("✅ Project created successfully! Running game...");
+
+  // Run game
+  await runGame(projectName);
 }
 
-// Learn more at https://docs.deno.com/runtime/manual/examples/module_metadata#concepts
 if (import.meta.main) {
-  console.log("Add 2 + 3 =", add(2, 3));
+  await run();
 }
+
