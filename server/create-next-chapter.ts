@@ -6,13 +6,25 @@ import writeChapter from "@/game-engine-io/write-chapter/write-chapter.ts";
 import writeStubChapter from "@/game-engine-io/write-chapter/write-stub-chapter.ts";
 import { removeLastEvent } from "@/game-engine-io/write-chapter/remove-last-event.ts";
 import runGame from "@/run-game.ts";
+import getChapterResults from "@/game-engine-io/get-chapter-results.ts";
 
-export default async function createNextChapter(
-  projectNameEndingInDotLtProj: string
-): Promise<void> {
+export default async function createNextChapter({
+  projectNameEndingInDotLtProj,
+  gameNid,
+}: {
+  projectNameEndingInDotLtProj: string;
+  gameNid: string;
+}): Promise<void> {
   const nextChapterNumber = await getCurrentChapterNumber(
     projectNameEndingInDotLtProj
   ).then((currentChapterNumber) => currentChapterNumber + 1);
+
+  const chapterResults = await getChapterResults({
+    gameNid,
+    levelNid: nextChapterNumber.toString(),
+  });
+  console.log("chapterResults :>> ", chapterResults);
+  // Use chapter results in data generation
 
   const nextChapter: Chapter = {
     number: nextChapterNumber,
@@ -36,6 +48,9 @@ export default async function createNextChapter(
 }
 
 if (import.meta.main) {
-  await createNextChapter("_new.ltproj");
+  await createNextChapter({
+    projectNameEndingInDotLtProj: "_new.ltproj",
+    gameNid: "new",
+  });
 }
 
