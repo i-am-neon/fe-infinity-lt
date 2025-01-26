@@ -6,3 +6,4 @@ import { DB } from "https://deno.land/x/sqlite/mod.ts";
  */
 const dbPath = "./db/local.db";
 export const db = new DB(dbPath);
+db.execute("PRAGMA journal_mode = WAL;");
