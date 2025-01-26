@@ -1,15 +1,5 @@
-import { getPathWithinLtMaker } from "../../file-io/get-path-within-lt-maker.ts";
-
-interface Event {
-  name: string;
-  trigger: string;
-  level_nid: string;
-  condition: string;
-  commands: [];
-  only_once: boolean;
-  priority: number;
-  _source: string[];
-}
+import { getPathWithinLtMaker } from "@/file-io/get-path-within-lt-maker.ts";
+import { Event } from "@/types/game-engine/event.ts";
 
 export async function appendEvent({
   projectNameEndingInDotLtProj,

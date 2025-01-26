@@ -1,5 +1,5 @@
-import { getPathWithinLtMaker } from "../../file-io/get-path-within-lt-maker.ts";
-import { Level } from "../../types/game-engine/level.ts";
+import { getPathWithinLtMaker } from "@/file-io/get-path-within-lt-maker.ts";
+import { Level } from "@/types/game-engine/level.ts";
 
 export async function appendLevel({
   projectNameEndingInDotLtProj,

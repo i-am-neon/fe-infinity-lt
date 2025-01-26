@@ -1,9 +1,9 @@
 import {
   getLtMakerPath,
   getPathWithinLtMaker,
-} from "../file-io/get-path-within-lt-maker.ts";
-import writeFileWithinLtMaker from "../file-io/write-file-within-lt-maker.ts";
-import runPythonScript from "../lib/run-python-script.ts";
+} from "@/file-io/get-path-within-lt-maker.ts";
+import writeFileWithinLtMaker from "@/file-io/write-file-within-lt-maker.ts";
+import runPythonScript from "@/lib/run-python-script.ts";
 
 export default async function createNewProject(projectName: string) {
   const initProjectScriptPath = getPathWithinLtMaker("create_new_project.py");
