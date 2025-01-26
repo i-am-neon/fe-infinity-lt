@@ -15,3 +15,7 @@ export async function createGame() {
   console.log("res :>> ", res);
 }
 
+export async function listGames() {
+  const res = await apiCall("games");
+  return res.games || [];
+}

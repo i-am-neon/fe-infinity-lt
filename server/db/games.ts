@@ -50,6 +50,31 @@ export function getGameByNid(nid: string): Game | null {
 }
 
 /**
+ * Retrieve all Games.
+ */
+export function getAllGames(): Game[] {
+  const query = db.query("SELECT nid, title, directory, description, chapters FROM games");
+  const games: Game[] = [];
+  for (const row of query) {
+    const [dbNid, dbTitle, dbDirectory, dbDescription, dbChaptersJson] = row as [string, string, string, string, string];
+    let chapters = [];
+    try {
+      chapters = JSON.parse(dbChaptersJson) || [];
+    } catch {
+      // If JSON parse fails, keep chapters as empty array
+    }
+    games.push({
+      nid: dbNid,
+      title: dbTitle,
+      directory: dbDirectory,
+      description: dbDescription,
+      chapters,
+    });
+  }
+  return games;
+}
+
+/**
  * Example usage: create or open DB, ensure the table exists, insert & retrieve a Game.
  * Run with: deno run --allow-read --allow-write server/db/games.ts
  */

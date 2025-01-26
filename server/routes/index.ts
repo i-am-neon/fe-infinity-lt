@@ -11,6 +11,11 @@ export async function handleRequest(req: Request): Promise<Response> {
     return handlePing();
   }
 
+  if (req.method === "GET" && url.pathname === "/games") {
+    const { handleListGames } = await import("./list-games.ts");
+    return handleListGames(req);
+  }
+
   if (req.method === "POST" && url.pathname === "/create-game") {
     // "Create Game" route
     return await handleCreateGame(req);
