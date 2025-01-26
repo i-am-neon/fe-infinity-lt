@@ -6,7 +6,7 @@ import writeFileWithinLtMaker from "@/file-io/write-file-within-lt-maker.ts";
 import runPythonScript from "@/lib/run-python-script.ts";
 import { sluggify } from "@/lib/sluggify.ts";
 
-export default async function createNewProject(projectName: string) {
+export default async function initializeProject(projectName: string) {
   const initProjectScriptPath = getPathWithinLtMaker("create_new_project.py");
   const newProjectNameEndingInDotLtProj = `_${sluggify(projectName)}.ltproj`;
   const gameNid = "_" + sluggify(projectName);
@@ -37,6 +37,6 @@ export default async function createNewProject(projectName: string) {
 }
 
 if (import.meta.main) {
-  await createNewProject("My Project");
+  await initializeProject("My Project");
 }
 

@@ -1,6 +1,6 @@
 import writeStubChapter from "@/game-engine-io/write-chapter/write-stub-chapter.ts";
 import { stubPrologue } from "@/test-data/stubPrologue.ts";
-import createNewProject from "./game-engine-io/create-new-project.ts";
+import initializeProject from "./game-engine-io/initialize-project.ts";
 import writeChapter from "./game-engine-io/write-chapter/write-chapter.ts";
 import shortUuid from "./lib/short-uuid.ts";
 import runGame from "./run-game.ts";
@@ -9,7 +9,7 @@ export default async function run() {
   const projectName = shortUuid();
 
   // Create new project
-  const { projectNameEndingInDotLtProj, gameNid } = await createNewProject(
+  const { projectNameEndingInDotLtProj, gameNid } = await initializeProject(
     projectName
   );
 
