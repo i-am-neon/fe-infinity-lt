@@ -2,6 +2,7 @@
 
 import runPythonScript from "@/lib/run-python-script.ts";
 import { getPathWithinLtMaker } from "@/file-io/get-path-within-lt-maker.ts";
+import { getHighestSaveNumber } from "@/game-engine-io/get-highest-save-number.ts";
 
 // We only return lastChoice and an array of killee names
 export type ChapterResults = {
@@ -16,9 +17,14 @@ export default async function getChapterResults({
   gameNid: string;
   levelNid: string;
 }): Promise<ChapterResults> {
+  const savePrefix = `${gameNid}-preload-${levelNid}`;
+  console.log("savePrefix :>> ", savePrefix);
+  const highestSaveIndex = await getHighestSaveNumber(savePrefix);
+  console.log("highestSaveIndex :>> ", highestSaveIndex);
   const savePath = getPathWithinLtMaker(
-    `saves/${gameNid}-preload-${levelNid}-0.p`
+    `saves/${savePrefix}-${highestSaveIndex}.p`
   );
+  console.log("savePath :>> ", savePath);
 
   const { output, error } = await runPythonScript({
     pathToPythonScript: getPathWithinLtMaker("get_chapter_results.py"),
