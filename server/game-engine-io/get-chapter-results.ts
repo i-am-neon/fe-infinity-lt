@@ -57,7 +57,7 @@ export default async function getChapterResults({
 }
 
 if (import.meta.main) {
-  getChapterResults({ gameNid: "new", levelNid: "chapter_1" })
+  getChapterResults({ gameNid: "new", levelNid: "1" })
     .then((res) => {
       console.log("Last Choice:", res.lastChoice);
       console.log("Kills:", res.kills);

@@ -26,7 +26,7 @@ export interface Unit {
   ai: string;
   roam_ai: string | null;
   ai_group: string | null;
-  starting_position: Position;
+  starting_position: Position | null;
   starting_traveler: null;
   generic: boolean;
   variant?: string | null;
@@ -45,14 +45,14 @@ export interface UnitGroup {
 
 export interface Level {
   nid: string;
-  name: string;
+  title: string;
   tilemap: string;
   bg_tilemap: string | null;
   party: string;
   music: Music;
   objective: Objective;
   roam: boolean;
-  roam_unit: string;
+  roam_unit: string | null;
   go_to_overworld: boolean;
   should_record: boolean;
   tags?: string[];

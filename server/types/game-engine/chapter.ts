@@ -3,7 +3,7 @@ import { Event } from "@/types/game-engine/event.ts";
 
 export interface Chapter {
   number: number;
-  name: string;
+  title: string;
   level: Level;
   events: Event[];
 }

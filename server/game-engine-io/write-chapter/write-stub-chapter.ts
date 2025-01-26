@@ -11,8 +11,8 @@ export default async function writeStubChapter({
   await appendLevel({
     projectNameEndingInDotLtProj,
     newLevel: {
-      nid: `chapter_${chapterNumber}`,
-      name: `Chapter ${chapterNumber}`,
+      nid: `${chapterNumber}`,
+      title: `Chapter ${chapterNumber}`,
     },
   });
   await appendEvents({
@@ -21,7 +21,7 @@ export default async function writeStubChapter({
       {
         name: `Chapter ${chapterNumber} Start`,
         trigger: "level_start",
-        level_nid: `chapter_${chapterNumber}`,
+        level_nid: `${chapterNumber}`,
         _source: [
           "speak;hint;This chapter has not been created yet!|You must close the game, create the chapter, and then restart the game to play it.",
         ],

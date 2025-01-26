@@ -2,10 +2,10 @@ import { Chapter } from "@/types/game-engine/chapter.ts";
 
 export const stubPrologue: Chapter = {
   number: 0,
-  name: "It's da Prologue bishhh",
+  title: "It's da Prologue bishhh",
   level: {
     nid: "0",
-    name: "Prologue",
+    title: "Prologue, Bish!",
     tilemap: "Prologue",
     bg_tilemap: null,
     party: "Eirika",

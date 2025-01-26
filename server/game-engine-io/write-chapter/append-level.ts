@@ -15,7 +15,7 @@ export async function appendLevel({
     const content = await Deno.readTextFile(filePath);
     const levels: Level[] = JSON.parse(content);
 
-    if (!newLevel.nid || !newLevel.name) {
+    if (!newLevel.nid || !newLevel.title) {
       throw new Error("New level requires nid and name");
     }
 
@@ -25,7 +25,7 @@ export async function appendLevel({
 
     const defaultLevel: Level = {
       nid: newLevel.nid,
-      name: newLevel.name,
+      title: newLevel.title,
       tilemap: "Prologue",
       bg_tilemap: null,
       party: "Eirika",
@@ -74,7 +74,7 @@ if (import.meta.main) {
     projectNameEndingInDotLtProj: "_new.ltproj",
     newLevel: {
       nid: "test",
-      name: "Test",
+      title: "Test",
     },
   });
 }
