@@ -23,7 +23,9 @@ export default async function runPythonScript({
   }
 
   if (output) {
-    console.log("Output:", output);
+    console.log("Begin output for Python script:", pathToPythonScript);
+    console.log(output);
+    console.log("End output for Python script:", pathToPythonScript);
   }
 
   return { output, error };

@@ -50,6 +50,16 @@ export const stubPrologue: Chapter = {
         generic: false,
       },
       {
+        nid: "Lute",
+        team: "player",
+        ai: "None",
+        roam_ai: null,
+        ai_group: null,
+        starting_position: [9, 5],
+        starting_traveler: null,
+        generic: false,
+      },
+      {
         nid: "O'Neill",
         team: "enemy",
         ai: "Guard",
@@ -85,6 +95,7 @@ export const stubPrologue: Chapter = {
       _source: [
         "add_portrait;Eirika;Right",
         "speak;Eirika;Welcome to FE Infinity!",
+        "set_current_hp;Lute;1",
       ],
     },
     {
@@ -127,7 +138,6 @@ export const stubPrologue: Chapter = {
         "add_portrait;Seth;Left;no_block",
         "speak;Seth;Well, that was the prologue!",
         "choice;fates;Who do you side with?;Hoshido,Nohr,Smash",
-        "dump_game_vars",
         "transition;Close",
       ],
     },
