@@ -3,9 +3,11 @@ import removeDefaultFiles from "./remove-default-files.ts";
 
 export default async function createNewProject(
   newProjectName: string
-): Promise<void> {
+): Promise<string> {
   const newProjectNameEndingInDotLtProj = `${newProjectName}.ltproj`;
   await copyDefaultProject(newProjectNameEndingInDotLtProj);
   await removeDefaultFiles(newProjectNameEndingInDotLtProj);
+
+  return newProjectNameEndingInDotLtProj;
 }
 
