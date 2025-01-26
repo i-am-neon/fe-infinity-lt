@@ -12,7 +12,7 @@ export default async function writeStubChapter({
     projectNameEndingInDotLtProj,
     newLevel: {
       nid: `${chapterNumber}`,
-      title: `Chapter ${chapterNumber}`,
+      name: `Chapter ${chapterNumber}`,
     },
   });
   await appendEvents({

@@ -3,7 +3,7 @@ import { Event } from "@/types/game-engine/event.ts";
 
 export const stubCh1Level: Level = {
   nid: "1",
-  title: "Ch. 1: Escape!",
+  name: "Ch. 1: Escape!",
   tilemap: "Chapter 1",
   bg_tilemap: null,
   party: "Eirika",

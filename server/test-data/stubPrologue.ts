@@ -5,7 +5,7 @@ export const stubPrologue: Chapter = {
   title: "It's da Prologue bishhh",
   level: {
     nid: "0",
-    title: "Prologue, Bish!",
+    name: "Prologue, Bish!",
     tilemap: "Prologue",
     bg_tilemap: null,
     party: "Eirika",

@@ -45,7 +45,7 @@ export interface UnitGroup {
 
 export interface Level {
   nid: string;
-  title: string;
+  name: string;
   tilemap: string;
   bg_tilemap: string | null;
   party: string;
