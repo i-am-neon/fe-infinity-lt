@@ -9,10 +9,16 @@ import { sluggify } from "@/lib/sluggify.ts";
 export default async function createNewProject(projectName: string) {
   const initProjectScriptPath = getPathWithinLtMaker("create_new_project.py");
   const newProjectNameEndingInDotLtProj = `_${sluggify(projectName)}.ltproj`;
+  const gameNid = "_" + sluggify(projectName);
   // python initialize_new_project.py <nid> <title> <lt_project_base_path> <new_project_relative_path>
   await runPythonScript({
     pathToPythonScript: initProjectScriptPath,
-    args: ["2", projectName, getLtMakerPath(), newProjectNameEndingInDotLtProj],
+    args: [
+      sluggify(projectName),
+      projectName,
+      getLtMakerPath(),
+      newProjectNameEndingInDotLtProj,
+    ],
   });
 
   // Empty levels.json and events.json
@@ -24,7 +30,10 @@ export default async function createNewProject(projectName: string) {
     relativePath: `${newProjectNameEndingInDotLtProj}/game_data/events.json`,
     text: "[]",
   });
-  return newProjectNameEndingInDotLtProj;
+  return {
+    projectNameEndingInDotLtProj: newProjectNameEndingInDotLtProj,
+    gameNid,
+  };
 }
 
 if (import.meta.main) {

@@ -6,10 +6,13 @@ import shortUuid from "./lib/short-uuid.ts";
 import runGame from "./run-game.ts";
 
 export default async function run() {
-  const projectName = shortUuid();
+  const projectName = "new";
+  // const projectName = shortUuid();
 
   // Create new project
-  const projectNameEndingInDotLtProj = await createNewProject(projectName);
+  const { projectNameEndingInDotLtProj, gameNid } = await createNewProject(
+    projectName
+  );
 
   // Generate data for initial chapter
 

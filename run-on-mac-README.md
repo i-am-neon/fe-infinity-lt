@@ -40,7 +40,7 @@ wine python run_engine.py
 Or, run a specific project (like "_new.ltproj"):
 
 ```bash
-wine python run_engine_for_project.py _new
+wine python run_engine_for_project.py _new.ltproj
 ```
 
 ## Running the Editor

@@ -127,6 +127,7 @@ export const stubPrologue: Chapter = {
         "add_portrait;Seth;Left;no_block",
         "speak;Seth;Well, that was the prologue!",
         "choice;fates;Who do you side with?;Hoshido,Nohr,Smash",
+        "dump_game_vars",
         "transition;Close",
       ],
     },
