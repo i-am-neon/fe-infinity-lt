@@ -3,6 +3,8 @@ import writeChapter from "@/game-engine-io/write-chapter/write-chapter.ts";
 import writeStubChapter from "@/game-engine-io/write-chapter/write-stub-chapter.ts";
 import runGame from "@/run-game.ts";
 import { stubPrologue } from "@/test-data/stubPrologue.ts";
+import { Game } from "@/types/game-engine/game.ts";
+import { insertGame } from "@/db/games.ts";
 
 export default async function createTestGame(projectName: string) {
   // Create new project
@@ -23,6 +25,16 @@ export default async function createTestGame(projectName: string) {
     chapterNumber: 1,
   });
 
+  const newGame: Game = {
+    nid: gameNid,
+    title: projectName,
+    directory: projectNameEndingInDotLtProj,
+    description: `Project ${projectName} description here...`,
+    chapters: [],
+  };
+
+  insertGame(newGame);
+
   console.log("✅ Project created successfully! Running game...");
 
   // Run game
@@ -30,3 +42,4 @@ export default async function createTestGame(projectName: string) {
 
   return { projectNameEndingInDotLtProj, gameNid };
 }
+

@@ -1,34 +1,10 @@
-import { DB } from "https://deno.land/x/sqlite/mod.ts";
+import { db } from "./connection.ts";
 import { Game } from "@/types/game-engine/game.ts";
 
 /**
  * This file sets up a local SQLite database in Deno and uses it to store Game objects.
  */
-
 type GameRow = [string, string, string, string, string];
-
-/**
- * Create (or open) a local SQLite database file named "my_local.db"
- * located in the server/db/ folder.
- */
-const dbPath = "./db/local.db";
-const db = new DB(dbPath);
-
-/**
- * Initializes the database by ensuring the 'games' table exists.
- */
-export function initializeDatabase() {
-  db.execute(`
-    CREATE TABLE IF NOT EXISTS games (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      nid TEXT UNIQUE,
-      title TEXT,
-      directory TEXT,
-      description TEXT,
-      chapters TEXT
-    )
-  `);
-}
 
 /**
  * Insert a Game into the database.
@@ -75,21 +51,22 @@ export function getGameByNid(nid: string): Game | null {
 
 /**
  * Example usage: create or open DB, ensure the table exists, insert & retrieve a Game.
- * Run with: deno run --allow-read --allow-write server/db/local-db.ts
+ * Run with: deno run --allow-read --allow-write server/db/games.ts
  */
 if (import.meta.main) {
-  initializeDatabase();
+  import("./init.ts").then(async (init) => {
+    init.initializeDatabase();
 
-  const exampleGame: Game = {
-    nid: "example-game",
-    title: "Example Only Games Table",
-    directory: "_example.ltproj",
-    description: "Just an example to test storing games.",
-    chapters: [],
-  };
-  insertGame(exampleGame);
+    const exampleGame: Game = {
+      nid: "example-game",
+      title: "Example Only Games Table",
+      directory: "_example.ltproj",
+      description: "Just an example to test storing games.",
+      chapters: [],
+    };
+    insertGame(exampleGame);
 
-  const retrieved = getGameByNid("example-game");
-  console.log("Retrieved Game:", retrieved);
+    const retrieved = getGameByNid("example-game");
+    console.log("Retrieved Game:", retrieved);
+  });
 }
-
