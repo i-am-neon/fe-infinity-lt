@@ -11,7 +11,7 @@ type GameRow = [string, string, string, string, string];
  * Create (or open) a local SQLite database file named "my_local.db"
  * located in the server/db/ folder.
  */
-const dbPath = "./db/my_local.db";
+const dbPath = "./db/local.db";
 const db = new DB(dbPath);
 
 /**
