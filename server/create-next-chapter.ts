@@ -7,6 +7,7 @@ import writeStubChapter from "@/game-engine-io/write-chapter/write-stub-chapter.
 import { removeLastEvent } from "@/game-engine-io/write-chapter/remove-last-event.ts";
 import runGame from "@/run-game.ts";
 import getChapterResults from "@/game-engine-io/get-chapter-results.ts";
+import { deleteSuspendSave } from "@/game-engine-io/delete-suspend-save.ts";
 
 export default async function createNextChapter({
   projectNameEndingInDotLtProj,
@@ -33,9 +34,10 @@ export default async function createNextChapter({
     events: stubCh1Events,
   };
 
-  // Delete stub level and event
+  // Delete stub level and event, and suspend save from stub chapter
   await removeLastLevel(projectNameEndingInDotLtProj);
   await removeLastEvent(projectNameEndingInDotLtProj);
+  await deleteSuspendSave();
 
   await writeChapter({ projectNameEndingInDotLtProj, chapter: nextChapter });
 
