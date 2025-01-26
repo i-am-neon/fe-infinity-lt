@@ -1,12 +1,12 @@
 import { getPathWithinLtMaker } from "@/file-io/get-path-within-lt-maker.ts";
 import { Event } from "@/types/game-engine/event.ts";
 
-export async function appendEvent({
+export async function appendEvents({
   projectNameEndingInDotLtProj,
-  newEvent,
+  newEvents,
 }: {
   projectNameEndingInDotLtProj: string;
-  newEvent: Partial<Event>;
+  newEvents: Partial<Event>[];
 }): Promise<void> {
   try {
     const filePath = getPathWithinLtMaker(
@@ -15,14 +15,7 @@ export async function appendEvent({
     const content = await Deno.readTextFile(filePath);
     const events: Event[] = JSON.parse(content);
 
-    if (!newEvent.name || !newEvent.trigger || !newEvent.level_nid) {
-      throw new Error("New event requires name, trigger, and level_nid");
-    }
-
-    const defaultEvent: Event = {
-      name: newEvent.name,
-      trigger: newEvent.trigger,
-      level_nid: newEvent.level_nid,
+    const defaultEvent: Omit<Event, "name" | "trigger" | "level_nid"> = {
       condition: "True",
       commands: [],
       only_once: false,
@@ -30,13 +23,26 @@ export async function appendEvent({
       _source: [],
     };
 
-    events.push({ ...defaultEvent, ...newEvent });
+    const validatedEvents = newEvents.map((event) => {
+      if (!event.name || !event.trigger || !event.level_nid) {
+        throw new Error("Each event requires name, trigger, and level_nid");
+      }
+      return {
+        ...defaultEvent,
+        name: event.name,
+        trigger: event.trigger,
+        level_nid: event.level_nid,
+        ...event,
+      } satisfies Event;
+    });
+
+    events.push(...validatedEvents);
     await Deno.writeTextFile(filePath, JSON.stringify(events, null, 2));
   } catch (error) {
     if (error instanceof Deno.errors.NotFound) {
       await Deno.writeTextFile(
         projectNameEndingInDotLtProj,
-        JSON.stringify([newEvent], null, 2)
+        JSON.stringify(newEvents, null, 2)
       );
       return;
     }
@@ -45,13 +51,14 @@ export async function appendEvent({
 }
 
 if (import.meta.main) {
-  await appendEvent({
+  await appendEvents({
     projectNameEndingInDotLtProj: "_new.ltproj",
-    newEvent: {
-      name: "Test Event",
-      trigger: "level_start",
-      level_nid: "test",
-    },
+    newEvents: [
+      {
+        name: "Test Event",
+        trigger: "level_start",
+        level_nid: "test",
+      },
+    ],
   });
 }
-

@@ -1,27 +1,21 @@
-import { appendEvent } from "./append-event.ts";
+import { Chapter } from "@/types/game-engine/chapter.ts";
+import { appendEvents } from "./append-events.ts";
 import { appendLevel } from "./append-level.ts";
 
 export default async function writeChapter({
   projectNameEndingInDotLtProj,
-  chapterNumber,
+  chapter,
 }: {
   projectNameEndingInDotLtProj: string;
-  chapterNumber: number;
+  chapter: Chapter;
 }): Promise<void> {
   await appendLevel({
     projectNameEndingInDotLtProj,
-    newLevel: {
-      nid: `chapter_${chapterNumber}`,
-      name: `Chapter ${chapterNumber}`,
-    },
+    newLevel: chapter.level,
   });
-  await appendEvent({
+  await appendEvents({
     projectNameEndingInDotLtProj,
-    newEvent: {
-      name: `Chapter ${chapterNumber} Start`,
-      trigger: "level_start",
-      level_nid: `chapter_${chapterNumber}`,
-    },
+    newEvents: chapter.events,
   });
 }
 

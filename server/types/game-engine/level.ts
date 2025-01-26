@@ -55,9 +55,10 @@ export interface Level {
   roam_unit: string;
   go_to_overworld: boolean;
   should_record: boolean;
-  tags: string[];
+  tags?: string[];
   units: Unit[];
   regions: any[];
   unit_groups: UnitGroup[];
   ai_groups: any[];
 }
+
