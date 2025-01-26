@@ -18,13 +18,10 @@ export default async function getChapterResults({
   levelNid: string;
 }): Promise<ChapterResults> {
   const savePrefix = `${gameNid}-preload-${levelNid}`;
-  console.log("savePrefix :>> ", savePrefix);
   const highestSaveIndex = await getHighestSaveNumber(savePrefix);
-  console.log("highestSaveIndex :>> ", highestSaveIndex);
   const savePath = getPathWithinLtMaker(
     `saves/${savePrefix}-${highestSaveIndex}.p`
   );
-  console.log("savePath :>> ", savePath);
 
   const { output, error } = await runPythonScript({
     pathToPythonScript: getPathWithinLtMaker("get_chapter_results.py"),
