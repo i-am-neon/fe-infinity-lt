@@ -1,3 +1,4 @@
+import writeEvents from "./write-events.ts";
 import writeLevel from "./write-level.ts";
 
 export default async function writeChapter({
@@ -8,7 +9,6 @@ export default async function writeChapter({
   chapterNumber: number;
 }): Promise<void> {
   await writeLevel({ newProjectNameEndingInDotLtProj, chapterNumber });
-
-  // write event...
+  await writeEvents({ newProjectNameEndingInDotLtProj, chapterNumber });
 }
 
