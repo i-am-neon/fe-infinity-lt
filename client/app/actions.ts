@@ -9,7 +9,7 @@ export async function ping() {
 
 export async function createGame() {
   const res = await apiCall("create-game", {
-    body: { projectName: "My Project" },
+    body: { projectName: "OH MY GOD" },
     method: "POST",
   });
   console.log("res :>> ", res);
