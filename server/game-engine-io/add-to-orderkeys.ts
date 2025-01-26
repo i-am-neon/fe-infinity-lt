@@ -7,22 +7,28 @@ export default async function addToOrderKeys({
   relativeDirPath: string;
   orderKey: string;
 }): Promise<void> {
-  // If the order keys file doesn't exist, create it
   const orderKeysPath = getPathWithinLtMaker(`${relativeDirPath}/.orderkeys`);
+  let orderKeys: string[] = [];
+
   try {
-    await Deno.readTextFile(orderKeysPath);
+    const content = await Deno.readTextFile(orderKeysPath);
+    if (content.trim()) {
+      orderKeys = JSON.parse(content);
+      if (!Array.isArray(orderKeys)) {
+        orderKeys = content.split("\n").filter((key) => key.trim());
+      }
+    }
   } catch (error) {
-    if (error instanceof Deno.errors.NotFound) {
-      await Deno.writeTextFile(orderKeysPath, "");
-    } else {
+    if (!(error instanceof Deno.errors.NotFound)) {
       throw error;
     }
   }
 
-  // Add the order key
-  await Deno.writeTextFile(orderKeysPath, `${orderKey}\n`, {
-    append: true,
-  });
+  if (!orderKeys.includes(orderKey)) {
+    orderKeys.push(orderKey);
+  }
+
+  await Deno.writeTextFile(orderKeysPath, JSON.stringify(orderKeys, null, 4));
 }
 
 if (import.meta.main) {
@@ -33,4 +39,3 @@ if (import.meta.main) {
     console.log("Added order key");
   });
 }
-
