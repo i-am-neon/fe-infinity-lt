@@ -1,14 +1,27 @@
-import writeEvents from "./write-events.ts";
-import writeLevel from "./write-level.ts";
+import { appendEvent } from "./append-event.ts";
+import { appendLevel } from "./append-level.ts";
 
 export default async function writeChapter({
-  newProjectNameEndingInDotLtProj,
+  projectNameEndingInDotLtProj,
   chapterNumber,
 }: {
-  newProjectNameEndingInDotLtProj: string;
+  projectNameEndingInDotLtProj: string;
   chapterNumber: number;
 }): Promise<void> {
-  await writeLevel({ newProjectNameEndingInDotLtProj, chapterNumber });
-  await writeEvents({ newProjectNameEndingInDotLtProj, chapterNumber });
+  await appendLevel({
+    projectNameEndingInDotLtProj,
+    newLevel: {
+      nid: `chapter_${chapterNumber}`,
+      name: `Chapter ${chapterNumber}`,
+    },
+  });
+  await appendEvent({
+    projectNameEndingInDotLtProj,
+    newEvent: {
+      name: `Chapter ${chapterNumber} Start`,
+      trigger: "level_start",
+      level_nid: `chapter_${chapterNumber}`,
+    },
+  });
 }
 
