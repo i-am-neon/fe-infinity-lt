@@ -6,8 +6,7 @@ import shortUuid from "./lib/short-uuid.ts";
 import runGame from "./run-game.ts";
 
 export default async function run() {
-  const projectName = "new";
-  // const projectName = shortUuid();
+  const projectName = shortUuid();
 
   // Create new project
   const { projectNameEndingInDotLtProj, gameNid } = await createNewProject(
