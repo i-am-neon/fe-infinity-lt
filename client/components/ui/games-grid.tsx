@@ -27,6 +27,9 @@ interface Game {
 export default function GamesGrid() {
   const [games, setGames] = useState<Game[]>([]);
   const [loadingGameId, setLoadingGameId] = useState<string | null>(null);
+  const [loadingAction, setLoadingAction] = useState<
+    "opening" | "creatingNextChapter" | null
+  >(null);
 
   useEffect(() => {
     listGames().then((fetchedGames) => {
@@ -41,10 +44,12 @@ export default function GamesGrid() {
   const handleOpenGame = useCallback(
     async (directory: string, gameNid: string) => {
       setLoadingGameId(gameNid);
+      setLoadingAction("opening");
       try {
         await openGame(directory);
       } finally {
         setLoadingGameId(null);
+        setLoadingAction(null);
       }
     },
     []
@@ -53,10 +58,12 @@ export default function GamesGrid() {
   const handleGenerateNextChapter = useCallback(
     async (directory: string, gameNid: string) => {
       setLoadingGameId(gameNid);
+      setLoadingAction("creatingNextChapter");
       try {
         await generateNextChapter(directory, gameNid);
       } finally {
         setLoadingGameId(null);
+        setLoadingAction(null);
       }
     },
     []
@@ -65,7 +72,7 @@ export default function GamesGrid() {
   return (
     <div className="grid w-full max-w-[600px] grid-cols-1 gap-4 sm:grid-cols-2">
       {games.map((game) => (
-        <div key={game.nid} className="relative group">
+        <div key={game.nid} className="relative">
           <Card>
             <CardHeader>
               <CardTitle>{game.title}</CardTitle>
@@ -73,41 +80,44 @@ export default function GamesGrid() {
             </CardHeader>
           </Card>
           <TooltipProvider>
-            <div className="flex gap-2 opacity-0 group-hover:opacity-100 absolute top-2 right-2">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleOpenGame(game.directory, game.nid)}
-                    disabled={loadingGameId === game.nid}
-                  >
-                    {loadingGameId === game.nid ? (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    ) : (
-                      <Play className="h-4 w-4" />
-                    )}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Run Game</TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleGenerateNextChapter(game.directory, game.nid)}
-                    disabled={loadingGameId === game.nid}
-                  >
-                    {loadingGameId === game.nid ? (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    ) : (
-                      <Wand2 className="h-4 w-4" />
-                    )}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Generate Next Chapter</TooltipContent>
-              </Tooltip>
+            <div className="flex gap-2 absolute top-2 right-2">
+              {loadingGameId === game.nid ? (
+                <div className="flex gap-1 items-center">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span className="text-sm">
+                    {loadingAction === "opening" ? "opening" : "generating"}
+                  </span>
+                </div>
+              ) : (
+                <>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleOpenGame(game.directory, game.nid)}
+                      >
+                        <Play className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Run Game</TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() =>
+                          handleGenerateNextChapter(game.directory, game.nid)
+                        }
+                      >
+                        <Wand2 className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Generate Next Chapter</TooltipContent>
+                  </Tooltip>
+                </>
+              )}
             </div>
           </TooltipProvider>
         </div>
@@ -115,3 +125,4 @@ export default function GamesGrid() {
     </div>
   );
 }
+
