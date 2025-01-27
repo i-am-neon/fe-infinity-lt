@@ -14,6 +14,12 @@ export async function handleRequest(req: Request): Promise<Response> {
     return handleListGames(req);
   }
 
+  // GET /games/<nid> for a single game
+  if (req.method === "GET" && /^\/games\/[^/]+$/.test(url.pathname)) {
+    const { handleGetGame } = await import("./get-game.ts");
+    return handleGetGame(req);
+  }
+
   if (req.method === "POST" && url.pathname === "/create-game") {
     // "Create Game" route
     return await handleCreateGame(req);
