@@ -19,3 +19,10 @@ export async function listGames() {
   const res = await apiCall("games");
   return res.games || [];
 }
+
+export async function openGame(directory: string) {
+  return apiCall("run-game", {
+    method: "POST",
+    body: { directory },
+  });
+}

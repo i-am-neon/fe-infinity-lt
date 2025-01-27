@@ -19,6 +19,11 @@ export async function handleRequest(req: Request): Promise<Response> {
     return await handleCreateGame(req);
   }
 
+  if (req.method === "POST" && url.pathname === "/run-game") {
+    const { handleRunGame } = await import("./run-game.ts");
+    return await handleRunGame(req);
+  }
+
   // Default route
   return new Response("Not Found", { status: 404 });
 }
