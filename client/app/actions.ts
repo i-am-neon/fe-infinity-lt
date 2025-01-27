@@ -37,3 +37,13 @@ export async function generateNextChapter(directory: string, gameNid: string) {
     body: { directory, gameNid },
   });
 }
+
+/**
+ * Delete game from DB and remove project directory
+ */
+export async function deleteGame(nid: string, directory: string) {
+  return apiCall("delete-game", {
+    method: "POST",
+    body: { nid, directory },
+  });
+}

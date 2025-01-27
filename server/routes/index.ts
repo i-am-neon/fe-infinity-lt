@@ -35,6 +35,11 @@ export async function handleRequest(req: Request): Promise<Response> {
     return await handleGenerateNextChapter(req);
   }
 
+  if (req.method === "POST" && url.pathname === "/delete-game") {
+    const { handleDeleteGame } = await import("./delete-game.ts");
+    return await handleDeleteGame(req);
+  }
+
   // Default route
   return new Response("Not Found", { status: 404 });
 }

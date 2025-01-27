@@ -81,6 +81,13 @@ export function getAllGames(): Game[] {
 }
 
 /**
+ * Remove a game by its nid.
+ */
+export function removeGameByNid(nid: string): void {
+  db.query("DELETE FROM games WHERE nid = ?", [nid]);
+}
+
+/**
  * Example usage: create or open DB, ensure the table exists, insert & retrieve a Game.
  * Run with: deno run --allow-read --allow-write server/db/games.ts
  */
