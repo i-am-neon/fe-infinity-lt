@@ -18,8 +18,6 @@ import {
   TooltipProvider,
 } from "@/components/ui/tooltip";
 
-   
-
 export default function GamesGrid() {
   const [games, setGames] = useState<Game[]>([]);
   const [loadingGameId, setLoadingGameId] = useState<string | null>(null);
@@ -78,7 +76,7 @@ export default function GamesGrid() {
           <TooltipProvider>
             <div className="flex gap-2 absolute top-2 right-2">
               {loadingGameId === game.nid ? (
-                <div className="flex gap-1 items-center">
+                <div className="flex gap-1 items-center pr-1">
                   <Loader2 className="h-4 w-4 animate-spin" />
                   <span className="text-sm">
                     {loadingAction === "opening" ? "opening" : "generating"}
@@ -121,3 +119,4 @@ export default function GamesGrid() {
     </div>
   );
 }
+
