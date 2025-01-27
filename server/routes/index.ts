@@ -4,8 +4,6 @@ import { handleCreateGame } from "./create-game.ts";
 export async function handleRequest(req: Request): Promise<Response> {
   const url = new URL(req.url);
 
-  console.log("url.pathname :>> ", url.pathname);
-
   if (req.method === "GET" && url.pathname === "/ping") {
     // "Ping" route
     return handlePing();
