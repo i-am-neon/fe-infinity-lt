@@ -15,9 +15,11 @@ export async function createGame() {
   console.log("res :>> ", res);
 }
 
-export async function listGames() {
-  const res = await apiCall("games");
-  return res.games || [];
+import type { Game } from "@/types/game";
+
+export async function listGames(): Promise<Game[]> {
+  const res = await apiCall<{ success: boolean; games: Game[] }>("games");
+  return res.games;
 }
 
 export async function openGame(directory: string) {

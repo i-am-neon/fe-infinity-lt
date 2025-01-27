@@ -4,7 +4,13 @@ import { Game } from "@/types/game-engine/game.ts";
 /**
  * This file sets up a local SQLite database in Deno and uses it to store Game objects.
  */
-type GameRow = [string, string, string, string, string];
+type GameRow = [
+  nid: string,
+  title: string,
+  directory: string,
+  description: string,
+  chaptersJson: string
+];
 
 /**
  * Insert a Game into the database.
@@ -25,7 +31,7 @@ export function insertGame(game: Game): void {
  * Retrieve a Game by its nid.
  */
 export function getGameByNid(nid: string): Game | null {
-  const query = db.query(
+  const query = db.query<GameRow>(
     "SELECT nid, title, directory, description, chapters FROM games WHERE nid = ? LIMIT 1",
     [nid]
   );
@@ -53,7 +59,7 @@ export function getGameByNid(nid: string): Game | null {
  * Retrieve all Games.
  */
 export function getAllGames(): Game[] {
-  const query = db.query("SELECT nid, title, directory, description, chapters FROM games");
+  const query = db.query<GameRow>("SELECT nid, title, directory, description, chapters FROM games");
   const games: Game[] = [];
   for (const row of query) {
     const [dbNid, dbTitle, dbDirectory, dbDescription, dbChaptersJson] = row as [string, string, string, string, string];

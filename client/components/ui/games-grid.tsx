@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Play, Loader2, Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import type { Game } from "@/types/game";
 import { openGame, generateNextChapter, listGames } from "@/app/actions";
 
 import {
@@ -17,12 +18,7 @@ import {
   TooltipProvider,
 } from "@/components/ui/tooltip";
 
-interface Game {
-  nid: string;
-  title: string;
-  directory: string;
-  description: string;
-}
+   
 
 export default function GamesGrid() {
   const [games, setGames] = useState<Game[]>([]);
@@ -125,4 +121,3 @@ export default function GamesGrid() {
     </div>
   );
 }
-
