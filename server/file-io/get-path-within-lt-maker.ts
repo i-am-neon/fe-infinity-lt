@@ -8,7 +8,7 @@ export function getLtMakerPath(): string {
   const cwd = Deno.cwd();
 
   // 2) Check if we're already in the monorepo root by looking for lt-maker/ directly
-  let candidate = join(cwd, "lt-maker");
+  let candidate = join(cwd, "lt-maker-fork");
   try {
     // Try reading the directory to confirm it exists
     Deno.statSync(candidate);
@@ -18,7 +18,7 @@ export function getLtMakerPath(): string {
   }
 
   // 3) If the above fails, we assume we might be in the /server directory
-  candidate = join(cwd, "..", "lt-maker");
+  candidate = join(cwd, "..", "lt-maker-fork");
   try {
     Deno.statSync(candidate);
     return candidate;
