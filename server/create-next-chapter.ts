@@ -20,11 +20,11 @@ export default async function createNextChapter({
     projectNameEndingInDotLtProj
   ).then((currentChapterNumber) => currentChapterNumber + 1);
 
-  const chapterResults = await getChapterResults({
-    gameNid,
-    levelNid: nextChapterNumber.toString(),
-  });
-  console.log("chapterResults :>> ", chapterResults);
+  // const chapterResults = await getChapterResults({
+  //   gameNid,
+  //   levelNid: nextChapterNumber.toString(),
+  // });
+  // console.log("chapterResults :>> ", chapterResults);
   // Use chapter results in data generation
 
   const nextChapter: Chapter = {
@@ -45,8 +45,6 @@ export default async function createNextChapter({
     projectNameEndingInDotLtProj,
     chapterNumber: nextChapterNumber + 1,
   });
-
-  await runGame(projectNameEndingInDotLtProj);
 }
 
 if (import.meta.main) {

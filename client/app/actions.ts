@@ -26,3 +26,12 @@ export async function openGame(directory: string) {
     body: { directory },
   });
 }
+
+export async function generateNextChapter(directory: string, gameNid: string) {
+  console.log("generateNextChapter!!!!!!");
+
+  return apiCall("generate-next-chapter", {
+    method: "POST",
+    body: { directory, gameNid },
+  });
+}

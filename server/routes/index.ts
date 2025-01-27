@@ -24,6 +24,11 @@ export async function handleRequest(req: Request): Promise<Response> {
     return await handleRunGame(req);
   }
 
+  if (req.method === "POST" && url.pathname === "/generate-next-chapter") {
+    const { handleGenerateNextChapter } = await import("./generate-next-chapter.ts");
+    return await handleGenerateNextChapter(req);
+  }
+
   // Default route
   return new Response("Not Found", { status: 404 });
 }

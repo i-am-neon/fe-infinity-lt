@@ -1,10 +1,21 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
-import { Play, Loader2 } from "lucide-react";
+import { Play, Loader2, Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { openGame } from "@/app/actions";
-import apiCall from "@/lib/api-call";
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { openGame, generateNextChapter, listGames } from "@/app/actions";
+
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+  TooltipProvider,
+} from "@/components/ui/tooltip";
 
 interface Game {
   nid: string;
@@ -17,27 +28,39 @@ export default function GamesGrid() {
   const [games, setGames] = useState<Game[]>([]);
   const [loadingGameId, setLoadingGameId] = useState<string | null>(null);
 
-  const fetchGames = useCallback(async () => {
-    const res = await apiCall("games");
-    if (res?.games) {
-      setGames(res.games);
-    }
-  }, []);
-
   useEffect(() => {
-    fetchGames();
-    const interval = setInterval(fetchGames, 5000);
+    listGames().then((fetchedGames) => {
+      setGames(fetchedGames);
+    });
+    const interval = setInterval(() => {
+      listGames().then((fetchedGames) => setGames(fetchedGames));
+    }, 5000);
     return () => clearInterval(interval);
-  }, [fetchGames]);
-
-  const handleOpenGame = useCallback(async (directory: string, gameNid: string) => {
-    setLoadingGameId(gameNid);
-    try {
-      await openGame(directory);
-    } finally {
-      setLoadingGameId(null);
-    }
   }, []);
+
+  const handleOpenGame = useCallback(
+    async (directory: string, gameNid: string) => {
+      setLoadingGameId(gameNid);
+      try {
+        await openGame(directory);
+      } finally {
+        setLoadingGameId(null);
+      }
+    },
+    []
+  );
+
+  const handleGenerateNextChapter = useCallback(
+    async (directory: string, gameNid: string) => {
+      setLoadingGameId(gameNid);
+      try {
+        await generateNextChapter(directory, gameNid);
+      } finally {
+        setLoadingGameId(null);
+      }
+    },
+    []
+  );
 
   return (
     <div className="grid w-full max-w-[600px] grid-cols-1 gap-4 sm:grid-cols-2">
@@ -49,19 +72,44 @@ export default function GamesGrid() {
               <CardDescription>{game.description}</CardDescription>
             </CardHeader>
           </Card>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => handleOpenGame(game.directory, game.nid)}
-            disabled={loadingGameId === game.nid}
-            className="opacity-0 group-hover:opacity-100 absolute top-2 right-2"
-          >
-            {loadingGameId === game.nid ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Play className="h-4 w-4" />
-            )}
-          </Button>
+          <TooltipProvider>
+            <div className="flex gap-2 opacity-0 group-hover:opacity-100 absolute top-2 right-2">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleOpenGame(game.directory, game.nid)}
+                    disabled={loadingGameId === game.nid}
+                  >
+                    {loadingGameId === game.nid ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Play className="h-4 w-4" />
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Run Game</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleGenerateNextChapter(game.directory, game.nid)}
+                    disabled={loadingGameId === game.nid}
+                  >
+                    {loadingGameId === game.nid ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Wand2 className="h-4 w-4" />
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Generate Next Chapter</TooltipContent>
+              </Tooltip>
+            </div>
+          </TooltipProvider>
         </div>
       ))}
     </div>
