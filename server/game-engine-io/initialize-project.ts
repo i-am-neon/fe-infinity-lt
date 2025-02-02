@@ -5,6 +5,7 @@ import {
 import writeFileWithinLtMaker from "@/file-io/write-file-within-lt-maker.ts";
 import runPythonScript from "@/lib/run-python-script.ts";
 import { sluggify } from "@/lib/sluggify.ts";
+import removeWithinLtMaker from "@/file-io/remove-within-lt-maker.ts";
 
 export default async function initializeProject(projectName: string) {
   const initProjectScriptPath = getPathWithinLtMaker("create_new_project.py");
@@ -135,6 +136,13 @@ export default async function initializeProject(projectName: string) {
     }
 ]`,
   });
+
+  // Remove tilemaps
+  await removeWithinLtMaker({
+    relativePath: `${newProjectNameEndingInDotLtProj}/resources/tilemaps/tilemap_data`,
+    preserveDirectory: true,
+  });
+
   return {
     projectNameEndingInDotLtProj: newProjectNameEndingInDotLtProj,
     gameNid,

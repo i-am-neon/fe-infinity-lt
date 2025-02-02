@@ -7,6 +7,7 @@ import writeStubChapter from "@/game-engine-io/write-chapter/write-stub-chapter.
 import { stubCh1Events, stubCh1Level } from "@/test-data/stub-ch1.ts";
 import { Chapter } from "@/types/chapter.ts";
 import { stubCharacterBreguet } from "@/test-data/stub-characters.ts";
+import { stubTilemapPrologue } from "@/test-data/stub-tilemap.ts";
 
 export default async function createNextChapter({
   projectNameEndingInDotLtProj,
@@ -32,6 +33,7 @@ export default async function createNextChapter({
     level: stubCh1Level,
     newCharacters: [stubCharacterBreguet],
     events: stubCh1Events,
+    tilemap: stubTilemapPrologue,
   };
 
   // Delete stub level and event, and suspend save from stub chapter

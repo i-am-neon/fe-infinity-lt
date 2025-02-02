@@ -10,6 +10,7 @@ import {
   stubCharacterBroNeill,
 } from "@/test-data/stub-characters.ts";
 import { Chapter } from "@/types/chapter.ts";
+import { stubTilemapPrologue } from "@/test-data/stub-tilemap.ts";
 
 export default async function genAndWritePrologue(projectName: string) {
   await removeExistingGame(projectName);
@@ -25,6 +26,7 @@ export default async function genAndWritePrologue(projectName: string) {
   const newChapter: Chapter = {
     ...stubPrologue,
     newCharacters,
+    tilemap: stubTilemapPrologue,
   };
 
   // Modify project files
