@@ -37,8 +37,6 @@ export async function openGame(directory: string) {
 }
 
 export async function generateNextChapter(directory: string, gameNid: string) {
-  console.log("generateNextChapter!!!!!!");
-
   return apiCall("generate-next-chapter", {
     method: "POST",
     body: { directory, gameNid },
@@ -54,3 +52,4 @@ export async function deleteGame(nid: string, directory: string) {
     body: { nid, directory },
   });
 }
+

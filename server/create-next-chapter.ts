@@ -6,6 +6,7 @@ import writeChapter from "@/game-engine-io/write-chapter/write-chapter.ts";
 import writeStubChapter from "@/game-engine-io/write-chapter/write-stub-chapter.ts";
 import { stubCh1Events, stubCh1Level } from "@/test-data/stub-ch1.ts";
 import { Chapter } from "@/types/chapter.ts";
+import { stubCharacterBreguet } from "@/test-data/stub-characters.ts";
 
 export default async function createNextChapter({
   projectNameEndingInDotLtProj,
@@ -29,14 +30,14 @@ export default async function createNextChapter({
     number: nextChapterNumber,
     title: `Chapter ${nextChapterNumber}`,
     level: stubCh1Level,
-    characters: [],
+    newCharacters: [stubCharacterBreguet],
     events: stubCh1Events,
   };
 
   // Delete stub level and event, and suspend save from stub chapter
   await removeLastLevel(projectNameEndingInDotLtProj);
   await removeLastEvent(projectNameEndingInDotLtProj);
-  await deleteSuspendSave();
+  deleteSuspendSave();
 
   await writeChapter({ projectNameEndingInDotLtProj, chapter: nextChapter });
 

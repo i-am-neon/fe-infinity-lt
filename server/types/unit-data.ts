@@ -61,7 +61,7 @@ export type UnitData = {
   };
   alternate_classes: string[]; // Should always be an empty list
   portrait_nid: string; // Should exactly match name
-  affinity: string; // Should exactly match one: Anima, Dark, Fire, Ice, Light, Thunder, Wind
+  affinity: string | null; // Should exactly match one: Anima, Dark, Fire, Ice, Light, Thunder, Wind. Enemy bosses should have a null affinity
   fields: string[]; // Should always be an empty list
 };
 
