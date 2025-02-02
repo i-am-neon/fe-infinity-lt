@@ -15,7 +15,26 @@ export default async function removeWithinLtMaker({
       await Deno.remove(`${path}/${entry.name}`, { recursive: true });
     }
   } else {
-    await Deno.remove(path, { recursive: true });
+    try {
+      await Deno.remove(path, { recursive: true });
+      // deno-lint-ignore no-explicit-any
+    } catch (err: any) {
+      if (err instanceof Deno.errors.NotFound) {
+        return;
+      }
+      if (
+        err.message.includes("os error 66") ||
+        err.message.includes("Directory not empty")
+      ) {
+        const entries = Deno.readDir(path);
+        for await (const entry of entries) {
+          await Deno.remove(`${path}/${entry.name}`, { recursive: true });
+        }
+        await Deno.remove(path);
+      } else {
+        throw err;
+      }
+    }
   }
 }
 

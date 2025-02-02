@@ -3,10 +3,13 @@ import writeChapter from "@/game-engine-io/write-chapter/write-chapter.ts";
 import writeStubChapter from "@/game-engine-io/write-chapter/write-stub-chapter.ts";
 import runGame from "@/run-game.ts";
 import { stubPrologue } from "@/test-data/stubPrologue.ts";
+import removeExistingGame from "@/lib/remove-existing-game.ts";
 import { Game } from "@/types/game-engine/game.ts";
 import { insertGame } from "@/db/games.ts";
 
 export default async function createTestGame(projectName: string) {
+  await removeExistingGame(projectName);
+
   // Create new project
   const { projectNameEndingInDotLtProj, gameNid } = await initializeProject(
     projectName
@@ -42,4 +45,3 @@ export default async function createTestGame(projectName: string) {
 
   return { projectNameEndingInDotLtProj, gameNid };
 }
-
