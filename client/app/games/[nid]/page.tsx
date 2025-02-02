@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState, useCallback, useTransition } from "react";
 import { Loader2 } from "lucide-react";
+import { useParams } from "next/navigation";
 import { Game } from "@/types/game";
 import { openGame, generateNextChapter, deleteGame } from "@/app/actions";
 import apiCall from "@/lib/api-call";
@@ -15,31 +16,24 @@ import {
   AlertDialogFooter,
 } from "@/components/ui/alert-dialog";
 
-interface GameDetailPageProps {
-  params: { nid: string };
-}
+export default function GameDetailPage() {
+  const { nid } = useParams() as { nid: string };
 
-export default function GameDetailPage({ params }: GameDetailPageProps) {
-  // State for API data
   const [data, setData] = useState<{
     success: boolean;
     game?: Game;
     error?: string;
   } | null>(null);
-  // Loading state for fetching game details
+
   const [loading, setLoading] = useState(true);
 
-  // Track which action is currently loading: "play", "generate", or "delete"
-  // We'll disable all buttons if one is active
   const [loadingAction, setLoadingAction] = useState<
     "play" | "generate" | "delete" | null
   >(null);
   const [isPending, startTransition] = useTransition();
 
-  // Dialog state for delete confirmation
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  // Fetch game info client-side once on mount or when nid changes
   useEffect(() => {
     let canceled = false;
     (async () => {
@@ -47,7 +41,7 @@ export default function GameDetailPage({ params }: GameDetailPageProps) {
         success: boolean;
         game?: Game;
         error?: string;
-      }>(`games/${params.nid}`);
+      }>(`games/${nid}`);
       if (!canceled) {
         setData(res);
         setLoading(false);
@@ -56,7 +50,7 @@ export default function GameDetailPage({ params }: GameDetailPageProps) {
     return () => {
       canceled = true;
     };
-  }, [params.nid]);
+  }, [nid]);
 
   const handlePlay = useCallback(() => {
     setLoadingAction("play");
@@ -82,7 +76,6 @@ export default function GameDetailPage({ params }: GameDetailPageProps) {
     startTransition(async () => {
       if (data?.game) {
         await deleteGame(data.game.nid, data.game.directory);
-        // Redirect to home (or wherever you prefer) after deletion
         window.location.href = "/";
       }
     });
@@ -90,8 +83,6 @@ export default function GameDetailPage({ params }: GameDetailPageProps) {
 
   const disabled = loadingAction !== null || isPending;
 
-  // Instead of early returns, we use conditional rendering so that
-  // hooks always run in the same order.
   return (
     <div className="p-6 space-y-4">
       {loading ? (
