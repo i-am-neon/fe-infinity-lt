@@ -1,13 +1,11 @@
+import { deleteSuspendSave } from "@/game-engine-io/delete-suspend-save.ts";
 import getCurrentChapterNumber from "@/game-engine-io/get-current-chapter-number.ts";
-import { Chapter } from "@/types/game-engine/chapter.ts";
+import { removeLastEvent } from "@/game-engine-io/write-chapter/remove-last-event.ts";
 import { removeLastLevel } from "@/game-engine-io/write-chapter/remove-last-level.ts";
-import { stubCh1Level, stubCh1Events } from "@/test-data/stubCh1.ts";
 import writeChapter from "@/game-engine-io/write-chapter/write-chapter.ts";
 import writeStubChapter from "@/game-engine-io/write-chapter/write-stub-chapter.ts";
-import { removeLastEvent } from "@/game-engine-io/write-chapter/remove-last-event.ts";
-import runGame from "@/run-game.ts";
-import getChapterResults from "@/game-engine-io/get-chapter-results.ts";
-import { deleteSuspendSave } from "@/game-engine-io/delete-suspend-save.ts";
+import { stubCh1Events, stubCh1Level } from "@/test-data/stub-ch1.ts";
+import { Chapter } from "@/types/chapter.ts";
 
 export default async function createNextChapter({
   projectNameEndingInDotLtProj,
@@ -31,6 +29,7 @@ export default async function createNextChapter({
     number: nextChapterNumber,
     title: `Chapter ${nextChapterNumber}`,
     level: stubCh1Level,
+    characters: [],
     events: stubCh1Events,
   };
 

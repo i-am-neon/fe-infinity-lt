@@ -1,9 +1,9 @@
 import writeStubChapter from "@/game-engine-io/write-chapter/write-stub-chapter.ts";
-import { stubPrologue } from "@/test-data/stubPrologue.ts";
-import initializeProject from "./game-engine-io/initialize-project.ts";
-import writeChapter from "./game-engine-io/write-chapter/write-chapter.ts";
-import shortUuid from "./lib/short-uuid.ts";
-import runGame from "./run-game.ts";
+import { stubPrologue } from "./test-data/stub-prologue.ts";
+import initializeProject from "@/game-engine-io/initialize-project.ts";
+import writeChapter from "@/game-engine-io/write-chapter/write-chapter.ts";
+import shortUuid from "@/lib/short-uuid.ts";
+import runGame from "@/run-game.ts";
 
 export default async function run() {
   const projectName = shortUuid();

@@ -9,7 +9,7 @@ export async function ping() {
 
 export async function createGame() {
   const res = await apiCall("create-game", {
-    body: { projectName: "OH MY GOD" },
+    body: { projectName: "test" },
     method: "POST",
   });
   console.log("res :>> ", res);
@@ -18,7 +18,14 @@ export async function createGame() {
 import type { Game } from "@/types/game";
 
 export async function listGames(): Promise<Game[]> {
-  const res = await apiCall<{ success: boolean; games: Game[] }>("games");
+  const res = await apiCall<{
+    success: boolean;
+    games?: Game[];
+    error?: string;
+  }>("games");
+  if (!res.success || !res.games) {
+    return [];
+  }
   return res.games;
 }
 

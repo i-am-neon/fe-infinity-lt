@@ -1,4 +1,4 @@
-import { Chapter } from "@/types/game-engine/chapter.ts";
+import { Chapter } from "@/types/chapter.ts";
 
 export const stubPrologue: Chapter = {
   number: 0,
@@ -40,27 +40,37 @@ export const stubPrologue: Chapter = {
         generic: false,
       },
       {
-        nid: "Seth",
+        nid: "Bozla",
         team: "player",
         ai: "None",
         roam_ai: null,
         ai_group: null,
-        starting_position: [4, 4],
+        starting_position: [4, 6],
         starting_traveler: null,
         generic: false,
       },
+      // {
+      //   nid: "Seth",
+      //   team: "player",
+      //   ai: "None",
+      //   roam_ai: null,
+      //   ai_group: null,
+      //   starting_position: [4, 4],
+      //   starting_traveler: null,
+      //   generic: false,
+      // },
+      // {
+      //   nid: "Lute",
+      //   team: "player",
+      //   ai: "None",
+      //   roam_ai: null,
+      //   ai_group: null,
+      //   starting_position: [9, 5],
+      //   starting_traveler: null,
+      //   generic: false,
+      // },
       {
-        nid: "Lute",
-        team: "player",
-        ai: "None",
-        roam_ai: null,
-        ai_group: null,
-        starting_position: [9, 5],
-        starting_traveler: null,
-        generic: false,
-      },
-      {
-        nid: "O'Neill",
+        nid: "BroNeill",
         team: "enemy",
         ai: "Guard",
         roam_ai: null,
@@ -83,6 +93,7 @@ export const stubPrologue: Chapter = {
     ],
     ai_groups: [],
   },
+  newCharacters: [],
   events: [
     {
       name: "Intro",

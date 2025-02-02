@@ -12,7 +12,7 @@ import {
 
 export default function GamesGrid() {
   const [games, setGames] = useState<Game[]>([]);
-
+  console.log("games :>> ", games);
   useEffect(() => {
     listGames().then((fetchedGames) => {
       setGames(fetchedGames);
@@ -42,3 +42,4 @@ export default function GamesGrid() {
     </div>
   );
 }
+

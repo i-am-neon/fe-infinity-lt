@@ -1,4 +1,5 @@
-import { Chapter } from "@/types/game-engine/chapter.ts";
+import { Chapter } from "@/types/chapter.ts";
+import { Character } from "@/types/character.ts";
 
 export interface Game {
   nid: string;
@@ -6,4 +7,6 @@ export interface Game {
   directory: string; // relative to the root of lt-maker, ex "_new.ltproj"
   description: string;
   chapters: Chapter[];
+  characters: Character[];
 }
+

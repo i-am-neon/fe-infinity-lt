@@ -11,7 +11,8 @@ export function initializeDatabase() {
       title TEXT,
       directory TEXT,
       description TEXT,
-      chapters TEXT
+      chapters TEXT,
+      characters TEXT
     )
   `);
 }

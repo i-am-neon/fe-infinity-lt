@@ -1,13 +1,17 @@
+import { insertGame } from "@/db/games.ts";
 import initializeProject from "@/game-engine-io/initialize-project.ts";
 import writeChapter from "@/game-engine-io/write-chapter/write-chapter.ts";
 import writeStubChapter from "@/game-engine-io/write-chapter/write-stub-chapter.ts";
-import runGame from "@/run-game.ts";
-import { stubPrologue } from "@/test-data/stubPrologue.ts";
 import removeExistingGame from "@/lib/remove-existing-game.ts";
-import { Game } from "@/types/game-engine/game.ts";
-import { insertGame } from "@/db/games.ts";
+import { stubPrologue } from "@/test-data/stub-prologue.ts";
+import { Game } from "@/types/game.ts";
+import {
+  stubCharacterBozla,
+  stubCharacterBroNeill,
+} from "@/test-data/stub-characters.ts";
+import { Chapter } from "@/types/chapter.ts";
 
-export default async function createTestGame(projectName: string) {
+export default async function genAndWritePrologue(projectName: string) {
   await removeExistingGame(projectName);
 
   // Create new project
@@ -16,11 +20,17 @@ export default async function createTestGame(projectName: string) {
   );
 
   // Generate data for initial chapter
+  const newCharacters = [stubCharacterBozla, stubCharacterBroNeill];
+
+  const newChapter: Chapter = {
+    ...stubPrologue,
+    newCharacters,
+  };
 
   // Modify project files
   await writeChapter({
     projectNameEndingInDotLtProj,
-    chapter: stubPrologue,
+    chapter: newChapter,
   });
 
   await writeStubChapter({
@@ -33,15 +43,12 @@ export default async function createTestGame(projectName: string) {
     title: projectName,
     directory: projectNameEndingInDotLtProj,
     description: `Project ${projectName} description here...`,
-    chapters: [],
+    chapters: [newChapter],
+    characters: newCharacters,
   };
 
   insertGame(newGame);
 
-  console.log("✅ Project created successfully! Running game...");
-
-  // Run game
-  await runGame(projectNameEndingInDotLtProj);
-
   return { projectNameEndingInDotLtProj, gameNid };
 }
+

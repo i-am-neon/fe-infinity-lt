@@ -1,5 +1,5 @@
-import { db } from "./connection.ts";
-import { Game } from "@/types/game-engine/game.ts";
+import { db } from "@/db/connection.ts";
+import { Game } from "@/types/game.ts";
 
 /**
  * This file sets up a local SQLite database in Deno and uses it to store Game objects.
@@ -9,7 +9,8 @@ type GameRow = [
   title: string,
   directory: string,
   description: string,
-  chaptersJson: string
+  chaptersJson: string,
+  charactersJson: string
 ];
 
 /**
@@ -18,12 +19,20 @@ type GameRow = [
  */
 export function insertGame(game: Game): void {
   const chaptersJson = JSON.stringify(game.chapters);
+  const charactersJson = JSON.stringify(game.characters);
   db.query(
     `
-      INSERT OR REPLACE INTO games (nid, title, directory, description, chapters)
-      VALUES (?, ?, ?, ?, ?)
+      INSERT OR REPLACE INTO games (nid, title, directory, description, chapters, characters)
+      VALUES (?, ?, ?, ?, ?, ?)
     `,
-    [game.nid, game.title, game.directory, game.description, chaptersJson]
+    [
+      game.nid,
+      game.title,
+      game.directory,
+      game.description,
+      chaptersJson,
+      charactersJson,
+    ]
   );
 }
 
@@ -32,19 +41,31 @@ export function insertGame(game: Game): void {
  */
 export function getGameByNid(nid: string): Game | null {
   const query = db.query<GameRow>(
-    "SELECT nid, title, directory, description, chapters FROM games WHERE nid = ? LIMIT 1",
+    "SELECT nid, title, directory, description, chapters, characters FROM games WHERE nid = ? LIMIT 1",
     [nid]
   );
   if (query.length === 0) {
     return null;
   }
-  const [dbNid, dbTitle, dbDirectory, dbDescription, dbChaptersJson] =
-    query[0] as GameRow;
+  const [
+    dbNid,
+    dbTitle,
+    dbDirectory,
+    dbDescription,
+    dbChaptersJson,
+    dbCharactersJson,
+  ] = query[0] as GameRow;
   let chapters = [];
+  let characters = [];
   try {
     chapters = JSON.parse(dbChaptersJson) || [];
   } catch {
     // If JSON parse fails, keep chapters as empty array
+  }
+  try {
+    characters = JSON.parse(dbCharactersJson) || [];
+  } catch {
+    // If JSON parse fails, keep characters as empty array
   }
   return {
     nid: dbNid,
@@ -52,6 +73,7 @@ export function getGameByNid(nid: string): Game | null {
     directory: dbDirectory,
     description: dbDescription,
     chapters,
+    characters,
   };
 }
 
@@ -59,15 +81,30 @@ export function getGameByNid(nid: string): Game | null {
  * Retrieve all Games.
  */
 export function getAllGames(): Game[] {
-  const query = db.query<GameRow>("SELECT nid, title, directory, description, chapters FROM games");
+  const query = db.query<GameRow>(
+    "SELECT nid, title, directory, description, chapters, characters FROM games"
+  );
   const games: Game[] = [];
   for (const row of query) {
-    const [dbNid, dbTitle, dbDirectory, dbDescription, dbChaptersJson] = row as [string, string, string, string, string];
+    const [
+      dbNid,
+      dbTitle,
+      dbDirectory,
+      dbDescription,
+      dbChaptersJson,
+      dbCharactersJson,
+    ] = row as [string, string, string, string, string, string];
     let chapters = [];
+    let characters = [];
     try {
       chapters = JSON.parse(dbChaptersJson) || [];
     } catch {
       // If JSON parse fails, keep chapters as empty array
+    }
+    try {
+      characters = JSON.parse(dbCharactersJson) || [];
+    } catch {
+      // If JSON parse fails, keep characters as empty array
     }
     games.push({
       nid: dbNid,
@@ -75,6 +112,7 @@ export function getAllGames(): Game[] {
       directory: dbDirectory,
       description: dbDescription,
       chapters,
+      characters,
     });
   }
   return games;
@@ -92,7 +130,7 @@ export function removeGameByNid(nid: string): void {
  * Run with: deno run --allow-read --allow-write server/db/games.ts
  */
 if (import.meta.main) {
-  import("./init.ts").then(async (init) => {
+  import("@/db/init.ts").then(async (init) => {
     init.initializeDatabase();
 
     const exampleGame: Game = {
@@ -101,6 +139,7 @@ if (import.meta.main) {
       directory: "_example.ltproj",
       description: "Just an example to test storing games.",
       chapters: [],
+      characters: [],
     };
     insertGame(exampleGame);
 

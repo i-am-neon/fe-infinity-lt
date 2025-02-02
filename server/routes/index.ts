@@ -1,5 +1,5 @@
-import { handlePing } from "./ping.ts";
-import { handleCreateGame } from "./create-game.ts";
+import { handlePing } from "@/routes/ping.ts";
+import { handleCreateGame } from "@/routes/create-game.ts";
 
 export async function handleRequest(req: Request): Promise<Response> {
   const url = new URL(req.url);
@@ -31,7 +31,9 @@ export async function handleRequest(req: Request): Promise<Response> {
   }
 
   if (req.method === "POST" && url.pathname === "/generate-next-chapter") {
-    const { handleGenerateNextChapter } = await import("./generate-next-chapter.ts");
+    const { handleGenerateNextChapter } = await import(
+      "./generate-next-chapter.ts"
+    );
     return await handleGenerateNextChapter(req);
   }
 
@@ -51,3 +53,4 @@ if (import.meta.main) {
     console.log("Test route responded with:", await res.text());
   });
 }
+

@@ -1,0 +1,95 @@
+[
+  {
+    "nid": "MyChar",
+    "name": "MyChar",
+    "desc": "My custom unit",
+    "variant": null,
+    "level": 1,
+    "klass": "Fighter",
+    "tags": [],
+    "bases": {
+      "HP": 20,
+      "STR": 5,
+      "MAG": 0,
+      "SKL": 5,
+      "SPD": 7,
+      "LCK": 3,
+      "DEF": 4,
+      "RES": 1,
+      "CON": 10,
+      "MOV": 5
+    },
+    "growths": {
+      "HP": 50,
+      "STR": 40,
+      "MAG": 10,
+      "SKL": 40,
+      "SPD": 40,
+      "LCK": 30,
+      "DEF": 20,
+      "RES": 15,
+      "CON": 0,
+      "MOV": 0
+    },
+    "stat_cap_modifiers": {},
+    "starting_items": [
+      [
+        "Iron Axe",
+        false
+      ]
+    ],
+    "learned_skills": [],
+    "unit_notes": [],
+    "wexp_gain": {
+      "Sword": [
+        false,
+        0,
+        251
+      ],
+      "Lance": [
+        false,
+        0,
+        251
+      ],
+      "Axe": [
+        true,
+        1,
+        251
+      ],
+      "Bow": [
+        false,
+        0,
+        251
+      ],
+      "Staff": [
+        false,
+        0,
+        251
+      ],
+      "Light": [
+        false,
+        0,
+        251
+      ],
+      "Anima": [
+        false,
+        0,
+        251
+      ],
+      "Dark": [
+        false,
+        0,
+        251
+      ],
+      "Default": [
+        false,
+        0,
+        251
+      ]
+    },
+    "alternate_classes": [],
+    "portrait_nid": "MyChar",
+    "affinity": "Fire",
+    "fields": []
+  }
+]

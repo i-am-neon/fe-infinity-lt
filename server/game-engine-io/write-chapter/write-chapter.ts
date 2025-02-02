@@ -1,6 +1,7 @@
-import { Chapter } from "@/types/game-engine/chapter.ts";
+import { Chapter } from "../../types/chapter.ts";
 import { appendEvents } from "./append-events.ts";
 import { appendLevel } from "./append-level.ts";
+import appendUnits from "@/game-engine-io/write-chapter/append-units.ts";
 
 export default async function writeChapter({
   projectNameEndingInDotLtProj,
@@ -16,6 +17,10 @@ export default async function writeChapter({
   await appendEvents({
     projectNameEndingInDotLtProj,
     newEvents: chapter.events,
+  });
+  await appendUnits({
+    projectNameEndingInDotLtProj,
+    newUnits: chapter.newCharacters.map((c) => c.unitData),
   });
 }
 

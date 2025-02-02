@@ -1,4 +1,5 @@
-import createTestGame from "@/create-test-game.ts";
+import genAndWritePrologue from "../gen-and-write-prologue.ts";
+import runGame from "@/run-game.ts";
 
 export async function handleCreateGame(req: Request): Promise<Response> {
   try {
@@ -13,9 +14,12 @@ export async function handleCreateGame(req: Request): Promise<Response> {
       );
     }
 
-    const { gameNid, projectNameEndingInDotLtProj } = await createTestGame(
+    const { gameNid, projectNameEndingInDotLtProj } = await genAndWritePrologue(
       body.projectName
     );
+
+    // Run game
+    await runGame(projectNameEndingInDotLtProj);
 
     const responseBody = JSON.stringify({
       success: true,
@@ -46,3 +50,4 @@ export async function handleCreateGame(req: Request): Promise<Response> {
     }
   }
 }
+

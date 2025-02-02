@@ -1,5 +1,5 @@
-import { Level } from "@/types/game-engine/level.ts";
-import { Event } from "@/types/game-engine/event.ts";
+import { Level } from "@/types/level.ts";
+import { Event } from "@/types/event.ts";
 
 export const stubCh1Level: Level = {
   nid: "1",

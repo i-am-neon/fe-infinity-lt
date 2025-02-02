@@ -1,5 +1,5 @@
 import { getPathWithinLtMaker } from "@/file-io/get-path-within-lt-maker.ts";
-import { Level } from "@/types/game-engine/level.ts";
+import { Level } from "@/types/level.ts";
 
 export async function removeLastLevel(
   projectNameEndingInDotLtProj: string
@@ -28,3 +28,4 @@ export async function removeLastLevel(
 if (import.meta.main) {
   await removeLastLevel("_new.ltproj");
 }
+
