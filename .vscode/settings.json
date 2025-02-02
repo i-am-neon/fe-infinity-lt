@@ -1,2 +1,5 @@
 {
+  "[justfile]": {
+    "editor.formatOnSave": false
+}
 }
