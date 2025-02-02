@@ -23,3 +23,7 @@ clean:
     find lt-maker-fork -maxdepth 1 -type d -name "*.ltproj" ! -name "default.ltproj" -exec rm -rf {} +
     echo "Removing server/db/local.db..."
     rm -f server/db/local.db
+
+# Run a script in the server directory, passing in the relative path from the root directory
+run path:
+    deno run --allow-all --config server/deno.json "{{path}}"
