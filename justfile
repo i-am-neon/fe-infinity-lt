@@ -16,3 +16,10 @@ start-client:
 # Stop all running processes
 stop:
     pkill -f "deno|pnpm dev"
+
+clean:
+    just stop
+    echo "Removing all test .ltproj from lt-maker-fork except 'default.ltproj'..."
+    find lt-maker-fork -maxdepth 1 -type d -name "*.ltproj" ! -name "default.ltproj" -exec rm -rf {} +
+    echo "Removing server/db/local.db..."
+    rm -f server/db/local.db
