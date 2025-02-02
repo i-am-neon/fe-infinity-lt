@@ -7,7 +7,15 @@ start:
 
 # Start the Deno server with Conda
 start-server:
-    cd server && source /opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh && conda activate fe-i-lt && deno task server
+    cd server && just activate-conda && deno task server
+
+# Activate Conda environment
+activate-conda:
+    source /opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh && conda activate fe-i-lt
+
+# Run the LT editor
+editor:
+    cd lt-maker-fork && just activate-conda && wine python run_editor.py
 
 # Start the Next.js client
 start-client:
