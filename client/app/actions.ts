@@ -3,16 +3,14 @@
 import apiCall from "@/lib/api-call";
 
 export async function ping() {
-  const res = await apiCall("ping");
-  console.log("res :>> ", res);
+  await apiCall("ping");
 }
 
 export async function createGame() {
-  const res = await apiCall("create-game", {
+  await apiCall("create-game", {
     body: { projectName: "test" },
     method: "POST",
   });
-  console.log("res :>> ", res);
 }
 
 import type { Game } from "@/types/game";
