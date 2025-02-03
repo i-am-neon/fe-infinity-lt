@@ -3,6 +3,7 @@ import { appendEvents } from "./append-events.ts";
 import { appendLevel } from "./append-level.ts";
 import appendUnits from "@/game-engine-io/write-chapter/append-units.ts";
 import appendTilemap from "@/game-engine-io/write-chapter/append-tilemap.ts";
+import appendTilesetData from "@/game-engine-io/write-chapter/append-tileset-data.ts";
 
 export default async function writeChapter({
   projectNameEndingInDotLtProj,
@@ -27,6 +28,10 @@ export default async function writeChapter({
     projectNameEndingInDotLtProj,
     chapterNumber: chapter.number,
     tilemap: chapter.tilemap,
+  });
+  await appendTilesetData({
+    projectNameEndingInDotLtProj,
+    mapNid: chapter.tilemap.nid,
   });
 }
 

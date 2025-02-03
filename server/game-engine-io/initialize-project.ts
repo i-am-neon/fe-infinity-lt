@@ -149,6 +149,10 @@ export default async function initializeProject(projectName: string) {
     relativePath: `${newProjectNameEndingInDotLtProj}/resources/tilesets`,
     preserveDirectory: true,
   });
+  await writeFileWithinLtMaker({
+    relativePath: `${newProjectNameEndingInDotLtProj}/resources/tilesets/tileset.json`,
+    text: "[]",
+  });
 
   await copyTilesetsToProject(newProjectNameEndingInDotLtProj);
 
