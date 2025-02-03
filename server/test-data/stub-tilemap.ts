@@ -776,7 +776,7 @@ export const stubTilemapImportedTmx: Tilemap = {
   autotile_fps: 29,
   layers: [
     {
-      nid: "Tile Layer 1",
+      nid: "base",
       visible: true,
       foreground: false,
       sprite_grid: {

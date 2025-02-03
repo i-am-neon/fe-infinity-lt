@@ -7,6 +7,7 @@ import runPythonScript from "@/lib/run-python-script.ts";
 import { sluggify } from "@/lib/sluggify.ts";
 import removeWithinLtMaker from "@/file-io/remove-within-lt-maker.ts";
 import copyTilesetsToProject from "@/file-io/copy-tilesets-to-project.ts";
+import appendAllTilesetsData from "@/game-engine-io/write-chapter/append-all-tilesets-data.ts";
 
 export default async function initializeProject(projectName: string) {
   const initProjectScriptPath = getPathWithinLtMaker("create_new_project.py");
@@ -155,6 +156,7 @@ export default async function initializeProject(projectName: string) {
   });
 
   await copyTilesetsToProject(newProjectNameEndingInDotLtProj);
+  await appendAllTilesetsData(newProjectNameEndingInDotLtProj);
 
   return {
     projectNameEndingInDotLtProj: newProjectNameEndingInDotLtProj,
@@ -165,4 +167,3 @@ export default async function initializeProject(projectName: string) {
 if (import.meta.main) {
   await initializeProject("My Project");
 }
-
