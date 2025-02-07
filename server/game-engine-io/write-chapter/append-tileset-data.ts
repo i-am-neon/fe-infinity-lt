@@ -49,3 +49,4 @@ if (import.meta.main) {
   });
   console.log("Appended tileset data successfully.");
 }
+

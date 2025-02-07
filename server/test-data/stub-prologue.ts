@@ -1,4 +1,5 @@
 import { Chapter } from "@/types/chapter.ts";
+import { stubTilemapPrologue } from "@/test-data/stub-tilemap.ts";
 
 export const stubPrologue: Chapter = {
   number: 0,
@@ -153,5 +154,6 @@ export const stubPrologue: Chapter = {
       ],
     },
   ],
+  tilemap: stubTilemapPrologue,
 };
 
