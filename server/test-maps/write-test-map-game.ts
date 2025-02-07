@@ -118,7 +118,7 @@ export default async function writeTestMapGame(): Promise<void> {
         {
           name: "Intro",
           trigger: "level_start",
-          level_nid: "0",
+          level_nid: counter.toString(),
           condition: "True",
           commands: [],
           only_once: false,
@@ -131,7 +131,7 @@ export default async function writeTestMapGame(): Promise<void> {
         {
           name: "Defeat Boss",
           trigger: "combat_end",
-          level_nid: "0",
+          level_nid: counter.toString(),
           condition: 'game.check_dead("BroNeill")',
           commands: [],
           only_once: false,
@@ -141,7 +141,7 @@ export default async function writeTestMapGame(): Promise<void> {
         {
           name: "Outro",
           trigger: "level_end",
-          level_nid: "0",
+          level_nid: counter.toString(),
           condition: "True",
           commands: [],
           only_once: false,
@@ -149,6 +149,9 @@ export default async function writeTestMapGame(): Promise<void> {
           _source: [
             "add_portrait;Bozla;Right",
             `speak;Bozla;That was to test the map, "${mapName}". Now moving on.`,
+            "resurrect;Eirika",
+            "resurrect;Bozla",
+            "resurrect;BroNeill",
           ],
         },
       ],

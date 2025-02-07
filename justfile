@@ -29,4 +29,4 @@ clean:
 
 # Run a script in the server directory, passing in the relative path from the root directory
 run path:
-    deno run --allow-all --config server/deno.json "{{path}}"
+    source /opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh && conda activate fe-i-lt && deno run --allow-all --config server/deno.json "{{path}}"
