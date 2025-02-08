@@ -1,4 +1,4 @@
-import chunkGridIntoQuadrants from "@/map-processing/chunk-grid-into-quadrants.ts";
+import chunkGridIntoQuadrants from "../lib/chunk-grid-into-quadrants.ts";
 import {
   ch3TerrainGrid,
   ch4TerrainGrid,

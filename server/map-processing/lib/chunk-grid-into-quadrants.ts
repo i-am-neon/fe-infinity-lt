@@ -1,7 +1,7 @@
 import { ch1TerrainGrid } from "@/map-processing/test-data/terrain-grid.ts";
 import { SubGrid } from "@/types/maps/sub-grid.ts";
 import { TerrainGrid } from "@/types/maps/terrain-grid.ts";
-import orderTerrainGrid from "@/map-processing/order-terrain-grid.ts";
+import orderTerrainGrid from "@/map-processing/lib/order-terrain-grid.ts";
 
 export default function chunkGridIntoQuadrants(
   terrainGrid: TerrainGrid

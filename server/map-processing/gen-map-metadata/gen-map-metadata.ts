@@ -1,7 +1,7 @@
 import { MapMetadata, MapMetadataSchema } from "@/types/maps/map-metadata.ts";
 import { SubGrid } from "@/types/maps/sub-grid.ts";
-import chunkGridIntoQuadrants from "@/map-processing/chunk-grid-into-quadrants.ts";
-import { MAP_METADATA_EXAMPLES } from "@/map-processing/map-metadata-examples.ts";
+import chunkGridIntoQuadrants from "../lib/chunk-grid-into-quadrants.ts";
+import { MAP_METADATA_EXAMPLES } from "./map-metadata-examples.ts";
 import { ch5TerrainGrid } from "@/map-processing/test-data/terrain-grid.ts";
 import generateStructuredData from "@/lib/generate-structured-data.ts";
 import getMapSetting from "@/map-processing/gen-map-metadata/get-map-setting.ts";
