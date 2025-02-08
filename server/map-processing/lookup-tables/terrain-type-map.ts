@@ -27,6 +27,6 @@ export const TERRAIN_TYPE_MAP: TerrainMapping = {
   36: "Chest",
   37: "Door",
   38: "Throne",
-  Fence: "Fence",
+  Fence: "Wall",
 };
 

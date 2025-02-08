@@ -1,11 +1,13 @@
 import { ch1TerrainGrid } from "@/map-processing/test-data/terrain-grid.ts";
 import { SubGrid } from "@/types/maps/sub-grid.ts";
 import { TerrainGrid } from "@/types/maps/terrain-grid.ts";
+import orderTerrainGrid from "@/map-processing/order-terrain-grid.ts";
 
 export default function chunkGridIntoQuadrants(
   terrainGrid: TerrainGrid
 ): SubGrid[] {
-  const coords = Object.entries(terrainGrid).map(([key, terrain]) => {
+  const orderedTerrainGrid = orderTerrainGrid(terrainGrid);
+  const coords = Object.entries(orderedTerrainGrid).map(([key, terrain]) => {
     const [x, y] = key.split(",").map(Number);
     return { x, y, terrain };
   });
@@ -16,7 +18,7 @@ export default function chunkGridIntoQuadrants(
   const maxY = Math.max(...coords.map((c) => c.y));
 
   if (maxX < 10 || maxY < 10) {
-    return [{ label: "Full Grid", data: terrainGrid }];
+    return [{ label: "Full Grid", data: orderedTerrainGrid }];
   }
 
   const totalWidth = maxX - minX + 1;
@@ -65,3 +67,4 @@ if (import.meta.main) {
   const res = chunkGridIntoQuadrants(ch1TerrainGrid);
   console.log("res :>> ", res);
 }
+

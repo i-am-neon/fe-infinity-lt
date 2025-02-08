@@ -9,7 +9,16 @@ export default function convertLTGrid(
   const result: TerrainGrid = {};
 
   for (const [coords, codeStr] of Object.entries(sampleData)) {
+    if (codeStr === "Fence") {
+      result[coords] = "Wall";
+      continue;
+    }
     const code = parseInt(codeStr, 10);
+    if (!TERRAIN_TYPE_MAP[code]) {
+      console.warn(
+        `No terrain type found for code ${code}. Coords: ${coords}. codeStr: ${codeStr}`
+      );
+    }
     result[coords] = (TERRAIN_TYPE_MAP[code] || "Plain") as TerrainType;
   }
 
