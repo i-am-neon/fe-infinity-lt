@@ -86,7 +86,6 @@ Additionally, we have provided an image for reference to help you identify regio
     systemMessage,
     prompt,
     temperature: 0,
-    model: "gpt-4o",
     imagePath,
   });
 

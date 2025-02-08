@@ -1,31 +1,28 @@
-import "jsr:@std/dotenv/load";
-import { openai } from "@ai-sdk/openai";
-import { OpenAIChatModelId } from "@ai-sdk/openai/internal";
-import { generateObject } from "ai";
-import { z, ZodSchema } from "zod";
-import { readFileSync } from "node:fs";
 import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
+import { openai } from "@ai-sdk/openai";
+import { generateObject } from "ai";
+import "jsr:@std/dotenv/load";
+import { readFileSync } from "node:fs";
+import { z, ZodSchema } from "zod";
 
 export default async function generateStructuredDataWithImage<T>({
   schema,
   systemMessage,
   prompt,
   temperature = 0,
-  model = "gpt-4o",
   imagePath,
 }: {
   schema: ZodSchema<T>;
   systemMessage: string;
   prompt?: string;
   temperature?: number;
-  model?: OpenAIChatModelId;
   imagePath: string;
 }): Promise<T> {
   const fileContents = readFileSync(imagePath);
   const base64 = fileContents.toString("base64");
 
   const { object: result } = await generateObject({
-    model: openai(model),
+    model: openai("gpt-4o"),
     schema,
     system: systemMessage,
     messages: [

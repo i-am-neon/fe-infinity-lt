@@ -4,6 +4,7 @@ import chunkGridIntoQuadrants from "@/map-processing/chunk-grid-into-quadrants.t
 import { MAP_METADATA_EXAMPLES } from "@/map-processing/map-metadata-examples.ts";
 import { ch5TerrainGrid } from "@/map-processing/test-data/terrain-grid.ts";
 import generateStructuredData from "@/lib/generate-structured-data.ts";
+import getMapSetting from "@/map-processing/gen-map-metadata/get-map-setting.ts";
 
 const systemMessage = `You are an advanced Fire Emblem Tactician. The map data you receive might be split into multiple “chunks” or “quadrants” for convenience, but these chunks do NOT represent true boundaries within the map. They are purely for data transmission.
 
@@ -47,43 +48,8 @@ export default async function genMapMetadata(
     prompt: `Map Quadrants: ${JSON.stringify(mapQuadrants)}`,
     schema: MapMetadataSchema.omit({ setting: true }),
   });
-  const setting = getSetting(mapQuadrants);
+  const setting = getMapSetting(mapQuadrants);
   return { ...result, setting };
-}
-
-function getSetting(
-  mapQuadrants: SubGrid[]
-): "indoor" | "outdoor" | "mixed indoor and outdoor" {
-  const indoorTerrains = new Set<string>(["Floor", "Stairs", "Pillar"]);
-  const outdoorTerrains = new Set<string>([
-    "Plain",
-    "Road",
-    "Forest",
-    "Mountain",
-  ]);
-  let indoorCount = 0;
-  let outdoorCount = 0;
-  for (const quadrant of mapQuadrants) {
-    for (const terrain of Object.values(quadrant.data)) {
-      if (indoorTerrains.has(terrain)) {
-        indoorCount++;
-      } else if (outdoorTerrains.has(terrain)) {
-        outdoorCount++;
-      }
-    }
-  }
-  const total = indoorCount + outdoorCount;
-  if (total === 0) {
-    return "outdoor";
-  }
-  const ratio = indoorCount / total;
-  if (ratio > 0.6) {
-    return "indoor";
-  } else if (ratio < 0.4) {
-    return "outdoor";
-  } else {
-    return "mixed indoor and outdoor";
-  }
 }
 
 if (import.meta.main) {
