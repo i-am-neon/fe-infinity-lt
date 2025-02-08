@@ -11,7 +11,7 @@ import {
 import { Chapter } from "@/types/chapter.ts";
 
 export default async function writeTestMapGame(): Promise<void> {
-  const projectName = "test-map";
+  const projectName = "test-maps";
   await removeExistingGame(projectName);
 
   // Create new project

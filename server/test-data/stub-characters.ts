@@ -7,7 +7,7 @@ export const stubCharacterBozla: Character = {
     name: "Bozla",
     desc: "A berserker from Rausten. He's a hearty man with a thirst for life.",
     variant: null,
-    level: 1,
+    level: 20,
     klass: FE8Class.Berserker,
     tags: [],
     bases: {
@@ -65,7 +65,7 @@ export const stubCharacterBroNeill: Character = {
     name: "BroNeill",
     desc: "A troop leader in Grado's army.",
     variant: null,
-    level: 4,
+    level: 1,
     klass: FE8Class.Fighter,
     tags: ["Boss"],
     bases: {
