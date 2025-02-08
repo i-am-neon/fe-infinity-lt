@@ -4,9 +4,12 @@
     "server": "deno run --allow-all --watch server.ts"
   },
   "imports": {
+    "@ai-sdk/openai": "npm:@ai-sdk/openai@^1.1.9",
     "@std/assert": "jsr:@std/assert@1",
+    "ai": "npm:ai@^4.1.26",
     "uuid": "npm:uuid@^11.0.5",
-    "@/": "./"
+    "@/": "./",
+    "zod": "npm:zod@^3.24.1"
   }
 }
 

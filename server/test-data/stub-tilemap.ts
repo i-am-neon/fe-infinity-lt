@@ -1,4 +1,4 @@
-import { Tilemap } from "@/types/tilemap.ts";
+import { Tilemap } from "../types/maps/tilemap.ts";
 
 export const stubTilemapPrologue: Tilemap = {
   nid: "Prologue",

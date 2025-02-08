@@ -1,7 +1,7 @@
 import { Level } from "@/types/level.ts";
 import { Event } from "@/types/event.ts";
 import { Character } from "@/types/character.ts";
-import { Tilemap } from "@/types/tilemap.ts";
+import { Tilemap } from "./maps/tilemap.ts";
 
 export interface Chapter {
   number: number;

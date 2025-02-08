@@ -1,5 +1,5 @@
 import { getPathWithinLtMaker } from "@/file-io/get-path-within-lt-maker.ts";
-import { Tilemap } from "@/types/tilemap.ts";
+import { Tilemap } from "../../types/maps/tilemap.ts";
 import { stubTilemapPrologue } from "@/test-data/stub-tilemap.ts";
 
 /**
