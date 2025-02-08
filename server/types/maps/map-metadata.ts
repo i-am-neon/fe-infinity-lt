@@ -11,7 +11,12 @@ export const MapRegionSchema = z.object({
 });
 
 export const MapMetadataSchema = z.object({
-  name: z.string(),
+  givenName: z.string(),
+  originalName: z
+    .string()
+    .describe(
+      "The original name of the map, including author. Ex: '(7)Ch3BandofMercenaries_Diff_Tileset__by_Shin19'"
+    ),
   description: z.string(),
   distinctRegions: z
     .array(MapRegionSchema)

@@ -1,7 +1,11 @@
 import { z } from "zod";
 
 export const MapVisualSummarySchema = z.object({
-  name: z.string().describe("A creative, concise name for the map."),
+  name: z
+    .string()
+    .describe(
+      "A literal, concise name for the map. The name should directly reflect the map's content, do not use vague story-related names."
+    ),
   description: z.string().describe("A brief description of the map."),
   regions: z.array(
     z.object({

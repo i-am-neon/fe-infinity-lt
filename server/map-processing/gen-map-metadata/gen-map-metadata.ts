@@ -64,15 +64,27 @@ export default async function genMapMetadata({
       mapQuadrants
     )}\nMap Visual Summary: ${JSON.stringify(mapVisualSummary)}`,
     schema: MapMetadataSchema.omit({
-      name: true,
+      givenName: true,
+      originalName: true,
       description: true,
       setting: true,
     }),
   });
 
+  const originalName = imagePath
+    .split("/")
+    .pop()
+    ?.replace(/\.png$/, "");
+  if (!originalName) {
+    throw new Error(
+      "Failed to extract original name from image path: " + imagePath
+    );
+  }
+
   return {
     ...mapMetadata,
-    name: mapVisualSummary.name,
+    givenName: mapVisualSummary.name,
+    originalName,
     description: mapVisualSummary.description,
     setting: mapSetting,
   };

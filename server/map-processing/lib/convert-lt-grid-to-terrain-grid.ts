@@ -3,7 +3,7 @@ import { TerrainType } from "@/types/maps/terrain-type.ts";
 import { TERRAIN_TYPE_MAP } from "@/map-processing/lookup-tables/terrain-type-map.ts";
 import { ch5LTGrid } from "@/map-processing/test-data/lt-grids.ts";
 
-export default function convertLTGrid(
+export default function convertLTGridToTerrainGrid(
   sampleData: Record<string, string>
 ): TerrainGrid {
   const result: TerrainGrid = {};
@@ -11,6 +11,10 @@ export default function convertLTGrid(
   for (const [coords, codeStr] of Object.entries(sampleData)) {
     if (codeStr === "Fence") {
       result[coords] = "Wall";
+      continue;
+    }
+    if (codeStr === "Ruins") {
+      result[coords] = "Ruins";
       continue;
     }
     const code = parseInt(codeStr, 10);
@@ -26,7 +30,7 @@ export default function convertLTGrid(
 }
 
 if (import.meta.main) {
-  const res = convertLTGrid(ch5LTGrid);
+  const res = convertLTGridToTerrainGrid(ch5LTGrid);
   console.log("res :>> ", res);
 }
 

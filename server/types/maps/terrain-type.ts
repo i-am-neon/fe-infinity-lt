@@ -23,4 +23,6 @@ export type TerrainType =
   | "Village"
   | "Chest"
   | "Door"
+  | "Ruins"
   | "Throne";
+
