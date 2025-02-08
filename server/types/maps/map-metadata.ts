@@ -2,15 +2,17 @@ import { z } from "zod";
 
 export const MapRegionSchema = z.object({
   name: z.string(),
+  description: z.string(),
   terrainTypes: z.array(z.string()),
   fromX: z.number(),
   fromY: z.number(),
   toX: z.number(),
   toY: z.number(),
-  description: z.string(),
 });
 
 export const MapMetadataSchema = z.object({
+  name: z.string(),
+  description: z.string(),
   distinctRegions: z
     .array(MapRegionSchema)
     .describe(

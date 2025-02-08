@@ -5,6 +5,8 @@ import { MAP_METADATA_EXAMPLES } from "@/map-processing/map-metadata-examples.ts
 import { ch5TerrainGrid } from "@/map-processing/test-data/terrain-grid.ts";
 import generateStructuredData from "@/lib/generate-structured-data.ts";
 import getMapSetting from "@/map-processing/gen-map-metadata/get-map-setting.ts";
+import processMapImage from "@/map-processing/gen-map-metadata/process-map-image.ts";
+import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
 
 const systemMessage = `You are an advanced Fire Emblem Tactician. The map data you receive might be split into multiple “chunks” or “quadrants” for convenience, but these chunks do NOT represent true boundaries within the map. They are purely for data transmission.
 
@@ -38,23 +40,50 @@ Constraints:
 - Do not merge distinct passable areas if they are completely separated by walls or other impassable terrain.
 - For outdoor maps, pay special attention to subtle transitions in terrain. Divide regions based on natural boundaries such as changes in vegetation, water bodies, or elevation differences. Avoid grouping the entire map into one region unless there is a clear natural division. Consider features like small forests, isolated hills, or natural chokepoints that can split a large field into tactically distinct zones.
 
+Using the Map Visual Summary:
+- You will be provided with a visual summary of the map, with a general guess for the regions to give more context.
+- Use this as a starting point, but do not rely on it as the final answer. The visual summary is generated automatically and may not always be accurate. Your task is to refine the regions based on the rules and heuristics provided above.
+- You may come up with new or slightly different regions than the visual summary. This is expected and encouraged, as long as your regions follow the guidelines.
+
 ${MAP_METADATA_EXAMPLES}`;
 
-export default async function genMapMetadata(
-  mapQuadrants: SubGrid[]
-): Promise<MapMetadata> {
-  const result = await generateStructuredData({
+export default async function genMapMetadata({
+  mapQuadrants,
+  imagePath,
+}: {
+  mapQuadrants: SubGrid[];
+  imagePath: string;
+}): Promise<MapMetadata> {
+  const mapSetting = getMapSetting(mapQuadrants);
+
+  const mapVisualSummary = await processMapImage({ imagePath, mapSetting });
+
+  const mapMetadata = await generateStructuredData({
     systemMessage,
-    prompt: `Map Quadrants: ${JSON.stringify(mapQuadrants)}`,
-    schema: MapMetadataSchema.omit({ setting: true }),
+    prompt: `Map Quadrants: ${JSON.stringify(
+      mapQuadrants
+    )}\nMap Visual Summary: ${JSON.stringify(mapVisualSummary)}`,
+    schema: MapMetadataSchema.omit({
+      name: true,
+      description: true,
+      setting: true,
+    }),
   });
-  const setting = getMapSetting(mapQuadrants);
-  return { ...result, setting };
+
+  return {
+    ...mapMetadata,
+    name: mapVisualSummary.name,
+    description: mapVisualSummary.description,
+    setting: mapSetting,
+  };
 }
 
 if (import.meta.main) {
   console.time("Map Metadata Generation");
-  genMapMetadata(chunkGridIntoQuadrants(ch5TerrainGrid))
+  genMapMetadata({
+    mapQuadrants: chunkGridIntoQuadrants(ch5TerrainGrid),
+    imagePath: getPathWithinServer("assets/test/Chpt5.png"),
+  })
     .then((res) => {
       console.timeEnd("Map Metadata Generation");
       console.log(res);
