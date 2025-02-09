@@ -42,6 +42,7 @@ process-portraits:
 init-pgvector:
 	brew install pgvector || true
 	brew services restart postgresql@14
+	just run server/vector-db/seed-vectors.ts
 
 stop-pgvector:
     brew services stop postgresql@14
