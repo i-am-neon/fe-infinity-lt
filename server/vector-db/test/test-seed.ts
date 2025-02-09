@@ -1,8 +1,7 @@
-import initVectorDb from "@/vector-db/init.ts";
-import storeVector from "@/vector-db/store-vector.ts";
-import similaritySearch from "@/vector-db/similarity-search.ts";
 import createEmbedding from "@/vector-db/create-embedding.ts";
+import initVectorDb from "@/vector-db/init.ts";
 import { seedVectors } from "@/vector-db/seed-vectors.ts";
+import similaritySearch from "@/vector-db/similarity-search.ts";
 
 /**
  * Runs a full test by initializing the vector DB, generating embeddings for sample texts,
