@@ -20,7 +20,7 @@ start-client:
 # Stop all running processes
 stop:
     pkill -f "deno|pnpm dev"
-    brew services stop postgresql@14
+    just stop-pgvector
 
 clean:
     just stop
@@ -42,3 +42,6 @@ process-portraits:
 init-pgvector:
 	brew install pgvector || true
 	brew services restart postgresql@14
+
+stop-pgvector:
+    brew services stop postgresql@14

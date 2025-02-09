@@ -28,7 +28,7 @@ const sampleVectors = [
 
 /**
  * Runs a full test by initializing the vector DB, generating embeddings for sample texts,
- * storing sample vectors, and performing a similarity search using one of the sample vectors as the query.
+ * storing sample vectors, updating the seed vectors file, and performing a similarity search using one of the sample vectors as the query.
  */
 async function testAll(): Promise<void> {
   await initVectorDb();
@@ -41,6 +41,12 @@ async function testAll(): Promise<void> {
     console.log(`Stored vector: ${sample.id}`);
     vectorData.push({ ...sample, embedding });
   }
+
+  // Update seed vectors file with generated vectors
+  const seedFilePath = new URL("./seed-vectors.json", import.meta.url).pathname;
+  const seedVectors = vectorData.map(({ id, embedding, metadata }) => ({ id, embedding, metadata }));
+  await Deno.writeTextFile(seedFilePath, JSON.stringify(seedVectors, null, 2));
+  console.log("Updated seed vectors file at", seedFilePath);
 
   // Use the embedding of "sample-1" as the query vector
   const queryVector = await createEmbedding({ text: "fancy boy" });

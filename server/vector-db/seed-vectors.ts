@@ -1,36 +1,37 @@
 import storeVector from "@/vector-db/store-vector.ts";
 
-/**
- * Seeds the database with precomputed vector embeddings.
- * This script inserts sample vectors into the "vectors" table so that
- * once a user clones the repository they can run similarity searches
- * on already seeded vectors.
- */
-async function seedVectors(): Promise<void> {
-  const dimension = 1536;
+export async function seedVectors(): Promise<void> {
+  const seedFilePath = new URL("./seed-vectors.json", import.meta.url).pathname;
+  let vectorsData: Array<{
+    id: string;
+    embedding: number[];
+    metadata: Record<string, unknown>;
+  }> = [];
+  try {
+    const data = await Deno.readTextFile(seedFilePath);
+    vectorsData = JSON.parse(data);
+    console.log("Loaded seed vectors from file:", seedFilePath);
+  } catch (e) {
+    console.log("No seed vectors file found, using default sample vectors.");
+    const dimension = 1536;
+    vectorsData = [
+      {
+        id: "portrait-1",
+        embedding: new Array(dimension).fill(0.1),
+        metadata: { type: "portrait", name: "Portrait One" },
+      },
+      {
+        id: "map-1",
+        embedding: new Array(dimension).fill(0.2),
+        metadata: { type: "map", name: "Map One" },
+      },
+    ];
+  }
 
-  // Sample vector for a portrait: an array of 1536 numbers (all 0.1 for demonstration)
-  const portraitVector = {
-    id: "portrait-1",
-    embedding: new Array(dimension).fill(0.1),
-    metadata: { type: "portrait", name: "Portrait One" },
-  };
-
-  // Sample vector for a map: an array of 1536 numbers (all 0.2 for demonstration)
-  const mapVector = {
-    id: "map-1",
-    embedding: new Array(dimension).fill(0.2),
-    metadata: { type: "map", name: "Map One" },
-  };
-
-  console.log("Seeding vector:", portraitVector.id);
-  await storeVector(
-    portraitVector.id,
-    portraitVector.embedding,
-    portraitVector.metadata
-  );
-  console.log("Seeding vector:", mapVector.id);
-  await storeVector(mapVector.id, mapVector.embedding, mapVector.metadata);
+  for (const vector of vectorsData) {
+    console.log("Seeding vector:", vector.id);
+    await storeVector(vector.id, vector.embedding, vector.metadata);
+  }
 
   console.log("Seeding complete. Vectors have been stored in the database.");
 }
