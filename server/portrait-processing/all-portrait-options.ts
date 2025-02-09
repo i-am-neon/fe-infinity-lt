@@ -6,63 +6,70 @@ import { PortraitMetadata } from "@/types/portraits/portrait-metadata.ts";
     "age": "mature adult",
     "hairColor": "silver",
     "eyeColor": "red",
-    "vibe": "mysterious, regal, wise",
-    "clothing": "ornate robe",
-    "accessories": "earrings",
+    "vibe": "mysterious, regal, enigmatic",
+    "clothing": "dark robe with gold accents",
     "originalName": "2",
-    "eyeMouthOffsets": {
-      "mouthX": 0,
-      "mouthY": 0,
-      "eyeX": 0,
-      "eyeY": 0
-    }
+    "blinkingOffset": [
+      32,
+      24
+    ],
+    "smilingOffset": [
+      32,
+      40
+    ]
   },
   {
     "gender": "female",
     "age": "young adult",
     "hairColor": "purple",
     "eyeColor": "purple",
-    "vibe": "confident, adventurous, bold",
+    "vibe": "confident, bold, adventurous",
     "clothing": "red and gold outfit",
     "accessories": "earrings, headband",
     "originalName": "3",
-    "eyeMouthOffsets": {
-      "mouthX": 0,
-      "mouthY": 0,
-      "eyeX": 0,
-      "eyeY": 0
-    }
+    "blinkingOffset": [
+      24,
+      24
+    ],
+    "smilingOffset": [
+      24,
+      40
+    ]
   },
   {
     "gender": "male",
     "age": "young adult",
     "hairColor": "red",
     "eyeColor": "yellow",
-    "vibe": "mystical, confident, regal",
-    "clothing": "fur-trimmed cloak",
+    "vibe": "mysterious, confident, regal",
+    "clothing": "fur-lined cloak",
     "accessories": "earrings",
     "originalName": "1",
-    "eyeMouthOffsets": {
-      "mouthX": 0,
-      "mouthY": 0,
-      "eyeX": 0,
-      "eyeY": 0
-    }
+    "blinkingOffset": [
+      24,
+      24
+    ],
+    "smilingOffset": [
+      24,
+      40
+    ]
   },
   {
     "gender": "female",
     "age": "young adult",
     "hairColor": "teal",
     "eyeColor": "purple",
-    "vibe": "mystical, serene, elegant",
-    "clothing": "ornate dress",
+    "vibe": "mystical,elegant,calm",
+    "clothing": "white and gold outfit",
     "accessories": "headband, earrings",
     "originalName": "0",
-    "eyeMouthOffsets": {
-      "mouthX": 0,
-      "mouthY": 0,
-      "eyeX": 0,
-      "eyeY": 0
-    }
+    "blinkingOffset": [
+      24,
+      32
+    ],
+    "smilingOffset": [
+      24,
+      48
+    ]
   }
 ];

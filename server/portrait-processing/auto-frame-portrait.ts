@@ -17,10 +17,8 @@ export interface AutoFrameResult {
 export default async function autoFramePortrait(
   filePath: string
 ): Promise<AutoFrameResult> {
-  console.log("Reading file:", filePath);
   const data = await Deno.readFile(filePath);
   const image = await Image.decode(data);
-  console.log("Image decoded. Dimensions:", image.width, "x", image.height);
 
   if (image.width !== 128 || image.height !== 112) {
     throw new Error(
@@ -54,7 +52,6 @@ export default async function autoFramePortrait(
   let bestBlinkPos: [number, number] = [0, 0];
   let bestMouthPos: [number, number] = [0, 0];
 
-  console.log("Beginning sub-frame scan for blink/mouth offsets...");
   for (let x = 0; x <= 64; x += 8) {
     for (let y = 0; y <= 64; y += 8) {
       const subFrame = mainFrame.clone().crop(x, y, 32, 16);
@@ -76,19 +73,6 @@ export default async function autoFramePortrait(
       }
     }
   }
-
-  console.log(
-    "Best blink similarity:",
-    bestBlinkSimilarity.toString(),
-    "at",
-    bestBlinkPos
-  );
-  console.log(
-    "Best mouth similarity:",
-    bestMouthSimilarity.toString(),
-    "at",
-    bestMouthPos
-  );
 
   return {
     blinkingOffset: bestBlinkPos,
