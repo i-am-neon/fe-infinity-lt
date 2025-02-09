@@ -58,11 +58,6 @@ export default async function autoFramePortrait(
       const blinkSim = testSimilarity(blinkFrame, subFrame);
       const mouthSim = testSimilarity(mouthFrame, subFrame);
 
-      // Debug logs
-      console.log(
-        `(x=${x}, y=${y}): blinkSim=${blinkSim.toString()}, mouthSim=${mouthSim.toString()}`
-      );
-
       if (blinkSim < bestBlinkSimilarity) {
         bestBlinkSimilarity = blinkSim;
         bestBlinkPos = [x, y];

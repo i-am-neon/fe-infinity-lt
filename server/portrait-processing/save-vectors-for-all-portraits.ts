@@ -21,6 +21,7 @@ Accessories: ${portraitMetadata.accessories || "None"}`;
       id: shortUuid(),
       text,
       metadata: portraitMetadata,
+      vectorType: "portraits",
     });
   }
 }

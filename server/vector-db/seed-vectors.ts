@@ -12,25 +12,19 @@ export async function seedVectors(): Promise<void> {
     vectorsData = JSON.parse(data);
     console.log("Loaded seed vectors from file:", seedFilePath);
   } catch (e) {
-    console.log("No seed vectors file found, using default sample vectors.");
-    const dimension = 1536;
-    vectorsData = [
-      {
-        id: "portrait-1",
-        embedding: new Array(dimension).fill(0.1),
-        metadata: { type: "portrait", name: "Portrait One" },
-      },
-      {
-        id: "map-1",
-        embedding: new Array(dimension).fill(0.2),
-        metadata: { type: "map", name: "Map One" },
-      },
-    ];
+    console.log("No seed vectors file found, not seeding any vectors.");
+    return;
   }
 
   for (const vector of vectorsData) {
     console.log("Seeding vector:", vector.id);
-    await storeVector(vector.id, vector.embedding, vector.metadata);
+    const vectorType = vector.metadata.type === "map" ? "maps" : "portraits";
+    await storeVector({
+      id: vector.id,
+      embedding: vector.embedding,
+      metadata: vector.metadata,
+      vectorType,
+    });
   }
 
   console.log("Seeding complete. Vectors have been stored in the database.");
@@ -39,3 +33,4 @@ export async function seedVectors(): Promise<void> {
 if (import.meta.main) {
   await seedVectors();
 }
+

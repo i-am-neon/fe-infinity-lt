@@ -1,15 +1,9 @@
 import pool from "@/vector-db/connection.ts";
 
-/**
- * Performs a similarity search on the 'vectors' table, finding the closest matches
- * by cosine distance between a query embedding and stored embeddings.
- * @param embedding Query embedding to compare against.
- * @param topK Number of results to return.
- * @returns An array of objects including { id, score, metadata }.
- */
 export default async function similaritySearch(
   embedding: number[],
-  topK = 3
+  topK = 3,
+  vectorType: "maps" | "portraits"
 ): Promise<
   Array<{
     id: string;
@@ -19,13 +13,14 @@ export default async function similaritySearch(
 > {
   const client = await pool.connect();
   try {
+    const tableName = vectorType === "maps" ? "maps_vectors" : "portraits_vectors";
     const embeddingLiteral = "[" + embedding.join(",") + "]";
     const query = `
       SELECT
         id,
         1 - (embedding <#> $1::vector) AS score,
         metadata
-      FROM vectors
+      FROM ${tableName}
       ORDER BY embedding <#> $1::vector
       LIMIT $2;
     `;
@@ -41,8 +36,12 @@ export default async function similaritySearch(
 }
 
 if (import.meta.main) {
-  // Example usage
+  // Example usage for maps
   const queryEmbedding = new Array(1536).fill(0).map(() => Math.random());
-  const results = await similaritySearch(queryEmbedding, 5);
-  console.log("Similarity search results:", results);
+  const resultsMaps = await similaritySearch(queryEmbedding, 5, "maps");
+  console.log("Maps similarity search results:", resultsMaps);
+
+  // Example usage for portraits
+  const resultsPortraits = await similaritySearch(queryEmbedding, 5, "portraits");
+  console.log("Portraits similarity search results:", resultsPortraits);
 }

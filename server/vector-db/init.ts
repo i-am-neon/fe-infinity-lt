@@ -10,10 +10,17 @@ export default async function initVectorDb(): Promise<void> {
     // Enable pgvector extension
     await client.query(`CREATE EXTENSION IF NOT EXISTS vector;`);
 
-    // Create table if not exists
-    // We assume dimension=1536 for embeddings, but adjust as needed
+    // Create table for maps vectors
     await client.query(`
-      CREATE TABLE IF NOT EXISTS vectors (
+      CREATE TABLE IF NOT EXISTS maps_vectors (
+        id TEXT PRIMARY KEY,
+        embedding vector(1536) NOT NULL,
+        metadata JSONB
+      );
+    `);
+    // Create table for portraits vectors
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS portraits_vectors (
         id TEXT PRIMARY KEY,
         embedding vector(1536) NOT NULL,
         metadata JSONB

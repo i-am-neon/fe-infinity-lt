@@ -31,6 +31,7 @@ Distinct Regions: ${mapMetadata.distinctRegions
       id: shortUuid(),
       text,
       metadata: mapMetadata,
+      vectorType: "maps",
     });
   }
 }

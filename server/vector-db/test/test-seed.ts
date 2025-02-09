@@ -12,8 +12,8 @@ async function testSeedVectors(): Promise<void> {
   await seedVectors();
 
   // Use the embedding of "sample-1" as the query vector
-  const queryVector = await createEmbedding({ text: "fancy boy" });
-  const results = await similaritySearch(queryVector, 3);
+  const queryVector = await createEmbedding({ text: "mountains" });
+  const results = await similaritySearch(queryVector, 3, "maps");
   console.log("Similarity search results for sample-1:");
   console.log(results);
 }

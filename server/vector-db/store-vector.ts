@@ -6,23 +6,33 @@ import pool from "@/vector-db/connection.ts";
  * @param embedding Array of numbers, must match the dimension declared in initVectorDb.
  * @param metadata Arbitrary metadata, stored as JSON.
  */
-export default async function storeVector(
-  id: string,
-  embedding: number[],
-  metadata: Record<string, unknown>
-): Promise<void> {
+export default async function storeVector({
+  id,
+  embedding,
+  metadata,
+  vectorType,
+}: {
+  id: string;
+  embedding: number[];
+  metadata: Record<string, unknown>;
+  vectorType: "maps" | "portraits";
+}): Promise<void> {
   const client = await pool.connect();
   try {
     // Convert embedding array to Postgres vector literal format
     const embeddingLiteral = "[" + embedding.join(",") + "]";
-    const query = `
-      INSERT INTO vectors (id, embedding, metadata)
-      VALUES ($1, $2::vector, $3)
-      ON CONFLICT (id)
-      DO UPDATE SET embedding = EXCLUDED.embedding,
-                    metadata  = EXCLUDED.metadata;
-    `;
-    await client.query(query, [id, embeddingLiteral, JSON.stringify(metadata)]);
+    const tableName =
+      vectorType === "maps" ? "maps_vectors" : "portraits_vectors";
+    await client.query(
+      `
+        INSERT INTO ${tableName} (id, embedding, metadata)
+        VALUES ($1, $2::vector, $3)
+        ON CONFLICT (id)
+        DO UPDATE SET embedding = EXCLUDED.embedding,
+                      metadata  = EXCLUDED.metadata;
+      `,
+      [id, embeddingLiteral, JSON.stringify(metadata)]
+    );
   } finally {
     client.release();
   }
@@ -34,6 +44,12 @@ if (import.meta.main) {
   const sampleEmbedding = new Array(1536).fill(0).map(() => Math.random());
   const sampleMetadata = { type: "portrait", name: "Test Portrait" };
 
-  await storeVector(id, sampleEmbedding, sampleMetadata);
+  await storeVector({
+    id,
+    embedding: sampleEmbedding,
+    metadata: sampleMetadata,
+    vectorType: "portraits",
+  });
   console.log("Stored sample vector data in 'vectors' table.");
 }
+

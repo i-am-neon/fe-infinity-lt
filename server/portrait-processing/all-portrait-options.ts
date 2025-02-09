@@ -7,7 +7,7 @@ import { PortraitMetadata } from "@/types/portraits/portrait-metadata.ts";
     "hairColor": "silver",
     "eyeColor": "red",
     "vibe": "mysterious, regal, wise",
-    "clothing": "ornate dark robe",
+    "clothing": "ornate robe",
     "accessories": "earrings",
     "originalName": "2",
     "blinkingOffset": [
@@ -44,6 +44,7 @@ import { PortraitMetadata } from "@/types/portraits/portrait-metadata.ts";
     "eyeColor": "yellow",
     "vibe": "mysterious, confident, regal",
     "clothing": "fur-lined cloak",
+    "accessories": "earrings",
     "originalName": "1",
     "blinkingOffset": [
       24,
@@ -59,9 +60,9 @@ import { PortraitMetadata } from "@/types/portraits/portrait-metadata.ts";
     "age": "young adult",
     "hairColor": "green",
     "eyeColor": "purple",
-    "vibe": "mystical, serene, elegant",
+    "vibe": "mystical,elegant,calm",
     "clothing": "white and gold outfit",
-    "accessories": "headband, earrings, necklace",
+    "accessories": "headband, earrings",
     "originalName": "0",
     "blinkingOffset": [
       24,
