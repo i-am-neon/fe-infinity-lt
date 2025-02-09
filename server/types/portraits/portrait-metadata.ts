@@ -13,18 +13,15 @@ export const PortraitMetadataSchema = z.object({
   ]),
   hairColor: z.string(),
   eyeColor: z.string(),
-  vibe: z.string(),
+  vibe: z
+    .string()
+    .describe("A three-word description of the character's vibe."),
   clothing: z.string(),
-  // .describe("A three-word description of the character's vibe."),
-  eyeMouthOffsets: z.object({
-    mouthX: z.number(),
-    mouthY: z.number(),
-    eyeX: z.number(),
-    eyeY: z.number(),
-  }),
+  smilingOffset: z.tuple([z.number(), z.number()]),
+  blinkingOffset: z.tuple([z.number(), z.number()]),
   headgear: z.string().optional(),
   facialHair: z.string().optional(),
-  accessories: z.string().optional(), // e.g. eye wear, jewelry, etc.
+  accessories: z.string().optional().describe("e.g. eye wear, jewelry, etc."),
 });
 
 export type PortraitMetadata = z.infer<typeof PortraitMetadataSchema>;

@@ -4,6 +4,7 @@ import {
 } from "@/types/portraits/portrait-metadata.ts";
 import generateStructuredDataWithImage from "@/lib/generate-structured-data-with-image.ts";
 import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
+import autoFramePortrait from "@/portrait-processing/auto-frame-portrait.ts";
 
 const systemMessage = `Generate metadata for a portrait of this character.
 Guidelines:
@@ -20,7 +21,8 @@ export default async function genPortraitMetadata(
     imagePath,
     schema: PortraitMetadataSchema.omit({
       originalName: true,
-      eyeMouthOffsets: true,
+      smilingOffset: true,
+      blinkingOffset: true,
     }),
   });
 
@@ -34,15 +36,13 @@ export default async function genPortraitMetadata(
     );
   }
 
+  const { blinkingOffset, smilingOffset } = await autoFramePortrait(imagePath);
+
   return {
     ...metadata,
     originalName,
-    eyeMouthOffsets: {
-      mouthX: 0,
-      mouthY: 0,
-      eyeX: 0,
-      eyeY: 0,
-    },
+    blinkingOffset,
+    smilingOffset,
   };
 }
 

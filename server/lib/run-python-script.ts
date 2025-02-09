@@ -1,3 +1,5 @@
+import { getPathWithinLtMaker } from "@/file-io/get-path-within-lt-maker.ts";
+
 export default async function runPythonScript({
   pathToPythonScript,
   args = [],
@@ -5,10 +7,11 @@ export default async function runPythonScript({
   pathToPythonScript: string;
   args?: string[];
 }) {
-  console.log("Running Python script:", pathToPythonScript, "with args:", args);
+  const fullPath = getPathWithinLtMaker(pathToPythonScript);
+  console.log("Running Python script:", fullPath, "with args:", args);
 
   const command = new Deno.Command("python3", {
-    args: [pathToPythonScript, ...args],
+    args: [fullPath, ...args],
     stdout: "piped",
     stderr: "piped",
   });
@@ -23,9 +26,9 @@ export default async function runPythonScript({
   }
 
   if (output) {
-    console.log("Begin output for Python script:", pathToPythonScript);
+    console.log("Begin output for Python script:", fullPath);
     console.log(output);
-    console.log("End output for Python script:", pathToPythonScript);
+    console.log("End output for Python script:", fullPath);
   }
 
   return { output, error };
