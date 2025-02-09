@@ -33,3 +33,6 @@ run path:
 
 process-maps:
     just run server/map-processing/process-all-maps.ts
+
+process-portraits:
+    just run server/portrait-processing/process-all-portraits.ts
