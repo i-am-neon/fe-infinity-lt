@@ -1,25 +1,32 @@
-import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
 import { PortraitMetadata } from "@/types/portraits/portrait-metadata.ts";
+import generateAndStoreVector from "@/vector-db/generate-and-store-vector.ts";
+import shortUuid from "@/lib/short-uuid.ts";
 
-export default function writeAllPortraitOptions(
+export default async function saveVectorsForAllPortraits(
   portraitMetadatas: PortraitMetadata[]
-): void {
-  const outputPath = getPathWithinServer(
-    "portrait-processing/all-portrait-options.ts"
-  );
-  const outputContent = `import { PortraitMetadata } from "@/types/portraits/portrait-metadata.ts";
-
-  export const allPortraitOptions: PortraitMetadata[] = ${JSON.stringify(
-    portraitMetadatas,
-    null,
-    2
-  )};`;
-
-  Deno.writeTextFileSync(outputPath, outputContent);
+): Promise<void> {
+  for (const portraitMetadata of portraitMetadatas) {
+    const text = `Portrait Details:
+Original Name: ${portraitMetadata.originalName}
+Gender: ${portraitMetadata.gender}
+Age: ${portraitMetadata.age}
+Hair Color: ${portraitMetadata.hairColor}
+Eye Color: ${portraitMetadata.eyeColor}
+Vibe: ${portraitMetadata.vibe}
+Clothing: ${portraitMetadata.clothing}
+Headgear: ${portraitMetadata.headgear || "None"}
+Facial Hair: ${portraitMetadata.facialHair || "None"}
+Accessories: ${portraitMetadata.accessories || "None"}`;
+    await generateAndStoreVector({
+      id: shortUuid(),
+      text,
+      metadata: portraitMetadata,
+    });
+  }
 }
 
 if (import.meta.main) {
-  writeAllPortraitOptions([
+  await saveVectorsForAllPortraits([
     {
       gender: "male",
       age: "mature adult",
@@ -69,4 +76,3 @@ if (import.meta.main) {
     },
   ]);
 }
-

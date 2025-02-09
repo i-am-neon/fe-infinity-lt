@@ -3,6 +3,7 @@ import genPortraitMetadata from "@/portrait-processing/gen-portrait-metadata.ts"
 import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
 import writeAllPortraitOptions from "@/portrait-processing/write-all-portrait-options.ts";
 import replaceBackgroundColorInPortraits from "@/portrait-processing/replace-background-color-in-portraits.ts";
+import saveVectorsForAllPortraits from "@/portrait-processing/save-vectors-for-all-portraits.ts";
 
 export default async function processAllPortraits(): Promise<void> {
   await replaceBackgroundColorInPortraits();
@@ -20,6 +21,11 @@ export default async function processAllPortraits(): Promise<void> {
   );
   console.log(
     `✅🤖 Completed getting portrait metadata for ${portraitMetadatas.length} portraits`
+  );
+
+  await saveVectorsForAllPortraits(portraitMetadatas);
+  console.log(
+    `✅💾 Completed saving vectors for ${portraitMetadatas.length} portraits`
   );
 
   writeAllPortraitOptions(portraitMetadatas);
