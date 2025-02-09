@@ -2,7 +2,7 @@ import getAllPortraitFileNames from "@/portrait-processing/get-all-portrait-path
 import genPortraitMetadata from "@/portrait-processing/gen-portrait-metadata.ts";
 import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
 import writeAllPortraitOptions from "@/portrait-processing/write-all-portrait-options.ts";
-import replaceBackgroundColorInPortraits from "./replace-background-color-in-portraits.ts";
+import replaceBackgroundColorInPortraits from "@/portrait-processing/replace-background-color-in-portraits.ts";
 
 export default async function processAllPortraits(): Promise<void> {
   await replaceBackgroundColorInPortraits();
