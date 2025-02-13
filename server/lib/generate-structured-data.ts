@@ -5,12 +5,14 @@ import "jsr:@std/dotenv/load";
 import { z, ZodSchema } from "zod";
 
 export default async function generateStructuredData<T>({
+  fnName,
   schema,
   systemMessage,
   prompt,
   temperature = 0,
   model = "gpt-4o",
 }: {
+  fnName: string;
   schema: ZodSchema<T>;
   systemMessage: string;
   prompt?: string;
@@ -30,11 +32,15 @@ export default async function generateStructuredData<T>({
       });
       return result;
     } catch (error) {
-      console.warn(`[generateStructuredData] Attempt ${attempt} failed: ${error}`);
+      console.warn(
+        `[generateStructuredData: ${fnName}] Attempt ${attempt} failed: ${error}`
+      );
       lastError = error;
       if (attempt === 3) {
         throw new Error(
-          `[generateStructuredData] All 3 attempts failed: ${String(lastError)}`
+          `[generateStructuredData: ${fnName}] All 3 attempts failed: ${String(
+            lastError
+          )}`
         );
       }
     }
@@ -50,6 +56,7 @@ if (import.meta.main) {
   });
 
   generateStructuredData({
+    fnName: "generatePerson",
     schema,
     systemMessage: "Generate a person object",
   }).then((res) => {

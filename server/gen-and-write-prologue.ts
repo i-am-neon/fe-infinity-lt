@@ -11,8 +11,20 @@ import { stubPrologue } from "@/test-data/stub-prologue.ts";
 import { stubTilemapImportedTmx } from "@/test-data/stub-tilemap.ts";
 import { Chapter } from "@/types/chapter.ts";
 import { Game } from "@/types/game.ts";
+import { testTone } from "@/ai/test-data/initial.ts";
+import genWorldSummary from "@/ai/gen-world-summary.ts";
+import genInitialGameIdea from "@/ai/gen-initial-game-idea.ts";
+import genPrologueScript from "@/ai/gen-prologue-script.ts";
 
-export default async function genAndWritePrologue(projectName: string) {
+export default async function genAndWritePrologue({
+  projectName,
+  description,
+  tone,
+}: {
+  projectName: string;
+  description: string;
+  tone: string;
+}) {
   await removeExistingGame(projectName);
 
   // Create new project
@@ -21,10 +33,36 @@ export default async function genAndWritePrologue(projectName: string) {
   );
 
   // Generate data for initial chapter
+  const worldSummary = await genWorldSummary({
+    gameName: projectName,
+    gameDescription: description,
+    tone,
+  });
+  const initialGameIdea = await genInitialGameIdea({ worldSummary, tone });
+  const prologueScript = await genPrologueScript({
+    worldSummary,
+    initialGameIdea,
+    tone,
+  });
+  const prologueEvents: Chapter["events"] = [
+    {
+      name: "Intro",
+      trigger: "level_start",
+      level_nid: "0",
+      condition: "True",
+      commands: [],
+      only_once: false,
+      priority: 20,
+      _source: [`speak;hint;${prologueScript}`],
+    },
+    ...stubPrologue.events,
+  ];
+
   const newCharacters = [stubCharacterBozla, stubCharacterBroNeill];
 
   const newChapter: Chapter = {
     ...stubPrologue,
+    events: prologueEvents,
     newCharacters,
     tilemap: stubTilemapImportedTmx,
   };
@@ -47,6 +85,7 @@ export default async function genAndWritePrologue(projectName: string) {
     description: `Project ${projectName} description here...`,
     chapters: [newChapter],
     characters: newCharacters,
+    tone: testTone,
   };
 
   insertGame(newGame);

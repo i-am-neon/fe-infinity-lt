@@ -97,20 +97,6 @@ export const stubPrologue: Chapter = {
   newCharacters: [],
   events: [
     {
-      name: "Intro",
-      trigger: "level_start",
-      level_nid: "0",
-      condition: "True",
-      commands: [],
-      only_once: false,
-      priority: 20,
-      _source: [
-        "add_portrait;Eirika;Right",
-        "speak;Eirika;Welcome to FE Infinity!",
-        "set_current_hp;Lute;1",
-      ],
-    },
-    {
       name: "DeathBroNeill",
       trigger: "unit_death",
       level_nid: "0",
