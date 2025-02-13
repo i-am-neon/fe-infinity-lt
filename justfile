@@ -28,6 +28,7 @@ clean:
     just stop
     find lt-maker-fork -maxdepth 1 -type d -name "*.ltproj" ! -name "default.ltproj" -exec rm -rf {} +
     rm -f server/db/local.db
+    rm -rf server/logs/*
     deno run --allow-all server/game-engine-io/clean-saves.ts
 
 # Run a script in the server directory, passing in the relative path from the root directory
