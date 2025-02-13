@@ -1,6 +1,5 @@
 import { join } from "jsr:@std/path";
 import { ensureDirSync } from "jsr:@std/fs";
-import { format } from "jsr:@std/datetime";
 
 type LogLevel = "debug" | "info" | "warn" | "error";
 
@@ -17,13 +16,14 @@ export class Logger {
 
   constructor(projectName: string) {
     this.projectName = projectName;
-    this.baseLogDir = join(Deno.cwd(), "server", "logs", this.projectName);
+    this.baseLogDir = join(Deno.cwd(), "server", "logs");
     ensureDirSync(this.baseLogDir);
-
-    const timestamp = format(new Date(), "yyyy-MM-dd_HH-mm-ss");
-    const logFilePath = join(this.baseLogDir, `${timestamp}.log`);
-
-    this.stream = Deno.openSync(logFilePath, { write: true, create: true });
+    const logFilePath = join(this.baseLogDir, `${projectName}.log`);
+    this.stream = Deno.openSync(logFilePath, {
+      write: true,
+      create: true,
+      append: true,
+    });
   }
 
   private writeLog({ level, message, metadata }: LogOptions) {
