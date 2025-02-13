@@ -21,7 +21,7 @@ start-client:
 stop:
 	-pkill -f "deno"
 	-pkill -f "pnpm dev"
-	-pkill -f "node .* next"
+	-pkill -f "next dev"
 	just stop-pgvector
 
 clean:
