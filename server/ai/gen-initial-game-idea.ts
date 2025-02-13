@@ -21,7 +21,10 @@ In your response, include:
 - A narrative backstory that sets the stage for the game.
 - A list of character ideas for the characters that will appear in the prologue. Use the format specified in the CharacterIdea schema. You must include at least 2 characters.
 - Potential plot directions or twists that could define the prologue.
-- Any additional notes or details that would be important for establishing the tone and setup of the game.`;
+- Any additional notes or details that would be important for establishing the tone and setup of the game.
+
+Requirements that MUST be met:
+- You must include at least 2 character ideas. Anything less will result in an error.`;
 
   const prompt = `World Summary: ${JSON.stringify(
     worldSummary,
