@@ -17,6 +17,7 @@ import genInitialGameIdea from "@/ai/gen-initial-game-idea.ts";
 import genPrologueScript from "@/ai/gen-prologue-script.ts";
 import breakTextIntoGameLines from "@/lib/break-text-into-game-lines.ts";
 import { getLogger } from "@/lib/logger.ts";
+import choosePortrait from "@/ai/choose-portrait.ts";
 
 export default async function genAndWritePrologue({
   projectName,
@@ -41,6 +42,12 @@ export default async function genAndWritePrologue({
     tone,
   });
   const initialGameIdea = await genInitialGameIdea({ worldSummary, tone });
+  const characterPortraits = [];
+
+  for (const characterIdea of initialGameIdea.characterIdeas) {
+    const portrait = await choosePortrait(characterIdea);
+    characterPortraits.push(portrait);
+  }
   const prologueScript = await genPrologueScript({
     worldSummary,
     initialGameIdea,
