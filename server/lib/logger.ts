@@ -2,7 +2,7 @@ import { join } from "jsr:@std/path";
 import { ensureDirSync } from "jsr:@std/fs";
 import { format } from "jsr:@std/datetime";
 
-type LogLevel = "debug" | "info" | "error";
+type LogLevel = "debug" | "info" | "warn" | "error";
 
 interface LogOptions {
   level: LogLevel;
@@ -10,7 +10,7 @@ interface LogOptions {
   metadata?: Record<string, unknown>;
 }
 
-class Logger {
+export class Logger {
   private baseLogDir: string;
   private projectName: string;
   private stream: Deno.FsFile | null = null;
@@ -44,6 +44,9 @@ class Logger {
   }
   info(message: string, metadata?: Record<string, unknown>) {
     this.writeLog({ level: "info", message, metadata });
+  }
+  warn(message: string, metadata?: Record<string, unknown>) {
+    this.writeLog({ level: "warn", message, metadata });
   }
   error(message: string, metadata?: Record<string, unknown>) {
     this.writeLog({ level: "error", message, metadata });
@@ -82,3 +85,4 @@ if (import.meta.main) {
   logger.close();
   console.log("Finished logging in demo-project logger.");
 }
+

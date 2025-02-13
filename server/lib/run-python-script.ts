@@ -1,4 +1,5 @@
 import { getPathWithinLtMaker } from "@/file-io/get-path-within-lt-maker.ts";
+import { getCurrentLogger } from "@/lib/current-logger.ts";
 
 export default async function runPythonScript({
   pathToPythonScript,
@@ -7,8 +8,11 @@ export default async function runPythonScript({
   pathToPythonScript: string;
   args?: string[];
 }) {
-const fullPath = pathToPythonScript.startsWith("/") ? pathToPythonScript : getPathWithinLtMaker(pathToPythonScript);
-  console.log("Running Python script:", fullPath, "with args:", args);
+  const fullPath = pathToPythonScript.startsWith("/")
+    ? pathToPythonScript
+    : getPathWithinLtMaker(pathToPythonScript);
+  const logger = getCurrentLogger();
+  logger.debug("Running Python script", { path: fullPath, args });
 
   const command = new Deno.Command("python3", {
     args: [fullPath, ...args],
@@ -22,13 +26,11 @@ const fullPath = pathToPythonScript.startsWith("/") ? pathToPythonScript : getPa
   const error = new TextDecoder().decode(stderr);
 
   if (error) {
-    console.error("Error:", error);
+    logger.error("Error running Python script", { path: fullPath, error });
   }
 
   if (output) {
-    console.log("Begin output for Python script:", fullPath);
-    console.log(output);
-    console.log("End output for Python script:", fullPath);
+    logger.debug("Output for Python script", { path: fullPath, output });
   }
 
   return { output, error };
@@ -44,3 +46,4 @@ if (import.meta.main) {
 
   await runPythonScript({ pathToPythonScript: scriptPath, args: scriptArgs });
 }
+

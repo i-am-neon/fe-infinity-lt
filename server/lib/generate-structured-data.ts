@@ -3,6 +3,7 @@ import { OpenAIChatModelId } from "@ai-sdk/openai/internal";
 import { generateObject } from "ai";
 import "jsr:@std/dotenv/load";
 import { z, ZodSchema } from "zod";
+import { getCurrentLogger } from "@/lib/current-logger.ts";
 
 export default async function generateStructuredData<T>({
   fnName,
@@ -19,6 +20,7 @@ export default async function generateStructuredData<T>({
   temperature?: number;
   model?: OpenAIChatModelId;
 }): Promise<T> {
+  const logger = getCurrentLogger();
   let lastError: unknown;
 
   for (let attempt = 1; attempt <= 3; attempt++) {
@@ -30,18 +32,23 @@ export default async function generateStructuredData<T>({
         prompt: prompt || "",
         temperature,
       });
+      logger.debug(
+        `[generateStructuredData: ${fnName}] Attempt ${attempt} succeeded`,
+        { result }
+      );
       return result;
     } catch (error) {
-      console.warn(
-        `[generateStructuredData: ${fnName}] Attempt ${attempt} failed: ${error}`
+      logger.warn(
+        `[generateStructuredData: ${fnName}] Attempt ${attempt} failed`,
+        { error }
       );
       lastError = error;
       if (attempt === 3) {
-        throw new Error(
-          `[generateStructuredData: ${fnName}] All 3 attempts failed: ${String(
-            lastError
-          )}`
-        );
+        const message = `[generateStructuredData: ${fnName}] All 3 attempts failed: ${String(
+          lastError
+        )}`;
+        logger.error(message);
+        throw new Error(message);
       }
     }
   }
@@ -63,3 +70,4 @@ if (import.meta.main) {
     console.log(res);
   });
 }
+

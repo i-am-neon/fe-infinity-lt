@@ -28,9 +28,11 @@ clean:
     just stop
     find lt-maker-fork -maxdepth 1 -type d -name "*.ltproj" ! -name "default.ltproj" -exec rm -rf {} +
     rm -f server/db/local.db
-    rm -rf server/logs/*
+    just clean-logs
     deno run --allow-all server/game-engine-io/clean-saves.ts
 
+clean-logs:
+    rm -rf server/logs/*
 # Run a script in the server directory, passing in the relative path from the root directory
 run path:
     source /opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh && conda activate fe-i-lt && cd server && set -a; source .env; set +a; cd .. && deno run --allow-all --config server/deno.json "{{path}}"
