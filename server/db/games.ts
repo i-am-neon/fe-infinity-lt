@@ -11,7 +11,8 @@ type GameRow = [
   description: string,
   tone: string,
   chaptersJson: string,
-  charactersJson: string
+  charactersJson: string,
+  usedPortraitsJson: string
 ];
 
 /**
@@ -23,8 +24,8 @@ export function insertGame(game: Game): void {
   const charactersJson = JSON.stringify(game.characters);
   db.query(
     `
-      INSERT OR REPLACE INTO games (nid, title, directory, description, tone, chapters, characters)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      INSERT OR REPLACE INTO games (nid, title, directory, description, tone, chapters, characters, used_portraits)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `,
     [
       game.nid,
@@ -34,6 +35,7 @@ export function insertGame(game: Game): void {
       game.tone,
       chaptersJson,
       charactersJson,
+      JSON.stringify(game.usedPortraits || []),
     ]
   );
 }
@@ -43,7 +45,7 @@ export function insertGame(game: Game): void {
  */
 export function getGameByNid(nid: string): Game | null {
   const query = db.query<GameRow>(
-    "SELECT nid, title, directory, description, tone, chapters, characters FROM games WHERE nid = ? LIMIT 1",
+    "SELECT nid, title, directory, description, tone, chapters, characters, used_portraits FROM games WHERE nid = ? LIMIT 1",
     [nid]
   );
   if (query.length === 0) {
@@ -57,6 +59,7 @@ export function getGameByNid(nid: string): Game | null {
     dbTone,
     dbChaptersJson,
     dbCharactersJson,
+    dbUsedPortraitsJson,
   ] = query[0] as GameRow;
   let chapters = [];
   let characters = [];
@@ -70,6 +73,14 @@ export function getGameByNid(nid: string): Game | null {
   } catch {
     // If JSON parse fails, keep characters as empty array
   }
+  let usedPortraits: string[] = [];
+  try {
+    const parsed = JSON.parse(dbUsedPortraitsJson) || [];
+    usedPortraits = Array.isArray(parsed) ? parsed : [];
+  } catch {
+    usedPortraits = [];
+  }
+
   return {
     nid: dbNid,
     title: dbTitle,
@@ -78,6 +89,7 @@ export function getGameByNid(nid: string): Game | null {
     tone: dbTone,
     chapters,
     characters,
+    usedPortraits,
   };
 }
 
@@ -86,7 +98,7 @@ export function getGameByNid(nid: string): Game | null {
  */
 export function getAllGames(): Game[] {
   const query = db.query<GameRow>(
-    "SELECT nid, title, directory, description, chapters, characters FROM games"
+    "SELECT nid, title, directory, description, tone, chapters, characters, used_portraits FROM games"
   );
   const games: Game[] = [];
   for (const row of query) {
@@ -95,9 +107,11 @@ export function getAllGames(): Game[] {
       dbTitle,
       dbDirectory,
       dbDescription,
+      dbTone,
       dbChaptersJson,
       dbCharactersJson,
-    ] = row as [string, string, string, string, string, string];
+      dbUsedPortraitsJson,
+    ] = row as [string, string, string, string, string, string, string, string];
     let chapters = [];
     let characters = [];
     try {
@@ -110,13 +124,23 @@ export function getAllGames(): Game[] {
     } catch {
       // If JSON parse fails, keep characters as empty array
     }
+    let usedPortraits: string[] = [];
+    try {
+      const parsed = JSON.parse(dbUsedPortraitsJson) || [];
+      usedPortraits = Array.isArray(parsed) ? parsed : [];
+    } catch {
+      usedPortraits = [];
+    }
+
     games.push({
       nid: dbNid,
       title: dbTitle,
       directory: dbDirectory,
       description: dbDescription,
+      tone: dbTone,
       chapters,
       characters,
+      usedPortraits,
     });
   }
   return games;
@@ -140,10 +164,12 @@ if (import.meta.main) {
     const exampleGame: Game = {
       nid: "example-game",
       title: "Example Only Games Table",
+      tone: "example",
       directory: "_example.ltproj",
       description: "Just an example to test storing games.",
       chapters: [],
       characters: [],
+      usedPortraits: [],
     };
     insertGame(exampleGame);
 

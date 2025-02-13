@@ -13,7 +13,8 @@ export function initializeDatabase() {
       description TEXT,
       tone TEXT,
       chapters TEXT,
-      characters TEXT
+      characters TEXT,
+      used_portraits TEXT
     )
   `);
 }

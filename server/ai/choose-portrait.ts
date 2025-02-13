@@ -29,9 +29,13 @@ const decideSchema = z.object({
   chosenId: z.enum(["A", "B", "C"]),
 });
 
-export default async function choosePortrait(
-  characterIdea: CharacterIdea
-): Promise<string> {
+export default async function choosePortrait({
+  characterIdea,
+  usedPortraits,
+}: {
+  characterIdea: CharacterIdea;
+  usedPortraits: string[];
+}): Promise<string> {
   const start = Date.now();
   const logger = getCurrentLogger();
 
@@ -50,15 +54,24 @@ Given the user's Fire Emblem character idea, provide a brief single-line string 
 
   // 2) Embed and run similarity search
   const embedding = await createEmbedding({ text: searchQuery });
-  const topResults = await similaritySearch(embedding, 3, "portraits");
+  const topResults = await similaritySearch(embedding, 20, "portraits");
   if (!topResults.length) {
     logger.warn("No portrait results found for search query", { searchQuery });
     throw new Error("No portrait matches found.");
   }
 
+  let filteredResults = topResults.filter((res) => {
+    const md = res.metadata as { originalName?: string };
+    return md.originalName && !usedPortraits.includes(md.originalName);
+  });
+  if (!filteredResults.length) {
+    logger.warn("No unused portraits remain", { searchQuery });
+    throw new Error("No unused portrait matches found.");
+  }
+
   // 3) Decide among top results with second LLM call
   // Create ephemeral IDs A, B, C
-  const ephemeralOptions: EphemeralPortraitOption[] = topResults.map(
+  const ephemeralOptions: EphemeralPortraitOption[] = filteredResults.map(
     (res, idx) => {
       const ephemeralId = idx === 0 ? "A" : idx === 1 ? "B" : "C";
       const md = res.metadata as Record<string, unknown>;
@@ -79,7 +92,6 @@ Given the user's Fire Emblem character idea, provide a brief single-line string 
     }
   );
 
-  // Construct system message
   const systemMessageForDecision = `You are a portrait decider for a Fire Emblem fangame. We have:
 - The character idea describing the unit to be matched.
 - An array of up to 3 portrait options, each with ephemeralId and some attributes.
@@ -108,13 +120,19 @@ Return a JSON object { "chosenId": "A" } or "B" or "C" with no quotes around the
     throw new Error("LLM returned an invalid ephemeral ID");
   }
 
-  logger.info("Chose portrait", { chosenPortrait: chosen, elapsedTimeMs: Date.now() - start });
-  return chosen.originalName;
+  logger.info("Chose portrait for character", {
+    characterIdea,
+    chosenPortrait: chosen,
+    elapsedTimeMs: Date.now() - start,
+  });
+  const chosenPortraitName = chosen.originalName;
+
+  return chosenPortraitName;
 }
 
 if (import.meta.main) {
   // Quick test
-  choosePortrait(testCharIdeaThorne)
+  choosePortrait({ characterIdea: testCharIdeaThorne, usedPortraits: [] })
     .then((res) => {
       console.log("Chosen portrait:", res);
     })
@@ -122,3 +140,4 @@ if (import.meta.main) {
       console.error("Error choosing portrait:", err);
     });
 }
+

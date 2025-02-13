@@ -9,4 +9,5 @@ export interface Game {
   tone: string;
   chapters: Chapter[];
   characters: Character[];
+  usedPortraits?: string[];
 }

@@ -1,7 +1,17 @@
-import { insertGame } from "@/db/games.ts";
+import choosePortrait from "@/ai/choose-portrait.ts";
+import genInitialGameIdea from "@/ai/gen-initial-game-idea.ts";
+import genPrologueScript from "@/ai/gen-prologue-script.ts";
+import genWorldSummary from "@/ai/gen-world-summary.ts";
+import {
+  testGameDescription,
+  testGameName,
+  testTone,
+} from "@/ai/test-data/initial.ts";
+import { getGameByNid, insertGame } from "@/db/games.ts";
 import initializeProject from "@/game-engine-io/initialize-project.ts";
 import writeChapter from "@/game-engine-io/write-chapter/write-chapter.ts";
 import writeStubChapter from "@/game-engine-io/write-chapter/write-stub-chapter.ts";
+import breakTextIntoGameLines from "@/lib/break-text-into-game-lines.ts";
 import removeExistingGame from "@/lib/remove-existing-game.ts";
 import {
   stubCharacterBozla,
@@ -11,13 +21,6 @@ import { stubPrologue } from "@/test-data/stub-prologue.ts";
 import { stubTilemapImportedTmx } from "@/test-data/stub-tilemap.ts";
 import { Chapter } from "@/types/chapter.ts";
 import { Game } from "@/types/game.ts";
-import { testTone } from "@/ai/test-data/initial.ts";
-import genWorldSummary from "@/ai/gen-world-summary.ts";
-import genInitialGameIdea from "@/ai/gen-initial-game-idea.ts";
-import genPrologueScript from "@/ai/gen-prologue-script.ts";
-import breakTextIntoGameLines from "@/lib/break-text-into-game-lines.ts";
-import { getLogger } from "@/lib/logger.ts";
-import choosePortrait from "@/ai/choose-portrait.ts";
 
 export default async function genAndWritePrologue({
   projectName,
@@ -42,12 +45,17 @@ export default async function genAndWritePrologue({
     tone,
   });
   const initialGameIdea = await genInitialGameIdea({ worldSummary, tone });
-  const characterPortraits = [];
 
+  // Since we're creating the prologue, no portraits have been used
+  const usedPortraits: string[] = [];
   for (const characterIdea of initialGameIdea.characterIdeas) {
-    const portrait = await choosePortrait(characterIdea);
-    characterPortraits.push(portrait);
+    const chosenPortraitName = await choosePortrait({
+      characterIdea,
+      usedPortraits,
+    });
+    usedPortraits.push(chosenPortraitName);
   }
+
   const prologueScript = await genPrologueScript({
     worldSummary,
     initialGameIdea,
@@ -99,10 +107,19 @@ export default async function genAndWritePrologue({
     chapters: [newChapter],
     characters: newCharacters,
     tone: testTone,
+    usedPortraits,
   };
 
   insertGame(newGame);
 
   return { projectNameEndingInDotLtProj, gameNid };
+}
+
+if (import.meta.main) {
+  await genAndWritePrologue({
+    projectName: testGameName,
+    description: testGameDescription,
+    tone: testTone,
+  });
 }
 
