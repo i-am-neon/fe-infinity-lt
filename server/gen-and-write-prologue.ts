@@ -7,7 +7,7 @@ import {
   testGameName,
   testTone,
 } from "@/ai/test-data/initial.ts";
-import { getGameByNid, insertGame } from "@/db/games.ts";
+import { insertGame } from "@/db/games.ts";
 import initializeProject from "@/game-engine-io/initialize-project.ts";
 import writeChapter from "@/game-engine-io/write-chapter/write-chapter.ts";
 import writeStubChapter from "@/game-engine-io/write-chapter/write-stub-chapter.ts";

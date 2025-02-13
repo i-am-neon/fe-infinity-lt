@@ -1,5 +1,6 @@
 import { db } from "@/db/connection.ts";
 import { Game } from "@/types/game.ts";
+import { initializeDatabase } from "@/db/init.ts";
 
 /**
  * This file sets up a local SQLite database in Deno and uses it to store Game objects.
@@ -158,22 +159,21 @@ export function removeGameByNid(nid: string): void {
  * Run with: deno run --allow-read --allow-write server/db/games.ts
  */
 if (import.meta.main) {
-  import("@/db/init.ts").then(async (init) => {
-    init.initializeDatabase();
+  initializeDatabase();
 
-    const exampleGame: Game = {
-      nid: "example-game",
-      title: "Example Only Games Table",
-      tone: "example",
-      directory: "_example.ltproj",
-      description: "Just an example to test storing games.",
-      chapters: [],
-      characters: [],
-      usedPortraits: [],
-    };
-    insertGame(exampleGame);
+  const exampleGame: Game = {
+    nid: "example-game",
+    title: "Example Only Games Table",
+    tone: "example",
+    directory: "_example.ltproj",
+    description: "Just an example to test storing games.",
+    chapters: [],
+    characters: [],
+    usedPortraits: [],
+  };
+  insertGame(exampleGame);
 
-    const retrieved = getGameByNid("example-game");
-    console.log("Retrieved Game:", retrieved);
-  });
+  const retrieved = getGameByNid("example-game");
+  console.log("Retrieved Game:", retrieved);
 }
+

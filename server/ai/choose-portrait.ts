@@ -60,7 +60,7 @@ Given the user's Fire Emblem character idea, provide a brief single-line string 
     throw new Error("No portrait matches found.");
   }
 
-  let filteredResults = topResults.filter((res) => {
+  const filteredResults = topResults.filter((res) => {
     const md = res.metadata as { originalName?: string };
     return md.originalName && !usedPortraits.includes(md.originalName);
   });
