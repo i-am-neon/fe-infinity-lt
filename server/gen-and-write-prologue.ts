@@ -46,8 +46,8 @@ export default async function genAndWritePrologue({
   });
   const initialGameIdea = await genInitialGameIdea({ worldSummary, tone });
 
-  // Since we're creating the prologue, no portraits have been used
-  const usedPortraits: string[] = [];
+  // Choose Portraits
+  const usedPortraits: string[] = []; // Since we're creating the prologue, no portraits have been used
   for (const characterIdea of initialGameIdea.characterIdeas) {
     const chosenPortraitName = await choosePortrait({
       characterIdea,
