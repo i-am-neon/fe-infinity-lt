@@ -1,7 +1,7 @@
 lt-maker-fork/*
 .env
 webpack/*
-
+seed-vectors.json
 
 # Default fallback .repo_ignore content
 **/node_modules/
