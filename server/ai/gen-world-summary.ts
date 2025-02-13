@@ -1,7 +1,7 @@
 import { WorldSummary, worldSummarySchema } from "@/ai/types/world-summary.ts";
 import generateStructuredData from "@/lib/generate-structured-data.ts";
 
-export default async function genWorldSummary({
+export default function genWorldSummary({
   gameName,
   gameDescription,
 }: {
@@ -32,7 +32,7 @@ Notes:
   - The only available mounts are horses, pegasi, and wyverns
 `;
 
-  return await generateStructuredData({
+  return generateStructuredData<WorldSummary>({
     systemMessage,
     prompt: `Game Name: ${gameName}\nGame Description: ${gameDescription}`,
     schema: worldSummarySchema,
