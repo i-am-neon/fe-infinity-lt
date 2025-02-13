@@ -17,15 +17,30 @@ export default async function generateStructuredData<T>({
   temperature?: number;
   model?: OpenAIChatModelId;
 }): Promise<T> {
-  const { object: result } = await generateObject({
-    model: openai(model),
-    schema,
-    system: systemMessage,
-    prompt: prompt || "",
-    temperature,
-  });
+  let lastError: unknown;
 
-  return result;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const { object: result } = await generateObject({
+        model: openai(model),
+        schema,
+        system: systemMessage,
+        prompt: prompt || "",
+        temperature,
+      });
+      return result;
+    } catch (error) {
+      console.warn(`[generateStructuredData] Attempt ${attempt} failed: ${error}`);
+      lastError = error;
+      if (attempt === 3) {
+        throw new Error(
+          `[generateStructuredData] All 3 attempts failed: ${String(lastError)}`
+        );
+      }
+    }
+  }
+
+  throw new Error("[generateStructuredData] This should never happen.");
 }
 
 if (import.meta.main) {
