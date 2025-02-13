@@ -1,5 +1,6 @@
 import genAndWritePrologue from "../gen-and-write-prologue.ts";
 import runGame from "@/run-game.ts";
+import { insertGame } from "@/db/games.ts";
 
 export async function handleCreateGame(req: Request): Promise<Response> {
   try {
@@ -17,6 +18,14 @@ export async function handleCreateGame(req: Request): Promise<Response> {
     const { gameNid, projectNameEndingInDotLtProj } = await genAndWritePrologue(
       body.title, body.description
     );
+    insertGame({
+      nid: gameNid,
+      title: body.title,
+      directory: projectNameEndingInDotLtProj,
+      description: body.description,
+      chapters: [],
+      characters: [],
+    });
 
     // Run game without waiting
     void runGame(projectNameEndingInDotLtProj);
