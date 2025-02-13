@@ -1,5 +1,6 @@
 import { join } from "jsr:@std/path";
 import { ensureDirSync } from "jsr:@std/fs";
+import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
 
 type LogLevel = "debug" | "info" | "warn" | "error";
 
@@ -16,7 +17,7 @@ export class Logger {
 
   constructor(projectName: string) {
     this.projectName = projectName;
-    this.baseLogDir = join(Deno.cwd(), "server", "logs");
+    this.baseLogDir = getPathWithinServer("logs");
     ensureDirSync(this.baseLogDir);
     const logFilePath = join(this.baseLogDir, `${projectName}.log`);
     this.stream = Deno.openSync(logFilePath, {

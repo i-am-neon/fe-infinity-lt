@@ -19,7 +19,7 @@ Your task is to craft a detailed story idea for the prologue chapter of a Fire E
 Take into account the world setting, geography, history, and factions to create a compelling narrative start.
 In your response, include:
 - A narrative backstory that sets the stage for the game.
-- A list of character ideas for the characters that will appear in the prologue. Use the format specified in the CharacterIdea schema.
+- A list of character ideas for the characters that will appear in the prologue. Use the format specified in the CharacterIdea schema. You must include at least 2 characters.
 - Potential plot directions or twists that could define the prologue.
 - Any additional notes or details that would be important for establishing the tone and setup of the game.`;
 
