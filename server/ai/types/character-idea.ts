@@ -1,11 +1,15 @@
 import { z } from "zod";
 
 export const CharacterIdeaSchema = z.object({
-  name: z
+  firstName: z
     .string()
-    .min(
-      1,
-      "Must be first name only and contain no spaces. That means no last names or titles ('King', 'Sir', etc are not allowed, just the first name.)."
+    .describe(
+      "The character's first name or nickname. Must be unique. Avoid these common names and variations on them: Eliara, Liora, Gareth, Lyra"
+    ),
+  fullName: z
+    .string()
+    .describe(
+      "The character's full name, including title if any, given first name (which may be different from the firstName field which can also be their nickname), and last name."
     ),
   gender: z.union([z.literal("male"), z.literal("female")]),
   personality: z
@@ -19,9 +23,9 @@ export const CharacterIdeaSchema = z.object({
   ]),
   backstory: z.string().min(20, "Must be 4-5 sentences"),
   firstSeenAs: z.union([
-    z.literal("ally"),
-    z.literal("allied NPC"),
-    z.literal("enemy non-boss"),
+    z.literal("ally").describe("Blue unit"),
+    z.literal("allied NPC").describe("Green unit"),
+    z.literal("enemy non-boss").describe("Red unit"),
     z.literal("boss"),
   ]),
   physicalDescription: z
@@ -40,3 +44,4 @@ export const CharacterIdeaSchema = z.object({
 });
 
 export type CharacterIdea = z.infer<typeof CharacterIdeaSchema>;
+

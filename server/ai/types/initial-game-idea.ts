@@ -9,6 +9,7 @@ export const initialGameIdeaSchema = z.object({
     ),
   characterIdeas: z
     .array(CharacterIdeaSchema)
+    .min(2)
     .describe(
       "A list of character ideas for the characters that will appear in the prologue. This should NOT include a boss and should be 2-4+ characters. These are the only playable characters that will be available in the prologue."
     ),
