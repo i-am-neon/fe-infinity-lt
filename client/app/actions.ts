@@ -6,8 +6,13 @@ export async function ping() {
   await apiCall("ping");
 }
 
-export async function createGame() {
-  await apiCall("create-game", {
+export async function createGame(): Promise<{
+  success: boolean;
+  projectNameEndingInDotLtProj?: string;
+  gameNid?: string;
+  error?: string;
+}> {
+  return apiCall("create-game", {
     body: { projectName: "test" },
     method: "POST",
   });
@@ -50,4 +55,3 @@ export async function deleteGame(nid: string, directory: string) {
     body: { nid, directory },
   });
 }
-

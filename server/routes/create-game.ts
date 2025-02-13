@@ -18,8 +18,8 @@ export async function handleCreateGame(req: Request): Promise<Response> {
       body.projectName
     );
 
-    // Run game
-    await runGame(projectNameEndingInDotLtProj);
+    // Run game without waiting
+    void runGame(projectNameEndingInDotLtProj);
 
     const responseBody = JSON.stringify({
       success: true,
@@ -50,4 +50,3 @@ export async function handleCreateGame(req: Request): Promise<Response> {
     }
   }
 }
-

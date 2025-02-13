@@ -7,7 +7,7 @@ export default async function runPythonScript({
   pathToPythonScript: string;
   args?: string[];
 }) {
-  const fullPath = getPathWithinLtMaker(pathToPythonScript);
+const fullPath = pathToPythonScript.startsWith("/") ? pathToPythonScript : getPathWithinLtMaker(pathToPythonScript);
   console.log("Running Python script:", fullPath, "with args:", args);
 
   const command = new Deno.Command("python3", {
@@ -44,4 +44,3 @@ if (import.meta.main) {
 
   await runPythonScript({ pathToPythonScript: scriptPath, args: scriptArgs });
 }
-
