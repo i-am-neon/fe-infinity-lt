@@ -31,14 +31,16 @@ export default function Home() {
     const title = parts[0] ? parts[0].trim() : "";
     const description = parts[1] ? parts[1].trim() : "";
     if (!title || !description) {
-      console.error("Invalid game idea format. Expected 'Title - Description'.");
+      console.error(
+        "Invalid game idea format. Expected 'Title - Description'."
+      );
       return;
     }
     setIsCreating(true);
     try {
       const res = await createGame({ title, description });
       if (res.success && res.gameNid) {
-        router.push(`/games/${res.gameNid}`);
+        router.push(`/games/${res.gameNid}?new=true`);
       }
     } finally {
       setIsCreating(false);
@@ -63,7 +65,10 @@ export default function Home() {
               <DialogTitle>Select a Game Idea</DialogTitle>
             </DialogHeader>
             <div>
-              <GameIdeaSelector onChange={(val) => setGameIdea(val)} />
+              <GameIdeaSelector
+                onChange={(val) => setGameIdea(val)}
+                selected={gameIdea}
+              />
             </div>
             <DialogFooter>
               <Button variant="secondary" onClick={() => setDialogOpen(false)}>
