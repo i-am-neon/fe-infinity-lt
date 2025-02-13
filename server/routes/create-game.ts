@@ -1,6 +1,7 @@
 import genAndWritePrologue from "../gen-and-write-prologue.ts";
 import runGame from "@/run-game.ts";
 import { insertGame } from "@/db/games.ts";
+import { getCurrentLogger } from "@/lib/current-logger.ts";
 
 export async function handleCreateGame(req: Request): Promise<Response> {
   try {
@@ -51,7 +52,12 @@ export async function handleCreateGame(req: Request): Promise<Response> {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error: unknown) {
+    const logger = getCurrentLogger();
     if (error instanceof Error) {
+      logger.error("Error creating game", {
+        error: error.message,
+        error1: error,
+      });
       return new Response(
         JSON.stringify({ success: false, error: error.message }),
         {
@@ -71,3 +77,4 @@ export async function handleCreateGame(req: Request): Promise<Response> {
     }
   }
 }
+
