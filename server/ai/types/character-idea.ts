@@ -23,9 +23,9 @@ export const CharacterIdeaSchema = z.object({
   ]),
   backstory: z.string().min(20, "Must be 4-5 sentences"),
   firstSeenAs: z.union([
-    z.literal("ally").describe("Blue unit"),
-    z.literal("allied NPC").describe("Green unit"),
-    z.literal("enemy non-boss").describe("Red unit"),
+    z.literal("ally"),
+    z.literal("allied NPC"),
+    z.literal("enemy non-boss"),
     z.literal("boss"),
   ]),
   physicalDescription: z

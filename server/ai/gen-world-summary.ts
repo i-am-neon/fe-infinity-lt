@@ -1,5 +1,10 @@
 import { WorldSummary, worldSummarySchema } from "@/ai/types/world-summary.ts";
 import generateStructuredData from "@/lib/generate-structured-data.ts";
+import {
+  testGameDescription,
+  testGameName,
+  testTone,
+} from "@/ai/test-data/initial.ts";
 
 export default function genWorldSummary({
   gameName,
@@ -46,10 +51,9 @@ Game Tone: ${tone}`,
 
 if (import.meta.main) {
   genWorldSummary({
-    gameName: "Blood and Blight",
-    gameDescription:
-      "A kingdom ravaged by a mysterious plague fights for survival, but the cure is as dangerous as the disease.",
-    tone: "dark, serious",
+    gameName: testGameName,
+    gameDescription: testGameDescription,
+    tone: testTone,
   }).then((summary) => console.log(JSON.stringify(summary, null, 2)));
 }
 
