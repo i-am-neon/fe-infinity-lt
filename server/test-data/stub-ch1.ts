@@ -1,5 +1,5 @@
 import { Level } from "@/types/level.ts";
-import { Event } from "@/types/event.ts";
+import { Event } from "../types/events/event.ts";
 
 export const stubCh1Level: Level = {
   nid: "1",

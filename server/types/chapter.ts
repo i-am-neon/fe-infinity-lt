@@ -1,5 +1,5 @@
 import { Level } from "@/types/level.ts";
-import { Event } from "@/types/event.ts";
+import { Event } from "./events/event.ts";
 import { Character } from "@/types/character.ts";
 import { Tilemap } from "./maps/tilemap.ts";
 

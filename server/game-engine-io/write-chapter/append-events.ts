@@ -1,5 +1,5 @@
 import { getPathWithinLtMaker } from "@/file-io/get-path-within-lt-maker.ts";
-import { Event } from "@/types/event.ts";
+import { Event } from "../../types/events/event.ts";
 import readOrCreateJSON from "@/game-engine-io/read-or-create-json.ts";
 
 export async function appendEvents({

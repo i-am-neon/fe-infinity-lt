@@ -1,6 +1,8 @@
+import { TriggerEnum } from "@/types/events/trigger-enum.ts";
+
 export interface Event {
   name: string;
-  trigger: string;
+  trigger: TriggerEnum;
   level_nid: string;
   condition: string;
   commands: [];
