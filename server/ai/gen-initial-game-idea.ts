@@ -32,7 +32,7 @@ Return the response as a JSON object matching the following schema:
     schema: initialGameIdeaSchema,
     systemMessage,
     prompt,
-    temperature: 1,
+    temperature: 0.8,
   });
 }
 
