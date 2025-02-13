@@ -11,6 +11,7 @@ export function initializeDatabase() {
       title TEXT,
       directory TEXT,
       description TEXT,
+      tone TEXT,
       chapters TEXT,
       characters TEXT
     )

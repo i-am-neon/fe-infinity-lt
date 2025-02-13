@@ -30,15 +30,16 @@ export default function Home() {
     const parts = gameIdea.split(" - ");
     const title = parts[0] ? parts[0].trim() : "";
     const description = parts[1] ? parts[1].trim() : "";
-    if (!title || !description) {
+    const tone = parts[2] ? parts[2].trim() : "";
+    if (!title || !description || !tone) {
       console.error(
-        "Invalid game idea format. Expected 'Title - Description'."
+        "Invalid game idea format. Expected 'Title - Description - Tone'."
       );
       return;
     }
     setIsCreating(true);
     try {
-      const res = await createGame({ title, description });
+      const res = await createGame({ title, description, tone });
       if (res.success && res.gameNid) {
         router.push(`/games/${res.gameNid}?new=true`);
       }

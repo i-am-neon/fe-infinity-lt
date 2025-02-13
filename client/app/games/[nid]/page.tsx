@@ -134,6 +134,7 @@ export default function GameDetailPage() {
           <>
             <h1 className="text-2xl font-bold">Game: {data.game.title}</h1>
             <p>Description: {data.game.description}</p>
+            <p className="italic text-sm text-muted-foreground">Tone: {data.game.tone}</p>
 
             <div className="flex flex-col sm:flex-row sm:items-center gap-2">
               <Button onClick={handlePlay} disabled={disabled}>

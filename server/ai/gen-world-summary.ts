@@ -4,9 +4,11 @@ import generateStructuredData from "@/lib/generate-structured-data.ts";
 export default function genWorldSummary({
   gameName,
   gameDescription,
+  tone,
 }: {
   gameName: string;
   gameDescription: string;
+  tone: string;
 }): Promise<WorldSummary> {
   const systemMessage = `You are a Fire Emblem Fangame World Builder!
 
@@ -34,7 +36,9 @@ Notes:
 
   return generateStructuredData<WorldSummary>({
     systemMessage,
-    prompt: `Game Name: ${gameName}\nGame Description: ${gameDescription}`,
+    prompt: `Game Name: ${gameName}
+Game Description: ${gameDescription}
+Game Tone: ${tone}`,
     schema: worldSummarySchema,
     temperature: 1,
   });
@@ -47,4 +51,3 @@ if (import.meta.main) {
       "A kingdom ravaged by a mysterious plague fights for survival, but the cure is as dangerous as the disease.",
   }).then((summary) => console.log(JSON.stringify(summary, null, 2)));
 }
-

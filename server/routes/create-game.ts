@@ -4,10 +4,10 @@ import { insertGame } from "@/db/games.ts";
 
 export async function handleCreateGame(req: Request): Promise<Response> {
   try {
-    const body = (await req.json()) as { title?: string; description?: string };
-    if (!body.title || !body.description) {
+    const body = (await req.json()) as { title?: string; description?: string; tone?: string };
+    if (!body.title || !body.description || !body.tone) {
       return new Response(
-        JSON.stringify({ success: false, error: "Missing title or description" }),
+        JSON.stringify({ success: false, error: "Missing title, description, or tone" }),
         {
           status: 400,
           headers: { "Content-Type": "application/json" },
@@ -16,13 +16,14 @@ export async function handleCreateGame(req: Request): Promise<Response> {
     }
 
     const { gameNid, projectNameEndingInDotLtProj } = await genAndWritePrologue(
-      body.title, body.description
+      body.title, body.description, body.tone
     );
     insertGame({
       nid: gameNid,
       title: body.title,
       directory: projectNameEndingInDotLtProj,
       description: body.description,
+      tone: body.tone,
       chapters: [],
       characters: [],
     });

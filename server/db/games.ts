@@ -9,6 +9,7 @@ type GameRow = [
   title: string,
   directory: string,
   description: string,
+  tone: string,
   chaptersJson: string,
   charactersJson: string
 ];
@@ -22,14 +23,15 @@ export function insertGame(game: Game): void {
   const charactersJson = JSON.stringify(game.characters);
   db.query(
     `
-      INSERT OR REPLACE INTO games (nid, title, directory, description, chapters, characters)
-      VALUES (?, ?, ?, ?, ?, ?)
+      INSERT OR REPLACE INTO games (nid, title, directory, description, tone, chapters, characters)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
     `,
     [
       game.nid,
       game.title,
       game.directory,
       game.description,
+      game.tone,
       chaptersJson,
       charactersJson,
     ]
@@ -41,7 +43,7 @@ export function insertGame(game: Game): void {
  */
 export function getGameByNid(nid: string): Game | null {
   const query = db.query<GameRow>(
-    "SELECT nid, title, directory, description, chapters, characters FROM games WHERE nid = ? LIMIT 1",
+    "SELECT nid, title, directory, description, tone, chapters, characters FROM games WHERE nid = ? LIMIT 1",
     [nid]
   );
   if (query.length === 0) {
@@ -52,6 +54,7 @@ export function getGameByNid(nid: string): Game | null {
     dbTitle,
     dbDirectory,
     dbDescription,
+    dbTone,
     dbChaptersJson,
     dbCharactersJson,
   ] = query[0] as GameRow;
@@ -72,6 +75,7 @@ export function getGameByNid(nid: string): Game | null {
     title: dbTitle,
     directory: dbDirectory,
     description: dbDescription,
+    tone: dbTone,
     chapters,
     characters,
   };

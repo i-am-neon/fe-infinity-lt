@@ -6,7 +6,7 @@ export async function ping() {
   await apiCall("ping");
 }
 
-export async function createGame({ title, description }: { title: string; description: string }): Promise<{
+export async function createGame({ title, description, tone }: { title: string; description: string; tone: string }): Promise<{
   success: boolean;
   projectNameEndingInDotLtProj?: string;
   gameNid?: string;
@@ -14,7 +14,7 @@ export async function createGame({ title, description }: { title: string; descri
 }> {
   return apiCall("create-game", {
     method: "POST",
-    body: { title, description },
+    body: { title, description, tone },
   });
 }
 

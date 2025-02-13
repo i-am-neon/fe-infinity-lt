@@ -3,6 +3,7 @@ export interface Game {
   title: string;
   directory: string;
   description: string;
+  tone: string;
   chapters: Chapter[];
 }
 
