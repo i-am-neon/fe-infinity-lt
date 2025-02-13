@@ -1,5 +1,5 @@
 import { appendEvents } from "@/game-engine-io/write-chapter/append-events.ts";
-import { appendLevel } from "./append-level.ts";
+import { appendLevel } from "@/game-engine-io/write-chapter/append-level.ts";
 
 export default async function writeStubChapter({
   projectNameEndingInDotLtProj,

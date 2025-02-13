@@ -15,6 +15,7 @@ import { testTone } from "@/ai/test-data/initial.ts";
 import genWorldSummary from "@/ai/gen-world-summary.ts";
 import genInitialGameIdea from "@/ai/gen-initial-game-idea.ts";
 import genPrologueScript from "@/ai/gen-prologue-script.ts";
+import breakTextIntoGameLines from "@/lib/break-text-into-game-lines.ts";
 
 export default async function genAndWritePrologue({
   projectName,
@@ -45,6 +46,10 @@ export default async function genAndWritePrologue({
     tone,
   });
   console.log("prologueScript :>> ", prologueScript);
+
+  // Break the prologue script into multiple lines separated by "|"
+  const splittedPrologueScript = breakTextIntoGameLines(prologueScript);
+
   const prologueEvents: Chapter["events"] = [
     {
       name: "Intro",
@@ -54,7 +59,7 @@ export default async function genAndWritePrologue({
       commands: [],
       only_once: false,
       priority: 20,
-      _source: [`speak;hint;${prologueScript}`],
+      _source: [`speak;hint;${splittedPrologueScript}`],
     },
     ...stubPrologue.events,
   ];
