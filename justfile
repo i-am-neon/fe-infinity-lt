@@ -19,8 +19,10 @@ start-client:
 
 # Stop all running processes
 stop:
-    pkill -f "deno|pnpm dev"
-    just stop-pgvector
+	-pkill -f "deno"
+	-pkill -f "pnpm dev"
+	-pkill -f "node .* next"
+	just stop-pgvector
 
 clean:
     just stop
