@@ -3,10 +3,10 @@ import runGame from "@/run-game.ts";
 
 export async function handleCreateGame(req: Request): Promise<Response> {
   try {
-    const body = (await req.json()) as { projectName?: string };
-    if (!body.projectName) {
+    const body = (await req.json()) as { title?: string; description?: string };
+    if (!body.title || !body.description) {
       return new Response(
-        JSON.stringify({ success: false, error: "No projectName provided" }),
+        JSON.stringify({ success: false, error: "Missing title or description" }),
         {
           status: 400,
           headers: { "Content-Type": "application/json" },
@@ -15,7 +15,7 @@ export async function handleCreateGame(req: Request): Promise<Response> {
     }
 
     const { gameNid, projectNameEndingInDotLtProj } = await genAndWritePrologue(
-      body.projectName
+      body.title, body.description
     );
 
     // Run game without waiting

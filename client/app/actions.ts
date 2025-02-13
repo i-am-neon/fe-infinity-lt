@@ -6,15 +6,15 @@ export async function ping() {
   await apiCall("ping");
 }
 
-export async function createGame(): Promise<{
+export async function createGame({ title, description }: { title: string; description: string }): Promise<{
   success: boolean;
   projectNameEndingInDotLtProj?: string;
   gameNid?: string;
   error?: string;
 }> {
   return apiCall("create-game", {
-    body: { projectName: "test" },
     method: "POST",
+    body: { title, description },
   });
 }
 

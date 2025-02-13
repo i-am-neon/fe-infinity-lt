@@ -6,35 +6,84 @@ import { Button } from "@/components/ui/button";
 import { createGame, ping } from "./actions";
 import GamesGrid from "@/components/ui/games-grid";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import GameIdeaSelector from "@/components/ui/game-idea-selector";
+import {
+  DialogHeader,
+  DialogFooter,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 export default function Home() {
   const router = useRouter();
   const [isCreating, setIsCreating] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [gameIdea, setGameIdea] = useState("");
 
   const handleCreateGame = useCallback(async () => {
+    if (!gameIdea) {
+      console.error("No game idea selected.");
+      return;
+    }
+    const parts = gameIdea.split(" - ");
+    const title = parts[0] ? parts[0].trim() : "";
+    const description = parts[1] ? parts[1].trim() : "";
+    if (!title || !description) {
+      console.error("Invalid game idea format. Expected 'Title - Description'.");
+      return;
+    }
     setIsCreating(true);
     try {
-      const res = await createGame();
+      const res = await createGame({ title, description });
       if (res.success && res.gameNid) {
         router.push(`/games/${res.gameNid}`);
       }
     } finally {
       setIsCreating(false);
     }
-  }, [router]);
+  }, [router, gameIdea]);
 
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
         <ThemeToggle />
         <Button onClick={ping}>Ping</Button>
-        <Button onClick={handleCreateGame} disabled={isCreating}>
-          {isCreating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Create Game
-        </Button>
+
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogTrigger asChild>
+            <Button disabled={isCreating}>
+              {isCreating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Create New Game
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Select a Game Idea</DialogTitle>
+            </DialogHeader>
+            <div>
+              <GameIdeaSelector onChange={(val) => setGameIdea(val)} />
+            </div>
+            <DialogFooter>
+              <Button variant="secondary" onClick={() => setDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button
+                onClick={handleCreateGame}
+                disabled={isCreating || !gameIdea}
+              >
+                {isCreating && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                Confirm
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
         <GamesGrid />
       </main>
     </div>
   );
 }
-
