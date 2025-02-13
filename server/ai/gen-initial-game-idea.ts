@@ -7,8 +7,10 @@ import generateStructuredData from "@/lib/generate-structured-data.ts";
 
 export default function genInitialGameIdea({
   worldSummary,
+  tone,
 }: {
   worldSummary: WorldSummary;
+  tone: string;
 }): Promise<InitialGameIdea> {
   const systemMessage = `You are a Fire Emblem Fangame Prologue Story Generator!
 
@@ -18,15 +20,13 @@ In your response, include:
 - A narrative backstory that sets the stage for the game.
 - A list of character ideas for the characters that will appear in the prologue. Use the format specified in the CharacterIdea schema.
 - Potential plot directions or twists that could define the prologue.
-- Any additional notes or details that would be important for establishing the tone and setup of the game.
+- Any additional notes or details that would be important for establishing the tone and setup of the game.`;
 
-Return the response as a JSON object matching the following schema:
-- backstory: string
-- characterIdeas: array of CharacterIdea objects
-- plotDirections: array of strings
-- additionalNotes: string (optional)`;
-
-  const prompt = `World Summary: ${JSON.stringify(worldSummary, null, 2)}`;
+  const prompt = `World Summary: ${JSON.stringify(
+    worldSummary,
+    null,
+    2
+  )}\nTone: ${tone}`;
 
   return generateStructuredData<InitialGameIdea>({
     schema: initialGameIdeaSchema,
@@ -125,7 +125,10 @@ if (import.meta.main) {
     ],
   };
 
-  genInitialGameIdea({ worldSummary: dummyWorldSummary }).then((idea) => {
+  genInitialGameIdea({
+    worldSummary: dummyWorldSummary,
+    tone: "dark, serious",
+  }).then((idea) => {
     console.log(JSON.stringify(idea, null, 2));
   });
 }
