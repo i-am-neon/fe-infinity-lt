@@ -30,6 +30,7 @@ In your response, include:
   )}\nTone: ${tone}`;
 
   return generateStructuredData<InitialGameIdea>({
+    fnName: "genInitialGameIdea",
     schema: initialGameIdeaSchema,
     systemMessage,
     prompt,

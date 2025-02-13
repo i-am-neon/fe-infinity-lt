@@ -59,6 +59,7 @@ export default async function genMapMetadata({
   const mapVisualSummary = await processMapImage({ imagePath, mapSetting });
 
   const mapMetadata = await generateStructuredData({
+    fnName: "genMapMetadata",
     systemMessage,
     prompt: `Map Quadrants: ${JSON.stringify(
       mapQuadrants

@@ -8,18 +8,16 @@ import {
   testWorldSummary,
 } from "@/ai/test-data/initial.ts";
 
-export const prologueScriptSchema = z.object({
-  prologueScript: z
-    .string()
-    .max(700, "Limit to 1 paragraph")
-    .describe(
-      "Short introduction describing the setting and main characters, no more than a paragraph."
-    ),
-});
+export const prologueScriptSchema = z
+  .string()
+  .max(700, "Limit to 1 paragraph")
+  .describe(
+    "Short introduction describing the setting and main characters, no more than a paragraph."
+  );
 
 export type PrologueScript = z.infer<typeof prologueScriptSchema>;
 
-export default function genPrologueScript({
+export default async function genPrologueScript({
   worldSummary,
   initialGameIdea,
   tone,
@@ -30,16 +28,18 @@ export default function genPrologueScript({
 }): Promise<PrologueScript> {
   const systemMessage = `You are a Fire Emblem Fangame Prologue Script Writer! The user provides a world summary and an initial game idea. Write a short introduction that is no more than a paragraph, describing the setting and the main characters. Keep it under 700 characters.`;
 
-  return generateStructuredData<PrologueScript>({
+  const { prologueScript } = await generateStructuredData({
+    fnName: "genPrologueScript",
     systemMessage,
     prompt: `World Summary: ${JSON.stringify(
       worldSummary,
       null,
       2
     )}\nGame Idea: ${JSON.stringify(initialGameIdea, null, 2)}\nTone: ${tone}`,
-    schema: prologueScriptSchema,
+    schema: z.object({ prologueScript: prologueScriptSchema }),
     temperature: 0.7,
   });
+  return prologueScript;
 }
 
 if (import.meta.main) {

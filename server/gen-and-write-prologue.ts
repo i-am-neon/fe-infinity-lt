@@ -44,6 +44,7 @@ export default async function genAndWritePrologue({
     initialGameIdea,
     tone,
   });
+  console.log("prologueScript :>> ", prologueScript);
   const prologueEvents: Chapter["events"] = [
     {
       name: "Intro",

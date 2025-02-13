@@ -40,6 +40,7 @@ Notes:
 `;
 
   return generateStructuredData<WorldSummary>({
+    fnName: "genWorldSummary",
     systemMessage,
     prompt: `Game Name: ${gameName}
 Game Description: ${gameDescription}
