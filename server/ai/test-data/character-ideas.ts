@@ -6,6 +6,7 @@ export const testCharIdeaAislin: CharacterIdea = {
   gender: "female",
   personality:
     "Clever and resourceful, with a keen sense for strategy and diplomacy.",
+  classDirection: "Healer",
   age: "young adult",
   backstory:
     "Aislin Valtoria, daughter of the head of House Valtoria, has been groomed from a young age to navigate the political labyrinth of Elyndor. Her father’s sudden illness thrusts her into the forefront of political maneuvering, where she must quickly adapt to protect her family's interests.",
@@ -23,6 +24,7 @@ export const testCharIdeaThorne: CharacterIdea = {
   gender: "male",
   personality:
     "Stubborn and honorable, driven by a strong moral compass and a sense of duty.",
+  classDirection: "Sword User",
   age: "young adult",
   backstory:
     "Thorne is the youngest son of House Greymont, sent to Elyndor as a representative and to gather information on the political climate. He struggles with the tension between his desire for peace and his family's militaristic ambitions.",
@@ -32,3 +34,4 @@ export const testCharIdeaThorne: CharacterIdea = {
   inGameDescription: "A warrior torn between duty and peace.",
   deathQuote: "I have failed... my family, my land... forgive me.",
 };
+

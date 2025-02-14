@@ -16,6 +16,11 @@ export const CharacterIdeaSchema = z
     personality: z
       .string()
       .min(1, "Must be a 1-sentence personality description"),
+    classDirection: z
+      .string()
+      .describe(
+        "The general idea of the character's class, using Fire Emblem Sacred Stones classes. This does not decide if they are promoted or not, so keep it vague. For example, 'Dark Magic User' or 'Bow User' or 'Pegasus Rider' or 'Horse Mounted'."
+      ),
     age: z.union([
       z.literal("child"),
       z.literal("young adult"),
