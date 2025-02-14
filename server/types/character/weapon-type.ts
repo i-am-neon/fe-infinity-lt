@@ -12,3 +12,5 @@ export const WeaponTypeSchema = z.enum([
 ]);
 
 export type WeaponType = z.infer<typeof WeaponTypeSchema>;
+
+export type WeaponRank = "E" | "D" | "C" | "B" | "A" | "S";

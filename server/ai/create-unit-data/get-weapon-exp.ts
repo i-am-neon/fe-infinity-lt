@@ -70,6 +70,7 @@ export default function getWeaponExp({
     "Sword Wight": ["Sword"],
     "Bow Wight": ["Bow"],
     Mogall: ["Dark"],
+    Manakete: [],
 
     // Promoted classes:
     Swordmaster: ["Sword"],
@@ -91,15 +92,6 @@ export default function getWeaponExp({
     "Sword Bonewalker": ["Sword"],
     "Bow Bonewalker": ["Bow"],
     "Arch Mogall": ["Dark"],
-  };
-
-  const weaponRankExpMap = {
-    E: 1,
-    D: 31,
-    C: 71,
-    B: 121,
-    A: 181,
-    S: 251,
   };
 
   // Decide the base rank
@@ -131,6 +123,15 @@ export default function getWeaponExp({
     Default: [false, 0, 251],
   };
 }
+
+export const weaponRankExpMap = {
+  E: 1,
+  D: 31,
+  C: 71,
+  B: 121,
+  A: 181,
+  S: 251,
+};
 
 if (import.meta.main) {
   // Quick test
