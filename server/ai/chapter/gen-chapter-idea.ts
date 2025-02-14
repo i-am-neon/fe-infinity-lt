@@ -27,27 +27,11 @@ The user provides:
 3) A tone
 
 Your job:
-Generate a single new chapter that logically follows from them. Output a JSON object matching the shape:
-{
-  "intro": string,
-  "battle": string,
-  "outro": string,
-  "boss": {CharacterIdea},
-  ${chapterNumber > 0 ? '"newPlayableUnits": [{CharacterIdea}, ...]' : ""}
-}
-Where:
-- "intro" = brief overview of the starting event.
-- "battle" = short description of how the battle begins.
-- "outro" = short description of the ending.
-- "boss" = a single new character idea who serves as the boss.
-  ${
-    chapterNumber > 0
-      ? '- "newPlayableUnits" = an array of new character ideas that become playable (can be empty).'
-      : ""
-  }
+Generate a single new chapter that logically follows from them.
 
-All new characters must be human. If you mention futuristic or non-lore-friendly elements, it is invalid.
-Only return valid JSON. No commentary.`;
+## New Characters
+- All new characters must be human.
+- When adding Non Battle Characters, make sure to use them in the intro and/or outro.`;
 
   const prompt = `World Summary: ${JSON.stringify(worldSummary, null, 2)}
 Initial Game Idea: ${JSON.stringify(initialGameIdea, null, 2)}
@@ -70,7 +54,7 @@ if (import.meta.main) {
     worldSummary: testWorldSummary,
     initialGameIdea: testInitialGameIdea,
     tone: testTone,
-    chapterNumber: 1,
+    chapterNumber: 0,
   }).then((chapterIdea) => {
     console.log(JSON.stringify(chapterIdea, null, 2));
   });
