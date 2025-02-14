@@ -109,7 +109,6 @@ export default async function genAndWritePrologue({
       getPathWithinServer(`assets/maps/${level.tilemap}.json`)
     )
   );
-  console.log("tilemap :>> ", tilemap);
 
   const newChapter: Chapter = {
     title: chapterIdea.title,
