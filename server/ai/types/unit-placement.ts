@@ -1,10 +1,12 @@
 import { z } from "zod";
 import { FE8ClassSchema } from "@/types/fe8-class.ts";
+import { EnemyAIGroupSchema } from "@/ai/types/enemy-ai-group.ts";
 
 export const EnemyGenericUnitSchema = z.object({
   x: z.number().int().min(0),
   y: z.number().int().min(0),
   class: FE8ClassSchema.optional(),
+  aiGroup: EnemyAIGroupSchema.default("Attack"),
 });
 
 export type EnemyGenericUnit = z.infer<typeof EnemyGenericUnitSchema>;
@@ -32,4 +34,3 @@ export const GreenUnitSchema = z.object({
 });
 
 export type GreenUnit = z.infer<typeof GreenUnitSchema>;
-

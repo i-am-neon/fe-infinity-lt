@@ -18,6 +18,7 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
 import { TerrainGrid } from "@/types/maps/terrain-grid.ts";
 import { z } from "zod";
 import { testMapMetadata } from "../../test-data/unit-placement.ts";
+import { EnemyAIGroupSchema } from "@/ai/types/enemy-ai-group.ts";
 
 export default async function placeEnemyGenericUnits({
   terrainGrid,
@@ -38,7 +39,9 @@ export default async function placeEnemyGenericUnits({
       ? allClassOptions.filter((c) => c.promotionLevel === "unpromoted")
       : allClassOptions;
 
-  const systemMessage = `
+  const systemMessage =
+    `You are an advanced Fire Emblem Tactician. Based on the sub terrain grid, the region's squad info, the chapter idea, and the map metadata, generate strategic recommendations for forming unit squads in each distinct region.
+For each enemy unit, also assign an "aiGroup" from this list: [None, Attack, Pursue, Defend, Guard, AttackTile, PursueVillage, FollowBoss, FollowWagon, Berserk, Heal, Thief, SimpleThief, Seize].
       You are an advanced Fire Emblem Tactician. Based on the sub terrain grid, the region's squad info, the chapter idea, and the map metadata, generate generic enemy unit placements for ONLY this region.
 You must ensure these units reflect the "squadInfo" concept and remain within the region's bounding box.
 
@@ -74,9 +77,7 @@ Place the same number of units as specified in the "numberOfGenericEnemies" fiel
           systemMessage,
           prompt,
           schema: z.object({
-            units: z.array(
-              EnemyGenericUnitSchema.extend({ class: z.string() })
-            ),
+            units: z.array(EnemyGenericUnitSchema),
           }),
         });
 

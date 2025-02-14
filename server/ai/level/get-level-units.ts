@@ -72,7 +72,7 @@ export default async function getLevelUnits({
     units.push({
       nid: shortUuid(),
       team: "enemy",
-      ai: "Attack",
+      ai: ge.aiGroup,
       // TODO: figure out generic levels
       level: 1,
       // TODO: factions
@@ -91,4 +91,3 @@ export default async function getLevelUnits({
 
   return units;
 }
-
