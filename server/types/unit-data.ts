@@ -11,7 +11,7 @@ export type UnitData = {
   name: string;
   desc: string; // Should exactly match provided description
   variant: string | null; // Should always be null
-  level: number; // The level the character starts at when first seen in game. Should be in line with the given chapter number (the whole game has 10 chapters)
+  level: number; // The level the character starts at when first seen in game.
   // "klass": Should match the class name exactly from the provided list of options
   klass: FE8Class;
   tags: string[]; // Should always be an empty list

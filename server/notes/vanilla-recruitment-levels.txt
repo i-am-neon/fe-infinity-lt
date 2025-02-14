@@ -1,0 +1,35 @@
+| Character Name | Level at Recruitment | isPromoted | Base Class       | Chapter Recruited |
+|----------------|----------------------|------------|------------------|-------------------|
+| Eirika         | 1                    | false      | Lord             | Prologue          |
+| Seth           | 1                    | true       | Paladin          | Prologue          |
+| Franz          | 1                    | false      | Cavalier         | 1                 |
+| Gilliam        | 4                    | false      | Knight           | 1                 |
+| Moulder        | 3                    | false      | Priest           | 2                 |
+| Vanessa        | 1                    | false      | Pegasus Knight   | 2                 |
+| Ross           | 1                    | false      | Journeyman       | 2                 |
+| Garcia         | 4                    | false      | Fighter          | 2                 |
+| Neimi          | 1                    | false      | Archer           | 3                 |
+| Colm           | 2                    | false      | Thief            | 3                 |
+| Lute           | 1                    | false      | Mage             | 4                 |
+| Artur          | 2                    | false      | Monk             | 4                 |
+| Joshua         | 5                    | false      | Myrmidon         | 5                 |
+| Natasha        | 1                    | false      | Cleric           | 5                 |
+| Ephraim        | 4                    | false      | Lord             | 5                 |
+| Forde          | 6                    | false      | Cavalier         | 5                 |
+| Kyle           | 5                    | false      | Cavalier         | 5                 |
+| Tana           | 4                    | false      | Pegasus Knight   | 9                 |
+| Amelia         | 1                    | false      | Recruit          | 9                 |
+| Duessel        | 8                    | true       | Great Knight     | 10                |
+| Cormag         | 9                    | false      | Wyvern Rider     | 10                |
+| L’Arachel      | 3                    | false      | Troubadour       | 11                |
+| Dozla          | 1                    | true       | Berserker        | 11                |
+| Ewan           | 1                    | false      | Pupil            | 12                |
+| Marisa         | 5                    | false      | Myrmidon         | 12                |
+| Tethys         | 1                    | false      | Dancer           | 12                |
+| Gerik          | 10                   | false      | Mercenary        | 13                |
+| Rennac         | 1                    | true       | Rogue            | 14                |
+| Saleh          | 1                    | true       | Sage             | 15                |
+| Knoll          | 10                   | false      | Shaman           | 16                |
+| Innes          | 1                    | true       | Sniper           | 15                |
+| Myrrh          | 1                    | false      | Manakete         | 17                |
+| Syrene         | 1                    | true       | Falcoknight      | 18                |
