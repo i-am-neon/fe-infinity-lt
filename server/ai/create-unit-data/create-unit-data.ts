@@ -4,6 +4,7 @@ import decideLevel from "@/ai/create-unit-data/decide-level.ts";
 import decideClass from "@/ai/create-unit-data/decide-class.ts";
 import decideStats from "@/ai/create-unit-data/decide-stats.ts";
 import { testCharIdeaThorne } from "@/ai/test-data/character-ideas.ts";
+import getWeaponExp from "@/ai/create-unit-data/get-weapon-exp.ts";
 
 export default async function createUnitData({
   characterIdea,
@@ -29,17 +30,7 @@ export default async function createUnitData({
     starting_items: [],
     learned_skills: [],
     unit_notes: [],
-    wexp_gain: {
-      Sword: [false, 0, 251],
-      Lance: [false, 0, 251],
-      Axe: [false, 0, 251],
-      Bow: [false, 0, 251],
-      Staff: [false, 0, 251],
-      Light: [false, 0, 251],
-      Anima: [false, 0, 251],
-      Dark: [false, 0, 251],
-      Default: [false, 0, 251],
-    },
+    wexp_gain: getWeaponExp({ className: klass, level, isPromoted }),
     alternate_classes: [],
     portrait_nid: characterIdea.firstName,
     affinity: characterIdea.affinity,
