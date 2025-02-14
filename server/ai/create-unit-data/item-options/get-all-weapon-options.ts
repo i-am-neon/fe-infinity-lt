@@ -2,13 +2,14 @@ import { WeaponRank, WeaponType } from "@/types/character/weapon-type.ts";
 import { weaponRankExpMap } from "@/ai/create-unit-data/get-weapon-exp.ts";
 import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
 
-interface RawItemData {
+export interface RawItemData {
   nid: string;
   name: string;
+  // deno-lint-ignore no-explicit-any
   components: [string, any][];
 }
 
-interface WeaponOption {
+export interface WeaponOption {
   nid: string;
   name: string;
   levelRequired: WeaponRank;
