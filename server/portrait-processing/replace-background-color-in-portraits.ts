@@ -5,23 +5,32 @@ import getAllPortraitFileNames from "@/portrait-processing/get-all-portrait-path
 export default async function replaceBackgroundColorInPortraits(): Promise<void> {
   const portraitsDir = getPathWithinServer("assets/portraits");
   const fileNames = getAllPortraitFileNames();
+
   for (const fileName of fileNames) {
     const filePath = `${portraitsDir}/${fileName}`;
     const imageData = await Deno.readFile(filePath);
     const img = await Image.decode(imageData);
+
+    if (img.width === 0 || img.height === 0) {
+      console.warn(`Skipping empty image: ${fileName}`);
+      continue;
+    }
+
+    // Get the color of the top-left pixel at (1,1) due to 1-based indexing in imagescript
+    const referencePixel = img.getPixelAt(1, 1);
+
+    // New color to replace the background
+    const newPixel = (128 << 24) | (160 << 16) | (128 << 8) | 255;
+
+    // Iterate over every pixel and replace matching colors
     for (let x = 1; x <= img.width; x++) {
       for (let y = 1; y <= img.height; y++) {
-        const pixel = img.getPixelAt(x, y);
-        const r = (pixel >> 24) & 0xff;
-        const g = (pixel >> 16) & 0xff;
-        const b = (pixel >> 8) & 0xff;
-        const a = pixel & 0xff;
-        if (r === 160 && g === 200 && b === 152 && a === 255) {
-          const newPixel = (128 << 24) | (160 << 16) | (128 << 8) | 255;
+        if (img.getPixelAt(x, y) === referencePixel) {
           img.setPixelAt(x, y, newPixel);
         }
       }
     }
+
     const encoded = await img.encode();
     await Deno.writeFile(filePath, encoded);
     console.log(`Processed: ${fileName}`);
