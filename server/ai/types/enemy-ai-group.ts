@@ -22,7 +22,7 @@ Defines different enemy AI behavior groups:
 - Attack: Attacks any enemy within range.
 - Pursue: Pursues and attacks enemies aggressively.
 - Defend: Attacks enemies while holding a defensive position.
-- Guard: Guards a location and attacks approaching enemies.
+- Guard: Will not move and only attacks enemies within range of not moving. Mostly use for bosses or units guarding a specific location like a door.
 - AttackTile: Prioritizes attacking enemies on specific tiles.
 - PursueVillage: Pursues villages and interacts with destructible objects.
 - FollowBoss: Follows the boss unit while attacking enemies.
