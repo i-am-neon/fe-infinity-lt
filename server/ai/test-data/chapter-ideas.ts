@@ -1,5 +1,5 @@
 import { ChapterIdea } from "@/ai/types/chapter-idea.ts";
-import { testNonBattleCharLyander } from "@/ai/test-data/character-ideas.ts";
+import { testCharIdeaThorne } from "@/ai/test-data/character-ideas.ts";
 
 export const testChapterIdea: ChapterIdea = {
   name: "Whispers in the Frost",
@@ -26,6 +26,6 @@ export const testChapterIdea: ChapterIdea = {
     inGameDescription: "A fanatical guardian of the Hermitage's secrets.",
     deathQuote: "The secrets... will not die... with me...",
   },
-  newNonBattleCharacters: [testNonBattleCharLyander],
+  newNonBattleCharacters: [testCharIdeaThorne],
 };
 

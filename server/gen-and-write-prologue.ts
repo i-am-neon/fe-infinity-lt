@@ -60,15 +60,17 @@ export default async function genAndWritePrologue({
     chapterNumber,
   });
 
+  const newCharacterIdeas = [
+    ...initialGameIdea.characterIdeas,
+    chapterIdea.boss,
+    ...(chapterIdea.newPlayableUnits ?? []),
+    ...(chapterIdea.newNonBattleCharacters ?? []),
+  ];
+
   const [portraitMap, unitDatas, prologueIntroEvent] = await Promise.all([
-    choosePortraits([
-      ...initialGameIdea.characterIdeas,
-      chapterIdea.boss,
-      ...(chapterIdea.newPlayableUnits ?? []),
-      ...(chapterIdea.newNonBattleCharacters ?? []),
-    ]),
+    choosePortraits(newCharacterIdeas),
     createUnitDatas({
-      characterIdeas: initialGameIdea.characterIdeas,
+      characterIdeas: newCharacterIdeas,
       chapterNumber,
     }),
     assembleEvent({

@@ -1,6 +1,5 @@
-import { z } from "zod";
 import { CharacterIdeaSchema } from "@/ai/types/character-idea.ts";
-import { NonBattleCharacterIdeaSchema } from "@/ai/types/non-battle-character-idea.ts";
+import { z } from "zod";
 
 export const ChapterIdeaSchema = z.object({
   name: z
@@ -14,7 +13,11 @@ export const ChapterIdeaSchema = z.object({
     .describe("Description of the starting situation of the battle."),
   outro: z.string().describe("Description of the ending event of the chapter."),
   boss: CharacterIdeaSchema,
-  newNonBattleCharacters: NonBattleCharacterIdeaSchema.array().optional(),
+  newNonBattleCharacters: CharacterIdeaSchema.array()
+    .optional()
+    .describe(
+      "New characters introduced in this chapter that do not participate in battle. For example, villagers, kings, or any other characters that are in the chapter scenes but not in the battle. It is possible to have them appear in future battles."
+    ),
   newPlayableUnits: z
     .array(CharacterIdeaSchema)
     .optional()

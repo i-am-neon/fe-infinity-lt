@@ -1,11 +1,10 @@
+import { testCharIdeaThorne } from "@/ai/test-data/character-ideas.ts";
 import { CharacterIdea } from "@/ai/types/character-idea.ts";
-import { NonBattleCharacterIdea } from "@/ai/types/non-battle-character-idea.ts";
+import { getCurrentLogger } from "@/lib/current-logger.ts";
 import generateStructuredData from "@/lib/generate-structured-data.ts";
-import { z } from "zod";
 import createEmbedding from "@/vector-db/create-embedding.ts";
 import similaritySearch from "@/vector-db/similarity-search.ts";
-import { getCurrentLogger } from "@/lib/current-logger.ts";
-import { testCharIdeaThorne } from "@/ai/test-data/character-ideas.ts";
+import { z } from "zod";
 
 interface EphemeralPortraitOption {
   ephemeralId: "A" | "B" | "C";
@@ -34,7 +33,7 @@ export default async function choosePortrait({
   characterIdea,
   usedPortraits,
 }: {
-  characterIdea: CharacterIdea | NonBattleCharacterIdea;
+  characterIdea: CharacterIdea;
   usedPortraits: string[];
 }): Promise<string> {
   const start = Date.now();

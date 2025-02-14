@@ -1,13 +1,12 @@
 import choosePortrait from "@/ai/choose-portrait.ts";
-import { CharacterIdea } from "@/ai/types/character-idea.ts";
-import { NonBattleCharacterIdea } from "@/ai/types/non-battle-character-idea.ts";
 import {
   testCharIdeaAislin,
-  testNonBattleCharLyander,
+  testCharIdeaThorne,
 } from "@/ai/test-data/character-ideas.ts";
+import { CharacterIdea } from "@/ai/types/character-idea.ts";
 
 export async function choosePortraits(
-  characterIdeas: Array<CharacterIdea | NonBattleCharacterIdea>
+  characterIdeas: Array<CharacterIdea>
 ): Promise<Record<string, string>> {
   const usedPortraits: string[] = [];
   const result: Record<string, string> = {};
@@ -25,8 +24,6 @@ export async function choosePortraits(
 }
 
 if (import.meta.main) {
-  choosePortraits([testCharIdeaAislin, testNonBattleCharLyander]).then(
-    console.log
-  );
+  choosePortraits([testCharIdeaAislin, testCharIdeaThorne]).then(console.log);
 }
 

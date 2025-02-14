@@ -1,5 +1,4 @@
 import { CharacterIdea } from "@/ai/types/character-idea.ts";
-import { NonBattleCharacterIdea } from "@/ai/types/non-battle-character-idea.ts";
 
 export const testCharIdeaAislin: CharacterIdea = {
   firstName: "Aislin",
@@ -38,15 +37,3 @@ export const testCharIdeaThorne: CharacterIdea = {
   deathQuote: "I have failed... my family, my land... forgive me.",
 };
 
-export const testNonBattleCharLyander: NonBattleCharacterIdea = {
-  firstName: "Lyander",
-  fullName: "Lyander of the Frostvein Hermitage",
-  gender: "male",
-  personality:
-    "Wise and cautious, with a deep understanding of ancient texts and a guarded demeanor.",
-  age: "elderly",
-  backstory:
-    "Lyander is one of the eldest members of the Hermitage, a sage dedicated to preserving and interpreting the ancient knowledge stored within the mountains. He is wary of outsiders but understands the dire situation the kingdom faces.",
-  physicalDescription:
-    "An aged man with a long white beard, his eyes sharp and perceptive; he wears layered robes of deep blue, embroidered with silver runes.",
-};
