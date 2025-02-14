@@ -5,6 +5,7 @@ import decideClass from "@/ai/create-unit-data/decide-class.ts";
 import decideStats from "@/ai/create-unit-data/decide-stats.ts";
 import { testCharIdeaThorne } from "@/ai/test-data/character-ideas.ts";
 import getWeaponExp from "@/ai/create-unit-data/get-weapon-exp.ts";
+import { FE8ClassToLTNidMap } from "@/types/fe8-class.ts";
 
 export default async function createUnitData({
   characterIdea,
@@ -22,7 +23,7 @@ export default async function createUnitData({
     desc: characterIdea.inGameDescription,
     variant: null,
     level,
-    klass,
+    klass: FE8ClassToLTNidMap[klass],
     tags: characterIdea.firstSeenAs === "boss" ? ["Boss"] : [],
     bases: baseStats,
     growths: growthRates,

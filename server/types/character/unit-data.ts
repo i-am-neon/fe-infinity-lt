@@ -26,8 +26,7 @@ export type UnitData = {
   desc: string; // Should exactly match provided description
   variant: string | null; // Should always be null
   level: number; // The level the character starts at when first seen in game.
-  // "klass": Should match the class name exactly from the provided list of options
-  klass: FE8Class;
+  klass: string; // LTNid from FE8ClassToLTNidMap
   tags: string[]; // Should always be an empty list
   bases: StatValues;
   growths: StatValues;

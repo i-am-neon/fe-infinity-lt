@@ -5,6 +5,7 @@ import shortUuid from "@/lib/short-uuid.ts";
 import { allMapOptions } from "@/map-processing/all-map-options.ts";
 import { UnitData } from "@/types/character/unit-data.ts";
 import { Level } from "@/types/level.ts";
+import { FE8ClassToLTNidMap } from "@/types/fe8-class.ts";
 
 export default async function getLevelUnits({
   chosenMap,
@@ -65,7 +66,9 @@ export default async function getLevelUnits({
 
   // Add generic enemies
   genericEnemies.forEach((ge) => {
-    console.log("ge :>> ", ge);
+    if (!ge.class) {
+      throw new Error(`No class found for generic enemy ${ge}`);
+    }
     units.push({
       nid: shortUuid(),
       team: "enemy",
@@ -74,7 +77,7 @@ export default async function getLevelUnits({
       level: 1,
       // TODO: factions
       faction: "Soldier",
-      klass: ge.class,
+      klass: FE8ClassToLTNidMap[ge.class],
       roam_ai: null,
       ai_group: "",
       starting_position: [ge.x, ge.y],
