@@ -1,4 +1,4 @@
-import genChapterIdea from "@/ai/chapter/gen-chapter-idea.ts";
+import genChapterIdea from "./ai/gen-chapter-idea.ts";
 import { choosePortraits } from "@/ai/choose-portraits.ts";
 import createUnitDatas from "@/ai/create-unit-data/create-unit-datas.ts";
 import assembleEvent from "@/ai/events/assemble-event.ts";
@@ -22,7 +22,7 @@ import { stubTilemapImportedTmx } from "@/test-data/stub-tilemap.ts";
 import { Chapter } from "@/types/chapter.ts";
 import { Character } from "@/types/character/character.ts";
 import { Game } from "@/types/game.ts";
-import assembleLevel from "@/ai/level/assemble-level.ts";
+import assembleLevel from "./ai/assemble-level.ts";
 import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
 import { Tilemap } from "@/types/maps/tilemap.ts";
 
