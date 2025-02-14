@@ -6,7 +6,7 @@ import {
 import filterWeapons from "./filter-weapons.ts";
 import { WeaponOption } from "./get-all-weapon-options.ts";
 
-export default function decideGenericUnitWeapons({
+export default function decideUnitWeapons({
   fe8Class,
   level,
   isPromoted,
@@ -87,22 +87,23 @@ export default function decideGenericUnitWeapons({
 }
 
 if (import.meta.main) {
-  const paladin = decideGenericUnitWeapons({
+  const paladin = decideUnitWeapons({
     fe8Class: "Paladin",
     level: 7,
     isPromoted: true,
   });
   console.log("paladin", paladin);
-  const fighter = decideGenericUnitWeapons({
+  const fighter = decideUnitWeapons({
     fe8Class: "Fighter",
     level: 2,
     isPromoted: false,
   });
   console.log("fighter", fighter);
-  const shaman = decideGenericUnitWeapons({
+  const shaman = decideUnitWeapons({
     fe8Class: "Shaman",
     level: 12,
     isPromoted: false,
   });
   console.log("shaman", shaman);
 }
+
