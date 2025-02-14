@@ -1,6 +1,19 @@
 import { FE8Class } from "@/types/fe8-class.ts";
 
 type WeaponExperience = [boolean, number, number]; // [Usable, Starting Exp, Max Exp]. Max Exp is always 251
+type StatValues = {
+  HP: number;
+  STR: number;
+  MAG: number;
+  SKL: number;
+  SPD: number;
+  LCK: number;
+  DEF: number;
+  RES: number;
+  CON: number;
+  MOV: number;
+};
+
 // Weapon Rank Progression Totals: 0: not usable. E: 1, D: 31, C: 71, B: 121, A: 181, S: 251
 // For example, Weapon Level "E": [true, 1, 251]
 // For example, Weapon Level "D": [true, 31, 251], and so on.
@@ -15,32 +28,8 @@ export type UnitData = {
   // "klass": Should match the class name exactly from the provided list of options
   klass: FE8Class;
   tags: string[]; // Should always be an empty list
-  bases: {
-    // Should be in line with Fire Emblem 8 base stats given the unit's level
-    HP: number;
-    STR: number;
-    MAG: number;
-    SKL: number;
-    SPD: number;
-    LCK: number;
-    DEF: number;
-    RES: number;
-    CON: number;
-    MOV: number;
-  };
-  growths: {
-    // Should be in line with Fire Emblem 8 growth rates given the unit's level
-    HP: number;
-    STR: number;
-    MAG: number;
-    SKL: number;
-    SPD: number;
-    LCK: number;
-    DEF: number;
-    RES: number;
-    CON: number;
-    MOV: number;
-  };
+  bases: StatValues;
+  growths: StatValues;
   stat_cap_modifiers: Record<string, number>; // Should always be an empty object
   starting_items: [string, boolean][]; // [name, isDroppable]. Name should match the item names exactly from the provided list of options. A unit can only have droppable items isEnemy = true
   learned_skills: string[]; // Should always be an empty list
