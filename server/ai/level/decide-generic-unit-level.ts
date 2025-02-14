@@ -14,7 +14,6 @@ export default function decideGenericUnitLevel({
   const isPromoted = (PromotedFE8Classes as readonly FE8Class[]).includes(
     fe8Class
   );
-  console.log("isPromoted :>> ", isPromoted);
   let level = 1;
 
   if (isPromoted) {

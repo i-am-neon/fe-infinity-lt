@@ -30,10 +30,12 @@ export default async function assembleUnitPlacement({
       }),
     ]);
 
-  // If any enemies are on Player Units, remove them
+  // If any enemies are on Player Units or Boss, remove them
   const playerPositions = new Set(playerUnits.map((u) => `${u.x},${u.y}`));
   const genericEnemies = originalGenericEnemies.filter(
-    (e) => !playerPositions.has(`${e.x},${e.y}`)
+    (e) =>
+      !playerPositions.has(`${e.x},${e.y}`) &&
+      `${e.x},${e.y}` !== `${boss.x},${boss.y}`
   );
 
   return {
