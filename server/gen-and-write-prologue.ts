@@ -1,4 +1,4 @@
-import choosePortrait from "./ai/create-character/choose-portrait.ts";
+import choosePortrait from "./ai/choose-portrait.ts";
 import genInitialGameIdea from "@/ai/gen-initial-game-idea.ts";
 import genPrologueScript from "@/ai/gen-prologue-script.ts";
 import genWorldSummary from "@/ai/gen-world-summary.ts";
