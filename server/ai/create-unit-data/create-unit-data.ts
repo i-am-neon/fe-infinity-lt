@@ -6,6 +6,7 @@ import decideStats from "@/ai/create-unit-data/decide-stats.ts";
 import { testCharIdeaThorne } from "@/ai/test-data/character-ideas.ts";
 import getWeaponExp from "@/ai/create-unit-data/get-weapon-exp.ts";
 import { FE8ClassToLTNidMap } from "@/types/fe8-class.ts";
+import decideUnitWeapons from "@/ai/create-unit-data/item-options/decide-unit-weapons.ts";
 
 export default async function createUnitData({
   characterIdea,
@@ -28,7 +29,7 @@ export default async function createUnitData({
     bases: baseStats,
     growths: growthRates,
     stat_cap_modifiers: {},
-    starting_items: [],
+    starting_items: decideUnitWeapons({ fe8Class: klass, level, isPromoted }),
     learned_skills: [],
     unit_notes: [],
     wexp_gain: getWeaponExp({ className: klass, level, isPromoted }),
