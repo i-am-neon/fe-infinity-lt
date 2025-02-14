@@ -5,96 +5,89 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
     "distinctRegions": [
       {
         "name": "Western Village",
-        "description": "A small village located near a body of water, providing a strategic point for resources.",
+        "description": "A small village located near a body of water, providing a strategic point for resources and defense.",
         "terrainTypes": [
           "Plain",
           "Wall",
           "Village",
+          "Road",
           "Lake"
         ],
         "fromX": 0,
         "fromY": 0,
         "toX": 3,
-        "toY": 5
+        "toY": 6
       },
       {
         "name": "Central Crossroads",
-        "description": "The main intersection of roads, offering multiple paths to different regions.",
+        "description": "The main intersection of roads, offering multiple paths for movement and strategy.",
         "terrainTypes": [
           "Road",
           "Plain",
           "Forest"
         ],
-        "fromX": 3,
+        "fromX": 4,
         "fromY": 0,
         "toX": 9,
         "toY": 9
       },
       {
         "name": "Eastern Castle",
-        "description": "A fortified structure with defensive walls, serving as a stronghold.",
+        "description": "A fortified structure providing a defensive stronghold and strategic advantage.",
         "terrainTypes": [
           "Wall",
           "Road",
           "Ruins",
-          "Floor"
+          "Floor",
+          "Barrel"
         ],
-        "fromX": 9,
+        "fromX": 10,
         "fromY": 0,
         "toX": 14,
-        "toY": 3
+        "toY": 4
       },
       {
-        "name": "Southern Pathway",
-        "description": "A narrow road leading south, bordered by trees and natural terrain.",
+        "name": "Southern Outpost",
+        "description": "A small outpost near the water, serving as a defensive position and lookout point.",
         "terrainTypes": [
-          "Road",
           "Plain",
-          "Forest"
+          "Road",
+          "Wall",
+          "Armory",
+          "Cliff"
         ],
-        "fromX": 5,
+        "fromX": 10,
         "fromY": 5,
         "toX": 14,
         "toY": 9
-      },
-      {
-        "name": "Northern Outpost",
-        "description": "A small building located at the northern edge, possibly serving as a lookout or supply point.",
-        "terrainTypes": [
-          "Wall",
-          "Road",
-          "Armory"
-        ],
-        "fromX": 13,
-        "fromY": 6,
-        "toX": 14,
-        "toY": 7
       }
     ],
     "keyPointsOfInterest": [
       "Village at (2,2) and (3,6)",
-      "Armory at (13,7)"
+      "Armory at (13,7)",
+      "Ruins at (11,1) to (13,2)"
     ],
     "chokePoints": [
-      "Narrow road at (5,0)",
-      "Wall at (5,5)"
+      "Narrow road between walls at (5,0) and (6,0)",
+      "Road through walls at (7,3)",
+      "Road through walls at (7,6)"
     ],
     "strategicConsiderations": [
-      "Control the Central Crossroads to dominate movement across the map.",
-      "Defend the Eastern Castle to maintain a stronghold.",
-      "Utilize the Western Village for resource gathering.",
-      "Secure the Northern Outpost for a strategic vantage point."
+      "The Western Village provides a resource point and is defensible due to its proximity to the lake.",
+      "The Central Crossroads is crucial for movement and offers multiple strategic paths.",
+      "The Eastern Castle is a strong defensive position with limited access points.",
+      "The Southern Outpost serves as a lookout and defensive position, with the armory providing additional resources."
     ],
     "givenName": "Crossroads of Commerce",
     "originalName": "(7)Ch3BandofMercenaries_Diff_Tileset__by_Shin19",
-    "description": "An outdoor map featuring a network of roads connecting various key locations, including villages and a castle, surrounded by natural terrain.",
+    "description": "An outdoor map featuring a network of roads connecting various key locations, including villages and a castle. The terrain is a mix of open plains and strategic choke points formed by walls and water.",
     "setting": "outdoor"
   },
   {
     "distinctRegions": [
       {
         "name": "Castle Entrance",
-        "description": "The fortified entrance to a grand castle, surrounded by walls and providing a strategic defensive position.",
+        "description": "A fortified structure with a grand entrance, surrounded by walls and plains. Provides a defensive position with limited access points.",
         "terrainTypes": [
           "Wall",
           "Plain"
@@ -106,51 +99,41 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
       },
       {
         "name": "Central Forest",
-        "description": "A dense forest area providing cover and strategic movement options, ideal for ambushes and flanking maneuvers.",
+        "description": "A dense forest area providing cover and strategic movement options. It is surrounded by plains and cliffs, making it a key area for ambushes and tactical maneuvers.",
         "terrainTypes": [
           "Forest",
-          "Plain"
+          "Plain",
+          "Cliff"
         ],
-        "fromX": 0,
+        "fromX": 2,
         "fromY": 2,
-        "toX": 6,
+        "toX": 9,
         "toY": 9
       },
       {
         "name": "River Crossing",
-        "description": "A river with two wooden bridges allowing passage, serving as a critical chokepoint for controlling movement across the map.",
+        "description": "A river with two wooden bridges allowing passage. This area serves as a critical chokepoint for movement across the map.",
         "terrainTypes": [
           "River",
           "Bridge",
           "Plain"
         ],
-        "fromX": 11,
-        "fromY": 2,
-        "toX": 13,
-        "toY": 9
-      },
-      {
-        "name": "Mountain Edge",
-        "description": "A small mountain range providing a natural barrier, limiting movement and offering high ground advantage.",
-        "terrainTypes": [
-          "Mountain",
-          "Plain"
-        ],
-        "fromX": 12,
+        "fromX": 10,
         "fromY": 0,
         "toX": 14,
-        "toY": 2
+        "toY": 6
       },
       {
         "name": "Southern Forest",
-        "description": "A continuation of the forest with more open spaces, offering both cover and mobility for units.",
+        "description": "A smaller forested area offering additional cover, surrounded by plains and cliffs. It provides a secondary route for flanking maneuvers.",
         "terrainTypes": [
           "Forest",
-          "Plain"
+          "Plain",
+          "Cliff"
         ],
         "fromX": 0,
-        "fromY": 6,
-        "toX": 10,
+        "fromY": 7,
+        "toX": 9,
         "toY": 9
       }
     ],
@@ -164,11 +147,10 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
       "Bridge at (12,5)"
     ],
     "strategicConsiderations": [
-      "The Castle Entrance provides a strong defensive position with limited access points.",
-      "The Central Forest allows for ambushes and flanking due to its dense cover.",
-      "Controlling the River Crossing is crucial for movement across the map, as the bridges are key chokepoints.",
-      "The Mountain Edge offers high ground advantage but is difficult to traverse.",
-      "The Southern Forest provides a balance of cover and mobility, useful for repositioning."
+      "Defend the Castle Entrance to control access to the map.",
+      "Use the Central Forest for ambushes and to control movement.",
+      "Control the River Crossing to restrict enemy movement.",
+      "Utilize the Southern Forest for flanking and surprise attacks."
     ],
     "givenName": "Forest Crossing",
     "originalName": "(7)Ch01_Diff_Tileset__by_Shin19",

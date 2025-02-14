@@ -20,18 +20,19 @@ export default async function generateAndStoreVector({
   const embedding = await createEmbedding({ text, model });
   await storeVector({ id, embedding, metadata, vectorType });
 
-  // Update local seed-vectors.json file for seeding later
-  const seedFilePath = new URL("./seed-vectors.json", import.meta.url).pathname;
-  let seedVectors: Array<{
-    id: string;
-    embedding: number[];
-    metadata: Record<string, unknown>;
-  }> = [];
+  function getSeedFilePathByType(type: "maps" | "portraits"): string {
+    return new URL(
+      type === "maps" ? "./seed-vectors/maps.json" : "./seed-vectors/portraits.json",
+      import.meta.url
+    ).pathname;
+  }
+  const seedFilePath = getSeedFilePathByType(vectorType);
+  let seedVectors: Array<{ id: string; embedding: number[]; metadata: Record<string, unknown> }> = [];
   try {
     const data = await Deno.readTextFile(seedFilePath);
     seedVectors = JSON.parse(data);
   } catch (error) {
-    console.log("No seed vectors file found, creating a new one.");
+    console.log(`No seed vectors file found for ${vectorType}, creating a new one.`);
   }
   seedVectors.push({ id, embedding, metadata });
   await Deno.writeTextFile(seedFilePath, JSON.stringify(seedVectors, null, 2));
@@ -44,4 +45,3 @@ if (import.meta.main) {
   await generateAndStoreVector({ id, text, metadata, vectorType: "portraits" });
   console.log("Generated and stored embedding for sample-id.");
 }
-

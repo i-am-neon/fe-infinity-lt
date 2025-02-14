@@ -55,6 +55,7 @@ Given the user's Fire Emblem character idea, provide a brief single-line string 
   // 2) Embed and run similarity search
   const embedding = await createEmbedding({ text: searchQuery });
   const topResults = await similaritySearch(embedding, 20, "portraits");
+  console.log("topResults :>> ", topResults);
   if (!topResults.length) {
     logger.warn("No portrait results found for search query", { searchQuery });
     throw new Error("No portrait matches found.");

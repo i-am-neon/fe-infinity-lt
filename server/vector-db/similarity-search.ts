@@ -11,9 +11,12 @@ export default async function similaritySearch(
     metadata: Record<string, unknown> | null;
   }>
 > {
+  console.log("Similarity search table selection:", vectorType);
+
   const client = await pool.connect();
   try {
-    const tableName = vectorType === "maps" ? "maps_vectors" : "portraits_vectors";
+    const tableName =
+      vectorType === "maps" ? "maps_vectors" : "portraits_vectors";
     const embeddingLiteral = "[" + embedding.join(",") + "]";
     const query = `
       SELECT
@@ -38,10 +41,7 @@ export default async function similaritySearch(
 if (import.meta.main) {
   // Example usage for maps
   const queryEmbedding = new Array(1536).fill(0).map(() => Math.random());
-  const resultsMaps = await similaritySearch(queryEmbedding, 5, "maps");
-  console.log("Maps similarity search results:", resultsMaps);
-
-  // Example usage for portraits
-  const resultsPortraits = await similaritySearch(queryEmbedding, 5, "portraits");
-  console.log("Portraits similarity search results:", resultsPortraits);
+  const res = await similaritySearch(queryEmbedding, 100, "portraits");
+  console.log("similarity search results:", res);
 }
+
