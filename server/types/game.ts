@@ -1,5 +1,5 @@
 import { Chapter } from "@/types/chapter.ts";
-import { Character } from "@/types/character.ts";
+import { Character } from "./character/character.ts";
 
 export interface Game {
   nid: string;

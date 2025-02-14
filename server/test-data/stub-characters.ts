@@ -1,5 +1,4 @@
-import { Character } from "@/types/character.ts";
-import { FE8Class } from "@/types/fe8-class.ts";
+import { Character } from "../types/character/character.ts";
 
 export const stubCharacterBozla: Character = {
   unitData: {
@@ -8,7 +7,7 @@ export const stubCharacterBozla: Character = {
     desc: "A berserker from Rausten. He's a hearty man with a thirst for life.",
     variant: null,
     level: 20,
-    klass: FE8Class.Berserker,
+    klass: "Berserker",
     tags: [],
     bases: {
       HP: 43,
@@ -66,7 +65,7 @@ export const stubCharacterBroNeill: Character = {
     desc: "A troop leader in Grado's army.",
     variant: null,
     level: 1,
-    klass: FE8Class.Fighter,
+    klass: "Fighter",
     tags: ["Boss"],
     bases: {
       HP: 1,
@@ -109,7 +108,7 @@ export const stubCharacterBroNeill: Character = {
     },
     alternate_classes: [],
     portrait_nid: "Mercenary1",
-    affinity: "None",
+    affinity: null,
     fields: [],
   },
 };
@@ -121,7 +120,7 @@ export const stubCharacterBreguet: Character = {
     desc: "Commander of a Grado military force.",
     variant: null,
     level: 4,
-    klass: FE8Class.Knight,
+    klass: "Knight",
     tags: ["Boss"],
     bases: {
       HP: 21,

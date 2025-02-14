@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { AffinitySchema } from "@/types/character/affinity.ts";
 
 export const CharacterIdeaSchema = z
   .object({
@@ -16,6 +17,7 @@ export const CharacterIdeaSchema = z
     personality: z
       .string()
       .min(1, "Must be a 1-sentence personality description"),
+    affinity: AffinitySchema,
     classDirection: z
       .string()
       .describe(

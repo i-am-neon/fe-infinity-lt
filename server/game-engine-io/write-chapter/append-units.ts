@@ -1,7 +1,6 @@
 import { getPathWithinLtMaker } from "@/file-io/get-path-within-lt-maker.ts";
 import readOrCreateJSON from "@/game-engine-io/read-or-create-json.ts";
-import { UnitData } from "@/types/unit-data.ts";
-import { FE8Class } from "@/types/fe8-class.ts";
+import { UnitData } from "../../types/character/unit-data.ts";
 
 export async function appendSingleUnit({
   projectNameEndingInDotLtProj,
@@ -73,7 +72,7 @@ if (import.meta.main) {
         desc: "My custom unit",
         variant: null,
         level: 1,
-        klass: FE8Class.Fighter,
+        klass: "Fighter",
         tags: [],
         bases: {
           HP: 20,
@@ -131,7 +130,7 @@ if (import.meta.main) {
           desc: "Another custom unit",
           variant: null,
           level: 5,
-          klass: FE8Class.Archer,
+          klass: "Archer",
           tags: [],
           bases: {
             HP: 18,
@@ -182,3 +181,4 @@ if (import.meta.main) {
     console.log("Appended multiple new units successfully.");
   })();
 }
+

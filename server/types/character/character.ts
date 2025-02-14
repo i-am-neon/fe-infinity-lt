@@ -1,4 +1,4 @@
-import { UnitData } from "@/types/unit-data.ts";
+import { UnitData } from "./unit-data.ts";
 
 export type Character = {
   unitData: UnitData;

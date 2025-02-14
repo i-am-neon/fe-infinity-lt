@@ -6,6 +6,7 @@ export const testCharIdeaAislin: CharacterIdea = {
   gender: "female",
   personality:
     "Clever and resourceful, with a keen sense for strategy and diplomacy.",
+  affinity: "Light",
   classDirection: "Healer",
   age: "young adult",
   backstory:
@@ -24,6 +25,7 @@ export const testCharIdeaThorne: CharacterIdea = {
   gender: "male",
   personality:
     "Stubborn and honorable, driven by a strong moral compass and a sense of duty.",
+  affinity: "Ice",
   classDirection: "Sword User",
   age: "young adult",
   backstory:

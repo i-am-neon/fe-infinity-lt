@@ -1,5 +1,5 @@
 import { FE8Class } from "@/types/fe8-class.ts";
-import { StatValues } from "@/types/unit-data.ts";
+import { StatValues } from "../../types/character/unit-data.ts";
 
 const baseData: Record<FE8Class, { base: StatValues; growth: StatValues }> = {
   Citizen: {
@@ -1256,7 +1256,7 @@ function randomInRange(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-export default function decideBaseStatsForClass(fe8Class: FE8Class): {
+export default function decideStats(fe8Class: FE8Class): {
   baseStats: StatValues;
   growthRates: StatValues;
 } {
@@ -1292,7 +1292,7 @@ if (import.meta.main) {
     "Paladin",
   ];
   for (const c of testClasses) {
-    const res = decideBaseStatsForClass(c);
+    const res = decideStats(c);
     console.log(c, res);
   }
 }
