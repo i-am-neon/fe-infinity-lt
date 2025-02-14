@@ -20,6 +20,7 @@ import { stubTilemapImportedTmx } from "@/test-data/stub-tilemap.ts";
 import { Chapter } from "@/types/chapter.ts";
 import { Character } from "@/types/character/character.ts";
 import { Game } from "@/types/game.ts";
+import { allPortraitOptions } from "@/portrait-processing/all-portrait-options.ts";
 
 export default async function genAndWritePrologue({
   projectName,
@@ -82,12 +83,23 @@ export default async function genAndWritePrologue({
     ...stubPrologue.events,
   ];
 
-  const newCharacters: Character[] = unitDatas.map((ud) => ({
-    unitData: {
-      ...ud,
-      portrait_nid: portraitMap[ud.nid],
-    },
-  }));
+  const newCharacters: Character[] = unitDatas.map((ud) => {
+    const originalName = portraitMap[ud.nid];
+    const portraitMetadata = allPortraitOptions.find(
+      (p) => p.originalName === originalName
+    );
+    if (!portraitMetadata) {
+      logger.error("Could not find portrait metadata", { originalName });
+      throw new Error(`Could not find portrait metadata for ${originalName}`);
+    }
+    return {
+      unitData: {
+        ...ud,
+        portrait_nid: portraitMap[ud.nid],
+      },
+      portraitMetadata,
+    };
+  });
 
   const newChapter: Chapter = {
     ...stubPrologue,
@@ -118,7 +130,10 @@ export default async function genAndWritePrologue({
     usedPortraits,
   };
 
-  logger.info("Generated prologue", { elapsedTimeMs: Date.now() - startTime });
+  logger.info("Generated prologue", {
+    elapsedTimeMs: Date.now() - startTime,
+    game: newGame,
+  });
 
   return { projectNameEndingInDotLtProj, gameNid, newGame };
 }

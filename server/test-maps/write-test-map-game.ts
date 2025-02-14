@@ -5,8 +5,8 @@ import writeChapter from "@/game-engine-io/write-chapter/write-chapter.ts";
 import removeExistingGame from "@/lib/remove-existing-game.ts";
 import runGame from "@/run-game.ts";
 import {
-  stubCharacterBozla,
-  stubCharacterBroNeill,
+  stubCharacterCedric,
+  stubCharacterElara,
 } from "@/test-data/stub-characters.ts";
 import { Chapter } from "@/types/chapter.ts";
 
@@ -20,7 +20,7 @@ export default async function writeTestMapGame(): Promise<void> {
   );
 
   // Add the only characters we'll use in this test
-  const characters = [stubCharacterBozla, stubCharacterBroNeill];
+  const characters = [stubCharacterCedric, stubCharacterElara];
   await appendUnits({
     projectNameEndingInDotLtProj,
     newUnits: characters.map((c) => c.unitData),

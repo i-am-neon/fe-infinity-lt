@@ -139,6 +139,12 @@ export default async function initializeProject(projectName: string) {
 ]`,
   });
 
+  // Remove portraits
+  await removeWithinLtMaker({
+    relativePath: `${newProjectNameEndingInDotLtProj}/resources/portraits`,
+    preserveDirectory: true,
+  });
+
   // Remove tilemaps
   await removeWithinLtMaker({
     relativePath: `${newProjectNameEndingInDotLtProj}/resources/tilemaps/tilemap_data`,
@@ -167,3 +173,4 @@ export default async function initializeProject(projectName: string) {
 if (import.meta.main) {
   await initializeProject("My Project");
 }
+
