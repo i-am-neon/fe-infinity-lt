@@ -5,9 +5,11 @@ import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
 export default async function copyFileToLtMaker({
   filePathInServer,
   ltMakerSubdirectory,
+  newFileName,
 }: {
   filePathInServer: string;
   ltMakerSubdirectory: string;
+  newFileName?: string;
 }): Promise<void> {
   const absoluteSourcePath = getPathWithinServer(filePathInServer);
   const fileStat = await Deno.stat(absoluteSourcePath);
@@ -18,7 +20,7 @@ export default async function copyFileToLtMaker({
 
   const fileName = basename(absoluteSourcePath);
   const destinationPath = getPathWithinLtMaker(
-    join(ltMakerSubdirectory, fileName)
+    join(ltMakerSubdirectory, newFileName || fileName)
   );
   await Deno.copyFile(absoluteSourcePath, destinationPath);
 }
@@ -30,4 +32,3 @@ if (import.meta.main) {
   });
   console.log("File copied successfully.");
 }
-

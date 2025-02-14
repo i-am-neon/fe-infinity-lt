@@ -13,6 +13,7 @@ export default async function writeCharacter({
   await copyFileToLtMaker({
     filePathInServer: `assets/portraits/${character.portraitMetadata.originalName}.png`,
     ltMakerSubdirectory: `${projectNameEndingInDotLtProj}/resources/portraits`,
+    newFileName: `${character.unitData.nid}.png`,
   });
   // Update potraits.json with blinking and smiling offsets
   // Append to units.json
