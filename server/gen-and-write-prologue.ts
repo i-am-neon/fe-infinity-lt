@@ -21,6 +21,7 @@ import { stubPrologue } from "@/test-data/stub-prologue.ts";
 import { stubTilemapImportedTmx } from "@/test-data/stub-tilemap.ts";
 import { Chapter } from "@/types/chapter.ts";
 import { Game } from "@/types/game.ts";
+import createUnitDatas from "@/ai/create-unit-data/create-unit-datas.ts";
 
 export default async function genAndWritePrologue({
   projectName,
@@ -46,8 +47,12 @@ export default async function genAndWritePrologue({
   });
   const initialGameIdea = await genInitialGameIdea({ worldSummary, tone });
 
-  const [usedPortraits] = await Promise.all([
+  const [usedPortraits, unitDatas] = await Promise.all([
     choosePortraits(initialGameIdea.characterIdeas),
+    createUnitDatas({
+      characterIdeas: initialGameIdea.characterIdeas,
+      chapterNumber: 0,
+    }),
   ]);
 
   const prologueScript = await genPrologueScript({
