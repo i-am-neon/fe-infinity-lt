@@ -3,7 +3,7 @@ set shell := ["bash", "-c"]
 
 # Start both the client and server
 start:
-    just start-server & just start-client & just init-pgvector
+    just start-server & just start-client & just init-vector-db
 
 # Start the Deno server with Conda
 start-server:
@@ -26,7 +26,7 @@ stop:
 	-pkill -f "deno"
 	-pkill -f "pnpm dev"
 	-pkill -f "next dev"
-	just stop-pgvector
+	just stop-vector-db
 
 clean:
     just stop
@@ -48,11 +48,11 @@ process-portraits:
     just run server/portrait-processing/process-all-portraits.ts
 
 # Initialize PostgreSQL with pgvector extension installed and configured.
-init-pgvector:
+init-vector-db:
 	brew install pgvector || true
 	brew services restart postgresql@14
 	just run server/vector-db/init.ts
 	just run server/vector-db/seed-vectors.ts
 
-stop-pgvector:
+stop-vector-db:
     brew services stop postgresql@14
