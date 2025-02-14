@@ -1,4 +1,4 @@
-import { UnitData } from "../../types/character/unit-data.ts";
+import { UnitData } from "@/types/character/unit-data.ts";
 import { CharacterIdea } from "@/ai/types/character-idea.ts";
 import decideLevel from "@/ai/create-unit-data/decide-level.ts";
 import decideClass from "@/ai/create-unit-data/decide-class.ts";

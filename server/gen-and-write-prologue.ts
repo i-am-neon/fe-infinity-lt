@@ -1,4 +1,4 @@
-import choosePortrait from "./ai/choose-portrait.ts";
+import { choosePortraits } from "@/ai/choose-portraits.ts";
 import genInitialGameIdea from "@/ai/gen-initial-game-idea.ts";
 import genPrologueScript from "@/ai/gen-prologue-script.ts";
 import genWorldSummary from "@/ai/gen-world-summary.ts";
@@ -46,15 +46,9 @@ export default async function genAndWritePrologue({
   });
   const initialGameIdea = await genInitialGameIdea({ worldSummary, tone });
 
-  // Choose Portraits
-  const usedPortraits: string[] = []; // Since we're creating the prologue, no portraits have been used
-  for (const characterIdea of initialGameIdea.characterIdeas) {
-    const chosenPortraitName = await choosePortrait({
-      characterIdea,
-      usedPortraits,
-    });
-    usedPortraits.push(chosenPortraitName);
-  }
+  const [usedPortraits] = await Promise.all([
+    choosePortraits(initialGameIdea.characterIdeas),
+  ]);
 
   const prologueScript = await genPrologueScript({
     worldSummary,
