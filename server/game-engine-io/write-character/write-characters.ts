@@ -12,11 +12,9 @@ export default async function writeCharacters({
   characters: Character[];
   projectNameEndingInDotLtProj: string;
 }): Promise<void> {
-  await Promise.all(
-    characters.map((character) =>
-      writeCharacter({ character, projectNameEndingInDotLtProj })
-    )
-  );
+  for (const character of characters) {
+    await writeCharacter({ character, projectNameEndingInDotLtProj });
+  }
 }
 
 if (import.meta.main) {
