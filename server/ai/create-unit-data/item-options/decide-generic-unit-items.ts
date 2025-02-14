@@ -14,7 +14,7 @@ export default function decideGenericUnitWeapons({
   fe8Class: FE8Class;
   level: number;
   isPromoted: boolean;
-}): WeaponOption[] {
+}): [string, boolean][] {
   let rankExpVal = 1;
   if (!isPromoted) {
     rankExpVal = level < 10 ? weaponRankExpMap.E : weaponRankExpMap.D;
@@ -27,11 +27,6 @@ export default function decideGenericUnitWeapons({
     return [];
   }
 
-  // Pick 1 weapon type at random from the possible types
-  const chosenType =
-    possibleWeaponTypes[Math.floor(Math.random() * possibleWeaponTypes.length)];
-
-  // Map the rankExpVal back to a rank key
   const ranksArr = [
     "E",
     "D",
@@ -46,6 +41,8 @@ export default function decideGenericUnitWeapons({
   const minRank = ranksArr[rankIndex];
   const maxRank = ranksArr[rankIndex];
 
+  const chosenType =
+    possibleWeaponTypes[Math.floor(Math.random() * possibleWeaponTypes.length)];
   const candidateWeapons = filterWeapons({
     desiredType: chosenType,
     minRank,
@@ -54,18 +51,58 @@ export default function decideGenericUnitWeapons({
   if (!candidateWeapons.length) {
     return [];
   }
-
   const chosenWeapon =
     candidateWeapons[Math.floor(Math.random() * candidateWeapons.length)];
-  return [chosenWeapon];
+
+  const weapons: WeaponOption[] = [chosenWeapon];
+
+  if (possibleWeaponTypes.length > 1) {
+    let baseChance = 0.15 + Math.max(0, level - 5) * 0.02;
+    if (isPromoted) {
+      baseChance += 0.1;
+    }
+    if (Math.random() < baseChance) {
+      const otherTypes = possibleWeaponTypes.filter((t) => t !== chosenType);
+      if (otherTypes.length > 0) {
+        const secondType =
+          otherTypes[Math.floor(Math.random() * otherTypes.length)];
+        const secondCandidates = filterWeapons({
+          desiredType: secondType,
+          minRank,
+          maxRank,
+        });
+        if (secondCandidates.length) {
+          const secondWeapon =
+            secondCandidates[
+              Math.floor(Math.random() * secondCandidates.length)
+            ];
+          weapons.push(secondWeapon);
+        }
+      }
+    }
+  }
+
+  // Convert from WeaponOption to [weaponNid, false]
+  return weapons.map((w) => [w.nid, false]);
 }
 
 if (import.meta.main) {
-  const example = decideGenericUnitWeapons({
+  const paladin = decideGenericUnitWeapons({
     fe8Class: "Paladin",
     level: 7,
     isPromoted: true,
   });
-  console.log("Decided weapons for a level 7 Knight:", example);
+  console.log("paladin", paladin);
+  const fighter = decideGenericUnitWeapons({
+    fe8Class: "Fighter",
+    level: 2,
+    isPromoted: false,
+  });
+  console.log("fighter", fighter);
+  const shaman = decideGenericUnitWeapons({
+    fe8Class: "Shaman",
+    level: 12,
+    isPromoted: false,
+  });
+  console.log("shaman", shaman);
 }
-
