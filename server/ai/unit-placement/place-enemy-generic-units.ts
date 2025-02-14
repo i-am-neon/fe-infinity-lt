@@ -39,7 +39,7 @@ export default async function placeEnemyGenericUnits({
       : allClassOptions;
 
   const systemMessage = `
-      You are an advanced Fire Emblem Tactician. Based on the sub terrain grid, the region's squad info, the scene overview, and the map metadata, generate generic enemy unit placements for ONLY this region.
+      You are an advanced Fire Emblem Tactician. Based on the sub terrain grid, the region's squad info, the chapter idea, and the map metadata, generate generic enemy unit placements for ONLY this region.
 You must ensure these units reflect the "squadInfo" concept and remain within the region's bounding box.
 
 Place the same number of units as specified in the "numberOfGenericEnemies" field of the region squad info.
@@ -61,7 +61,7 @@ Place the same number of units as specified in the "numberOfGenericEnemies" fiel
           toY: region.toY,
         });
 
-        const prompt = `Scene Overview: ${JSON.stringify(
+        const prompt = `Chapter Idea: ${JSON.stringify(
           chapterIdea
         )}\nMap Metadata: ${JSON.stringify(
           mapMetadata

@@ -40,7 +40,7 @@ export default async function genUnitSquads({
       ? allClassOptions.filter((c) => c.promotionLevel === "unpromoted")
       : allClassOptions;
   const systemMessage = `
-You are an elite Fire Emblem Tactician. Your task is to analyze the provided terrain grid, scene overview, and map metadata to generate strategic recommendations for forming unit squads in each distinct region.
+You are an elite Fire Emblem Tactician. Your task is to analyze the provided terrain grid, chapter idea, and map metadata to generate strategic recommendations for forming unit squads in each distinct region.
 
 ${availableClasses(filteredClassOptions)}
 
@@ -81,7 +81,7 @@ Every region must have squadInfo. That means your output must follow:
   ]
 }`.trim();
 
-  const prompt = `Terrain Grid: ${terrainGrid}\nScene Overview: ${JSON.stringify(
+  const prompt = `Terrain Grid: ${terrainGrid}\nChapter Idea: ${JSON.stringify(
     chapterIdea
   )}\nMap Metadata: ${JSON.stringify(mapMetadata)}`;
 

@@ -3,7 +3,7 @@ import { ClassOption } from "@/ai/unit-placement/get-all-class-options.ts";
 export function availableClasses(classOptions: ClassOption[]) {
   return `## Available classes
 
-When choosing classes, consider the Scene Overview. For example, if this chapter's story is about a pirate raid, you might want to include classes like Pirates, Fighters, and Brigands. If it's a chapter about a dark mage with a band of wyverns, you might want to include Shamans, Mages, Wyvern Riders, etc.
+When choosing classes, consider the Chapter Idea. For example, if this chapter's story is about a pirate raid, you might want to include classes like Pirates, Fighters, and Brigands. If it's a chapter about a dark mage with a band of wyverns, you might want to include Shamans, Mages, Wyvern Riders, etc.
 
 At your disposal are the following available classes:
 ${JSON.stringify(classOptions, null, 2)}
