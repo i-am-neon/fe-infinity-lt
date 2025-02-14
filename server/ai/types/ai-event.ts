@@ -10,6 +10,7 @@ export const AIEventSchema = z.object({
     ),
   trigger: TriggerEnumSchema,
   condition: z.string().describe(`Common conditions:
+- For Intro and Outro events, simply return "True"
 - Check if the unit referenced by the event is a specific unit: "unit.nid == 'Eirika'"
 - Check if the region referenced by the event is a specific region: "region.nid == 'House1'"
 - Check if a unit is alive: "game.check_alive(unit.nid)" or "game.check_alive('Eirika')"
@@ -31,7 +32,7 @@ export const AIEventSchema = z.object({
 
   // The rest of the events are false.`
   //   ),
-  sourceAsObject: SourceAsObjectSchema.array(),
+  sourceObjects: SourceAsObjectSchema.array(),
 });
 
 export type AIEvent = z.infer<typeof AIEventSchema>;
