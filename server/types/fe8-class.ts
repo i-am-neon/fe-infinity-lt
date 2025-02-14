@@ -30,8 +30,6 @@ export const UnpromotedFE8Classes = [
   "Sword Wight",
   "Bow Wight",
   "Mogall",
-  "Wall",
-  "Snag",
 ] as const;
 
 export const PromotedFE8Classes = [

@@ -1,7 +1,7 @@
 import { FE8Class } from "@/types/fe8-class.ts";
 
 type WeaponExperience = [boolean, number, number]; // [Usable, Starting Exp, Max Exp]. Max Exp is always 251
-type StatValues = {
+export type StatValues = {
   HP: number;
   STR: number;
   MAG: number;
