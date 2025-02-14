@@ -15,8 +15,8 @@ export default async function assembleUnitPlacement({
   mapMetadata: MapMetadata;
   chapterNumber: number;
 }) {
-  const [genericEnemies, { boss, playerUnits, greenUnits }] = await Promise.all(
-    [
+  const [originalGenericEnemies, { boss, playerUnits, greenUnits }] =
+    await Promise.all([
       getGenericEnemies({
         terrainGrid,
         chapterIdea,
@@ -28,7 +28,12 @@ export default async function assembleUnitPlacement({
         chapterIdea,
         mapMetadata,
       }),
-    ]
+    ]);
+
+  // If any enemies are on Player Units, remove them
+  const playerPositions = new Set(playerUnits.map((u) => `${u.x},${u.y}`));
+  const genericEnemies = originalGenericEnemies.filter(
+    (e) => !playerPositions.has(`${e.x},${e.y}`)
   );
 
   return {
