@@ -23,7 +23,7 @@ export default async function createUnitData({
     variant: null,
     level,
     klass,
-    tags: [],
+    tags: characterIdea.firstSeenAs === "boss" ? ["Boss"] : [],
     bases: baseStats,
     growths: growthRates,
     stat_cap_modifiers: {},
