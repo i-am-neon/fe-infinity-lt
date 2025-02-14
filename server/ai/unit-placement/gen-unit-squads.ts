@@ -15,7 +15,7 @@ import {
 } from "@/ai/types/region-squad-info.ts";
 import { getTerrainGridSize } from "@/ai/unit-placement/get-terrain-grid-size.ts";
 import { testChapterIdea } from "@/ai/test-data/chapter-ideas.ts";
-import { testMapMetadata } from "@/ai/test-data/map-metadata.ts";
+import { testMapMetadata } from "../test-data/unit-placement.ts";
 import { getAllClassOptions } from "@/ai/unit-placement/get-all-class-options.ts";
 import { availableClasses } from "@/ai/unit-placement/shared-prompts/available-classes.ts";
 import { UNIT_TERRAIN_PLACEMENT_CONSTRAINTS } from "@/ai/unit-placement/shared-prompts/unit-terrain-placement-constraints.ts";

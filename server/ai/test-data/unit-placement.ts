@@ -65,3 +65,4 @@ export const testMapMetadata: MapMetadata = {
     "An outdoor map featuring a network of roads connecting various key locations, including villages and a castle. The terrain is a mix of open plains and strategic choke points formed by walls and water.",
   setting: "outdoor",
 };
+
