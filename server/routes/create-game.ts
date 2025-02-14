@@ -23,22 +23,14 @@ export async function handleCreateGame(req: Request): Promise<Response> {
       );
     }
 
-    const { gameNid, projectNameEndingInDotLtProj } = await genAndWritePrologue(
-      {
+    const { gameNid, projectNameEndingInDotLtProj, newGame } =
+      await genAndWritePrologue({
         projectName: body.title,
         description: body.description,
         tone: body.tone,
-      }
-    );
-    insertGame({
-      nid: gameNid,
-      title: body.title,
-      directory: projectNameEndingInDotLtProj,
-      description: body.description,
-      tone: body.tone,
-      chapters: [],
-      characters: [],
-    });
+      });
+
+    insertGame(newGame);
 
     // Run game without waiting
     void runGame(projectNameEndingInDotLtProj);

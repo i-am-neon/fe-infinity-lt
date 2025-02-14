@@ -22,7 +22,7 @@ interface EphemeralPortraitOption {
 }
 
 const searchQuerySchema = z.object({
-  searchQuery: z.string().max(70),
+  searchQuery: z.string().describe("A short sentence to search for a portrait"),
 });
 
 const decideSchema = z.object({
@@ -49,7 +49,7 @@ Given the user's Fire Emblem character idea, provide a brief single-line string 
     systemMessage: systemMessageForQuery,
     prompt: JSON.stringify(characterIdea),
     temperature: 0.3,
-    model: "gpt-4o",
+    model: "gpt-4o-mini",
   });
 
   // 2) Embed and run similarity search
@@ -109,7 +109,7 @@ Return a JSON object { "chosenId": "A" } or "B" or "C" with no quotes around the
     systemMessage: systemMessageForDecision,
     prompt: secondCallPrompt,
     temperature: 0.3,
-    model: "gpt-4o",
+    model: "gpt-4o-mini",
   });
 
   // 4) Return the originalName

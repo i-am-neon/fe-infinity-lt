@@ -1,6 +1,7 @@
 import { db } from "@/db/connection.ts";
 import { Game } from "@/types/game.ts";
 import { initializeDatabase } from "@/db/init.ts";
+import { getCurrentLogger } from "@/lib/current-logger.ts";
 
 /**
  * This file sets up a local SQLite database in Deno and uses it to store Game objects.
@@ -23,6 +24,7 @@ type GameRow = [
 export function insertGame(game: Game): void {
   const chaptersJson = JSON.stringify(game.chapters);
   const charactersJson = JSON.stringify(game.characters);
+  const usedPortraitsJson = JSON.stringify(game.usedPortraits);
   db.query(
     `
       INSERT OR REPLACE INTO games (nid, title, directory, description, tone, chapters, characters, used_portraits)
@@ -36,7 +38,7 @@ export function insertGame(game: Game): void {
       game.tone,
       chaptersJson,
       charactersJson,
-      JSON.stringify(game.usedPortraits || []),
+      usedPortraitsJson,
     ]
   );
 }

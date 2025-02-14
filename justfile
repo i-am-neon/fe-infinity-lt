@@ -17,6 +17,10 @@ editor:
 start-client:
     cd client && pnpm dev
 
+reset:
+    just stop
+    just clean
+
 # Stop all running processes
 stop:
 	-pkill -f "deno"

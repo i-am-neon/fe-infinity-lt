@@ -1,4 +1,5 @@
 import { choosePortraits } from "@/ai/choose-portraits.ts";
+import createUnitDatas from "@/ai/create-unit-data/create-unit-datas.ts";
 import genInitialGameIdea from "@/ai/gen-initial-game-idea.ts";
 import genPrologueScript from "@/ai/gen-prologue-script.ts";
 import genWorldSummary from "@/ai/gen-world-summary.ts";
@@ -12,16 +13,13 @@ import initializeProject from "@/game-engine-io/initialize-project.ts";
 import writeChapter from "@/game-engine-io/write-chapter/write-chapter.ts";
 import writeStubChapter from "@/game-engine-io/write-chapter/write-stub-chapter.ts";
 import breakTextIntoGameLines from "@/lib/break-text-into-game-lines.ts";
+import { setCurrentLoggerProject } from "@/lib/current-logger.ts";
 import removeExistingGame from "@/lib/remove-existing-game.ts";
-import {
-  stubCharacterBozla,
-  stubCharacterBroNeill,
-} from "@/test-data/stub-characters.ts";
 import { stubPrologue } from "@/test-data/stub-prologue.ts";
 import { stubTilemapImportedTmx } from "@/test-data/stub-tilemap.ts";
 import { Chapter } from "@/types/chapter.ts";
+import { Character } from "@/types/character/character.ts";
 import { Game } from "@/types/game.ts";
-import createUnitDatas from "@/ai/create-unit-data/create-unit-datas.ts";
 
 export default async function genAndWritePrologue({
   projectName,
@@ -32,6 +30,7 @@ export default async function genAndWritePrologue({
   description: string;
   tone: string;
 }) {
+  setCurrentLoggerProject(projectName);
   await removeExistingGame(projectName);
 
   // Create new project
@@ -47,22 +46,23 @@ export default async function genAndWritePrologue({
   });
   const initialGameIdea = await genInitialGameIdea({ worldSummary, tone });
 
-  const [usedPortraits, unitDatas] = await Promise.all([
+  const [portraitMap, unitDatas] = await Promise.all([
     choosePortraits(initialGameIdea.characterIdeas),
     createUnitDatas({
       characterIdeas: initialGameIdea.characterIdeas,
       chapterNumber: 0,
     }),
   ]);
+  const usedPortraits = Object.values(portraitMap);
 
-  const prologueScript = await genPrologueScript({
-    worldSummary,
-    initialGameIdea,
-    tone,
-  });
+  // const prologueScript = await genPrologueScript({
+  //   worldSummary,
+  //   initialGameIdea,
+  //   tone,
+  // });
 
   // Break the prologue script into multiple lines separated by "|"
-  const splittedPrologueScript = breakTextIntoGameLines(prologueScript);
+  // const splittedPrologueScript = breakTextIntoGameLines(prologueScript);
 
   const prologueEvents: Chapter["events"] = [
     {
@@ -73,12 +73,18 @@ export default async function genAndWritePrologue({
       commands: [],
       only_once: false,
       priority: 20,
-      _source: [`speak;hint;${splittedPrologueScript}`],
+      // _source: [`speak;hint;${splittedPrologueScript}`],
+      _source: [`speak;hint;This is a test`],
     },
     ...stubPrologue.events,
   ];
 
-  const newCharacters = [stubCharacterBozla, stubCharacterBroNeill];
+  const newCharacters: Character[] = unitDatas.map((ud) => ({
+    unitData: {
+      ...ud,
+      portrait_nid: portraitMap[ud.nid],
+    },
+  }));
 
   const newChapter: Chapter = {
     ...stubPrologue,
@@ -102,16 +108,14 @@ export default async function genAndWritePrologue({
     nid: gameNid,
     title: projectName,
     directory: projectNameEndingInDotLtProj,
-    description: `Project ${projectName} description here...`,
+    description,
     chapters: [newChapter],
     characters: newCharacters,
     tone: testTone,
     usedPortraits,
   };
 
-  insertGame(newGame);
-
-  return { projectNameEndingInDotLtProj, gameNid };
+  return { projectNameEndingInDotLtProj, gameNid, newGame };
 }
 
 if (import.meta.main) {
