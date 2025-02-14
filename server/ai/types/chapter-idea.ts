@@ -2,10 +2,10 @@ import { CharacterIdeaSchema } from "@/ai/types/character-idea.ts";
 import { z } from "zod";
 
 export const ChapterIdeaSchema = z.object({
-  name: z
+  title: z
     .string()
     .describe(
-      "Name of the chapter. Should be unique, just a few words, and not include the chapter number (or 'Prologue')."
+      "Title of the chapter. Should be unique, just a few words, and not include the chapter number (or 'Prologue')."
     ),
   intro: z.string().describe("Overview of the starting event of the chapter."),
   battle: z

@@ -1,3 +1,4 @@
+import genChapterIdea from "@/ai/chapter/gen-chapter-idea.ts";
 import { choosePortraits } from "@/ai/choose-portraits.ts";
 import createUnitDatas from "@/ai/create-unit-data/create-unit-datas.ts";
 import assembleEvent from "@/ai/events/assemble-event.ts";
@@ -17,12 +18,13 @@ import {
 } from "@/lib/current-logger.ts";
 import removeExistingGame from "@/lib/remove-existing-game.ts";
 import { allPortraitOptions } from "@/portrait-processing/all-portrait-options.ts";
-import { stubPrologue } from "@/test-data/stub-prologue.ts";
 import { stubTilemapImportedTmx } from "@/test-data/stub-tilemap.ts";
 import { Chapter } from "@/types/chapter.ts";
 import { Character } from "@/types/character/character.ts";
 import { Game } from "@/types/game.ts";
-import genChapterIdea from "@/ai/chapter/gen-chapter-idea.ts";
+import assembleLevel from "@/ai/level/assemble-level.ts";
+import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
+import { Tilemap } from "@/types/maps/tilemap.ts";
 
 export default async function genAndWritePrologue({
   projectName,
@@ -101,11 +103,21 @@ export default async function genAndWritePrologue({
     };
   });
 
+  const level = await assembleLevel({ chapterIdea, chapterNumber });
+  const tilemap: Tilemap = JSON.parse(
+    Deno.readTextFileSync(
+      getPathWithinServer(`assets/maps/${level.tilemap}.json`)
+    )
+  );
+  console.log("tilemap :>> ", tilemap);
+
   const newChapter: Chapter = {
-    ...stubPrologue,
+    title: chapterIdea.title,
+    number: chapterNumber,
+    level,
     events: [prologueIntroEvent],
     newCharacters,
-    tilemap: stubTilemapImportedTmx,
+    tilemap,
   };
 
   // Modify project files

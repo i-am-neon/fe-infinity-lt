@@ -2,7 +2,7 @@ import { ChapterIdea } from "@/ai/types/chapter-idea.ts";
 import { testCharIdeaThorne } from "@/ai/test-data/character-ideas.ts";
 
 export const testChapterIdea: ChapterIdea = {
-  name: "Whispers in the Frost",
+  title: "Whispers in the Frost",
   intro:
     "As the dawn breaks over the frost-laden peaks, Sir Aric and his companions arrive at the outskirts of the Frostvein Mountains, their breath crystallizing in the biting air. The journey has been arduous, fraught with skirmishes against the creeping Blight's minions. The party pauses to gather their strength, each member acutely aware of the weight of their mission. A sense of unease lingers, a feeling that they are not alone in these mountains, as shadows flit between the snow-laden trees.",
   battle:
