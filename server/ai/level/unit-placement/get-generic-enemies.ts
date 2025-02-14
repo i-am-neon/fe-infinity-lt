@@ -4,9 +4,10 @@ import {
   testTerrainGrid,
 } from "@/ai/test-data/unit-placement.ts";
 import { ChapterIdea } from "@/ai/types/chapter-idea.ts";
-import { EnemyGenericUnit } from "@/ai/types/unit-placement.ts";
+import { EnemyGenericUnitWithStartingItems } from "@/ai/types/unit-placement.ts";
 import { MapMetadata } from "@/types/maps/map-metadata.ts";
 import { TerrainGrid } from "@/types/maps/terrain-grid.ts";
+import assignDoorAndChestKeys from "./assign-door-and-chest-keys.ts";
 import correctUnitPlacement from "./correct-unit-placement.ts";
 import genUnitSquads from "./gen-unit-squads.ts";
 import getEnemyComposition from "./get-enemy-composition.ts";
@@ -24,7 +25,7 @@ export default async function getGenericEnemies({
   chapterIdea: ChapterIdea;
   mapMetadata: MapMetadata;
   chapterNumber: number;
-}): Promise<EnemyGenericUnit[]> {
+}): Promise<EnemyGenericUnitWithStartingItems[]> {
   const enemyComposition = getEnemyComposition(chapterNumber);
   const enemyCountRange = getGenericEnemyCountNumberRange(
     getTerrainGridSize(terrainGrid)
@@ -47,7 +48,9 @@ export default async function getGenericEnemies({
     terrainGrid,
     units: enemyGenericUnitPlacement,
   });
-  return correctedUnits;
+
+  const finalUnits = assignDoorAndChestKeys(terrainGrid, correctedUnits);
+  return finalUnits;
 }
 
 if (import.meta.main) {
@@ -59,4 +62,3 @@ if (import.meta.main) {
   });
   console.log(res);
 }
-

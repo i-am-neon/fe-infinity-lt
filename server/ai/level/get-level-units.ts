@@ -81,7 +81,7 @@ export default async function getLevelUnits({
       roam_ai: null,
       ai_group: "",
       starting_position: [ge.x, ge.y],
-      starting_items: [],
+      starting_items: ge.startingItems,
       starting_traveler: null,
       generic: true,
     });
@@ -91,3 +91,4 @@ export default async function getLevelUnits({
 
   return units;
 }
+

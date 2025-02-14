@@ -11,6 +11,10 @@ export const EnemyGenericUnitSchema = z.object({
 
 export type EnemyGenericUnit = z.infer<typeof EnemyGenericUnitSchema>;
 
+export type EnemyGenericUnitWithStartingItems = EnemyGenericUnit & {
+  startingItems?: [string, boolean][]; // boolean is droppable
+};
+
 export const BossCoordsSchema = z.object({
   x: z.number().int().min(0),
   y: z.number().int().min(0),
@@ -34,3 +38,4 @@ export const GreenUnitSchema = z.object({
 });
 
 export type GreenUnit = z.infer<typeof GreenUnitSchema>;
+
