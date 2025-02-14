@@ -21,7 +21,7 @@ const resultSchema = z.object({
   chosenClass: FE8ClassSchema,
 });
 
-export default async function decideCharacterClass({
+export default async function decideClass({
   isPromoted,
   level,
   characterIdea,
@@ -59,7 +59,7 @@ Use the character idea to pick the best class from that list. Output only JSON: 
 }
 
 if (import.meta.main) {
-  decideCharacterClass({
+  decideClass({
     isPromoted: false,
     level: 5,
     characterIdea: testCharIdeaThorne,

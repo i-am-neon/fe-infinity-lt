@@ -1,4 +1,4 @@
-export default function decideCharacterLevel(chapter: number): {
+export default function decideLevel(chapter: number): {
   isPromoted: boolean;
   level: number;
 } {
@@ -41,7 +41,7 @@ if (import.meta.main) {
   // Example usage
   const testChapters = [1, 3, 5, 7, 10, 11, 15, 20, 21, 25, 30];
   for (const ch of testChapters) {
-    const { isPromoted, level } = decideCharacterLevel(ch);
+    const { isPromoted, level } = decideLevel(ch);
     console.log(`Chapter ${ch}: promoted=${isPromoted}, level=${level}`);
   }
 }
