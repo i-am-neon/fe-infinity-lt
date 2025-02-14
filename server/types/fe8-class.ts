@@ -9,6 +9,7 @@ export const UnpromotedFE8Classes = [
   "Rogue",
   "Recruit",
   "Soldier",
+  "Knight",
   "Cavalier",
   "Pegasus Knight",
   "Journeyman",
@@ -40,7 +41,6 @@ export const PromotedFE8Classes = [
   "Paladin",
   "Great Knight",
   "Falcoknight",
-  "Knight",
   "General",
   "Berserker",
   "Sniper",
@@ -169,3 +169,4 @@ export const FE8ClassToLTNidMap: Record<FE8Class, string> = {
   "Arch Mogall": "Arch_Mogall",
   Manakete: "Manakete",
 };
+

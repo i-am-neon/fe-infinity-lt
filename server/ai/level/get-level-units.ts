@@ -6,6 +6,7 @@ import { allMapOptions } from "@/map-processing/all-map-options.ts";
 import { UnitData } from "@/types/character/unit-data.ts";
 import { Level } from "@/types/level.ts";
 import { FE8ClassToLTNidMap } from "@/types/fe8-class.ts";
+import decideGenericUnitLevel from "@/ai/level/decide-generic-unit-level.ts";
 
 export default async function getLevelUnits({
   chosenMap,
@@ -69,12 +70,24 @@ export default async function getLevelUnits({
     if (!ge.class) {
       throw new Error(`No class found for generic enemy ${ge}`);
     }
+    // For now just hard code items
+    ge.startingItems = ge.startingItems ?? [];
+    ge.startingItems.push(
+      ["Iron_Lance", false],
+      ["Iron_Sword", false],
+      ["Iron_Axe", false],
+      ["Fire", false],
+      ["Flux", false]
+    );
     units.push({
       nid: shortUuid(),
       team: "enemy",
       ai: ge.aiGroup,
       // TODO: figure out generic levels
-      level: 1,
+      level: decideGenericUnitLevel({
+        chapter: chapterNumber,
+        fe8Class: ge.class,
+      }),
       // TODO: factions
       faction: "Soldier",
       klass: FE8ClassToLTNidMap[ge.class],
