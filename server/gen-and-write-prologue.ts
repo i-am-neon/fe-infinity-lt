@@ -1,19 +1,19 @@
 import { choosePortraits } from "@/ai/choose-portraits.ts";
 import createUnitDatas from "@/ai/create-unit-data/create-unit-datas.ts";
 import genInitialGameIdea from "@/ai/gen-initial-game-idea.ts";
-import genPrologueScript from "@/ai/gen-prologue-script.ts";
 import genWorldSummary from "@/ai/gen-world-summary.ts";
 import {
   testGameDescription,
   testGameName,
   testTone,
 } from "@/ai/test-data/initial.ts";
-import { insertGame } from "@/db/games.ts";
 import initializeProject from "@/game-engine-io/initialize-project.ts";
 import writeChapter from "@/game-engine-io/write-chapter/write-chapter.ts";
 import writeStubChapter from "@/game-engine-io/write-chapter/write-stub-chapter.ts";
-import breakTextIntoGameLines from "@/lib/break-text-into-game-lines.ts";
-import { setCurrentLoggerProject } from "@/lib/current-logger.ts";
+import {
+  getCurrentLogger,
+  setCurrentLoggerProject,
+} from "@/lib/current-logger.ts";
 import removeExistingGame from "@/lib/remove-existing-game.ts";
 import { stubPrologue } from "@/test-data/stub-prologue.ts";
 import { stubTilemapImportedTmx } from "@/test-data/stub-tilemap.ts";
@@ -31,7 +31,10 @@ export default async function genAndWritePrologue({
   tone: string;
 }) {
   setCurrentLoggerProject(projectName);
+  const logger = getCurrentLogger();
   await removeExistingGame(projectName);
+
+  const startTime = Date.now();
 
   // Create new project
   const { projectNameEndingInDotLtProj, gameNid } = await initializeProject(
@@ -114,6 +117,8 @@ export default async function genAndWritePrologue({
     tone: testTone,
     usedPortraits,
   };
+
+  logger.info("Generated prologue", { elapsedTimeMs: Date.now() - startTime });
 
   return { projectNameEndingInDotLtProj, gameNid, newGame };
 }
