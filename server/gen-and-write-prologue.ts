@@ -22,6 +22,7 @@ import { stubTilemapImportedTmx } from "@/test-data/stub-tilemap.ts";
 import { Chapter } from "@/types/chapter.ts";
 import { Character } from "@/types/character/character.ts";
 import { Game } from "@/types/game.ts";
+import genChapterIdea from "@/ai/chapter/gen-chapter-idea.ts";
 
 export default async function genAndWritePrologue({
   projectName,
@@ -34,6 +35,8 @@ export default async function genAndWritePrologue({
 }) {
   setCurrentLoggerProject(projectName);
   const logger = getCurrentLogger();
+  const chapterNumber = 0;
+
   await removeExistingGame(projectName);
 
   const startTime = Date.now();
@@ -50,14 +53,25 @@ export default async function genAndWritePrologue({
     tone,
   });
   const initialGameIdea = await genInitialGameIdea({ worldSummary, tone });
+  const chapterIdea = await genChapterIdea({
+    worldSummary,
+    initialGameIdea,
+    tone,
+    chapterNumber,
+  });
 
   const [portraitMap, unitDatas, prologueIntroEvent] = await Promise.all([
-    choosePortraits(initialGameIdea.characterIdeas),
+    choosePortraits([
+      ...initialGameIdea.characterIdeas,
+      chapterIdea.boss,
+      ...(chapterIdea.newPlayableUnits ?? []),
+      ...(chapterIdea.newNonBattleCharacters ?? []),
+    ]),
     createUnitDatas({
       characterIdeas: initialGameIdea.characterIdeas,
-      chapterNumber: 0,
+      chapterNumber,
     }),
-    assembleEvent({ worldSummary, initialGameIdea, tone, chapterNumber: 0 }),
+    assembleEvent({ worldSummary, initialGameIdea, tone, chapterNumber }),
   ]);
   const usedPortraits = Object.values(portraitMap);
 

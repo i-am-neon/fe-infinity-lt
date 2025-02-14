@@ -1,4 +1,5 @@
 import { CharacterIdeaSchema } from "@/ai/types/character-idea.ts";
+import z from "zod";
 
 export const NonBattleCharacterIdeaSchema = CharacterIdeaSchema.omit({
   affinity: true,
@@ -9,4 +10,8 @@ export const NonBattleCharacterIdeaSchema = CharacterIdeaSchema.omit({
 }).describe(
   "New characters introduced in this chapter that do not participate in battle. For example, villagers, kings, or any other characters that are in the chapter scenes but not in the battle."
 );
+
+export type NonBattleCharacterIdea = z.infer<
+  typeof NonBattleCharacterIdeaSchema
+>;
 

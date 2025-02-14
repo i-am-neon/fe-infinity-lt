@@ -1,4 +1,5 @@
 import { CharacterIdea } from "@/ai/types/character-idea.ts";
+import { NonBattleCharacterIdea } from "@/ai/types/non-battle-character-idea.ts";
 import generateStructuredData from "@/lib/generate-structured-data.ts";
 import { z } from "zod";
 import createEmbedding from "@/vector-db/create-embedding.ts";
@@ -33,7 +34,7 @@ export default async function choosePortrait({
   characterIdea,
   usedPortraits,
 }: {
-  characterIdea: CharacterIdea;
+  characterIdea: CharacterIdea | NonBattleCharacterIdea;
   usedPortraits: string[];
 }): Promise<string> {
   const start = Date.now();
@@ -55,7 +56,6 @@ Given the user's Fire Emblem character idea, provide a brief single-line string 
   // 2) Embed and run similarity search
   const embedding = await createEmbedding({ text: searchQuery });
   const topResults = await similaritySearch(embedding, 20, "portraits");
-  console.log("topResults :>> ", topResults);
   if (!topResults.length) {
     logger.warn("No portrait results found for search query", { searchQuery });
     throw new Error("No portrait matches found.");
