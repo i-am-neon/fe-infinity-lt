@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { TriggerEnumSchema } from "@/types/events/trigger-enum.ts";
+import { SourceAsObjectSchema } from "@/types/events/source-as-object.ts";
 
 export const AIEventSchema = z.object({
   name: z
@@ -30,6 +31,7 @@ export const AIEventSchema = z.object({
 
   // The rest of the events are false.`
   //   ),
+  sourceAsObject: SourceAsObjectSchema.array(),
 });
 
 export type AIEvent = z.infer<typeof AIEventSchema>;
