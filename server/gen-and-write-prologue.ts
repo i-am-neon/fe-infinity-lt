@@ -71,7 +71,13 @@ export default async function genAndWritePrologue({
       characterIdeas: initialGameIdea.characterIdeas,
       chapterNumber,
     }),
-    assembleEvent({ worldSummary, initialGameIdea, tone, chapterNumber }),
+    assembleEvent({
+      worldSummary,
+      initialGameIdea,
+      chapterIdea,
+      tone,
+      chapterNumber,
+    }),
   ]);
   const usedPortraits = Object.values(portraitMap);
 
