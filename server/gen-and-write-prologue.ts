@@ -1,5 +1,6 @@
 import { choosePortraits } from "@/ai/choose-portraits.ts";
 import createUnitDatas from "@/ai/create-unit-data/create-unit-datas.ts";
+import assembleEvent from "@/ai/events/assemble-event.ts";
 import genInitialGameIdea from "@/ai/gen-initial-game-idea.ts";
 import genWorldSummary from "@/ai/gen-world-summary.ts";
 import {
@@ -15,14 +16,12 @@ import {
   setCurrentLoggerProject,
 } from "@/lib/current-logger.ts";
 import removeExistingGame from "@/lib/remove-existing-game.ts";
+import { allPortraitOptions } from "@/portrait-processing/all-portrait-options.ts";
 import { stubPrologue } from "@/test-data/stub-prologue.ts";
 import { stubTilemapImportedTmx } from "@/test-data/stub-tilemap.ts";
 import { Chapter } from "@/types/chapter.ts";
 import { Character } from "@/types/character/character.ts";
 import { Game } from "@/types/game.ts";
-import { allPortraitOptions } from "@/portrait-processing/all-portrait-options.ts";
-import genPrologueIntroEvent from "@/ai/events/gen-prologue-intro-event.ts";
-import convertAIEventToEvent from "@/ai/events/convert-ai-event-to-event.ts";
 
 export default async function genAndWritePrologue({
   projectName,
@@ -58,9 +57,7 @@ export default async function genAndWritePrologue({
       characterIdeas: initialGameIdea.characterIdeas,
       chapterNumber: 0,
     }),
-    genPrologueIntroEvent({ worldSummary, initialGameIdea, tone }).then(
-      (aiEvent) => convertAIEventToEvent({ aiEvent, chapterNumber: 0 })
-    ),
+    assembleEvent({ worldSummary, initialGameIdea, tone, chapterNumber: 0 }),
   ]);
   const usedPortraits = Object.values(portraitMap);
 

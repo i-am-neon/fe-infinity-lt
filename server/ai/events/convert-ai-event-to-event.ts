@@ -2,12 +2,17 @@ import { AIEvent } from "@/ai/types/ai-event.ts";
 import { Event } from "@/types/events/event.ts";
 import { testAIEvent } from "@/ai/test-data/events.ts";
 import breakTextIntoGameLines from "@/lib/break-text-into-game-lines.ts";
+import { BackgroundOption } from "@/ai/types/background-option.ts";
+import { backgroundImageMap } from "@/ai/types/background-option.ts";
+import { BackgroundOptions } from "@/ai/types/background-option.ts";
 
 export default function convertAIEventToEvent({
   aiEvent,
+  backgroundChoice,
   chapterNumber,
 }: {
   aiEvent: AIEvent;
+  backgroundChoice: BackgroundOption;
   chapterNumber: number;
 }): Event {
   const condition =
@@ -15,7 +20,11 @@ export default function convertAIEventToEvent({
       ? "True"
       : aiEvent.condition;
 
-  const _source = ["chapter_title", "transition;Open"];
+  const _source = [
+    "chapter_title",
+    `change_background;${backgroundImageMap[backgroundChoice]}`,
+    "transition;Open",
+  ];
 
   aiEvent.sourceObjects.forEach((sourceObj) => {
     if (sourceObj.command === "speak") {
@@ -49,6 +58,7 @@ if (import.meta.main) {
   console.log(
     convertAIEventToEvent({
       aiEvent: testAIEvent,
+      backgroundChoice: BackgroundOptions.Forest,
       chapterNumber: 0,
     })
   );
