@@ -5,21 +5,21 @@ import generateStructuredData from "@/lib/generate-structured-data.ts";
 import { ch1TerrainGrid } from "@/map-processing/test-data/terrain-grid.ts";
 import { MapMetadata } from "@/types/maps/map-metadata.ts";
 import { EnemyComposition } from "@/ai/types/enemy-composition.ts";
-import getEnemyComposition from "@/ai/unit-placement/get-enemy-composition.ts";
+import getEnemyComposition from "./get-enemy-composition.ts";
 import getGenericEnemyNumberRange, {
   EnemyCountRange,
-} from "@/ai/unit-placement/get-generic-enemy-number-range.ts";
+} from "./get-generic-enemy-number-range.ts";
 import {
   RegionSquadInfo,
   RegionSquadInfoSchema,
 } from "@/ai/types/region-squad-info.ts";
-import { getTerrainGridSize } from "@/ai/unit-placement/get-terrain-grid-size.ts";
+import { getTerrainGridSize } from "./get-terrain-grid-size.ts";
 import { testChapterIdea } from "@/ai/test-data/chapter-ideas.ts";
-import { testMapMetadata } from "../test-data/unit-placement.ts";
-import { getAllClassOptions } from "@/ai/unit-placement/get-all-class-options.ts";
-import { availableClasses } from "@/ai/unit-placement/shared-prompts/available-classes.ts";
-import { UNIT_TERRAIN_PLACEMENT_CONSTRAINTS } from "@/ai/unit-placement/shared-prompts/unit-terrain-placement-constraints.ts";
-import { unpromotedVsPromotedUnits } from "@/ai/unit-placement/shared-prompts/unpromoted-vs-promoted-units.ts";
+import { testMapMetadata } from "../../test-data/unit-placement.ts";
+import { getAllClassOptions } from "./get-all-class-options.ts";
+import { availableClasses } from "./shared-prompts/available-classes.ts";
+import { UNIT_TERRAIN_PLACEMENT_CONSTRAINTS } from "./shared-prompts/unit-terrain-placement-constraints.ts";
+import { unpromotedVsPromotedUnits } from "./shared-prompts/unpromoted-vs-promoted-units.ts";
 
 export default async function genUnitSquads({
   terrainGrid,

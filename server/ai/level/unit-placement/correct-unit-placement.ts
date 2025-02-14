@@ -2,8 +2,8 @@ import { ch4TerrainGrid } from "@/map-processing/test-data/terrain-grid.ts";
 import { FE8Class } from "@/types/fe8-class.ts";
 import { TerrainGrid } from "@/types/maps/terrain-grid.ts";
 import { EnemyGenericUnit } from "@/ai/types/unit-placement.ts";
-import { getAllClassOptions } from "@/ai/unit-placement/get-all-class-options.ts";
-import { getTerrainGridSize } from "@/ai/unit-placement/get-terrain-grid-size.ts";
+import { getAllClassOptions } from "./get-all-class-options.ts";
+import { getTerrainGridSize } from "./get-terrain-grid-size.ts";
 
 const movementGroupByClass: Partial<Record<FE8Class, string>> = {};
 (() => {
@@ -156,3 +156,4 @@ if (import.meta.main) {
   });
   console.log("Corrected placements:", corrected);
 }
+

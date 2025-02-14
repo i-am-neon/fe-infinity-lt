@@ -1,4 +1,4 @@
-import { ClassOption } from "@/ai/unit-placement/get-all-class-options.ts";
+import { ClassOption } from "../get-all-class-options.ts";
 
 export function availableClasses(classOptions: ClassOption[]) {
   return `## Available classes

@@ -6,18 +6,18 @@ import {
   EnemyGenericUnit,
   EnemyGenericUnitSchema,
 } from "@/ai/types/unit-placement.ts";
-import { getAllClassOptions } from "@/ai/unit-placement/get-all-class-options.ts";
-import getEnemyComposition from "@/ai/unit-placement/get-enemy-composition.ts";
-import getSubTerrainGrid from "@/ai/unit-placement/get-sub-terrain-grid.ts";
-import { availableClasses } from "@/ai/unit-placement/shared-prompts/available-classes.ts";
-import { UNIT_TERRAIN_PLACEMENT_CONSTRAINTS } from "@/ai/unit-placement/shared-prompts/unit-terrain-placement-constraints.ts";
-import { unpromotedVsPromotedUnits } from "@/ai/unit-placement/shared-prompts/unpromoted-vs-promoted-units.ts";
+import { getAllClassOptions } from "./get-all-class-options.ts";
+import getEnemyComposition from "./get-enemy-composition.ts";
+import getSubTerrainGrid from "./get-sub-terrain-grid.ts";
+import { availableClasses } from "./shared-prompts/available-classes.ts";
+import { UNIT_TERRAIN_PLACEMENT_CONSTRAINTS } from "./shared-prompts/unit-terrain-placement-constraints.ts";
+import { unpromotedVsPromotedUnits } from "./shared-prompts/unpromoted-vs-promoted-units.ts";
 import generateStructuredData from "@/lib/generate-structured-data.ts";
 import { ch1TerrainGrid } from "@/map-processing/test-data/terrain-grid.ts";
 import { MapMetadata } from "@/types/maps/map-metadata.ts";
 import { TerrainGrid } from "@/types/maps/terrain-grid.ts";
 import { z } from "zod";
-import { testMapMetadata } from "../test-data/unit-placement.ts";
+import { testMapMetadata } from "../../test-data/unit-placement.ts";
 
 export default async function placeEnemyGenericUnits({
   terrainGrid,

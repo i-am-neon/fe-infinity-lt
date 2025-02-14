@@ -9,7 +9,7 @@ import {
   PlayerUnitStartCoords,
   GreenUnit,
 } from "@/ai/types/unit-placement.ts";
-import correctUnitPlacement from "@/ai/unit-placement/correct-unit-placement.ts";
+import correctUnitPlacement from "./correct-unit-placement.ts";
 import { testChapterIdea } from "@/ai/test-data/chapter-ideas.ts";
 import { testMapMetadata } from "@/ai/test-data/unit-placement.ts";
 

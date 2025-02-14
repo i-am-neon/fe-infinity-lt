@@ -1,12 +1,12 @@
 import { MapMetadata } from "@/types/maps/map-metadata.ts";
 import { TerrainGrid } from "@/types/maps/terrain-grid.ts";
 import { EnemyGenericUnit } from "@/ai/types/unit-placement.ts";
-import correctUnitPlacement from "@/ai/unit-placement/correct-unit-placement.ts";
-import genUnitSquads from "@/ai/unit-placement/gen-unit-squads.ts";
-import getEnemyComposition from "@/ai/unit-placement/get-enemy-composition.ts";
-import getGenericEnemyCountNumberRange from "@/ai/unit-placement/get-generic-enemy-number-range.ts";
-import { getTerrainGridSize } from "@/ai/unit-placement/get-terrain-grid-size.ts";
-import placeEnemyGenericUnits from "@/ai/unit-placement/place-enemy-generic-units.ts";
+import correctUnitPlacement from "./correct-unit-placement.ts";
+import genUnitSquads from "./gen-unit-squads.ts";
+import getEnemyComposition from "./get-enemy-composition.ts";
+import getGenericEnemyCountNumberRange from "./get-generic-enemy-number-range.ts";
+import { getTerrainGridSize } from "./get-terrain-grid-size.ts";
+import placeEnemyGenericUnits from "./place-enemy-generic-units.ts";
 import { ChapterIdea } from "@/ai/types/chapter-idea.ts";
 
 export default async function getGenericEnemies({

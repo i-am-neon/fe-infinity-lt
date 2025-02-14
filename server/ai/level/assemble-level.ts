@@ -1,0 +1,59 @@
+import chooseMap from "@/ai/choose-map.ts";
+import getLevelUnits from "@/ai/level/get-level-units.ts";
+import { ChapterIdea } from "@/ai/types/chapter-idea.ts";
+import { UnitData } from "@/types/character/unit-data.ts";
+import { Level } from "@/types/level.ts";
+
+export default async function assembleLevel({
+  chapterIdea,
+  chapterNumber,
+  playerUnitDatas,
+  bossUnitData,
+}: {
+  chapterIdea: ChapterIdea;
+  chapterNumber: number;
+  playerUnitDatas: UnitData[];
+  bossUnitData: UnitData;
+}): Promise<Level> {
+  const chosenMap = await chooseMap(chapterIdea);
+
+  const units = await getLevelUnits({
+    chosenMap,
+    chapterIdea,
+    chapterNumber,
+    playerUnitDatas,
+    bossUnitData,
+  });
+
+  return {
+    nid: chapterNumber.toString(),
+    name: chapterIdea.title,
+    tilemap: chosenMap,
+    bg_tilemap: null,
+    party: "Eirika",
+    music: {
+      player_phase: "Distant Roads",
+      enemy_phase: "Shadow of the Enemy",
+      other_phase: null,
+      enemy2_phase: null,
+      player_battle: "Attack",
+      enemy_battle: "Defense",
+      other_battle: null,
+      enemy2_battle: null,
+    },
+    objective: {
+      simple: "Defeat boss",
+      win: "Defeat boss",
+      loss: "Eirika dies",
+    },
+    roam: false,
+    roam_unit: "Eirika",
+    go_to_overworld: false,
+    should_record: true,
+    units,
+    regions: [],
+    unit_groups: [],
+    ai_groups: [],
+  };
+}
+

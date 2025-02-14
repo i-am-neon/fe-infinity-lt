@@ -21,7 +21,7 @@ import { allPortraitOptions } from "@/portrait-processing/all-portrait-options.t
 import { Chapter } from "@/types/chapter.ts";
 import { Character } from "@/types/character/character.ts";
 import { Game } from "@/types/game.ts";
-import assembleLevel from "./ai/assemble-level.ts";
+import assembleLevel from "./ai/level/assemble-level.ts";
 import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
 import { Tilemap } from "@/types/maps/tilemap.ts";
 
@@ -102,7 +102,25 @@ export default async function genAndWritePrologue({
     };
   });
 
-  const level = await assembleLevel({ chapterIdea, chapterNumber });
+  const playerUnitDatas = unitDatas.filter((c) => {
+    return initialGameIdea.characterIdeas.some(
+      (idea) => idea.firstName === c.nid
+    );
+  });
+
+  const bossUnitData = unitDatas.find(
+    (c) => c.nid === chapterIdea.boss.firstName
+  );
+  if (!bossUnitData) {
+    throw new Error(`Could not find boss unit data`);
+  }
+
+  const level = await assembleLevel({
+    chapterIdea,
+    chapterNumber,
+    playerUnitDatas,
+    bossUnitData,
+  });
   const tilemap: Tilemap = JSON.parse(
     Deno.readTextFileSync(
       getPathWithinServer(`assets/maps/${level.tilemap}.json`)
