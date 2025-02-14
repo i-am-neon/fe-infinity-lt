@@ -1,10 +1,11 @@
 import { AIEvent } from "@/ai/types/ai-event.ts";
 import { Event } from "@/types/events/event.ts";
 import { testAIEvent } from "@/ai/test-data/events.ts";
-import breakTextIntoGameLines from "@/lib/break-text-into-game-lines.ts";
+import breakTextIntoGameLines from "../../lib/formatting/break-text-into-game-lines.ts";
 import { BackgroundOption } from "@/ai/types/background-option.ts";
 import { backgroundImageMap } from "@/ai/types/background-option.ts";
 import { BackgroundOptions } from "@/ai/types/background-option.ts";
+import cleanGameText from "../../lib/formatting/clean-game-text.ts";
 
 export default function convertAIEventToEvent({
   aiEvent,
@@ -30,11 +31,11 @@ export default function convertAIEventToEvent({
     if (sourceObj.command === "speak") {
       const speaker = sourceObj.args[0];
       const line = sourceObj.args.slice(1).join(" ");
-      const formatted = breakTextIntoGameLines(line);
+      const formatted = cleanGameText(line);
       _source.push(`speak;${speaker};${formatted}`);
     } else if (sourceObj.command === "narrate") {
       const line = sourceObj.args.join(" ");
-      const formatted = breakTextIntoGameLines(line);
+      const formatted = cleanGameText(line);
       _source.push(`speak;hint;${formatted}`);
     } else {
       const rawSource = `${sourceObj.command};${sourceObj.args.join(";")}`;
