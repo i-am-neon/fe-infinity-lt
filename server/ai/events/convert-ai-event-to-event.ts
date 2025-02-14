@@ -18,7 +18,7 @@ export default function convertAIEventToEvent({
 
   aiEvent.sourceObjects.forEach((sourceObj) => {
     const command =
-      sourceObj.command === "narrate" ? "hint" : sourceObj.command;
+      sourceObj.command === "narrate" ? "speak;hint" : sourceObj.command;
     _source.push(`${command};${sourceObj.args.join(";")}`);
   });
 

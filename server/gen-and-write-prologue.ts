@@ -21,6 +21,8 @@ import { Chapter } from "@/types/chapter.ts";
 import { Character } from "@/types/character/character.ts";
 import { Game } from "@/types/game.ts";
 import { allPortraitOptions } from "@/portrait-processing/all-portrait-options.ts";
+import genPrologueIntroEvent from "@/ai/events/gen-prologue-intro-event.ts";
+import convertAIEventToEvent from "@/ai/events/convert-ai-event-to-event.ts";
 
 export default async function genAndWritePrologue({
   projectName,
@@ -50,38 +52,17 @@ export default async function genAndWritePrologue({
   });
   const initialGameIdea = await genInitialGameIdea({ worldSummary, tone });
 
-  const [portraitMap, unitDatas] = await Promise.all([
+  const [portraitMap, unitDatas, prologueIntroEvent] = await Promise.all([
     choosePortraits(initialGameIdea.characterIdeas),
     createUnitDatas({
       characterIdeas: initialGameIdea.characterIdeas,
       chapterNumber: 0,
     }),
+    genPrologueIntroEvent({ worldSummary, initialGameIdea, tone }).then(
+      (aiEvent) => convertAIEventToEvent({ aiEvent, chapterNumber: 0 })
+    ),
   ]);
   const usedPortraits = Object.values(portraitMap);
-
-  // const prologueScript = await genPrologueScript({
-  //   worldSummary,
-  //   initialGameIdea,
-  //   tone,
-  // });
-
-  // Break the prologue script into multiple lines separated by "|"
-  // const splittedPrologueScript = breakTextIntoGameLines(prologueScript);
-
-  const prologueEvents: Chapter["events"] = [
-    {
-      name: "Intro",
-      trigger: "level_start",
-      level_nid: "0",
-      condition: "True",
-      commands: [],
-      only_once: false,
-      priority: 20,
-      // _source: [`speak;hint;${splittedPrologueScript}`],
-      _source: [`speak;hint;This is a test`],
-    },
-    ...stubPrologue.events,
-  ];
 
   const newCharacters: Character[] = unitDatas.map((ud) => {
     const originalName = portraitMap[ud.nid];
@@ -95,7 +76,7 @@ export default async function genAndWritePrologue({
     return {
       unitData: {
         ...ud,
-        portrait_nid: portraitMap[ud.nid],
+        portrait_nid: ud.nid,
       },
       portraitMetadata,
     };
@@ -103,7 +84,7 @@ export default async function genAndWritePrologue({
 
   const newChapter: Chapter = {
     ...stubPrologue,
-    events: prologueEvents,
+    events: [prologueIntroEvent],
     newCharacters,
     tilemap: stubTilemapImportedTmx,
   };
