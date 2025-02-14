@@ -1,6 +1,6 @@
 import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
 import initializeProject from "@/game-engine-io/initialize-project.ts";
-import appendUnits from "@/game-engine-io/write-chapter/append-units.ts";
+import appendUnits from "../game-engine-io/write-character/append-units.ts";
 import writeChapter from "@/game-engine-io/write-chapter/write-chapter.ts";
 import removeExistingGame from "@/lib/remove-existing-game.ts";
 import runGame from "@/run-game.ts";

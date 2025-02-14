@@ -1,7 +1,8 @@
 import copyFileToLtMaker from "@/file-io/copy-file-to-lt-maker.ts";
+import { appendPortraitsJson } from "@/game-engine-io/write-character/append-portraits-json.ts";
+import { appendUnit } from "@/game-engine-io/write-character/append-units.ts";
 import { stubCharacterCedric } from "@/test-data/stub-characters.ts";
 import { Character } from "@/types/character/character.ts";
-import { appendPortraitsJson } from "@/game-engine-io/write-character/append-portraits-json.ts";
 
 export default async function writeCharacter({
   character,
@@ -25,6 +26,10 @@ export default async function writeCharacter({
   });
 
   // Append to units.json
+  await appendUnit({
+    projectNameEndingInDotLtProj,
+    unitData: character.unitData,
+  });
 }
 
 if (import.meta.main) {
