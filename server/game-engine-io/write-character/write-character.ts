@@ -1,6 +1,7 @@
 import copyFileToLtMaker from "@/file-io/copy-file-to-lt-maker.ts";
-import { Character } from "@/types/character/character.ts";
 import { stubCharacterCedric } from "@/test-data/stub-characters.ts";
+import { Character } from "@/types/character/character.ts";
+import { appendPortraitsJson } from "@/game-engine-io/write-character/append-portraits-json.ts";
 
 export default async function writeCharacter({
   character,
@@ -15,7 +16,14 @@ export default async function writeCharacter({
     ltMakerSubdirectory: `${projectNameEndingInDotLtProj}/resources/portraits`,
     newFileName: `${character.unitData.nid}.png`,
   });
-  // Update potraits.json with blinking and smiling offsets
+
+  await appendPortraitsJson({
+    projectNameEndingInDotLtProj,
+    nid: character.unitData.nid,
+    blinkingOffset: character.portraitMetadata.blinkingOffset,
+    smilingOffset: character.portraitMetadata.smilingOffset,
+  });
+
   // Append to units.json
 }
 
