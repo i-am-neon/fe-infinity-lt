@@ -4,9 +4,8 @@ import generateStructuredData from "@/lib/generate-structured-data.ts";
 import {
   FE8Class,
   FE8ClassSchema,
-  promotedClassDescriptions,
+  FE8ClassDescriptionMap,
   PromotedFE8Classes,
-  unpromotedClassDescriptions,
   UnpromotedFE8Classes,
 } from "@/types/fe8-class.ts";
 import { z } from "zod";
@@ -27,6 +26,10 @@ export default async function decideClass({
   characterIdea,
 }: DecideClassOptions): Promise<FE8Class> {
   const validClasses = isPromoted ? PromotedFE8Classes : UnpromotedFE8Classes;
+  const classDescriptions = validClasses.reduce((acc, cls) => {
+    acc[cls] = FE8ClassDescriptionMap[cls];
+    return acc;
+  }, {} as Record<FE8Class, string>);
 
   const systemMessage = `You are a Fire Emblem fangame class decider.
 You will receive:
@@ -41,9 +44,7 @@ Use the character idea to pick the best class from that list. Output only JSON: 
     level,
     characterIdea,
     classOptions: validClasses,
-    classDescriptions: isPromoted
-      ? promotedClassDescriptions
-      : unpromotedClassDescriptions,
+    classDescriptions,
   });
 
   const { chosenClass } = await generateStructuredData({
@@ -65,4 +66,3 @@ if (import.meta.main) {
     characterIdea: testCharIdeaThorne,
   }).then((res) => console.log("Chosen class:", res));
 }
-

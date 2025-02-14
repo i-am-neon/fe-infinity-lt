@@ -18,7 +18,6 @@ import {
 } from "@/lib/current-logger.ts";
 import removeExistingGame from "@/lib/remove-existing-game.ts";
 import { allPortraitOptions } from "@/portrait-processing/all-portrait-options.ts";
-import { stubTilemapImportedTmx } from "@/test-data/stub-tilemap.ts";
 import { Chapter } from "@/types/chapter.ts";
 import { Character } from "@/types/character/character.ts";
 import { Game } from "@/types/game.ts";

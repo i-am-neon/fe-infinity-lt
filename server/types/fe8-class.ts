@@ -65,147 +65,53 @@ const FE8ClassesArray = [
 export const FE8ClassSchema = z.enum(FE8ClassesArray);
 export type FE8Class = z.infer<typeof FE8ClassSchema>;
 
-export const unpromotedClassDescriptions = `### Citizen
-A non-combatant civilian with no combat abilities.
-
-### Dancer
-A support unit that can refresh an ally’s turn by dancing.
-
-### Myrmidon
-A swift sword-wielding unit with high critical hit rates.
-
-### Mercenary
-A balanced swordfighter with solid stats in both offense and defense.
-
-### Thief
-A nimble unit capable of picking locks and stealing items.
-
-### Rogue
-An advanced thief with better combat abilities and the ability to pick locks without keys.
-
-### Recruit
-A trainee soldier with limited abilities, usually promoting into a stronger class.
-
-### Soldier
-A lance-wielding foot unit with mediocre stats and limited promotion options.
-
-### Cavalier
-A mounted unit with balanced stats and the ability to use swords and lances.
-
-### Pegasus Knight
-A flying unit with high mobility and resistance but low defense.
-
-### Journeyman
-A young axe-wielding trainee who later grows into a stronger class.
-
-### Fighter
-A strong but slow axe user with high HP and strength.
-
-### Warrior
-A powerful axe-wielding unit with access to bows upon promotion.
-
-### Pirate
-An axe-wielding unit that can move over water terrain.
-
-### Brigand
-A rugged axe-wielding bandit with high movement in rough terrain.
-
-### Archer
-A ranged unit that specializes in bows but has no melee options.
-
-### Ranger
-A mounted unit that specializes in bows and swords, offering strong mobility.
-
-### Monk
-A light magic user with high resistance and strong attacks against dark magic.
-
-### Cleric
-A staff-using healer who restores allies’ HP but lacks offensive capabilities.
-
-### Mage
-A spellcaster proficient in anima magic, excelling in offense.
-
-### Shaman
-A dark magic user with slow but powerful spells.
-
-### Troubadour
-A mounted healer who uses staffs to support allies.
-
-### Valkyrie
-A promoted troubadour with access to light magic and staves.
-
-### Wyvern Rider
-A powerful flying unit with high strength and defense but low resistance.
-
-### Revenant
-A weak, slow-moving monster that attacks with claws.
-
-### Entombed
-A stronger version of the Revenant, with higher stats.
-
-### Sword Wight
-An undead warrior that wields swords with high skill.
-
-### Bow Wight
-An undead archer with long-range attacks.
-
-### Mogall
-A floating, dark magic-using monster with high resistance.`;
-
-export const promotedClassDescriptions = `### Swordmaster
-An expert swordsman with high critical hit rates and exceptional speed.
-
-### Hero
-A balanced and strong warrior with access to swords and axes.
-
-### Assassin
-A stealthy killer with a chance to perform instant-kill attacks.
-
-### Paladin
-A highly mobile mounted warrior with strong stats and access to multiple weapon types.
-
-### Great Knight
-A heavily armored mounted knight with high defense and access to three weapon types.
-
-### Falcoknight
-A promoted Pegasus Knight with better stats and the ability to use swords and lances.
-
-### Knight
-A heavily armored foot soldier with strong defense but low mobility.
-
-### General
-A promoted knight with even higher defense and the ability to wield multiple weapons.
-
-### Berserker
-A high-crit axe-wielding warrior that excels in dealing massive damage.
-
-### Sniper
-A highly accurate and powerful archer with extended range.
-
-### Bishop
-A promoted Cleric or Monk that excels in light magic and healing.
-
-### Sage
-A powerful magic user proficient in anima magic and staves.
-
-### Mage Knight
-A mounted mage with strong magic and mobility.
-
-### Wyvern Lord
-A promoted Wyvern Rider with immense strength and durability.
-
-### Wyvern Knight
-A faster and more agile version of the Wyvern Lord with a piercing attack ability.
-
-### Necromancer
-A dark magic user capable of summoning phantom units.
-
-### Sword Bonewalker
-An undead skeleton warrior that wields swords with high skill.
-
-### Bow Bonewalker
-An undead skeleton archer that specializes in ranged combat.
-
-### Arch Mogall
-A floating, dark magic-using monster with high resistance.`;
-
+export const FE8ClassDescriptionMap: Record<FE8Class, string> = {
+  Citizen: "A non-combatant civilian with no combat abilities.",
+  Dancer: "A support unit that can refresh an ally's turn by dancing.",
+  Myrmidon: "A swift swordfighter with high crit potential.",
+  Mercenary: "A balanced swordfighter with solid offense and defense.",
+  Thief: "A nimble trickster able to pick locks and steal items.",
+  Rogue: "An advanced thief with improved combat and lockpicking.",
+  Recruit: "A trainee soldier with limited abilities and a bright future.",
+  Soldier: "A lance-wielding foot unit, straightforward and unremarkable.",
+  Cavalier: "A mounted unit with balanced stats and sword/lance access.",
+  "Pegasus Knight": "A swift flying unit with high resistance but low defense.",
+  Journeyman: "A young axe trainee who grows steadily with experience.",
+  Fighter: "A strong but slower axe user with high HP and strength.",
+  Warrior: "A promoted powerhouse proficient in axes (and sometimes bows).",
+  Pirate: "An axe-wielding seafarer able to traverse water terrain.",
+  Brigand: "An axe fighter adept at crossing rough terrain with ease.",
+  Archer: "A ranged combatant specializing in bows and lacking melee.",
+  Ranger: "A mounted archer with sword/bow capability and strong mobility.",
+  Monk: "A light magic user focused on resisting dark arts.",
+  Cleric: "A staff-wielding healer with limited offensive potential.",
+  Mage: "An anima magic user excelling in magical offense.",
+  Shaman: "A user of dark magic, slow but powerful in spells.",
+  Troubadour: "A mounted healer using staffs to support allies.",
+  Valkyrie: "A promoted troubadour adept with staves and light magic.",
+  "Wyvern Rider": "A flying bruiser with high strength and defense.",
+  Revenant: "A slow, weak undead monster that attacks with claws.",
+  Entombed: "A stronger undead variant of the Revenant with higher stats.",
+  "Sword Wight": "An undead swordsman with high skill and speed.",
+  "Bow Wight": "An undead archer with fearsome long-range attacks.",
+  Mogall: "A floating monster using dark magic with high resistance.",
+  Swordmaster: "An expert swordsman with exceptional speed and crit rate.",
+  Hero: "A balanced warrior strong with swords and axes.",
+  Assassin: "A stealthy killer with a chance of instant-kill attacks.",
+  Paladin: "A highly mobile mounted warrior with multiple weapon options.",
+  "Great Knight": "A heavily armored mount using swords, lances, and axes.",
+  Falcoknight: "A promoted Pegasus Knight with swords and lances.",
+  Knight: "A heavily armored soldier boasting high defense but low movement.",
+  General: "A promoted knight with even greater defense and multiple weapons.",
+  Berserker: "An axe specialist with high crit potential.",
+  Sniper: "A highly accurate archer specializing in ranged combat.",
+  Bishop: "A promoted healer focusing on light magic and staff usage.",
+  Sage: "A powerful mage proficient in anima magic and staves.",
+  "Mage Knight": "A mounted mage with strong magic and higher mobility.",
+  "Wyvern Lord": "A promoted Wyvern with immense strength and durability.",
+  "Wyvern Knight": "A swift Wyvern variant with a deadly piercing attack.",
+  Necromancer: "A dark caster capable of summoning phantoms.",
+  "Sword Bonewalker": "An undead skeleton swordsman with cunning skill.",
+  "Bow Bonewalker": "An undead skeleton archer specializing in ranged combat.",
+  "Arch Mogall": "A highly resistant floating monster using dark magic."
+};
