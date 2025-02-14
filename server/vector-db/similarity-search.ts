@@ -11,8 +11,6 @@ export default async function similaritySearch(
     metadata: Record<string, unknown> | null;
   }>
 > {
-  console.log("Similarity search table selection:", vectorType);
-
   const client = await pool.connect();
   try {
     const tableName =

@@ -1,3 +1,4 @@
+import getTerrainGridFromMapName from "@/ai/level/unit-placement/get-terrain-grid-from-tilemap.ts";
 import { MapMetadata } from "@/types/maps/map-metadata.ts";
 
 export const testMapMetadata: MapMetadata = {
@@ -65,4 +66,8 @@ export const testMapMetadata: MapMetadata = {
     "An outdoor map featuring a network of roads connecting various key locations, including villages and a castle. The terrain is a mix of open plains and strategic choke points formed by walls and water.",
   setting: "outdoor",
 };
+
+export const testTerrainGrid = getTerrainGridFromMapName(
+  "(7)Ch01_Diff_Tileset__by_Shin19"
+);
 

@@ -1,11 +1,10 @@
-import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
+import assembleUnitPlacement from "@/ai/level/unit-placement/assemble-unit-placement.ts";
+import getTerrainGridFromMapName from "@/ai/level/unit-placement/get-terrain-grid-from-tilemap.ts";
+import { ChapterIdea } from "@/ai/types/chapter-idea.ts";
 import shortUuid from "@/lib/short-uuid.ts";
 import { allMapOptions } from "@/map-processing/all-map-options.ts";
-import { Level } from "@/types/level.ts";
-import { TerrainGrid } from "@/types/maps/terrain-grid.ts";
-import assembleUnitPlacement from "@/ai/level/unit-placement/assemble-unit-placement.ts";
 import { UnitData } from "@/types/character/unit-data.ts";
-import { ChapterIdea } from "@/ai/types/chapter-idea.ts";
+import { Level } from "@/types/level.ts";
 
 export default async function getLevelUnits({
   chosenMap,
@@ -20,10 +19,6 @@ export default async function getLevelUnits({
   playerUnitDatas: UnitData[];
   bossUnitData: UnitData;
 }): Promise<Level["units"]> {
-  const terrainGrid: TerrainGrid = JSON.parse(
-    Deno.readTextFileSync(getPathWithinServer(`assets/maps/${chosenMap}.json`))
-  );
-
   const mapMetadata = allMapOptions.find((m) => m.originalName === chosenMap);
   if (!mapMetadata) {
     throw new Error(`No metadata found for map ${chosenMap}`);
@@ -34,7 +29,7 @@ export default async function getLevelUnits({
     playerUnits,
     greenUnits,
   } = await assembleUnitPlacement({
-    terrainGrid,
+    terrainGrid: getTerrainGridFromMapName(chosenMap),
     chapterIdea,
     mapMetadata,
     chapterNumber,
@@ -70,13 +65,20 @@ export default async function getLevelUnits({
 
   // Add generic enemies
   genericEnemies.forEach((ge) => {
+    console.log("ge :>> ", ge);
     units.push({
       nid: shortUuid(),
       team: "enemy",
       ai: "Attack",
+      // TODO: figure out generic levels
+      level: 1,
+      // TODO: factions
+      faction: "Soldier",
+      klass: ge.class,
       roam_ai: null,
       ai_group: "",
       starting_position: [ge.x, ge.y],
+      starting_items: [],
       starting_traveler: null,
       generic: true,
     });

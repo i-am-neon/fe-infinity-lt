@@ -7,13 +7,6 @@
     "YouTube link": "https://www.youtube.com/watch?v=xLhUGq1nhdU"
   },
   {
-    "Song name": "Through the Valleys",
-    "Feel": "Gentle and hopeful, conveying the serene mood of wandering the open land.",
-    "Instruments used": "Warm strings and woodwinds (flute/oboe) with soft brass undertones.",
-    "Situation used in-game": "Exploration (plays during outdoor free-roaming)",
-    "YouTube link": "https://www.youtube.com/watch?v=mNIGXJbpjaQ"
-  },
-  {
     "Song name": "Death Knell",
     "Feel": "Intense and ominous, quickly signaling imminent danger and urgency.",
     "Instruments used": "Fast-paced strings, pounding drums, and blaring brass.",
@@ -26,13 +19,6 @@
     "Instruments used": "Gentle strings, mellow woodwinds (flute), and light harp tones.",
     "Situation used in-game": "City/Town (peaceful town exploration)",
     "YouTube link": "https://www.youtube.com/watch?v=s9L9sNtv1-g"
-  },
-  {
-    "Song name": "Wind from the Depths",
-    "Feel": "Dark and eerie, creating an ominous atmosphere of deep underground spaces.",
-    "Instruments used": "Low droning strings, haunting woodwinds, and ambient tones.",
-    "Situation used in-game": "Dungeon (underground exploration music)",
-    "YouTube link": "https://www.youtube.com/watch?v=lwXQTINpx9M"
   },
   {
     "Song name": "King and Country",
@@ -61,13 +47,6 @@
     "Instruments used": "Soft strings, gentle woodwinds, and subtle harp.",
     "Situation used in-game": "City/Town (peaceful city or inn music)",
     "YouTube link": "https://www.youtube.com/watch?v=4IeUydwnrpQ"
-  },
-  {
-    "Song name": "Tension",
-    "Feel": "Suspenseful and uneasy, heightening the sense of lurking danger.",
-    "Instruments used": "Droning low strings, dissonant tones, and light percussion.",
-    "Situation used in-game": "Dungeon (tense dungeon exploration)",
-    "YouTube link": "https://www.youtube.com/watch?v=mb-pkf2sRAQ"
   },
   {
     "Song name": "March of the Marauders",
@@ -182,3 +161,4 @@
     "YouTube link": "https://www.youtube.com/watch?v=3xoSFHDwQCg"
   }
 ]
+

@@ -1,8 +1,8 @@
 import { EnemyComposition } from "@/ai/types/enemy-composition.ts";
 
 export default function getEnemyComposition(chapter: number): EnemyComposition {
-  if (chapter < 1 || chapter > 30) {
-    throw new Error("Chapter number must be between 1 and 30.");
+  if (chapter < 0 || chapter > 30) {
+    throw new Error("Chapter number must be between 0 and 30.");
   }
 
   let promotedPercentage = 0;

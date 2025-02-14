@@ -1,5 +1,5 @@
+import { testTerrainGrid } from "@/ai/test-data/unit-placement.ts";
 import { TerrainGrid } from "@/types/maps/terrain-grid.ts";
-import { ch1TerrainGrid } from "@/map-processing/test-data/terrain-grid.ts";
 
 export function getTerrainGridSize(terrainGrid: TerrainGrid): {
   width: number;
@@ -17,5 +17,6 @@ export function getTerrainGridSize(terrainGrid: TerrainGrid): {
 }
 
 if (import.meta.main) {
-  console.log(getTerrainGridSize(ch1TerrainGrid));
+  console.log(getTerrainGridSize(testTerrainGrid));
 }
+

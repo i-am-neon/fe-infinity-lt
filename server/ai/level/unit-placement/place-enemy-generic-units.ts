@@ -88,11 +88,6 @@ Place the same number of units as specified in the "numberOfGenericEnemies" fiel
           return EnemyGenericUnitSchema.parse(corrected);
         });
 
-        console.log(
-          `Placed units for region ${region.regionName}:`,
-          regionUnits
-        );
-
         return regionUnits;
       })
   );
