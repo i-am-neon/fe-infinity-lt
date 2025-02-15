@@ -4,42 +4,23 @@ import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
 export async function downloadYouTubeAsMP3({
   url,
   outputDir,
+  songName,
 }: {
   url: string;
   outputDir: string;
+  songName: string;
 }) {
-  // Ensure the output directory exists
   await Deno.mkdir(outputDir, { recursive: true });
+  const slugifiedName = sluggify(songName);
+  const outputFile = `${outputDir}/${slugifiedName}.mp3`;
 
-  // Fetch the video title using yt-dlp
-  const titleCommand = new Deno.Command("yt-dlp", {
-    args: ["--get-title", url],
-    stdout: "piped",
-    stderr: "piped",
-  });
-
-  const titleProcess = titleCommand.spawn();
-  const { success, stdout } = await titleProcess.output();
-
-  if (!success) {
-    throw new Error(`Failed to fetch video title for: ${url}`);
-  }
-
-  // Convert Uint8Array output to a string and sluggify it
-  const title = new TextDecoder().decode(stdout).trim();
-  const slugifiedTitle = sluggify(title);
-
-  // Construct the final output file path
-  const outputFile = `${outputDir}/${slugifiedTitle}.mp3`;
-
-  // Download the MP3 using yt-dlp
   const downloadCommand = new Deno.Command("yt-dlp", {
     args: [
-      "-x", // Extract audio
+      "-x",
       "--audio-format",
-      "mp3", // Convert to MP3
+      "mp3",
       "-o",
-      `${outputDir}/${slugifiedTitle}.%(ext)s`, // Use slugified title
+      `${outputDir}/${slugifiedName}.%(ext)s`,
       url,
     ],
     stdout: "inherit",
@@ -57,12 +38,12 @@ export async function downloadYouTubeAsMP3({
   return outputFile;
 }
 
-// Example Usage:
 if (import.meta.main) {
-  const youtubeUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"; // Replace with any video
+  const youtubeUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
   await downloadYouTubeAsMP3({
     url: youtubeUrl,
     outputDir: getPathWithinServer("assets/test"),
+    songName: "my-example-song",
   });
 }
 
