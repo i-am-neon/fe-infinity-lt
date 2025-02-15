@@ -15,7 +15,15 @@ export default async function createUnitData({
   characterIdea: CharacterIdea;
   chapterNumber: number;
 }): Promise<UnitData> {
-  const { isPromoted, level } = decideLevel(chapterNumber);
+  let { isPromoted, level } = decideLevel(chapterNumber);
+  if (characterIdea.firstSeenAs === "ally" || characterIdea.firstSeenAs === "allied NPC") {
+    level += 2;
+    if (!isPromoted && level > 20) {
+      level = 20;
+    } else if (isPromoted && level > 20) {
+      level = 20;
+    }
+  }
   const klass = await decideClass({ isPromoted, level, characterIdea });
   const { baseStats, growthRates } = decideStats({
     fe8Class: klass,
