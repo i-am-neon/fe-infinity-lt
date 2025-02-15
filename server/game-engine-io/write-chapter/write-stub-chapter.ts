@@ -13,6 +13,16 @@ export default async function writeStubChapter({
     newLevel: {
       nid: `${chapterNumber}`,
       name: `Chapter ${chapterNumber}`,
+      music: {
+        player_phase: "memories-of-green",
+        enemy_phase: "Distant Roads",
+        other_phase: null,
+        enemy2_phase: null,
+        player_battle: "Attack",
+        enemy_battle: "Defense",
+        other_battle: null,
+        enemy2_battle: null,
+      },
     },
   });
   await appendEvents({

@@ -12,62 +12,62 @@ const gameIdeas = [
   {
     title: "Revenant Oath",
     description:
-      "A cursed warlord rises from the dead to reclaim their stolen throne, but each battle reveals more of the sinister magic keeping them alive.",
+      "A once-feared warlord reawakens, determined to reclaim a lost empire. As the undead legions grow, questions of redemption or damnation loom over every choice.",
     tone: "dark, vengeful",
   },
   {
     title: "Echoes of the Forsaken",
     description:
-      "A war between two ancient factions rages, and the protagonist is caught in the middle, forced to pick a side while uncovering forgotten histories.",
+      "Two ancient factions awaken from centuries of slumber, and the protagonist stands at the crossroads of war and forgotten prophecies. Each chapter unearths buried secrets with dire consequences.",
     tone: "tragic, mystical",
   },
   {
     title: "Fractured Bonds",
     description:
-      "A shattered kingdom sees multiple claimants to the throne, and the player must decide which noble house to support—or betray.",
+      "A kingdom splinters under the weight of rival claimants to the throne. Political schemes ensnare the player, forcing alliances that may shatter trust in unexpected ways.",
     tone: "political intrigue",
-  },
-  {
-    title: "Veil of Twilight",
-    description:
-      "Prophecies dictate the fate of nations, but only the player knows they are false—leading to a battle of deception and manipulation.",
-    tone: "mysterious, ominous",
-  },
-  {
-    title: "Blood and Blight",
-    description:
-      "A kingdom ravaged by a mysterious plague fights for survival, but the cure is as dangerous as the disease.",
-    tone: "grim, desperate",
-  },
-  {
-    title: "Arcane Rebellion",
-    description:
-      "A magical empire hunts down rogue spellcasters, but the resistance is fractured—some mages seek peace, others want vengeance.",
-    tone: "rebellious, tense",
-  },
-  {
-    title: "Shattered Lineage",
-    description:
-      "The protagonist is the heir to a fallen dynasty but has no memory of their past, and each chapter reveals a new, conflicting truth.",
-    tone: "conflicted, personal",
   },
   {
     title: "Celestial Ruin",
     description:
-      "An empire blessed by divine weapons now finds them failing, and only by journeying across the land can the power be restored—or broken forever.",
+      "Sacred relics once upheld an empire’s glory, but now their power fades. Embark on a pilgrimage across a mystical land to either restore the divine or break the cycle forever.",
     tone: "grand, epic",
+  },
+  {
+    title: "Wings of Virtue",
+    description:
+      "Legend speaks of a realm protected by skybound knights and griffon riders. When a malevolent force encroaches, the player’s valor could unite the knights—or bring the clouds crashing down.",
+    tone: "heroic, high fantasy",
+  },
+  {
+    title: "Blossoms of Dawn",
+    description:
+      "A peaceful continent flourishes under the guidance of enchanted forests and gentle magic. As tensions rise between nature’s guardians and ambitious nobles, alliances and loyalties bloom or wither.",
+    tone: "hopeful, high fantasy",
+  },
+  {
+    title: "Arcane Rebellion",
+    description:
+      "Spellcasters are hunted by a tyrannical empire intent on controlling all magic. The rebellion’s fate hinges on whether the protagonist can unify warring mage factions—or watch them tear each other apart.",
+    tone: "rebellious, tense",
+  },
+  {
+    title: "Moonlit Masquerade",
+    description:
+      "Every year, nobles and commoners gather for a festival under moonlit skies to broker alliances and host covert duels. Danger lurks behind every mask, and the player’s every dance step could spark a feud—or a romance.",
+    tone: "whimsical, courtly intrigue",
   },
   {
     title: "Twin Fates",
     description:
-      "Two royal siblings are separated by war, both believing the other is dead, but each chapter brings them closer to a painful reunion.",
+      "Long-separated royal siblings believe each other lost to war. With each passing battle, they inch closer to a heart-wrenching reunion and the resolution of a kingdom’s fate.",
     tone: "bittersweet, emotional",
   },
   {
-    title: "The Ashen Pact",
+    title: "Goblin Guffaws",
     description:
-      "A war between zealots and revolutionaries burns the land, and the player is caught between two extremes.",
-    tone: "harsh, unyielding",
+      "A troop of mischievous goblins gatecrashes the royal tournament, turning serious quests into comedic misadventures. Whether you join their antics or thwart them could reshape the kingdom’s destiny—in the silliest way possible.",
+    tone: "lighthearted, playful",
   },
 ];
 
@@ -107,7 +107,9 @@ const GameIdeaSelector: FC<GameIdeaSelectorProps> = ({
           >
             <h3 className="font-bold">{idea.title}</h3>
             <p className="text-sm">{idea.description}</p>
-            <p className="mt-1 text-xs text-muted-foreground italic">Tone: {idea.tone}</p>
+            <p className="mt-1 text-xs text-muted-foreground italic">
+              Tone: {idea.tone}
+            </p>
           </div>
         );
       })}
