@@ -2,4 +2,3 @@ db/local.db
 .env
 logs/*
 assets/music/mp3/*
-assets/music/ogg/*

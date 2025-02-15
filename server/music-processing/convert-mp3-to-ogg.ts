@@ -47,6 +47,7 @@ export default async function convertAllMp3InDirToOgg({
 
 if (import.meta.main) {
   const inputDir = getPathWithinServer("assets/music/mp3/oblivion");
-  const outputDir = getPathWithinServer("assets/music/ogg/oblivion");
+  const outputDir = getPathWithinServer("assets/music/ogg");
   await convertAllMp3InDirToOgg({ inputDir, outputDir });
 }
+
