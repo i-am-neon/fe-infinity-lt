@@ -47,6 +47,9 @@ process-maps:
 process-portraits:
     just run server/portrait-processing/process-all-portraits.ts
 
+process-music:
+    just run server/music-processing/process-all-music.ts
+
 # Initialize PostgreSQL with pgvector extension installed and configured.
 init-vector-db:
 	brew install pgvector || true
