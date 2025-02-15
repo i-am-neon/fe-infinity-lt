@@ -58,7 +58,7 @@ export default async function getLevelUnits({
   units.push({
     nid: bossUnitData.nid,
     team: "enemy",
-    ai: "Attack",
+    ai: "Guard",
     roam_ai: null,
     ai_group: "",
     starting_position: [bossCoords.x, bossCoords.y],
