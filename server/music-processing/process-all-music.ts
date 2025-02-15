@@ -1,40 +1,54 @@
-import { SongListWithLinks } from "@/music-processing/types/song-list-with-links.ts";
-import saveVectorsForAllSongs from "@/music-processing/save-vectors-for-songs.ts";
 import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
+import { SongListWithLinks } from "@/music-processing/types/song-list-with-links.ts";
+import downloadSongsInList from "@/music-processing/download-songs-in-list.ts";
+import convertAllMp3InDirToOgg from "@/music-processing/convert-mp3-to-ogg.ts";
+import saveVectorsForAllSongs from "@/music-processing/save-vectors-for-songs.ts";
 
-export default async function processAllMusic(paths: string[]): Promise<void> {
-  for (const relPath of paths) {
-    const absolutePath = getPathWithinServer(relPath);
-    let songs: SongListWithLinks;
-    try {
-      const fileData = await Deno.readTextFile(absolutePath);
-      songs = JSON.parse(fileData) as SongListWithLinks;
-    } catch (error) {
-      console.error(`Failed to read or parse file: ${relPath}`, error);
+export default async function processAllMusic(): Promise<void> {
+  const listsDir = getPathWithinServer("assets/music/lists-with-links");
+
+  const tasks: Promise<void>[] = [];
+  for await (const entry of Deno.readDir(listsDir)) {
+    if (!entry.isFile || !entry.name.endsWith(".json")) {
       continue;
     }
-    console.log(`Loaded ${songs.length} songs from ${relPath}`);
 
-    try {
-      await saveVectorsForAllSongs(songs);
-      console.log(`Saved vectors for songs in ${relPath}`);
-    } catch (error) {
-      console.error(`Error saving vectors for songs in ${relPath}`, error);
-    }
+    // For each JSON file, push a concurrent task
+    tasks.push((async () => {
+      const listJsonPath = `${listsDir}/${entry.name}`;
+      const baseName = entry.name.replace(/\.json$/, "");
+      console.log(`Processing music list: ${entry.name}`);
+
+      try {
+        const fileData = await Deno.readTextFile(listJsonPath);
+        const songs = JSON.parse(fileData) as SongListWithLinks;
+        const mp3Dir = getPathWithinServer(`assets/music/mp3/${baseName}`);
+        const oggDir = getPathWithinServer("assets/music/ogg");
+
+        await downloadSongsInList({
+          listJsonPath,
+          outputDir: mp3Dir,
+        });
+
+        console.log(`Converting MP3 to OGG in: ${mp3Dir}`);
+        await convertAllMp3InDirToOgg({
+          inputDir: mp3Dir,
+          outputDir: oggDir,
+        });
+
+        await saveVectorsForAllSongs(songs);
+        console.log(`Done processing list: ${entry.name}`);
+      } catch (error) {
+        console.error(`Failed to process ${entry.name}:`, error);
+      }
+    })());
   }
+
+  await Promise.all(tasks);
 }
 
-// Before you call this make sure you download the mp3s from youtube and convert to ogg! This just processes the metadata.
 if (import.meta.main) {
-  const samplePaths = [
-    "assets/music/lists-with-links/oblivion.json",
-    "assets/music/lists-with-links/botw.json",
-    "assets/music/lists-with-links/skyrim.json",
-    "assets/music/lists-with-links/twilight-princess.json",
-  ];
-
-  processAllMusic(samplePaths)
+  processAllMusic()
     .then(() => console.log("All music data processed."))
     .catch(console.error);
 }
-

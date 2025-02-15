@@ -56,7 +56,6 @@ process-portraits:
 
 process-music:
     rm -rf server/vector-db/seed-vectors/music.json
-    just run server/music-processing/download-all-ogg.ts
     just run server/music-processing/process-all-music.ts
 
 # Initialize PostgreSQL with pgvector extension installed and configured.
