@@ -3,7 +3,7 @@ set shell := ["bash", "-c"]
 
 # Start both the client and server
 start:
-    just init-vector-db
+    just start-vector-db
     just start-server & # start server and client in parallel
     just start-client
 
@@ -60,7 +60,7 @@ process-music:
     just run server/music-processing/process-all-music.ts
 
 # Initialize PostgreSQL with pgvector extension installed and configured.
-init-vector-db:
+start-vector-db:
 	brew install pgvector || true
 	brew services restart postgresql@14
 	just run server/vector-db/init.ts
