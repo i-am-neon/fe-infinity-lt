@@ -6,7 +6,7 @@ import { getCurrentLogger } from "@/lib/current-logger.ts";
 export default async function chooseMusic(scenario: string): Promise<string> {
   const logger = getCurrentLogger();
   const embedding = await createEmbedding({ text: scenario });
-  const topResults = await similaritySearch(embedding, 20, "music");
+  const topResults = await similaritySearch(embedding, 3, "music");
   if (!topResults.length) {
     throw new Error("No music results found for this scenario.");
   }
@@ -24,7 +24,7 @@ export default async function chooseMusic(scenario: string): Promise<string> {
 }
 
 if (import.meta.main) {
-  chooseMusic("A calm and serene village in the mountains.")
+  chooseMusic("Exciting upbeat adventurous happy Whispers in the Frost")
     .then((res) => {
       console.log("Chosen music track name:", res);
     })
@@ -32,3 +32,4 @@ if (import.meta.main) {
       console.error("Error choosing music:", err);
     });
 }
+

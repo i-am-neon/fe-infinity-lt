@@ -11,15 +11,9 @@ export default async function chooseTopLevelMusic({
   tone: string;
 }): Promise<string[]> {
   const [mainTheme, promotionMusic, gameOverMusic] = await Promise.all([
-    chooseMusic(
-      `Main Game Theme for Game Description: ${gameDescription} Tone: ${tone}`
-    ),
-    chooseMusic(
-      `Promotion Music for Game Description: ${gameDescription} Tone: ${tone}`
-    ),
-    chooseMusic(
-      `Game Over Music for Game Description: ${gameDescription} Tone: ${tone}`
-    ),
+    chooseMusic(`${gameDescription} ${tone}`),
+    chooseMusic(`Magical, Exciting`),
+    chooseMusic(`Game Over. ${tone}`),
   ]);
   await modifyConstant({
     projectNameEndingInDotLtProj,

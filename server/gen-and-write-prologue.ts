@@ -98,8 +98,8 @@ export default async function genAndWritePrologue({
       tone,
       chapterNumber,
     }),
-    chooseMusic("Player phase for battle: " + chapterIdea.battle),
-    chooseMusic("Enemy phase for battle: " + chapterIdea.battle),
+    chooseMusic("Exciting uplifting fast-paced bold " + chapterIdea.battle),
+    chooseMusic("Scary, ominous, menacing " + chapterIdea.battle),
   ]);
   const usedPortraits = Object.values(portraitMap);
 

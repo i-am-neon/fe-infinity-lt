@@ -32,17 +32,12 @@ async function seedVectorsFromFile(fileName: string, vectorType: VectorType) {
   try {
     const data = await Deno.readTextFile(filePath);
     vectorsData = JSON.parse(data);
-    console.log(`Loaded seed vectors for ${vectorType} from file: ${filePath}`);
-    console.log(
-      `Vectors data read from file has length = ${vectorsData.length}`
-    );
   } catch (e) {
     console.log(`No seed vectors file found for ${vectorType}, skipping.`);
     return;
   }
 
   for (const vector of vectorsData) {
-    console.log(`Seeding ${vectorType} vector:`, vector.id);
     await storeVector({
       id: vector.id,
       embedding: vector.embedding,
@@ -50,6 +45,10 @@ async function seedVectorsFromFile(fileName: string, vectorType: VectorType) {
       vectorType,
     });
   }
+
+  console.log(
+    `Stored ${vectorsData.length} vectors for ${vectorType} in the database.`
+  );
 }
 
 if (import.meta.main) {
