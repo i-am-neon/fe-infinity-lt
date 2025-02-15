@@ -95,7 +95,7 @@ Return a JSON object { "chosenId": "A" } or "B" or "C" with no extra commentary.
 
 if (import.meta.main) {
   // Quick test
-  chooseMusic("Intense scenario with a sense of urgency, trumpets, war drums")
+  chooseMusic("A calm and serene village in the mountains.")
     .then((res) => {
       console.log("Chosen music track name:", res);
     })
@@ -103,3 +103,4 @@ if (import.meta.main) {
       console.error("Error choosing music:", err);
     });
 }
+

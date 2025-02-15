@@ -1,7 +1,8 @@
 import pool from "@/vector-db/connection.ts";
+import { VectorType } from "@/vector-db/types/vector-type.ts";
 
 export async function listAllVectors(
-  vectorType: "maps" | "portraits"
+  vectorType: VectorType
 ): Promise<Array<{ id: string; metadata: Record<string, unknown> }>> {
   const client = await pool.connect();
   try {
