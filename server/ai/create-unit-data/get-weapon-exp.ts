@@ -49,6 +49,11 @@ export default function getWeaponExp({
 
   const usableWeapons = classWeaponMap[className] || [];
 
+  // Minimum rank for Dark magic is D (Flux is D rank)
+  if (usableWeapons.includes("Dark")) {
+    rankExpVal = Math.max(rankExpVal, weaponRankExpMap.D);
+  }
+
   function wexpFor(weapon: WeaponType): WeaponExperience {
     if (usableWeapons.includes(weapon)) {
       return [true, rankExpVal, 251];
