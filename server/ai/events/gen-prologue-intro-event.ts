@@ -31,7 +31,8 @@ It should:
 - have the characters talk about something that sets up the main conflict with the "add_portrait" command for each character and then use the "speak" command for them to speak
 - unless a character enters the scene later, all characters in the event should be added with "add_portrait" before anyone speaks
 - be sure to include the Chapter Idea's newNonBattleCharacters as characters in the event, as mentioned in the "intro" section of the Chapter Idea
-- if a character is mentioned in the intro, it must be included in the event`;
+- if a character is mentioned in the intro, it must be included in the event
+- you may only give speaking roles to characters mentioned in the intro, not any other characters`;
 
   return generateStructuredData({
     fnName: "genPrologueIntroEvent",
