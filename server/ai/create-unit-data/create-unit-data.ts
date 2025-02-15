@@ -17,7 +17,7 @@ export default async function createUnitData({
 }): Promise<UnitData> {
   const { isPromoted, level } = decideLevel(chapterNumber);
   const klass = await decideClass({ isPromoted, level, characterIdea });
-  const { baseStats, growthRates } = decideStats(klass);
+const { baseStats, growthRates } = decideStats(kl{ fe8Class: klass }level, isPromoted);
   return {
     nid: characterIdea.firstName,
     name: characterIdea.firstName,
@@ -45,4 +45,3 @@ if (import.meta.main) {
     console.log
   );
 }
-
