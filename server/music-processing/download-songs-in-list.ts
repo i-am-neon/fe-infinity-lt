@@ -34,9 +34,9 @@ export default async function downloadSongsInList({
 if (import.meta.main) {
   downloadSongsInList({
     listJsonPath: getPathWithinServer(
-      "assets/music/lists-with-links/oblivion.json"
+      "assets/music/lists-with-links/twilight-princess.json"
     ),
-    outputDir: getPathWithinServer("assets/music/mp3/oblivion"),
+    outputDir: getPathWithinServer("assets/music/mp3/twilight-princess"),
   });
 }
 

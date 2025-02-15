@@ -26,7 +26,12 @@ export default async function processAllMusic(paths: string[]): Promise<void> {
 
 // Before you call this make sure you download the mp3s from youtube and convert to ogg! This just processes the metadata.
 if (import.meta.main) {
-  const samplePaths = ["assets/music/lists-with-links/oblivion.json"];
+  const samplePaths = [
+    "assets/music/lists-with-links/oblivion.json",
+    "assets/music/lists-with-links/botw.json",
+    "assets/music/lists-with-links/skyrim.json",
+    "assets/music/lists-with-links/twilight-princess.json",
+  ];
 
   processAllMusic(samplePaths)
     .then(() => console.log("All music data processed."))

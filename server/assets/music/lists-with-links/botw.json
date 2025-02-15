@@ -1,0 +1,66 @@
+[
+  {
+    "songName": "Hyrule Castle",
+    "feel": "Epic and foreboding, blending tension with a heroic undertone as you approach the climax of the adventure.",
+    "instrumentsUsed": "Full orchestra (sweeping strings, bold brass, percussion, and pipe organ/choral accents)",
+    "situationUsedInGame": "Exploration of Hyrule Castle (final dungeon area) leading up to the confrontation with Calamity Ganon.",
+    "youTubeLink": "https://www.youtube.com/watch?v=pZaqDYrvoMA"
+  },
+  {
+    "songName": "Tarrey Town",
+    "feel": "Warm, uplifting, and progressively joyful - it captures the feeling of building a community from scratch.",
+    "instrumentsUsed": "Light percussion and mallets (marimba), gentle strings, and additional instruments layered in as the town develops",
+    "situationUsedInGame": "Town theme for Tarrey Town, a settlement the player helps construct (music evolves and fills out as the town grows).",
+    "youTubeLink": "https://www.youtube.com/watch?v=2pGapEXcn30"
+  },
+  {
+    "songName": "Rito Village (Night)",
+    "feel": "Peaceful and nostalgic, with a soothing melody that evokes a sense of high-altitude tranquility and fond memories.",
+    "instrumentsUsed": "Acoustic guitar and soft piano undercurrent, with a wistful woodwind lead (flute) and gentle strings",
+    "situationUsedInGame": "Plays in Rito Village at night, the serene home of the Rito tribe perched in the mountains (features a motif from the classic 'Dragon Roost Island' theme).",
+    "youTubeLink": "https://www.youtube.com/watch?v=EUbS2LLmdX8"
+  },
+  {
+    "songName": "Kass's Theme",
+    "feel": "Melancholic yet hopeful - a soulful, wandering melody that inspires a sense of adventure and nostalgia on the road.",
+    "instrumentsUsed": "Solo accordion (a flowing, lyrical accordion performance is the centerpiece of this tune)",
+    "situationUsedInGame": "Heard whenever you encounter Kass, the traveling Rito minstrel, as he plays his accordion while giving clues to hidden secrets.",
+    "youTubeLink": "https://www.youtube.com/watch?v=1BD8sLtV7Bs"
+  },
+  {
+    "songName": "Kakariko Village",
+    "feel": "Calm, soothing, and slightly mystical - it feels like a gentle evening in a sacred, tranquil village.",
+    "instrumentsUsed": "Traditional instruments (soft shakuhachi flute melody, koto-like plucked strings, and subtle percussion bells)",
+    "situationUsedInGame": "Background theme for Kakariko Village, the quiet Sheikah settlement, emphasizing its peaceful and ancient atmosphere.",
+    "youTubeLink": "https://youtu.be/3Sjiz4DHMgw?si=phUzsFAKM224RCnG"
+  },
+  {
+    "songName": "Guardian Battle",
+    "feel": "Urgent and intense, instilling panic and adrenaline with its frantic pace and ominous tones.",
+    "instrumentsUsed": "Piano (rapid, pounding chords), dramatic strings, and electronic/industrial percussion for a techno-orchestral mix",
+    "situationUsedInGame": "Combat music triggered when battling Guardian enemies (the deadly ancient mechanical scouts) in the overworld.",
+    "youTubeLink": "https://www.youtube.com/watch?v=yyhbSiyyeow"
+  },
+  {
+    "songName": "Main Theme",
+    "feel": "Grand and adventurous, with sweeping emotional highs and a sense of both wonder and determination.",
+    "instrumentsUsed": "Orchestral arrangement featuring piano, soaring strings, brass fanfares, and powerful percussion",
+    "situationUsedInGame": "The primary theme of the game (heard in the title screen and trailers, and woven into key moments like the final battle), embodying the essence of Link’s journey.",
+    "youTubeLink": "https://www.youtube.com/watch?v=tDkjr_cYO6M"
+  },
+  {
+    "songName": "Attack on Vah Naboris",
+    "feel": "Dramatic and action-packed, driving a sense of urgency as thunder crashes and danger looms.",
+    "instrumentsUsed": "Bold orchestral elements (thundering drums, aggressive strings, and brass) with an ominous undertone",
+    "situationUsedInGame": "Plays during the sequence when you assault the Divine Beast Vah Naboris in the Gerudo Desert (a high-stakes battle while riding into a sandstorm).",
+    "youTubeLink": "https://www.youtube.com/watch?v=EWIqwOAFJv8"
+  },
+  {
+    "songName": "Korok Forest",
+    "feel": "Whimsical and magical, yet calm - it conveys a childlike wonder in an ancient, sacred wood.",
+    "instrumentsUsed": "Light woodwinds (playful oboe and flute), gentle strings, and twinkling chimes",
+    "situationUsedInGame": "Ambient theme for the Korok Forest (Lost Woods) where the Master Sword rests and Koroks play, creating an enchanted forest atmosphere.",
+    "youTubeLink": "https://www.youtube.com/watch?v=jUKwSsD_uIc"
+  }
+]
+
