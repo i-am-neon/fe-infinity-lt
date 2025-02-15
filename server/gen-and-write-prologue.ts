@@ -25,6 +25,7 @@ import { Tilemap } from "@/types/maps/tilemap.ts";
 import genChapterIdea from "./ai/gen-chapter-idea.ts";
 import assembleLevel from "./ai/level/assemble-level.ts";
 import chooseMusic from "@/ai/choose-music.ts";
+import chooseTopLevelMusic from "@/ai/choose-top-level-music.ts";
 
 export default async function genAndWritePrologue({
   projectName,
@@ -49,12 +50,21 @@ export default async function genAndWritePrologue({
   );
 
   // Generate data for initial chapter
-  const worldSummary = await genWorldSummary({
-    gameName: projectName,
-    gameDescription: description,
-    tone,
-  });
+  const [worldSummary, topLevelMusics] = await Promise.all([
+    genWorldSummary({
+      gameName: projectName,
+      gameDescription: description,
+      tone,
+    }),
+    chooseTopLevelMusic({
+      projectNameEndingInDotLtProj,
+      gameDescription: description,
+      tone,
+    }),
+  ]);
   const initialGameIdea = await genInitialGameIdea({ worldSummary, tone });
+
+  // Generate prologue chapter
   const chapterIdea = await genChapterIdea({
     worldSummary,
     initialGameIdea,
@@ -151,7 +161,7 @@ export default async function genAndWritePrologue({
   await writeChapter({
     projectNameEndingInDotLtProj,
     chapter: newChapter,
-    music: [introMusic, playerPhaseMusic, enemyPhaseMusic],
+    music: [...topLevelMusics, introMusic, playerPhaseMusic, enemyPhaseMusic],
   });
 
   await writeStubChapter({
