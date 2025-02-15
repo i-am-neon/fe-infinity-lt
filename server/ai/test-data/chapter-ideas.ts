@@ -26,6 +26,12 @@ export const testChapterIdea: ChapterIdea = {
     inGameDescription: "A fanatical guardian of the Hermitage's secrets.",
     deathQuote: "The secrets... will not die... with me...",
   },
+  enemyFaction: {
+    name: "Hermitage of Frostvein",
+    nid: "hermitage-of-frostvein",
+    desc: "A reclusive sect of scholars and mystics who have long dwelled within the Frostvein Mountains, guarding ancient knowledge and secrets. They have become increasingly wary of outsiders due to the spread of the Blight.",
+    icon_nid: "faction-hermitage",
+  },
   newNonBattleCharacters: [testCharIdeaThorne],
 };
 

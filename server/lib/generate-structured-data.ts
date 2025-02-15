@@ -10,8 +10,8 @@ export default async function generateStructuredData<T>({
   schema,
   systemMessage,
   prompt,
-  temperature = 0,
-  model = "gpt-4o",
+  temperature,
+  model = "gpt-4o-mini",
 }: {
   fnName: string;
   schema: ZodSchema<T>;

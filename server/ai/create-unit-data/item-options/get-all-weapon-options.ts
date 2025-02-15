@@ -17,7 +17,7 @@ export interface WeaponOption {
 }
 
 // List of item nids to ignore
-const ignoreList = ["Ballista"];
+const ignoreList = ["Ballista", "Long_Ballista"];
 
 export default function getAllWeaponOptions(
   data: RawItemData[]

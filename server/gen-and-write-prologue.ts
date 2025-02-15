@@ -1,6 +1,11 @@
+import chooseMusic from "@/ai/choose-music.ts";
 import { choosePortraits } from "@/ai/choose-portraits.ts";
+import chooseTopLevelMusic from "@/ai/choose-top-level-music.ts";
 import createUnitDatas from "@/ai/create-unit-data/create-unit-datas.ts";
-import assembleEvent from "@/ai/events/assemble-event.ts";
+import chooseBackground from "@/ai/events/choose-background.ts";
+import convertAIEventToEvent from "@/ai/events/convert-ai-event-to-event.ts";
+import genOutroEvent from "@/ai/events/gen-outro-event.ts";
+import genPrologueIntroEvent from "@/ai/events/gen-prologue-intro-event.ts";
 import genInitialGameIdea from "@/ai/gen-initial-game-idea.ts";
 import genWorldSummary from "@/ai/gen-world-summary.ts";
 import {
@@ -20,16 +25,11 @@ import removeExistingGame from "@/lib/remove-existing-game.ts";
 import { allPortraitOptions } from "@/portrait-processing/all-portrait-options.ts";
 import { Chapter } from "@/types/chapter.ts";
 import { Character } from "@/types/character/character.ts";
+import { Event } from "@/types/events/event.ts";
 import { Game } from "@/types/game.ts";
 import { Tilemap } from "@/types/maps/tilemap.ts";
 import genChapterIdea from "./ai/gen-chapter-idea.ts";
 import assembleLevel from "./ai/level/assemble-level.ts";
-import chooseMusic from "@/ai/choose-music.ts";
-import chooseTopLevelMusic from "@/ai/choose-top-level-music.ts";
-import genOutroEvent from "@/ai/events/gen-outro-event.ts";
-import convertAIEventToEvent from "@/ai/events/convert-ai-event-to-event.ts";
-import chooseBackground from "@/ai/events/choose-background.ts";
-import { Event } from "@/types/events/event.ts";
 
 export default async function genAndWritePrologue({
   projectName,
@@ -86,25 +86,68 @@ export default async function genAndWritePrologue({
   const [
     portraitMap,
     unitDatas,
-    { event: prologueIntroEvent, aiEvent: introAIEvent, music: introMusic },
     playerPhaseMusic,
     enemyPhaseMusic,
+    prologueIntroAIEvent,
+    introMusic,
+    outroAIEvent,
+    outroMusic,
   ] = await Promise.all([
     choosePortraits(newCharacterIdeas),
     createUnitDatas({
       characterIdeas: newCharacterIdeas,
       chapterNumber,
     }),
-    assembleEvent({
+    chooseMusic("Exciting uplifting fast-paced bold " + chapterIdea.battle),
+    chooseMusic("Scary, ominous, menacing " + chapterIdea.battle),
+    genPrologueIntroEvent({
       worldSummary,
       initialGameIdea,
       chapterIdea,
       tone,
-      chapterNumber,
     }),
-    chooseMusic("Exciting uplifting fast-paced bold " + chapterIdea.battle),
-    chooseMusic("Scary, ominous, menacing " + chapterIdea.battle),
+    chooseMusic(chapterIdea.intro),
+
+    genOutroEvent({
+      worldSummary,
+      initialGameIdea,
+      chapterIdea,
+      tone,
+    }),
+    chooseMusic("Reflective, concluding, final notes " + chapterIdea.outro),
   ]);
+
+  const [introBackgroundChoice, outroBackgroundChoice] = await Promise.all([
+    chooseBackground(prologueIntroAIEvent),
+    chooseBackground(outroAIEvent),
+  ]);
+
+  const prologueIntroEvent = convertAIEventToEvent({
+    aiEvent: prologueIntroAIEvent,
+    backgroundChoice: introBackgroundChoice,
+    musicChoice: introMusic,
+    chapterNumber,
+    showChapterTitle: true,
+  });
+  const outroEvent = convertAIEventToEvent({
+    aiEvent: outroAIEvent,
+    chapterNumber,
+    backgroundChoice: outroBackgroundChoice,
+    musicChoice: outroMusic,
+  });
+
+  const bossNid = chapterIdea.boss.firstName;
+  const defeatBossEvent: Event = {
+    name: "Defeat Boss",
+    trigger: "combat_end",
+    level_nid: chapterNumber.toString(),
+    condition: `game.check_dead("${bossNid}")`,
+    commands: [],
+    only_once: false,
+    priority: 20,
+    _source: ["win_game"],
+  };
+
   const usedPortraits = Object.values(portraitMap);
 
   const newCharacters: Character[] = unitDatas.map((ud) => {
@@ -152,50 +195,15 @@ export default async function genAndWritePrologue({
     )
   );
 
-  const [outroAIEvent, outroMusic] = await Promise.all([
-    genOutroEvent({
-      worldSummary,
-      initialGameIdea,
-      chapterIdea,
-      tone,
-      introEvent: introAIEvent,
-    }),
-    chooseMusic("Reflective, concluding, final notes " + chapterIdea.outro),
-  ]);
-  const outroBackground = await chooseBackground(outroAIEvent);
-  const outroEvent = convertAIEventToEvent({
-    aiEvent: outroAIEvent,
-    chapterNumber,
-    backgroundChoice: outroBackground,
-    musicChoice: outroMusic,
-  });
-
   const newChapter: Chapter = {
     title: chapterIdea.title,
     number: chapterNumber,
     level,
-    events: [prologueIntroEvent],
+    events: [prologueIntroEvent, outroEvent, defeatBossEvent],
     newCharacters,
     tilemap,
     enemyFaction: chapterIdea.enemyFaction,
   };
-
-  newChapter.events.push(outroEvent);
-
-  const bossNid = chapterIdea.boss.firstName;
-
-  const defeatBossEvent: Event = {
-    name: "Defeat Boss",
-    trigger: "combat_end",
-    level_nid: chapterNumber.toString(),
-    condition: `game.check_dead("${bossNid}")`,
-    commands: [],
-    only_once: false,
-    priority: 20,
-    _source: ["win_game"],
-  };
-
-  newChapter.events.push(defeatBossEvent);
 
   // Modify project files
   await writeChapter({
