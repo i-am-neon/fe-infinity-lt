@@ -1,5 +1,6 @@
 import { CharacterIdeaSchema } from "@/ai/types/character-idea.ts";
 import { z } from "zod";
+import { EnemyFactionSchema } from "@/ai/types/enemy-faction.ts";
 
 export const ChapterIdeaSchema = z.object({
   title: z
@@ -24,6 +25,7 @@ export const ChapterIdeaSchema = z.object({
     .describe(
       "New playable characters introduced in this chapter, if any. Includes units that start as player units, NPCs, or enemies but can be recruited."
     ),
+  enemyFaction: EnemyFactionSchema,
 });
 
 export type ChapterIdea = z.infer<typeof ChapterIdeaSchema>;

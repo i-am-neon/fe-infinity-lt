@@ -5,6 +5,7 @@ import { appendEvents } from "@/game-engine-io/write-chapter/append-events.ts";
 import { appendLevel } from "@/game-engine-io/write-chapter/append-level.ts";
 import writeCharacters from "@/game-engine-io/write-character/write-characters.ts";
 import { copyMusicAndUpdateJson } from "@/game-engine-io/write-chapter/copy-music.ts";
+import appendFaction from "@/game-engine-io/write-chapter/append-faction.ts";
 
 export default async function writeChapter({
   projectNameEndingInDotLtProj,
@@ -15,6 +16,14 @@ export default async function writeChapter({
   chapter: Chapter;
   music: string[];
 }): Promise<void> {
+  // If chapter.enemyFaction is defined, append it to factions.json
+  if (chapter.enemyFaction) {
+    await appendFaction({
+      projectNameEndingInDotLtProj,
+      faction: chapter.enemyFaction,
+    });
+  }
+
   await appendLevel({
     projectNameEndingInDotLtProj,
     newLevel: chapter.level,

@@ -31,7 +31,8 @@ Generate a single new chapter that logically follows from them.
 
 ## New Characters
 - All new characters must be human.
-- When adding Non Battle Characters, make sure to use them in the intro and/or outro.`;
+- When adding Non Battle Characters, make sure to use them in the intro and/or outro.
+`;
 
   const prompt = `World Summary: ${JSON.stringify(worldSummary, null, 2)}
 Initial Game Idea: ${JSON.stringify(initialGameIdea, null, 2)}

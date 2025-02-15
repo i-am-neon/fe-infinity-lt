@@ -87,7 +87,7 @@ export default async function getLevelUnits({
         fe8Class: ge.class,
       }),
       // TODO: factions
-      faction: "Soldier",
+      faction: chapterIdea.enemyFaction.nid,
       klass: FE8ClassToLTNidMap[ge.class],
       roam_ai: null,
       ai_group: "",
@@ -102,4 +102,3 @@ export default async function getLevelUnits({
 
   return units;
 }
-

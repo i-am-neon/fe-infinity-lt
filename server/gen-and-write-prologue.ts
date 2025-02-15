@@ -155,6 +155,7 @@ export default async function genAndWritePrologue({
     events: [prologueIntroEvent],
     newCharacters,
     tilemap,
+    enemyFaction: chapterIdea.enemyFaction,
   };
 
   // Modify project files
