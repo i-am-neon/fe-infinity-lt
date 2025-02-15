@@ -1,11 +1,16 @@
 import storeVector from "@/vector-db/store-vector.ts";
 import pool from "@/vector-db/connection.ts";
+import { VectorType } from "@/vector-db/types/vector-type.ts";
 
 export async function seedVectors(): Promise<void> {
   const client = await pool.connect();
   try {
-    console.log("Truncating maps_vectors and portraits_vectors tables...");
-    await client.query("TRUNCATE TABLE maps_vectors, portraits_vectors;");
+    console.log(
+      "Truncating maps_vectors, portraits_vectors, and music_vectors tables..."
+    );
+    await client.query(
+      "TRUNCATE TABLE maps_vectors, portraits_vectors, music_vectors;"
+    );
     console.log("Tables truncated. Fresh seeding will begin now.");
   } finally {
     client.release();
@@ -13,13 +18,11 @@ export async function seedVectors(): Promise<void> {
 
   await seedVectorsFromFile("./seed-vectors/maps.json", "maps");
   await seedVectorsFromFile("./seed-vectors/portraits.json", "portraits");
+  await seedVectorsFromFile("./seed-vectors/music.json", "music");
   console.log("Seeding complete. Vectors have been stored in the database.");
 }
 
-async function seedVectorsFromFile(
-  fileName: string,
-  vectorType: "maps" | "portraits"
-) {
+async function seedVectorsFromFile(fileName: string, vectorType: VectorType) {
   const filePath = new URL(fileName, import.meta.url).pathname;
   let vectorsData: Array<{
     id: string;

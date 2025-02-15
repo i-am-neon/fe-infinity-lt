@@ -1,9 +1,10 @@
 import pool from "@/vector-db/connection.ts";
+import { VectorType } from "@/vector-db/types/vector-type.ts";
 
 export default async function similaritySearch(
   embedding: number[],
   topK = 3,
-  vectorType: "maps" | "portraits"
+  vectorType: VectorType
 ): Promise<
   Array<{
     id: string;
@@ -13,8 +14,14 @@ export default async function similaritySearch(
 > {
   const client = await pool.connect();
   try {
-    const tableName =
-      vectorType === "maps" ? "maps_vectors" : "portraits_vectors";
+    let tableName = "";
+    if (vectorType === "maps") {
+      tableName = "maps_vectors";
+    } else if (vectorType === "portraits") {
+      tableName = "portraits_vectors";
+    } else {
+      tableName = "music_vectors";
+    }
     const embeddingLiteral = "[" + embedding.join(",") + "]";
     const query = `
       SELECT
@@ -39,7 +46,7 @@ export default async function similaritySearch(
 if (import.meta.main) {
   // Example usage for maps
   const queryEmbedding = new Array(1536).fill(0).map(() => Math.random());
-  const res = await similaritySearch(queryEmbedding, 100, "portraits");
+  const res = await similaritySearch(queryEmbedding, 100, "music");
   console.log("similarity search results:", res);
 }
 

@@ -1,4 +1,5 @@
 import pool from "@/vector-db/connection.ts";
+import { VectorType } from "@/vector-db/types/vector-type.ts";
 
 /**
  * Stores or updates a vector and its metadata in the database.
@@ -15,14 +16,20 @@ export default async function storeVector({
   id: string;
   embedding: number[];
   metadata: Record<string, unknown>;
-  vectorType: "maps" | "portraits";
+  vectorType: VectorType;
 }): Promise<void> {
   const client = await pool.connect();
   try {
     // Convert embedding array to Postgres vector literal format
     const embeddingLiteral = "[" + embedding.join(",") + "]";
-    const tableName =
-      vectorType === "maps" ? "maps_vectors" : "portraits_vectors";
+    let tableName = "";
+    if (vectorType === "maps") {
+      tableName = "maps_vectors";
+    } else if (vectorType === "portraits") {
+      tableName = "portraits_vectors";
+    } else {
+      tableName = "music_vectors";
+    }
     await client.query(
       `
         INSERT INTO ${tableName} (id, embedding, metadata)

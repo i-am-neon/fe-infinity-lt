@@ -26,6 +26,14 @@ export default async function initVectorDb(): Promise<void> {
         metadata JSONB
       );
     `);
+    // Create table for music vectors
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS music_vectors (
+        id TEXT PRIMARY KEY,
+        embedding vector(1536) NOT NULL,
+        metadata JSONB
+      );
+    `);
   } finally {
     client.release();
   }
