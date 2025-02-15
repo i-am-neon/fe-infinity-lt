@@ -8,6 +8,7 @@ import { sluggify } from "@/lib/sluggify.ts";
 import removeWithinLtMaker from "@/file-io/remove-within-lt-maker.ts";
 import copyTilesetsToProject from "@/file-io/copy-tilesets-to-project.ts";
 import appendAllTilesetsData from "@/game-engine-io/write-chapter/append-all-tilesets-data.ts";
+import modifyConstant from "@/game-engine-io/modify-constant.ts";
 
 export default async function initializeProject(projectName: string) {
   const initProjectScriptPath = getPathWithinLtMaker("create_new_project.py");
@@ -163,6 +164,28 @@ export default async function initializeProject(projectName: string) {
 
   await copyTilesetsToProject(newProjectNameEndingInDotLtProj);
   await appendAllTilesetsData(newProjectNameEndingInDotLtProj);
+
+  // Modify game settings to my liking
+  await modifyConstant({
+    projectNameEndingInDotLtProj: newProjectNameEndingInDotLtProj,
+    key: "turnwheel",
+    newValue: false,
+  });
+  await modifyConstant({
+    projectNameEndingInDotLtProj: newProjectNameEndingInDotLtProj,
+    key: "bexp",
+    newValue: true,
+  });
+  await modifyConstant({
+    projectNameEndingInDotLtProj: newProjectNameEndingInDotLtProj,
+    key: "auto_promote",
+    newValue: true,
+  });
+  await modifyConstant({
+    projectNameEndingInDotLtProj: newProjectNameEndingInDotLtProj,
+    key: "convoy_on_death",
+    newValue: true,
+  });
 
   return {
     projectNameEndingInDotLtProj: newProjectNameEndingInDotLtProj,
