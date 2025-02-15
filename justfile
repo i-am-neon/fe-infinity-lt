@@ -3,15 +3,23 @@ set shell := ["bash", "-c"]
 
 # Start both the client and server
 start:
-    just start-server & just start-client & just init-vector-db
+    just init-vector-db
+    just start-server
+    just start-client
 
 # Start the Deno server with Conda
 start-server:
-    cd server && source /opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh && conda activate fe-i-lt && deno task server
+    cd server
+    source /opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh
+    conda activate fe-i-lt
+    deno task server
 
 # Run the LT editor
 editor:
-    cd lt-maker-fork && source /opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh && conda activate fe-i-lt && wine python run_editor.py
+    cd lt-maker-fork
+    source /opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh
+    conda activate fe-i-lt
+    wine python run_editor.py
 
 # Start the Next.js client
 start-client:
