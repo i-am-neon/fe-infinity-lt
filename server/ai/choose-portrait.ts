@@ -1,4 +1,4 @@
-import { testCharIdeaThorne } from "@/ai/test-data/character-ideas.ts";
+import { testCharIdeaAislin } from "@/ai/test-data/character-ideas.ts";
 import { CharacterIdea } from "@/ai/types/character-idea.ts";
 import { getCurrentLogger } from "@/lib/current-logger.ts";
 import generateStructuredData from "@/lib/generate-structured-data.ts";
@@ -61,8 +61,12 @@ Given the user's Fire Emblem character idea, provide a brief single-line string 
   }
 
   const filteredResults = topResults.filter((res) => {
-    const md = res.metadata as { originalName?: string };
-    return md.originalName && !usedPortraits.includes(md.originalName);
+    const md = res.metadata as { originalName?: string; gender?: string };
+    return (
+      md.originalName &&
+      md.gender === characterIdea.gender &&
+      !usedPortraits.includes(md.originalName)
+    );
   });
   if (!filteredResults.length) {
     logger.warn("No unused portraits remain", { searchQuery });
@@ -132,7 +136,7 @@ Return a JSON object { "chosenId": "A" } or "B" or "C" with no quotes around the
 
 if (import.meta.main) {
   // Quick test
-  choosePortrait({ characterIdea: testCharIdeaThorne, usedPortraits: [] })
+  choosePortrait({ characterIdea: testCharIdeaAislin, usedPortraits: [] })
     .then((res) => {
       console.log("Chosen portrait:", res);
     })

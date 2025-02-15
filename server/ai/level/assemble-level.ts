@@ -33,8 +33,8 @@ export default async function assembleLevel({
     nid: chapterNumber.toString(),
     name:
       chapterNumber === 0
-        ? "Prologue: "
-        : `Ch. ${chapterNumber} ${chapterIdea.title}`,
+        ? `Prologue: ${chapterIdea.title}`
+        : `Ch. ${chapterNumber}: ${chapterIdea.title}`,
     tilemap: chosenMap,
     bg_tilemap: null,
     party: "Eirika",
