@@ -16,17 +16,28 @@ export interface WeaponOption {
   type: WeaponType;
 }
 
+// List of item nids to ignore
+const ignoreList = ["Ballista"];
+
 export default function getAllWeaponOptions(
   data: RawItemData[]
 ): WeaponOption[] {
   return data.reduce<WeaponOption[]>((acc, entry) => {
+    // If the item nid is in the ignore list, skip it
+    if (ignoreList.includes(entry.nid)) {
+      return acc;
+    }
+
     const weaponType = entry.components.find(
       ([key]) => key === "weapon_type"
     )?.[1] as WeaponType;
+
     const weaponRank = entry.components.find(
       ([key]) => key === "weapon_rank"
     )?.[1] as keyof typeof weaponRankExpMap;
+
     if (!weaponType || !weaponRank) return acc;
+
     acc.push({
       nid: entry.nid,
       name: entry.name,
@@ -43,4 +54,3 @@ if (import.meta.main) {
   );
   console.log(getAllWeaponOptions(data));
 }
-

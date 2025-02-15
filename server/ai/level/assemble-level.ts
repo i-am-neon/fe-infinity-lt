@@ -9,11 +9,15 @@ export default async function assembleLevel({
   chapterNumber,
   playerUnitDatas,
   bossUnitData,
+  playerPhaseMusic,
+  enemyPhaseMusic,
 }: {
   chapterIdea: ChapterIdea;
   chapterNumber: number;
   playerUnitDatas: UnitData[];
   bossUnitData: UnitData;
+  playerPhaseMusic: string;
+  enemyPhaseMusic: string;
 }): Promise<Level> {
   const chosenMap = await chooseMap(chapterIdea);
 
@@ -32,8 +36,8 @@ export default async function assembleLevel({
     bg_tilemap: null,
     party: "Eirika",
     music: {
-      player_phase: "Distant Roads",
-      enemy_phase: "Shadow of the Enemy",
+      player_phase: playerPhaseMusic,
+      enemy_phase: enemyPhaseMusic,
       other_phase: null,
       enemy2_phase: null,
       player_battle: "Attack",

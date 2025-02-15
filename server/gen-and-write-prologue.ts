@@ -24,6 +24,7 @@ import { Game } from "@/types/game.ts";
 import { Tilemap } from "@/types/maps/tilemap.ts";
 import genChapterIdea from "./ai/gen-chapter-idea.ts";
 import assembleLevel from "./ai/level/assemble-level.ts";
+import chooseMusic from "@/ai/choose-music.ts";
 
 export default async function genAndWritePrologue({
   projectName,
@@ -72,6 +73,8 @@ export default async function genAndWritePrologue({
     portraitMap,
     unitDatas,
     { event: prologueIntroEvent, music: introMusic },
+    playerPhaseMusic,
+    enemyPhaseMusic,
   ] = await Promise.all([
     choosePortraits(newCharacterIdeas),
     createUnitDatas({
@@ -85,6 +88,8 @@ export default async function genAndWritePrologue({
       tone,
       chapterNumber,
     }),
+    chooseMusic("Player phase for battle: " + chapterIdea.battle),
+    chooseMusic("Enemy phase for battle: " + chapterIdea.battle),
   ]);
   const usedPortraits = Object.values(portraitMap);
 
@@ -124,6 +129,8 @@ export default async function genAndWritePrologue({
     chapterNumber,
     playerUnitDatas,
     bossUnitData,
+    playerPhaseMusic,
+    enemyPhaseMusic,
   });
   const tilemap: Tilemap = JSON.parse(
     Deno.readTextFileSync(
@@ -144,7 +151,7 @@ export default async function genAndWritePrologue({
   await writeChapter({
     projectNameEndingInDotLtProj,
     chapter: newChapter,
-    music: [introMusic],
+    music: [introMusic, playerPhaseMusic, enemyPhaseMusic],
   });
 
   await writeStubChapter({
