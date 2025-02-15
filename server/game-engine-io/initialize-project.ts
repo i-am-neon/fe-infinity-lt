@@ -9,6 +9,7 @@ import removeWithinLtMaker from "@/file-io/remove-within-lt-maker.ts";
 import copyTilesetsToProject from "@/file-io/copy-tilesets-to-project.ts";
 import appendAllTilesetsData from "@/game-engine-io/write-chapter/append-all-tilesets-data.ts";
 import modifyConstant from "@/game-engine-io/modify-constant.ts";
+import { copyMusicAndUpdateJson } from "@/game-engine-io/write-chapter/copy-music.ts";
 
 export default async function initializeProject(projectName: string) {
   const initProjectScriptPath = getPathWithinLtMaker("create_new_project.py");
@@ -193,6 +194,12 @@ export default async function initializeProject(projectName: string) {
   });
   await removeWithinLtMaker({
     relativePath: `${newProjectNameEndingInDotLtProj}/resources/music/Defense.ogg`,
+  });
+
+  // Add music for stub chapter
+  await copyMusicAndUpdateJson({
+    projectNameEndingInDotLtProj: newProjectNameEndingInDotLtProj,
+    music: ["memories-of-green"],
   });
 
   return {
