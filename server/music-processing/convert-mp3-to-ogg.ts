@@ -34,6 +34,15 @@ export default async function convertAllMp3InDirToOgg({
       const baseName = entry.name.replace(/\.mp3$/i, "");
       const mp3Path = `${inputDir}/${entry.name}`;
       const oggPath = `${outputDir}/${baseName}.ogg`;
+      try {
+        const stat = await Deno.stat(oggPath);
+        if (stat.isFile) {
+          console.log(`OGG file already exists for ${baseName}, skipping.`);
+          continue;
+        }
+      } catch {
+        // file not found, proceed
+      }
       tasks.push(
         convertMp3ToOgg({
           inputFile: mp3Path,

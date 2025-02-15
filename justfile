@@ -42,12 +42,16 @@ run path:
     source /opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh && conda activate fe-i-lt && cd server && set -a; source .env; set +a; cd .. && deno run --allow-all --config server/deno.json "{{path}}"
 
 process-maps:
+    rm -rf server/vector-db/seed-vectors/maps.json
     just run server/map-processing/process-all-maps.ts
 
 process-portraits:
+    rm -rf server/vector-db/seed-vectors/portraits.json
     just run server/portrait-processing/process-all-portraits.ts
 
 process-music:
+    rm -rf server/vector-db/seed-vectors/music.json
+    just run server/music-processing/convert-mp3-to-ogg.ts
     just run server/music-processing/process-all-music.ts
 
 # Initialize PostgreSQL with pgvector extension installed and configured.
