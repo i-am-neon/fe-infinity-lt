@@ -1,7 +1,12 @@
-export type SongListWithLinks = {
+export type SongMetadata = {
   songName: string;
   feel: string;
   instrumentsUsed: string;
   situationUsedInGame: string;
-  youTubeLink: string;
-}[];
+};
+
+export type SongListWithLinks = Array<
+  SongMetadata & {
+    youTubeLink: string;
+  }
+>;
