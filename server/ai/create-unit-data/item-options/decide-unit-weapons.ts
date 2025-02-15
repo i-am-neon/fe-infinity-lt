@@ -1,10 +1,10 @@
-import { FE8Class } from "@/types/fe8-class.ts";
 import {
   classWeaponMap,
   weaponRankExpMap,
 } from "@/ai/create-unit-data/get-weapon-exp.ts";
+import { FE8Class } from "@/types/fe8-class.ts";
 import filterWeapons from "./filter-weapons.ts";
-import { WeaponOption } from "./get-all-weapon-options.ts";
+import getBasicWeapon from "./get-basic-weapon.ts";
 
 export default function decideUnitWeapons({
   fe8Class,
@@ -15,11 +15,12 @@ export default function decideUnitWeapons({
   level: number;
   isPromoted: boolean;
 }): [string, boolean][] {
-  let rankExpVal = 1;
+  // Determine rank for basic weapon
+  let rank: keyof typeof weaponRankExpMap = "E";
   if (!isPromoted) {
-    rankExpVal = level < 10 ? weaponRankExpMap.E : weaponRankExpMap.D;
+    rank = level < 10 ? "E" : "D";
   } else {
-    rankExpVal = level < 5 ? weaponRankExpMap.D : weaponRankExpMap.C;
+    rank = level < 5 ? "D" : "C";
   }
 
   const possibleWeaponTypes = classWeaponMap[fe8Class] || [];
@@ -27,63 +28,62 @@ export default function decideUnitWeapons({
     return [];
   }
 
-  const ranksArr = [
-    "E",
-    "D",
-    "C",
-    "B",
-    "A",
-    "S",
-  ] as (keyof typeof weaponRankExpMap)[];
-  let rankIndex = ranksArr.findIndex((r) => weaponRankExpMap[r] === rankExpVal);
-  if (rankIndex === -1) rankIndex = 0;
-
-  const minRank = ranksArr[rankIndex];
-  const maxRank = ranksArr[rankIndex];
-
+  // Always give one basic weapon from getBasicWeapon
   const chosenType =
     possibleWeaponTypes[Math.floor(Math.random() * possibleWeaponTypes.length)];
-  const candidateWeapons = filterWeapons({
-    desiredType: chosenType,
-    minRank,
-    maxRank,
-  });
-  if (!candidateWeapons.length) {
-    return [];
-  }
-  const chosenWeapon =
-    candidateWeapons[Math.floor(Math.random() * candidateWeapons.length)];
+  const [basicNid] = getBasicWeapon(chosenType, rank);
+  const weapons: [string, boolean][] = [[basicNid, false]];
 
-  const weapons: WeaponOption[] = [chosenWeapon];
-
+  // Chance to add another basic weapon if multiple weapon types
   if (possibleWeaponTypes.length > 1) {
-    let baseChance = 0.15 + Math.max(0, level - 5) * 0.02;
+    let baseChance = 0.15;
     if (isPromoted) {
       baseChance += 0.1;
     }
+    if (level > 5) {
+      // Increase chance the higher the level, up to some max
+      baseChance += Math.min(0.05 * (level - 5), 0.3);
+    }
     if (Math.random() < baseChance) {
       const otherTypes = possibleWeaponTypes.filter((t) => t !== chosenType);
-      if (otherTypes.length > 0) {
+      if (otherTypes.length) {
         const secondType =
           otherTypes[Math.floor(Math.random() * otherTypes.length)];
-        const secondCandidates = filterWeapons({
-          desiredType: secondType,
-          minRank,
-          maxRank,
-        });
-        if (secondCandidates.length) {
-          const secondWeapon =
-            secondCandidates[
-              Math.floor(Math.random() * secondCandidates.length)
-            ];
-          weapons.push(secondWeapon);
-        }
+        const [secondBasicNid] = getBasicWeapon(secondType, rank);
+        weapons.push([secondBasicNid, false]);
       }
     }
   }
 
+  // 0-2 extra random weapons from filterWeapons, excluding the basic(s)
+  let extraCount = 0;
+  const baseExtraChance = isPromoted ? 0.4 : 0.2;
+  if (Math.random() < baseExtraChance) extraCount++;
+  if (Math.random() < baseExtraChance / 2) extraCount++;
+
+  // Gather all valid weapons from filterWeapons for each type
+  // only including rank=rank
+  const allCandidates = possibleWeaponTypes.flatMap((t) =>
+    filterWeapons({
+      desiredType: t,
+      minRank: rank,
+      maxRank: rank,
+    })
+  );
+
+  // exclude any we've already included
+  const existing = new Set(weapons.map((w) => w[0]));
+  const extraPool = allCandidates.filter((c) => !existing.has(c.nid));
+
+  for (let i = 0; i < extraCount; i++) {
+    if (!extraPool.length) break;
+    const randIndex = Math.floor(Math.random() * extraPool.length);
+    weapons.push([extraPool[randIndex].nid, false]);
+    extraPool.splice(randIndex, 1);
+  }
+
   // Convert from WeaponOption to [weaponNid, false]
-  return weapons.map((w) => [w.nid, false]);
+  return weapons;
 }
 
 if (import.meta.main) {
