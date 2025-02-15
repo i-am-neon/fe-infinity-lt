@@ -187,6 +187,14 @@ export default async function initializeProject(projectName: string) {
     newValue: true,
   });
 
+  // Remove music that plays during battle
+  await removeWithinLtMaker({
+    relativePath: `${newProjectNameEndingInDotLtProj}/resources/music/Attack.ogg`,
+  });
+  await removeWithinLtMaker({
+    relativePath: `${newProjectNameEndingInDotLtProj}/resources/music/Defense.ogg`,
+  });
+
   return {
     projectNameEndingInDotLtProj: newProjectNameEndingInDotLtProj,
     gameNid,
