@@ -18,11 +18,9 @@ export default async function downloadSongsInList({
   await Promise.all(
     list.map(async (song) => {
       const { youTubeLink, songName } = song;
-      const slugifiedTitle = sluggify(songName);
-      const outputFile = `${outputDir}/${slugifiedTitle}.mp3`;
 
       try {
-        await downloadYouTubeAsMP3({ url: youTubeLink, outputDir });
+        await downloadYouTubeAsMP3({ url: youTubeLink, outputDir, songName });
       } catch (error) {
         console.error(`Failed to download song: ${songName}`);
         console.error(error);
@@ -34,9 +32,9 @@ export default async function downloadSongsInList({
 if (import.meta.main) {
   downloadSongsInList({
     listJsonPath: getPathWithinServer(
-      "assets/music/lists-with-links/twilight-princess.json"
+      "assets/music/lists-with-links/fe3h.json"
     ),
-    outputDir: getPathWithinServer("assets/music/mp3/twilight-princess"),
+    outputDir: getPathWithinServer("assets/music/mp3/fe3h"),
   });
 }
 

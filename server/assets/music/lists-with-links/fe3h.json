@@ -1,0 +1,38 @@
+[
+  {
+    "songName": "Fódlan Winds",
+    "feel": "Upbeat and adventurous, an energetic orchestral march that evokes heroism in battle.",
+    "instrumentsUsed": "Bold orchestral instrumentation (strings, brass, percussion) with a stirring melody derived from the game's main theme.",
+    "situationUsedInGame": "Primary battle map theme in the early chapters (Prologue and Chapters 1, 3, 4, 5), setting the tone for initial skirmishes.",
+    "youTubeLink": "https://www.youtube.com/watch?v=BZqWUyh1ugw"
+  },
+  {
+    "songName": "Blue Skies and a Battle",
+    "feel": "High-energy and exhilarating, blending triumphant orchestral elements with modern electronic beats for a thrilling effect.",
+    "instrumentsUsed": "Driving strings and brass backed by electric bass and percussion, with a subtle electronic rhythm section.",
+    "situationUsedInGame": "Used as the battle theme for Chapter 7 during the academy phase.",
+    "youTubeLink": "https://www.youtube.com/watch?v=sBGXtiQi-WY"
+  },
+  {
+    "songName": "Roar of Dominion",
+    "feel": "Bombastic and foreboding, creating a powerful, intimidating atmosphere.",
+    "instrumentsUsed": "Sweeping orchestra, choir, dark synths, pounding percussion, and a somber violin solo.",
+    "situationUsedInGame": "Final map theme of the pre-skip segment during Edelgard’s assault on Garreg Mach Monastery.",
+    "youTubeLink": "https://www.youtube.com/watch?v=Yj_Qd6nIX90"
+  },
+  {
+    "songName": "God-Shattering Star",
+    "feel": "Epic and overwhelming, delivering an awe-inspiring final battle aura.",
+    "instrumentsUsed": "Operatic choir vocals, intense orchestral passages, heavy percussion, and blaring brass.",
+    "situationUsedInGame": "Final map theme for the Verdant Wind route during the battle against the resurrected Nemesis.",
+    "youTubeLink": "https://www.youtube.com/watch?v=bMfvZmhqW0A"
+  },
+  {
+    "songName": "The Apex of the World",
+    "feel": "Grand and triumphant, with an uplifting blend of chants and bombastic orchestration.",
+    "instrumentsUsed": "Ethereal chanting, full orchestra and choir, with stirring violin and vocal motifs.",
+    "situationUsedInGame": "Final map theme for both the Azure Moon and Crimson Flower routes during decisive final battles.",
+    "youTubeLink": "https://www.youtube.com/watch?v=3eq-qUy-a-A"
+  }
+]
+
