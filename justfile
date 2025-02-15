@@ -4,15 +4,12 @@ set shell := ["bash", "-c"]
 # Start both the client and server
 start:
     just init-vector-db
-    just start-server
+    just start-server & # start server and client in parallel
     just start-client
 
 # Start the Deno server with Conda
 start-server:
-    cd server
-    source /opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh
-    conda activate fe-i-lt
-    deno task server
+    cd server && source /opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh && conda activate fe-i-lt && deno task server
 
 # Run the LT editor
 editor:
