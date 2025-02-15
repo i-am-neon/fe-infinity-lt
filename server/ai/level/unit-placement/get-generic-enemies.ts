@@ -27,9 +27,10 @@ export default async function getGenericEnemies({
   chapterNumber: number;
 }): Promise<EnemyGenericUnitWithStartingItems[]> {
   const enemyComposition = getEnemyComposition(chapterNumber);
-  const enemyCountRange = getGenericEnemyCountNumberRange(
-    getTerrainGridSize(terrainGrid)
-  );
+  const enemyCountRange = getGenericEnemyCountNumberRange({
+    mapSize: getTerrainGridSize(terrainGrid),
+    chapter: chapterNumber,
+  });
   const unitSquadsByRegion = await genUnitSquads({
     terrainGrid,
     chapterIdea,

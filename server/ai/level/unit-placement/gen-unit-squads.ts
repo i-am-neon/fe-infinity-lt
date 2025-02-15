@@ -128,9 +128,9 @@ Every region must have squadInfo. That means your output must follow:
 
 if (import.meta.main) {
   const composition = getEnemyComposition(1);
-  const enemyCountRange = getGenericEnemyNumberRange(
-    getTerrainGridSize(ch1TerrainGrid)
-  );
+  const enemyCountRange = getGenericEnemyNumberRange({
+    mapSize: getTerrainGridSize(ch1TerrainGrid),
+  });
   genUnitSquads({
     terrainGrid: ch1TerrainGrid,
     chapterIdea: testChapterIdea,
