@@ -24,8 +24,9 @@ export async function appendUnit({
     return;
   }
 
+  // If the unit is already in the list, don't add it again
   if (units.some((unit) => unit.nid === unitData.nid)) {
-    throw new Error(`Unit with nid ${unitData.nid} already exists`);
+    return;
   }
 
   units.push(unitData);

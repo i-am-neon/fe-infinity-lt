@@ -1,7 +1,7 @@
 import { getPathWithinLtMaker } from "@/file-io/get-path-within-lt-maker.ts";
 import { Level } from "@/types/level.ts";
 
-export async function removeLastLevel(
+export async function removeStubLevel(
   projectNameEndingInDotLtProj: string
 ): Promise<void> {
   try {
@@ -14,9 +14,11 @@ export async function removeLastLevel(
     if (levels.length === 0) {
       throw new Error("No levels to remove");
     }
-
-    levels.pop();
-    await Deno.writeTextFile(filePath, JSON.stringify(levels, null, 2));
+    // Only remove the last level if it's a stub
+    if (levels[levels.length - 1].tags?.includes("stub")) {
+      levels.pop();
+      await Deno.writeTextFile(filePath, JSON.stringify(levels, null, 2));
+    }
   } catch (error) {
     if (error instanceof Deno.errors.NotFound) {
       throw new Error(`File not found: ${projectNameEndingInDotLtProj}`);
@@ -26,6 +28,6 @@ export async function removeLastLevel(
 }
 
 if (import.meta.main) {
-  await removeLastLevel("_new.ltproj");
+  await removeStubLevel("_new.ltproj");
 }
 

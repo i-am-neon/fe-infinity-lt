@@ -1,6 +1,7 @@
 import { getPathWithinLtMaker } from "@/file-io/get-path-within-lt-maker.ts";
 import { Level } from "@/types/level.ts";
 import readOrCreateJSON from "@/game-engine-io/read-or-create-json.ts";
+import { getCurrentLogger } from "@/lib/current-logger.ts";
 
 export async function appendLevel({
   projectNameEndingInDotLtProj,
@@ -9,6 +10,7 @@ export async function appendLevel({
   projectNameEndingInDotLtProj: string;
   newLevel: Partial<Level>;
 }): Promise<void> {
+  const logger = getCurrentLogger();
   const filePath = getPathWithinLtMaker(
     `${projectNameEndingInDotLtProj}/game_data/levels.json`
   );
@@ -59,8 +61,12 @@ export async function appendLevel({
     return;
   }
 
+  // If the level is already in the list, don't add it again
   if (levels.some((level) => level.nid === newLevel.nid)) {
-    throw new Error(`Level with nid ${newLevel.nid} already exists`);
+    logger.warn(
+      `Level with nid ${newLevel.nid} already exists but it was tried to be appended again in appendLevel`
+    );
+    return;
   }
 
   levels.push({ ...defaultLevel, ...newLevel });

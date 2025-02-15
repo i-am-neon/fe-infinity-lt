@@ -11,9 +11,7 @@ export async function copyMusicAndUpdateJson({
 }): Promise<void> {
   const relativeMusicDir = `${projectNameEndingInDotLtProj}/resources/music`;
   const musicDir = getPathWithinLtMaker(relativeMusicDir);
-  console.log("musicDir :>> ", musicDir);
   const musicJsonPath = `${musicDir}/music.json`;
-  console.log("musicJsonPath :>> ", musicJsonPath);
 
   const [musicData, wasFallback] = await readOrCreateJSON<
     [string, boolean, boolean][]

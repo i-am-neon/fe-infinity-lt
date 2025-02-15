@@ -1,11 +1,17 @@
 import createNextChapter from "@/create-next-chapter.ts";
 import runGame from "@/run-game.ts";
+import {
+  getCurrentLogger,
+  setCurrentLoggerProject,
+} from "@/lib/current-logger.ts";
 
 export async function handleGenerateNextChapter(
   req: Request
 ): Promise<Response> {
   try {
     const { directory, gameNid } = await req.json();
+    setCurrentLoggerProject(directory);
+    const logger = getCurrentLogger();
     if (!directory || !gameNid) {
       return new Response(
         JSON.stringify({
@@ -32,7 +38,11 @@ export async function handleGenerateNextChapter(
       headers: { "Content-Type": "application/json" },
     });
   } catch (error: unknown) {
+    const logger = getCurrentLogger();
     if (error instanceof Error) {
+      logger.error("Error in handleGenerateNextChapter", {
+        error: error.message,
+      });
       return new Response(
         JSON.stringify({ success: false, error: error.message }),
         {
@@ -41,6 +51,7 @@ export async function handleGenerateNextChapter(
         }
       );
     } else {
+      logger.error("Error in handleGenerateNextChapter", { error });
       return new Response(
         JSON.stringify({ success: false, error: "Unknown error" }),
         {

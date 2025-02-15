@@ -1,6 +1,7 @@
 import { getPathWithinLtMaker } from "@/file-io/get-path-within-lt-maker.ts";
+import { Event } from "@/types/events/event.ts";
 
-export async function removeLastEvent(
+export async function removeStubEvent(
   projectNameEndingInDotLtProj: string
 ): Promise<void> {
   try {
@@ -14,6 +15,11 @@ export async function removeLastEvent(
       throw new Error("No events to remove");
     }
 
+    // Only remove the last event if it's a stub
+    if (events[events.length - 1].name === "stub") {
+      events.pop();
+      await Deno.writeTextFile(filePath, JSON.stringify(events, null, 2));
+    }
     events.pop();
     await Deno.writeTextFile(filePath, JSON.stringify(events, null, 2));
   } catch (error) {
@@ -25,5 +31,6 @@ export async function removeLastEvent(
 }
 
 if (import.meta.main) {
-  await removeLastEvent("_new.ltproj");
+  await removeStubEvent("_new.ltproj");
 }
+

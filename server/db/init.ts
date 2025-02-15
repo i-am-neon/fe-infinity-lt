@@ -14,7 +14,9 @@ export function initializeDatabase() {
       tone TEXT,
       chapters TEXT,
       characters TEXT,
-      used_portraits TEXT
+      used_portraits TEXT,
+      world_summary TEXT,
+      initial_game_idea TEXT
     )
   `);
 }

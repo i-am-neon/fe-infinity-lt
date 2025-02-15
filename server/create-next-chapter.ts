@@ -1,13 +1,16 @@
+import createChapter from "@/ai/create-chapter.ts";
+import genSubsequentChapterIdea from "@/ai/gen-subsequent-chapter.ts";
+import { ChapterIdea } from "@/ai/types/chapter-idea.ts";
+import { getGameByNid, insertGame } from "@/db/games.ts";
 import { deleteSuspendSave } from "@/game-engine-io/delete-suspend-save.ts";
-import getCurrentChapterNumber from "@/game-engine-io/get-current-chapter-number.ts";
-import { removeLastEvent } from "@/game-engine-io/write-chapter/remove-last-event.ts";
-import { removeLastLevel } from "@/game-engine-io/write-chapter/remove-last-level.ts";
+import { removeStubEvent } from "./game-engine-io/write-chapter/remove-stub-event.ts";
+import { removeStubLevel } from "./game-engine-io/write-chapter/remove-stub-level.ts";
 import writeChapter from "@/game-engine-io/write-chapter/write-chapter.ts";
 import writeStubChapter from "@/game-engine-io/write-chapter/write-stub-chapter.ts";
-import { stubCh1Events, stubCh1Level } from "@/test-data/stub-ch1.ts";
-import { Chapter } from "@/types/chapter.ts";
-import { stubCharacterBreguet } from "@/test-data/stub-characters.ts";
-import { stubTilemapPrologue } from "@/test-data/stub-tilemap.ts";
+import {
+  getCurrentLogger,
+  setCurrentLoggerProject,
+} from "@/lib/current-logger.ts";
 
 export default async function createNextChapter({
   projectNameEndingInDotLtProj,
@@ -16,37 +19,58 @@ export default async function createNextChapter({
   projectNameEndingInDotLtProj: string;
   gameNid: string;
 }): Promise<void> {
-  const nextChapterNumber = await getCurrentChapterNumber(
-    projectNameEndingInDotLtProj
-  ).then((currentChapterNumber) => currentChapterNumber + 1);
+  const logger = getCurrentLogger();
+  logger.debug("createNextChapter", { projectNameEndingInDotLtProj, gameNid });
+  // Retrieve existing game from DB
+  const existingGame = getGameByNid(gameNid);
+  if (!existingGame) {
+    throw new Error(`Game with nid ${gameNid} not found.`);
+  }
 
-  // const chapterResults = await getChapterResults({
-  //   gameNid,
-  //   levelNid: nextChapterNumber.toString(),
-  // });
-  // console.log("chapterResults :>> ", chapterResults);
-  // Use chapter results in data generation
+  const nextChapterNumber = existingGame.chapters.length;
 
-  const nextChapter: Chapter = {
-    number: nextChapterNumber,
-    title: `Chapter ${nextChapterNumber}`,
-    level: stubCh1Level,
-    newCharacters: [stubCharacterBreguet],
-    events: stubCh1Events,
-    tilemap: stubTilemapPrologue,
-  };
+  // Generate the new chapter idea using all context
+  const newChapterIdea: ChapterIdea = await genSubsequentChapterIdea({
+    worldSummary: existingGame.worldSummary!,
+    initialGameIdea: existingGame.initialGameIdea!,
+    chapters: existingGame.chapters,
+    nextChapterNumber,
+    tone: existingGame.tone,
+  });
 
-  // Delete stub level and event, and suspend save from stub chapter
-  await removeLastLevel(projectNameEndingInDotLtProj);
-  await removeLastEvent(projectNameEndingInDotLtProj);
+  logger.debug("newChapterIdeas", { newChapterIdea });
+
+  // Remove the old stub
+  await removeStubLevel(projectNameEndingInDotLtProj);
+  await removeStubEvent(projectNameEndingInDotLtProj);
   deleteSuspendSave();
 
-  await writeChapter({ projectNameEndingInDotLtProj, chapter: nextChapter });
+  logger.debug("existingGame", { existingGame });
 
+  // Create the actual next chapter
+  const { chapter } = await createChapter({
+    worldSummary: existingGame.worldSummary!,
+    initialGameIdea: existingGame.initialGameIdea!,
+    tone: existingGame.tone,
+    chapterNumber: nextChapterNumber,
+    chapterIdea: newChapterIdea,
+    existingCharacterIdeas: existingGame.characters.map((c) => c.characterIdea),
+  });
+
+  // Add the new chapter to the game
+  existingGame.chapters.push(chapter);
+
+  // Write the next chapter to the project
+  await writeChapter({ projectNameEndingInDotLtProj, chapter, music: [] });
+
+  // Write a new stub
   await writeStubChapter({
     projectNameEndingInDotLtProj,
     chapterNumber: nextChapterNumber + 1,
   });
+
+  // Update the DB with the newly appended chapters
+  insertGame(existingGame);
 }
 
 if (import.meta.main) {

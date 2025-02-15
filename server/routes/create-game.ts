@@ -93,6 +93,8 @@ export async function handleCreateGame(req: Request): Promise<Response> {
       characters: chapter.newCharacters,
       tone,
       usedPortraits,
+      worldSummary,
+      initialGameIdea,
     };
 
     insertGame(newGame);
@@ -117,3 +119,4 @@ export async function handleCreateGame(req: Request): Promise<Response> {
     });
   }
 }
+

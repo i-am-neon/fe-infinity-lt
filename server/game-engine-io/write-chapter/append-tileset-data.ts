@@ -1,5 +1,7 @@
 import { getPathWithinLtMaker } from "@/file-io/get-path-within-lt-maker.ts";
 import readOrCreateJSON from "@/game-engine-io/read-or-create-json.ts";
+import { Logger } from "@/lib/logger.ts";
+import { getCurrentLogger } from "@/lib/current-logger.ts";
 
 type TilesetData = {
   nid: string;
@@ -14,6 +16,7 @@ export default async function appendTilesetData({
   projectNameEndingInDotLtProj: string;
   mapNid: string;
 }): Promise<void> {
+  const logger = getCurrentLogger();
   const filePath = getPathWithinLtMaker(
     `${projectNameEndingInDotLtProj}/resources/tilesets/tileset.json`
   );
@@ -35,7 +38,8 @@ export default async function appendTilesetData({
   }
 
   if (tilesets.some((t) => t.nid === mapNid)) {
-    throw new Error(`Tileset data with nid ${mapNid} already exists`);
+    logger.info(`Tileset data with nid ${mapNid} already exists. Skipping...`);
+    return;
   }
 
   tilesets.push(newTileset);

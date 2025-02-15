@@ -13,10 +13,7 @@ start-server:
 
 # Run the LT editor
 editor:
-    cd lt-maker-fork
-    source /opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh
-    conda activate fe-i-lt
-    wine python run_editor.py
+    cd lt-maker-fork && source /opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh && conda activate fe-i-lt && wine python run_editor.py
 
 # Start the Next.js client
 start-client:

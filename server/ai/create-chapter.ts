@@ -4,10 +4,14 @@ import createUnitDatas from "@/ai/create-unit-data/create-unit-datas.ts";
 import chooseBackground from "@/ai/events/choose-background.ts";
 import convertAIEventToEvent from "@/ai/events/convert-ai-event-to-event.ts";
 import genOutroEvent from "@/ai/events/gen-outro-event.ts";
-import genIntroEvent from "./events/gen-intro-event.ts";
 import genChapterIdea from "@/ai/gen-chapter-idea.ts";
 import assembleLevel from "@/ai/level/assemble-level.ts";
-import { AIEvent } from "@/ai/types/ai-event.ts";
+import {
+  testInitialGameIdea,
+  testTone,
+  testWorldSummary,
+} from "@/ai/test-data/initial.ts";
+import { ChapterIdea } from "@/ai/types/chapter-idea.ts";
 import { InitialGameIdea } from "@/ai/types/initial-game-idea.ts";
 import { WorldSummary } from "@/ai/types/world-summary.ts";
 import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
@@ -17,11 +21,8 @@ import { Chapter } from "@/types/chapter.ts";
 import { Character } from "@/types/character/character.ts";
 import { Event } from "@/types/events/event.ts";
 import { Tilemap } from "@/types/maps/tilemap.ts";
-import {
-  testInitialGameIdea,
-  testTone,
-  testWorldSummary,
-} from "@/ai/test-data/initial.ts";
+import genIntroEvent from "./events/gen-intro-event.ts";
+import { CharacterIdea } from "@/ai/types/character-idea.ts";
 
 /**
  * Creates the next chapter based on the given data.
@@ -36,36 +37,42 @@ export default async function createChapter({
   tone,
   chapterNumber,
   usedPortraitsSoFar,
+  chapterIdea,
+  existingCharacterIdeas = [],
 }: {
   worldSummary: WorldSummary;
   initialGameIdea: InitialGameIdea;
   tone: string;
   chapterNumber: number;
   usedPortraitsSoFar?: string[];
+  chapterIdea?: ChapterIdea;
+  existingCharacterIdeas?: CharacterIdea[];
 }): Promise<{
   chapter: Chapter;
   usedPortraits: string[];
   musicToCopy: string[];
 }> {
   const logger = getCurrentLogger();
-  const chapterIdea = await genChapterIdea({
-    worldSummary,
-    initialGameIdea,
-    tone,
-    chapterNumber,
-  });
 
-  // Gather all new characters in this chapter
-  const newCharacterIdeas = [
-    ...initialGameIdea.characterIdeas, // from the game idea
+  if (!chapterIdea) {
+    chapterIdea = await genChapterIdea({
+      worldSummary,
+      initialGameIdea,
+      tone,
+      chapterNumber,
+    });
+  }
+  logger.debug("initialGameIdea", initialGameIdea);
+  // Gather all character ideas from existing chapters plus new ones
+  const allChapterCharacterIdeas = [
+    ...existingCharacterIdeas,
+    ...initialGameIdea.characterIdeas,
     chapterIdea.boss,
     ...(chapterIdea.newPlayableUnits ?? []),
     ...(chapterIdea.newNonBattleCharacters ?? []),
   ];
-
-  // Filter duplicates in case the same name reappears
   const uniqueSet = new Map<string, boolean>();
-  const finalCharacterIdeas = newCharacterIdeas.filter((c) => {
+  const finalCharacterIdeas = allChapterCharacterIdeas.filter((c) => {
     if (uniqueSet.has(c.firstName)) return false;
     uniqueSet.set(c.firstName, true);
     return true;
@@ -152,6 +159,7 @@ export default async function createChapter({
       throw new Error(`No portrait metadata found for ${portraitNid}`);
     }
     return {
+      characterIdea: finalCharacterIdeas.find((c) => c.firstName === ud.nid)!, // We know this will exist
       unitData: {
         ...ud,
         portrait_nid: ud.nid,

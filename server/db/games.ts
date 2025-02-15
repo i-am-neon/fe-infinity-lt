@@ -1,7 +1,6 @@
 import { db } from "@/db/connection.ts";
-import { Game } from "@/types/game.ts";
 import { initializeDatabase } from "@/db/init.ts";
-import { getCurrentLogger } from "@/lib/current-logger.ts";
+import { Game } from "@/types/game.ts";
 
 /**
  * This file sets up a local SQLite database in Deno and uses it to store Game objects.
@@ -25,10 +24,16 @@ export function insertGame(game: Game): void {
   const chaptersJson = JSON.stringify(game.chapters);
   const charactersJson = JSON.stringify(game.characters);
   const usedPortraitsJson = JSON.stringify(game.usedPortraits);
+  const worldSummaryJson = game.worldSummary
+    ? JSON.stringify(game.worldSummary)
+    : "";
+  const initialGameIdeaJson = game.initialGameIdea
+    ? JSON.stringify(game.initialGameIdea)
+    : "";
   db.query(
     `
-      INSERT OR REPLACE INTO games (nid, title, directory, description, tone, chapters, characters, used_portraits)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT OR REPLACE INTO games (nid, title, directory, description, tone, chapters, characters, used_portraits, world_summary, initial_game_idea)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `,
     [
       game.nid,
@@ -39,6 +44,8 @@ export function insertGame(game: Game): void {
       chaptersJson,
       charactersJson,
       usedPortraitsJson,
+      worldSummaryJson,
+      initialGameIdeaJson,
     ]
   );
 }
@@ -47,8 +54,21 @@ export function insertGame(game: Game): void {
  * Retrieve a Game by its nid.
  */
 export function getGameByNid(nid: string): Game | null {
-  const query = db.query<GameRow>(
-    "SELECT nid, title, directory, description, tone, chapters, characters, used_portraits FROM games WHERE nid = ? LIMIT 1",
+  const query = db.query<
+    [
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string?,
+      string?
+    ]
+  >(
+    "SELECT nid, title, directory, description, tone, chapters, characters, used_portraits, world_summary, initial_game_idea FROM games WHERE nid = ? LIMIT 1",
     [nid]
   );
   if (query.length === 0) {
@@ -63,7 +83,9 @@ export function getGameByNid(nid: string): Game | null {
     dbChaptersJson,
     dbCharactersJson,
     dbUsedPortraitsJson,
-  ] = query[0] as GameRow;
+    dbWorldSummaryJson,
+    dbInitialGameIdeaJson,
+  ] = query[0];
   let chapters = [];
   let characters = [];
   try {
@@ -84,6 +106,18 @@ export function getGameByNid(nid: string): Game | null {
     usedPortraits = [];
   }
 
+  let worldSummary = undefined;
+  let initialGameIdea = undefined;
+  try {
+    if (dbWorldSummaryJson) {
+      worldSummary = JSON.parse(dbWorldSummaryJson);
+    }
+  } catch (_) {}
+  try {
+    if (dbInitialGameIdeaJson) {
+      initialGameIdea = JSON.parse(dbInitialGameIdeaJson);
+    }
+  } catch (_) {}
   return {
     nid: dbNid,
     title: dbTitle,
@@ -93,6 +127,8 @@ export function getGameByNid(nid: string): Game | null {
     chapters,
     characters,
     usedPortraits,
+    worldSummary,
+    initialGameIdea,
   };
 }
 
@@ -100,8 +136,21 @@ export function getGameByNid(nid: string): Game | null {
  * Retrieve all Games.
  */
 export function getAllGames(): Game[] {
-  const query = db.query<GameRow>(
-    "SELECT nid, title, directory, description, tone, chapters, characters, used_portraits FROM games"
+  const query = db.query<
+    [
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string?,
+      string?
+    ]
+  >(
+    "SELECT nid, title, directory, description, tone, chapters, characters, used_portraits, world_summary, initial_game_idea FROM games"
   );
   const games: Game[] = [];
   for (const row of query) {
@@ -114,7 +163,9 @@ export function getAllGames(): Game[] {
       dbChaptersJson,
       dbCharactersJson,
       dbUsedPortraitsJson,
-    ] = row as [string, string, string, string, string, string, string, string];
+      dbWorldSummaryJson,
+      dbInitialGameIdeaJson,
+    ] = row;
     let chapters = [];
     let characters = [];
     try {
@@ -135,6 +186,18 @@ export function getAllGames(): Game[] {
       usedPortraits = [];
     }
 
+    let worldSummary = undefined;
+    let initialGameIdea = undefined;
+    try {
+      if (dbWorldSummaryJson) {
+        worldSummary = JSON.parse(dbWorldSummaryJson);
+      }
+    } catch (_) {}
+    try {
+      if (dbInitialGameIdeaJson) {
+        initialGameIdea = JSON.parse(dbInitialGameIdeaJson);
+      }
+    } catch (_) {}
     games.push({
       nid: dbNid,
       title: dbTitle,
@@ -144,6 +207,8 @@ export function getAllGames(): Game[] {
       chapters,
       characters,
       usedPortraits,
+      worldSummary,
+      initialGameIdea,
     });
   }
   return games;

@@ -13,6 +13,7 @@ export default async function writeStubChapter({
     newLevel: {
       nid: `${chapterNumber}`,
       name: `Chapter ${chapterNumber}`,
+      tilemap: "(7)Ch01_Diff_Tileset__by_Shin19",
       music: {
         player_phase: "memories-of-green",
         enemy_phase: "Distant Roads",
@@ -23,13 +24,14 @@ export default async function writeStubChapter({
         other_battle: null,
         enemy2_battle: null,
       },
+      tags: ["stub"],
     },
   });
   await appendEvents({
     projectNameEndingInDotLtProj,
     newEvents: [
       {
-        name: `Chapter ${chapterNumber} Start`,
+        name: "stub",
         trigger: "level_start",
         level_nid: `${chapterNumber}`,
         _source: [
