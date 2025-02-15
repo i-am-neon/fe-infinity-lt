@@ -1,65 +1,66 @@
 [
   {
-    "song_name": "Title Theme",
+    "songName": "Title Theme",
     "description": "A calm and serene piece that immediately evokes nostalgia. It feels peaceful and slightly melancholy, setting a reflective mood before the adventure begins.",
     "instruments": "Solo ocarina (playing the main melody) accompanied by soft strings and gentle harp arpeggios. The orchestral arrangement uses delicate woodwinds and warm strings to maintain the tranquil, dusk-like atmosphere.",
     "situation": "Plays on the title screen and opening sequence of Ocarina of Time, as Link rides Epona across Hyrule Field at sunset. It introduces the player to the world with a sense of quiet wonder.",
-    "youtube_link": "https://www.youtube.com/watch?v=DMgia24U2uo"
+    "youTubeLink": "https://www.youtube.com/watch?v=DMgia24U2uo"
   },
   {
-    "song_name": "Hyrule Field Main Theme",
+    "songName": "Hyrule Field Main Theme",
     "description": "An adventurous and energetic theme that captures the excitement of exploration. It’s bold and upbeat, instilling the player with a sense of freedom and heroism while traversing the vast landscape.",
     "instruments": "A full orchestra with sweeping strings driving the rhythm and triumphant brass fanfares carrying the melody. Woodwind flourishes add lightness, and percussion (like timpani and snare) gives it a galloping, adventurous beat.",
     "situation": "This is the overworld theme that plays as Link explores Hyrule Field. Its dynamic shifts reflect the changing events and encounters on the field, making every journey between locations feel epic.",
-    "youtube_link": "https://www.youtube.com/watch?v=YZ0BNzemPck"
+    "youTubeLink": "https://www.youtube.com/watch?v=YZ0BNzemPck"
   },
   {
-    "song_name": "Zelda’s Lullaby (Princess Zelda’s Theme)",
+    "songName": "Zelda’s Lullaby (Princess Zelda’s Theme)",
     "description": "A gentle and emotive melody that feels both regal and comforting. It has a nostalgic, lullaby-like quality, often invoking a sense of hope, memory, and the bond of destiny.",
     "instruments": "Usually led by a solo harp playing the tender melody, supported by a warm string ensemble. A flute or oboe may take the lead at times, and a French horn quietly reinforces the harmonies, creating a soothing and royal ambiance.",
     "situation": "Heard during scenes involving Princess Zelda or the Royal Family crest. Link first learns this song from Impa to gain access to sacred places, and it plays during poignant moments that highlight Zelda’s presence or the legacy of Hyrule’s royal lineage.",
-    "youtube_link": "https://www.youtube.com/watch?v=MLt7Rxl0GtE"
+    "youTubeLink": "https://www.youtube.com/watch?v=MLt7Rxl0GtE"
   },
   {
-    "song_name": "Gerudo Valley",
+    "songName": "Gerudo Valley",
     "description": "A fiery, up-tempo piece with a distinct Spanish flair. It feels adventurous and exotic, instantly recognizable for its driving rhythm and passionate melody that conjure images of a sun-baked desert canyon.",
     "instruments": "Features Spanish-style acoustic guitars strumming aggressively and often taking the lead melody. They are joined by rapid castanets and hand claps for percussion. Bright trumpets or flutes soar with the main theme, while string sections and occasional brass chords add depth and epic sweep to this flamenco-inspired orchestration.",
     "situation": "Plays in the Gerudo Valley area, representing the Gerudo people and their desert homeland. The music underscores the thrill of crossing the canyon bridges and the bold spirit of the Gerudo tribe.",
-    "youtube_link": "https://www.youtube.com/watch?v=o4gd51NzPPQ"
+    "youTubeLink": "https://www.youtube.com/watch?v=o4gd51NzPPQ"
   },
   {
-    "song_name": "Lost Woods (Saria’s Song)",
+    "songName": "Lost Woods (Saria’s Song)",
     "description": "A playful and catchy tune that loops with an infectious energy. Its tone is lighthearted and whimsical, bringing a smile with its dance-like rhythm and evoking the innocence of childhood friendship.",
     "instruments": "Led by lively woodwinds — typically a flute carries the main melody with an oboe or clarinet responding — over a bouncy backdrop of plucked strings (guitar or pizzicato violin) and gentle percussion like a tambourine. The arrangement gives it a folk dance feel, with the orchestra’s light instruments keeping the music sprightly and buoyant.",
     "situation": "This is the melody of the Lost Woods and Saria’s personal song. Link learns it from his friend Saria in the forest, and it’s used to communicate with her later. The tune plays whenever you wander the maze-like Lost Woods, emphasizing its cheerful, mysterious nature.",
-    "youtube_link": "https://www.youtube.com/watch?v=yljB_3XPogA"
+    "youTubeLink": "https://www.youtube.com/watch?v=yljB_3XPogA"
   },
   {
-    "song_name": "Kakariko Village",
+    "songName": "Kakariko Village",
     "description": "A warm and homely theme that conveys a sense of community and calm. It’s soothing and mellow, instantly creating the feeling of a safe haven away from the dangers of adventure.",
     "instruments": "The orchestration is gentle, often starting with a plucked string pattern (like a guitar or harp emulating the original’s lilting rhythm). Soft strings join in to carry the harmonious background, and occasionally a flute or recorder-style woodwind softly plays the melody, emphasizing the village’s simple charm.",
     "situation": "Plays in Kakariko Village, the peaceful settlement where villagers live under the protection of the Shiekah. This music sets a relaxed tone as you explore the village’s houses and interact with its residents.",
-    "youtube_link": "https://www.youtube.com/watch?v=U4iolY0dcgA"
+    "youTubeLink": "https://www.youtube.com/watch?v=U4iolY0dcgA"
   },
   {
-    "song_name": "Lon Lon Ranch (Epona’s Song)",
+    "songName": "Lon Lon Ranch (Epona’s Song)",
     "description": "A sweet, gentle melody that feels nostalgic and comforting. This theme has the character of a lullaby or folk song, evoking the simple joys of life on a ranch and the bond between a young girl and her horse.",
     "instruments": "Often begins with an acoustic guitar softly strumming the chord progression. In the orchestral arrangement, a solo vocalist (or a humming choir) carries the melody to mirror Malon’s singing. They are accompanied by mellow strings and perhaps a solo violin that harmonizes with the voice, all creating a very tender and pastoral sound.",
     "situation": "Heard at Lon Lon Ranch and whenever Epona’s Song is played on the ocarina. It symbolizes Link’s friendship with Epona and the serene life at the ranch. Malon sings this to calm the animals, and the orchestral version retains that soothing, heartwarming feeling.",
-    "youtube_link": "https://www.youtube.com/watch?v=llYx-qH0Xec"
+    "youTubeLink": "https://www.youtube.com/watch?v=llYx-qH0Xec"
   },
   {
-    "song_name": "Song of Storms",
+    "songName": "Song of Storms",
     "description": "A mysterious and rhythmic waltz that gradually swells like a gathering storm. It starts off eerie and hypnotic, then intensifies, capturing both the gloom and the drama of a sudden downpour.",
     "instruments": "Unusually for an orchestra, it prominently features an accordion grinding out the circular main motif (reflecting the windmill man’s instrument) alongside the ocarina playing the tune. As the piece progresses, strings and brass join in to heighten the energy, and a harp adds a brief gentle interlude (echoing the tranquility before the storm). Finally, cymbals crash and deep percussion underscores the thunderous climax, truly bringing the storm to life in sound.",
     "situation": "This theme is heard in the Kakariko Windmill (and when Link conducts the Song of Storms). The orchestral version evokes the windmill’s endless turning and the conjuring of rain, encapsulating the cyclical time-loop story of how the storm was started by the very song itself.",
-    "youtube_link": "https://youtu.be/8y_R4hGrFdk?si=AkEmHH7HMT_dbmAk"
+    "youTubeLink": "https://youtu.be/8y_R4hGrFdk?si=AkEmHH7HMT_dbmAk"
   },
   {
-    "song_name": "Zora’s Domain",
+    "songName": "Zora’s Domain",
     "description": "A tranquil and soothing piece that instantly brings a sense of cool, aquatic calm. The melody is gentle and flowing, perfectly echoing the serene underwater environment of the Zora people.",
     "instruments": "In orchestral form, a clarinet or soft flute often carries the smooth main melody, replacing the original’s marimba with a more fluid sound. It’s supported by lush, slow-moving strings that create a wave-like, ambient backdrop. A harp might accent with gentle glissandos to suggest flowing water, and the overall instrumentation remains light and airy to preserve the peaceful, reflective mood.",
     "situation": "Plays in Zora’s Domain, the hidden aquatic home of the Zora. This music sets a peaceful, reflective mood as you wander among waterfalls and waterways, highlighting the grace and calm of the Zora’s underwater sanctuary.",
-    "youtube_link": "https://www.youtube.com/watch?v=h9AHo0bqbsc"
+    "youTubeLink": "https://www.youtube.com/watch?v=h9AHo0bqbsc"
   }
 ]
+
