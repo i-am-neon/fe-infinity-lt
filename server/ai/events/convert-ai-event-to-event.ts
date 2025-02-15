@@ -1,6 +1,6 @@
 import { AIEvent } from "@/ai/types/ai-event.ts";
 import { Event } from "@/types/events/event.ts";
-import { testAIEvent } from "@/ai/test-data/events.ts";
+import { testAIEventPrologueIntro } from "@/ai/test-data/events.ts";
 import breakTextIntoGameLines from "../../lib/formatting/break-text-into-game-lines.ts";
 import { BackgroundOption } from "@/ai/types/background-option.ts";
 import { backgroundImageMap } from "@/ai/types/background-option.ts";
@@ -61,7 +61,7 @@ export default function convertAIEventToEvent({
 if (import.meta.main) {
   console.log(
     convertAIEventToEvent({
-      aiEvent: testAIEvent,
+      aiEvent: testAIEventPrologueIntro,
       backgroundChoice: BackgroundOptions.Forest,
       musicChoice: "Distant Roads",
       chapterNumber: 0,

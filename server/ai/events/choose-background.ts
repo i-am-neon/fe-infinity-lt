@@ -5,7 +5,7 @@ import {
   BackgroundOptionsSchema,
   BackgroundOption,
 } from "@/ai/types/background-option.ts";
-import { testAIEvent } from "@/ai/test-data/events.ts";
+import { testAIEventPrologueIntro } from "@/ai/test-data/events.ts";
 
 const resultSchema = z.object({
   chosenBackground: BackgroundOptionsSchema,
@@ -33,7 +33,7 @@ Output a JSON object { "chosenBackground": "OneOfTheBackgroundOptions" }. No add
 }
 
 if (import.meta.main) {
-  chooseBackground(testAIEvent).then((res) => {
+  chooseBackground(testAIEventPrologueIntro).then((res) => {
     console.log("Chosen background:", res);
   });
 }

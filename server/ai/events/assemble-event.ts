@@ -30,7 +30,7 @@ export default async function assembleEvent({
     chooseBackground(prologueIntroAIEvent),
     chooseMusic(chapterIdea.intro),
   ]);
-  const event = await convertAIEventToEvent({
+  const event = convertAIEventToEvent({
     aiEvent: prologueIntroAIEvent,
     backgroundChoice,
     musicChoice,

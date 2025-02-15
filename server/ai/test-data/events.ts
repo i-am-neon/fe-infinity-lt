@@ -1,6 +1,6 @@
 import { AIEvent } from "@/ai/types/ai-event.ts";
 
-export const testAIEvent: AIEvent = {
+export const testAIEventPrologueIntro: AIEvent = {
   name: "Prologue Opening",
   trigger: "level_start",
   condition: "True",
