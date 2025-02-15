@@ -4,6 +4,7 @@ import { Chapter } from "@/types/chapter.ts";
 import { appendEvents } from "@/game-engine-io/write-chapter/append-events.ts";
 import { appendLevel } from "@/game-engine-io/write-chapter/append-level.ts";
 import writeCharacters from "@/game-engine-io/write-character/write-characters.ts";
+import { copyMusicAndUpdateJson } from "@/game-engine-io/write-chapter/copy-music.ts";
 
 export default async function writeChapter({
   projectNameEndingInDotLtProj,
@@ -35,5 +36,6 @@ export default async function writeChapter({
     characters: chapter.newCharacters,
     projectNameEndingInDotLtProj,
   });
+  await copyMusicAndUpdateJson({ projectNameEndingInDotLtProj, music });
 }
 

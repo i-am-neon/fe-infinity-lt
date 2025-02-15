@@ -2,6 +2,7 @@ import generateStructuredData from "@/lib/generate-structured-data.ts";
 import createEmbedding from "@/vector-db/create-embedding.ts";
 import similaritySearch from "@/vector-db/similarity-search.ts";
 import { z } from "zod";
+import { sluggify } from "@/lib/sluggify.ts";
 
 interface EphemeralMusicOption {
   ephemeralId: "A" | "B" | "C";
@@ -19,9 +20,7 @@ const decideSchema = z.object({
   chosenId: z.enum(["A", "B", "C"]),
 });
 
-export default async function chooseMusic(
-  scenario: string
-): Promise<string> {
+export default async function chooseMusic(scenario: string): Promise<string> {
   // 1) Generate search query
   const systemMessageForQuery = `You are a music query generator for a Fire Emblem fangame scenario.
 Given the scenario string, return a short single-line text (max 70 chars) describing the vibe/instruments/feel to find a matching track. Do not wrap the string in quotes.`;
@@ -43,14 +42,17 @@ Given the scenario string, return a short single-line text (max 70 chars) descri
   }
 
   // Keep top 3
-  const ephemeralOptions: EphemeralMusicOption[] = topResults.slice(0, 3).map((res, idx) => {
-    const ephemeralId: "A" | "B" | "C" = idx === 0 ? "A" : idx === 1 ? "B" : "C";
-    return {
-      ephemeralId,
-      similarityScore: res.score,
-      metadata: res.metadata || {},
-    };
-  });
+  const ephemeralOptions: EphemeralMusicOption[] = topResults
+    .slice(0, 3)
+    .map((res, idx) => {
+      const ephemeralId: "A" | "B" | "C" =
+        idx === 0 ? "A" : idx === 1 ? "B" : "C";
+      return {
+        ephemeralId,
+        similarityScore: res.score,
+        metadata: res.metadata || {},
+      };
+    });
 
   // 3) Decide among top results with a second LLM call
   const systemMessageForDecision = `You are a music decider for a Fire Emblem fangame scenario. We have:
@@ -77,7 +79,9 @@ Return a JSON object { "chosenId": "A" } or "B" or "C" with no extra commentary.
     (opt) => opt.ephemeralId === decision.chosenId
   );
   if (!chosen) {
-    throw new Error("LLM returned an invalid ephemeral ID for music selection.");
+    throw new Error(
+      "LLM returned an invalid ephemeral ID for music selection."
+    );
   }
 
   const songName = chosen.metadata?.songName as string | undefined;
@@ -86,7 +90,7 @@ Return a JSON object { "chosenId": "A" } or "B" or "C" with no extra commentary.
   }
 
   // Return the track’s name
-  return songName;
+  return sluggify(songName);
 }
 
 if (import.meta.main) {
