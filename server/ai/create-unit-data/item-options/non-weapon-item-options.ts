@@ -5,15 +5,16 @@ export const healingItems: string[] = [
   "Antitoxin",
 ];
 
+// Just use master seals
 export const promotionItems: string[] = [
-  "Hero_Crest",
-  "Knight_Crest",
-  "Orion_Bolt",
-  "Elysian_Whip",
-  "Guiding_Ring",
-  "Ocean_Seal",
-  "Lunar_Brace",
-  "Solar_Brace",
+  // "Hero_Crest",
+  // "Knight_Crest",
+  // "Orion_Bolt",
+  // "Elysian_Whip",
+  // "Guiding_Ring",
+  // "Ocean_Seal",
+  // "Lunar_Brace",
+  // "Solar_Brace",
   "Master_Seal",
 ];
 
@@ -51,3 +52,4 @@ export const tacticalItems: string[] = [
 ];
 
 export const gems: string[] = ["Red_Gem", "Blue_Gem", "White_Gem"];
+
