@@ -1,0 +1,72 @@
+[
+  {
+    "songName": "Reign of the Septims",
+    "feel": "A grand and triumphant orchestral theme capturing epic heroism and nobility.",
+    "instrumentsUsed": "Brass fanfare (horns), sweeping strings, and powerful percussion.",
+    "situationUsedInGame": "Special (Main menu and introduction theme)",
+    "youTubeLink": "https://www.youtube.com/watch?v=xLhUGq1nhdU"
+  },
+  {
+    "songName": "Death Knell",
+    "feel": "Intense and ominous, quickly signaling imminent danger and urgency.",
+    "instrumentsUsed": "Fast-paced strings, pounding drums, and blaring brass.",
+    "situationUsedInGame": "Battle (combat music)",
+    "youTubeLink": "https://www.youtube.com/watch?v=ycw5s9wjPtM"
+  },
+  {
+    "songName": "Harvest Dawn",
+    "feel": "Warm and serene, evoking the calm of an early morning in a village.",
+    "instrumentsUsed": "Gentle strings, mellow woodwinds (flute), and light harp tones.",
+    "situationUsedInGame": "City/Town (peaceful town exploration)",
+    "youTubeLink": "https://www.youtube.com/watch?v=s9L9sNtv1-g"
+  },
+  {
+    "songName": "King and Country",
+    "feel": "Regal and bold, instilling pride and a spirit of adventurous nobility.",
+    "instrumentsUsed": "Stirring strings and noble brass with steady percussion.",
+    "situationUsedInGame": "Exploration (plays during outdoor exploration)",
+    "youTubeLink": "https://www.youtube.com/watch?v=owsS1TcoJbo"
+  },
+  {
+    "songName": "Fall of the Hammer",
+    "feel": "Energetic and rhythmic, driven by a Celtic-inspired battle cadence.",
+    "instrumentsUsed": "Lively strings, woodwinds, and driving percussion (Celtic dance influence).",
+    "situationUsedInGame": "Battle (combat music)",
+    "youTubeLink": "https://www.youtube.com/watch?v=HNq9QjpSwc4"
+  },
+  {
+    "songName": "Wings of Kynareth",
+    "feel": "Majestic and uplifting, invoking the freedom and wonder of the open sky.",
+    "instrumentsUsed": "Sweeping string melodies, airy woodwinds, and bright brass.",
+    "situationUsedInGame": "Exploration (plays during outdoor exploration)",
+    "youTubeLink": "https://www.youtube.com/watch?v=jkypBTH8hQQ"
+  },
+  {
+    "songName": "All's Well",
+    "feel": "Calm and reassuring, giving a feeling of safety and contentment.",
+    "instrumentsUsed": "Soft strings, gentle woodwinds, and subtle harp.",
+    "situationUsedInGame": "City/Town (peaceful city or inn music)",
+    "youTubeLink": "https://www.youtube.com/watch?v=4IeUydwnrpQ"
+  },
+  {
+    "songName": "March of the Marauders",
+    "feel": "Driving and militant, with a determined and forceful rhythm.",
+    "instrumentsUsed": "Marching drums, bold brass, and urgent strings.",
+    "situationUsedInGame": "Battle (combat music)",
+    "youTubeLink": "https://www.youtube.com/watch?v=-rfaTJpfBE4"
+  },
+  {
+    "songName": "Watchman's Ease",
+    "feel": "Peaceful and mellow, reflecting a quiet night watch and a sense of security.",
+    "instrumentsUsed": "Warm string harmonies and gentle woodwind melodies.",
+    "situationUsedInGame": "City/Town (relaxing indoor/city night music)",
+    "youTubeLink": "https://www.youtube.com/watch?v=FLYWMEWC7as"
+  },
+  {
+    "songName": "Glory of Cyrodiil",
+    "feel": "Proud and expansive, celebrating the grandeur and beauty of the realm.",
+    "instrumentsUsed": "Lush orchestral strings and triumphant brass fanfares.",
+    "situationUsedInGame": "Exploration (plays during outdoor exploration)",
+    "youTubeLink": "https://www.youtube.com/watch?v=2bDEVFfbnXE"
+  }
+]

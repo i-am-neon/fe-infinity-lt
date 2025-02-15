@@ -1,7 +1,7 @@
 import { sluggify } from "@/lib/sluggify.ts";
 import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
 
-async function downloadYouTubeAsMP3({
+export async function downloadYouTubeAsMP3({
   url,
   outputDir,
 }: {
