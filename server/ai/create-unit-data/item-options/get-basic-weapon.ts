@@ -2,35 +2,35 @@ import { WeaponRank, WeaponType } from "@/types/character/weapon-type.ts";
 
 const basicWeaponsMap: Record<WeaponType, Record<WeaponRank, string>> = {
   Sword: {
-    E: "IronSword",
-    D: "SteelSword",
-    C: "SilverSword",
+    E: "Iron_Sword",
+    D: "Steel_Sword",
+    C: "Silver_Sword",
     B: "KillingEdge",
     A: "BraveSword",
     S: "Audhulma",
   },
   Lance: {
-    E: "IronLance",
-    D: "SteelLance",
-    C: "SilverLance",
-    B: "KillerLance",
-    A: "BraveLance",
+    E: "Iron_Lance",
+    D: "Steel_Lance",
+    C: "Silver_Lance",
+    B: "Killer_Lance",
+    A: "Brave_Lance",
     S: "Vidofnir",
   },
   Axe: {
-    E: "IronAxe",
-    D: "SteelAxe",
-    C: "SilverAxe",
-    B: "KillerAxe",
-    A: "BraveAxe",
+    E: "Iron_Axe",
+    D: "Steel_Axe",
+    C: "Silver_Axe",
+    B: "Killer_Axe",
+    A: "Brave_Axe",
     S: "Garm",
   },
   Bow: {
-    E: "IronBow",
-    D: "SteelBow",
-    C: "SilverBow",
-    B: "KillerBow",
-    A: "BraveBow",
+    E: "Iron_Bow",
+    D: "Steel_Bow",
+    C: "Silver_Bow",
+    B: "Killer_Bow",
+    A: "Brave_Bow",
     S: "Nidhogg",
   },
   Staff: {
@@ -85,3 +85,4 @@ export default function getBasicWeapon(
 if (import.meta.main) {
   console.log(getBasicWeapon("Sword", "A"));
 }
+
