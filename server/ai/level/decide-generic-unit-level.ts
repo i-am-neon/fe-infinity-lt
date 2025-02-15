@@ -14,32 +14,29 @@ export default function decideGenericUnitLevel({
   const isPromoted = (PromotedFE8Classes as readonly FE8Class[]).includes(
     fe8Class
   );
-  let level = 1;
+
+  const chunkIndex = Math.floor((chapter - 1) / 3);
+  const clampedIndex = Math.max(0, Math.min(chunkIndex, 9));
+
+  // Make base a bit lower than player's.
+  let baseUnpromoted = Math.max(1, clampedIndex * 2 - 1);
+  let minLevel = baseUnpromoted;
+  let maxLevel = baseUnpromoted + 1;
 
   if (isPromoted) {
-    if (chapter <= 20) {
-      level = randomInRange(1, 3);
-    } else {
-      level = randomInRange(3, 8);
-    }
-  } else {
-    if (chapter <= 10) {
-      level = randomInRange(1, 5);
-    } else if (chapter <= 20) {
-      level = randomInRange(5, 10);
-    } else {
-      level = randomInRange(10, 15);
-    }
+    // Use a smaller offset for promoted enemies so they're not too high.
+    minLevel += 8;
+    maxLevel += 9;
   }
 
-  return level;
+  return randomInRange(minLevel, maxLevel);
 }
 
 if (import.meta.main) {
   // Example usage
-  console.log(
-    "Level:",
-    decideGenericUnitLevel({ chapter: 12, fe8Class: "Knight" })
-  );
+  const testChapters = [1, 3, 5, 7, 10, 12, 15, 18, 20, 25, 30];
+  for (const ch of testChapters) {
+    const lvl = decideGenericUnitLevel({ chapter: ch, fe8Class: "Fighter" });
+    console.log(`Chapter ${ch} => generic Fighter level=${lvl}`);
+  }
 }
-
