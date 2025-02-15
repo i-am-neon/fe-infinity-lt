@@ -6,7 +6,6 @@ export const UnpromotedFE8Classes = [
   "Myrmidon",
   "Mercenary",
   "Thief",
-  "Rogue",
   "Recruit",
   "Soldier",
   "Knight",
@@ -37,6 +36,7 @@ export const UnpromotedFE8Classes = [
 export const PromotedFE8Classes = [
   "Swordmaster",
   "Hero",
+  "Rogue",
   "Assassin",
   "Paladin",
   "Great Knight",
