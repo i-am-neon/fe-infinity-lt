@@ -10,10 +10,12 @@ import cleanGameText from "../../lib/formatting/clean-game-text.ts";
 export default function convertAIEventToEvent({
   aiEvent,
   backgroundChoice,
+  musicChoice,
   chapterNumber,
 }: {
   aiEvent: AIEvent;
   backgroundChoice: BackgroundOption;
+  musicChoice: string;
   chapterNumber: number;
 }): Event {
   const condition =
@@ -24,6 +26,7 @@ export default function convertAIEventToEvent({
   const _source = [
     "chapter_title",
     `change_background;${backgroundImageMap[backgroundChoice]}`,
+    `music;${musicChoice};1000`,
     "transition;Open",
   ];
 
@@ -60,6 +63,7 @@ if (import.meta.main) {
     convertAIEventToEvent({
       aiEvent: testAIEvent,
       backgroundChoice: BackgroundOptions.Forest,
+      musicChoice: "Distant Roads",
       chapterNumber: 0,
     })
   );

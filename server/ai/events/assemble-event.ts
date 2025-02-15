@@ -5,6 +5,7 @@ import chooseBackground from "@/ai/events/choose-background.ts";
 import convertAIEventToEvent from "@/ai/events/convert-ai-event-to-event.ts";
 import { Event } from "@/types/events/event.ts";
 import { ChapterIdea } from "@/ai/types/chapter-idea.ts";
+import chooseMusic from "@/ai/choose-music.ts";
 
 export default async function assembleEvent({
   worldSummary,
@@ -18,18 +19,23 @@ export default async function assembleEvent({
   chapterIdea: ChapterIdea;
   tone: string;
   chapterNumber: number;
-}): Promise<Event> {
+}): Promise<{ event: Event; music: string }> {
   const prologueIntroAIEvent = await genPrologueIntroEvent({
     worldSummary,
     initialGameIdea,
     chapterIdea,
     tone,
   });
-  const backgroundChoice = await chooseBackground(prologueIntroAIEvent);
-  return convertAIEventToEvent({
+  const [backgroundChoice, musicChoice] = await Promise.all([
+    chooseBackground(prologueIntroAIEvent),
+    chooseMusic(chapterIdea.intro),
+  ]);
+  const event = await convertAIEventToEvent({
     aiEvent: prologueIntroAIEvent,
     backgroundChoice,
+    musicChoice,
     chapterNumber,
   });
+  return { event, music: musicChoice };
 }
 

@@ -1,4 +1,3 @@
-import genChapterIdea from "./ai/gen-chapter-idea.ts";
 import { choosePortraits } from "@/ai/choose-portraits.ts";
 import createUnitDatas from "@/ai/create-unit-data/create-unit-datas.ts";
 import assembleEvent from "@/ai/events/assemble-event.ts";
@@ -9,6 +8,7 @@ import {
   testGameName,
   testTone,
 } from "@/ai/test-data/initial.ts";
+import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
 import initializeProject from "@/game-engine-io/initialize-project.ts";
 import writeChapter from "@/game-engine-io/write-chapter/write-chapter.ts";
 import writeStubChapter from "@/game-engine-io/write-chapter/write-stub-chapter.ts";
@@ -21,9 +21,9 @@ import { allPortraitOptions } from "@/portrait-processing/all-portrait-options.t
 import { Chapter } from "@/types/chapter.ts";
 import { Character } from "@/types/character/character.ts";
 import { Game } from "@/types/game.ts";
-import assembleLevel from "./ai/level/assemble-level.ts";
-import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
 import { Tilemap } from "@/types/maps/tilemap.ts";
+import genChapterIdea from "./ai/gen-chapter-idea.ts";
+import assembleLevel from "./ai/level/assemble-level.ts";
 
 export default async function genAndWritePrologue({
   projectName,
@@ -68,7 +68,11 @@ export default async function genAndWritePrologue({
     ...(chapterIdea.newNonBattleCharacters ?? []),
   ];
 
-  const [portraitMap, unitDatas, prologueIntroEvent] = await Promise.all([
+  const [
+    portraitMap,
+    unitDatas,
+    { event: prologueIntroEvent, music: introMusic },
+  ] = await Promise.all([
     choosePortraits(newCharacterIdeas),
     createUnitDatas({
       characterIdeas: newCharacterIdeas,
@@ -140,6 +144,7 @@ export default async function genAndWritePrologue({
   await writeChapter({
     projectNameEndingInDotLtProj,
     chapter: newChapter,
+    music: [introMusic],
   });
 
   await writeStubChapter({

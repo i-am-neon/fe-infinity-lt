@@ -8,9 +8,11 @@ import writeCharacters from "@/game-engine-io/write-character/write-characters.t
 export default async function writeChapter({
   projectNameEndingInDotLtProj,
   chapter,
+  music,
 }: {
   projectNameEndingInDotLtProj: string;
   chapter: Chapter;
+  music: string[];
 }): Promise<void> {
   await appendLevel({
     projectNameEndingInDotLtProj,
