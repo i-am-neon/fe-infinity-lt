@@ -26,6 +26,10 @@ import genChapterIdea from "./ai/gen-chapter-idea.ts";
 import assembleLevel from "./ai/level/assemble-level.ts";
 import chooseMusic from "@/ai/choose-music.ts";
 import chooseTopLevelMusic from "@/ai/choose-top-level-music.ts";
+import genOutroEvent from "@/ai/events/gen-outro-event.ts";
+import convertAIEventToEvent from "@/ai/events/convert-ai-event-to-event.ts";
+import chooseBackground from "@/ai/events/choose-background.ts";
+import { Event } from "@/types/events/event.ts";
 
 export default async function genAndWritePrologue({
   projectName,
@@ -82,7 +86,7 @@ export default async function genAndWritePrologue({
   const [
     portraitMap,
     unitDatas,
-    { event: prologueIntroEvent, music: introMusic },
+    { event: prologueIntroEvent, aiEvent: introAIEvent, music: introMusic },
     playerPhaseMusic,
     enemyPhaseMusic,
   ] = await Promise.all([
@@ -148,6 +152,24 @@ export default async function genAndWritePrologue({
     )
   );
 
+  const [outroAIEvent, outroMusic] = await Promise.all([
+    genOutroEvent({
+      worldSummary,
+      initialGameIdea,
+      chapterIdea,
+      tone,
+      introEvent: introAIEvent,
+    }),
+    chooseMusic("Reflective, concluding, final notes " + chapterIdea.outro),
+  ]);
+  const outroBackground = await chooseBackground(outroAIEvent);
+  const outroEvent = convertAIEventToEvent({
+    aiEvent: outroAIEvent,
+    chapterNumber,
+    backgroundChoice: outroBackground,
+    musicChoice: outroMusic,
+  });
+
   const newChapter: Chapter = {
     title: chapterIdea.title,
     number: chapterNumber,
@@ -157,6 +179,23 @@ export default async function genAndWritePrologue({
     tilemap,
     enemyFaction: chapterIdea.enemyFaction,
   };
+
+  newChapter.events.push(outroEvent);
+
+  const bossNid = chapterIdea.boss.firstName;
+
+  const defeatBossEvent: Event = {
+    name: "Defeat Boss",
+    trigger: "combat_end",
+    level_nid: chapterNumber.toString(),
+    condition: `game.check_dead("${bossNid}")`,
+    commands: [],
+    only_once: false,
+    priority: 20,
+    _source: ["win_game"],
+  };
+
+  newChapter.events.push(defeatBossEvent);
 
   // Modify project files
   await writeChapter({

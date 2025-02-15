@@ -1,10 +1,11 @@
-import { AIEvent } from "@/ai/types/ai-event.ts";
-import { Event } from "@/types/events/event.ts";
 import { testAIEventPrologueIntro } from "@/ai/test-data/events.ts";
-import breakTextIntoGameLines from "../../lib/formatting/break-text-into-game-lines.ts";
-import { BackgroundOption } from "@/ai/types/background-option.ts";
-import { backgroundImageMap } from "@/ai/types/background-option.ts";
-import { BackgroundOptions } from "@/ai/types/background-option.ts";
+import { AIEvent } from "@/ai/types/ai-event.ts";
+import {
+  backgroundImageMap,
+  BackgroundOption,
+  BackgroundOptions,
+} from "@/ai/types/background-option.ts";
+import { Event } from "@/types/events/event.ts";
 import cleanGameText from "../../lib/formatting/clean-game-text.ts";
 
 export default function convertAIEventToEvent({
@@ -12,11 +13,13 @@ export default function convertAIEventToEvent({
   backgroundChoice,
   musicChoice,
   chapterNumber,
+  showChapterTitle,
 }: {
   aiEvent: AIEvent;
   backgroundChoice: BackgroundOption;
   musicChoice: string;
   chapterNumber: number;
+  showChapterTitle?: boolean;
 }): Event {
   const condition =
     aiEvent.trigger === "level_start" || aiEvent.trigger === "level_end"
@@ -24,11 +27,11 @@ export default function convertAIEventToEvent({
       : aiEvent.condition;
 
   const _source = [
-    "chapter_title",
+    showChapterTitle ? "chapter_title" : "",
     `change_background;${backgroundImageMap[backgroundChoice]}`,
     `music;${musicChoice};1000`,
     "transition;Open",
-  ];
+  ].filter(Boolean);
 
   aiEvent.sourceObjects.forEach((sourceObj) => {
     if (sourceObj.command === "speak") {
