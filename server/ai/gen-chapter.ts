@@ -114,26 +114,22 @@ export default async function genChapter({
     `Reflective conclusion for chapter: ${chapterIdea.outro}`
   );
 
-  // Convert intro event to our internal Event type
-  let finalIntroEvent: Event | null = null;
-  if (introAIEvent && introMusic) {
-    const introBackgroundChoice = await chooseBackground(introAIEvent);
-    finalIntroEvent = convertAIEventToEvent({
-      aiEvent: introAIEvent,
-      backgroundChoice: introBackgroundChoice,
-      musicChoice: introMusic,
-      chapterNumber,
-      showChapterTitle: true,
-    });
-  }
+  const introBackgroundChoice = await chooseBackground(introAIEvent);
+  const introEvent = convertAIEventToEvent({
+    aiEvent: introAIEvent,
+    backgroundChoice: introBackgroundChoice,
+    musicChoice: introMusic,
+    chapterNumber,
+    showChapterTitle: true,
+  });
 
-  // Convert outro
   const outroBackgroundChoice = await chooseBackground(outroAIEvent);
-  const finalOutroEvent = convertAIEventToEvent({
+  const outroEvent = convertAIEventToEvent({
     aiEvent: outroAIEvent,
     backgroundChoice: outroBackgroundChoice,
     musicChoice: outroMusic,
     chapterNumber,
+    showChapterTitle: true,
   });
 
   // Also a defeat boss event
@@ -196,16 +192,12 @@ export default async function genChapter({
   );
   const tilemap: Tilemap = JSON.parse(tilemapRaw);
 
-  const eventsArray: Event[] = [];
-  if (finalIntroEvent) eventsArray.push(finalIntroEvent);
-  eventsArray.push(finalOutroEvent, defeatBossEvent);
-
   // Construct the final Chapter object
   const newChapter: Chapter = {
     title: chapterIdea.title,
     number: chapterNumber,
     level,
-    events: eventsArray,
+    events: [introEvent, outroEvent, defeatBossEvent],
     newCharacters,
     tilemap,
     enemyFaction: chapterIdea.enemyFaction,
