@@ -21,6 +21,7 @@ export type TerrainType =
   | "Armory"
   | "Vendor"
   | "Village"
+  | "Arena"
   | "Chest"
   | "Door"
   | "Ruins"

@@ -17,6 +17,10 @@ export default function convertLTGridToTerrainGrid(
       result[coords] = "Ruins";
       continue;
     }
+    if (codeStr === "Arena") {
+      result[coords] = "Arena";
+      continue;
+    }
     const code = parseInt(codeStr, 10);
     if (!TERRAIN_TYPE_MAP[code]) {
       console.warn(
