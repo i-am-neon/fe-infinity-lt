@@ -13,7 +13,6 @@ export const UnpromotedFE8Classes = [
   "Pegasus Knight",
   "Journeyman",
   "Fighter",
-  "Warrior",
   "Pirate",
   "Brigand",
   "Archer",
@@ -25,7 +24,6 @@ export const UnpromotedFE8Classes = [
   "Valkyrie",
   "Wyvern Rider",
   "Revenant",
-  "Entombed",
   "Sword Wight",
   "Bow Wight",
   "Mogall",
@@ -45,6 +43,7 @@ export const PromotedFE8Classes = [
   "Sniper",
   "Bishop",
   "Ranger",
+  "Warrior",
   "Sage",
   "Mage Knight",
   "Wyvern Lord",
@@ -52,6 +51,7 @@ export const PromotedFE8Classes = [
   "Necromancer",
   "Sword Bonewalker",
   "Bow Bonewalker",
+  "Entombed",
   "Arch Mogall",
 ] as const;
 

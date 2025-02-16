@@ -40,7 +40,7 @@ export default async function createNextChapter({
   deleteSuspendSave();
 
   // Create the actual next chapter
-  const { chapter } = await genChapter({
+  const { chapter, musicToCopy, usedPortraits } = await genChapter({
     worldSummary: existingGame.worldSummary!,
     initialGameIdea: existingGame.initialGameIdea!,
     tone: existingGame.tone,
@@ -53,9 +53,14 @@ export default async function createNextChapter({
 
   // Add the new chapter to the game
   existingGame.chapters.push(chapter);
+  existingGame.usedPortraits.push(...usedPortraits);
 
   // Write the next chapter to the project
-  await writeChapter({ projectNameEndingInDotLtProj, chapter, music: [] });
+  await writeChapter({
+    projectNameEndingInDotLtProj,
+    chapter,
+    music: musicToCopy,
+  });
 
   // Write a new stub
   await writeStubChapter({

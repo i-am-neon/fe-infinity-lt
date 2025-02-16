@@ -129,7 +129,7 @@ export default async function genChapter({
     backgroundChoice: outroBackgroundChoice,
     musicChoice: outroMusic,
     chapterNumber,
-    showChapterTitle: true,
+    showChapterTitle: false,
   });
 
   // Also a defeat boss event
@@ -208,8 +208,12 @@ export default async function genChapter({
   const updatedUsedPortraits = [...usedSoFar, ...newlyUsedPortraits];
 
   // Return all info
-  const musicToCopy = [playerPhaseMusic, enemyPhaseMusic, outroMusic];
-  if (introMusic) musicToCopy.push(introMusic);
+  const musicToCopy = [
+    playerPhaseMusic,
+    enemyPhaseMusic,
+    outroMusic,
+    introMusic,
+  ];
 
   return {
     chapter: newChapter,
