@@ -13,7 +13,9 @@ export const ChapterIdeaSchema = z.object({
     .string()
     .describe("Description of the starting situation of the battle."),
   outro: z.string().describe("Description of the ending event of the chapter."),
-  boss: CharacterIdeaSchema,
+  boss: CharacterIdeaSchema.describe(
+    "The boss of the chapter. This chaptacter's firstSeenAs must be 'boss'."
+  ),
   newNonBattleCharacters: CharacterIdeaSchema.array()
     .optional()
     .describe(

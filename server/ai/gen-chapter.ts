@@ -21,7 +21,7 @@ import { Chapter } from "@/types/chapter.ts";
 import { Character } from "@/types/character/character.ts";
 import { Event } from "@/types/events/event.ts";
 import { Tilemap } from "@/types/maps/tilemap.ts";
-import genIntroEvent from "./events/gen-intro-event.ts";
+import genIntroEvent from "@/ai/events/gen-intro-event.ts";
 import { CharacterIdea } from "@/ai/types/character-idea.ts";
 
 /**
@@ -31,7 +31,7 @@ import { CharacterIdea } from "@/ai/types/character-idea.ts";
  * Returns { chapter, usedPortraits, music } so the caller can proceed
  * to writing it out (with writeChapter) and do any additional steps (like stub next chapter).
  */
-export default async function createChapter({
+export default async function genChapter({
   worldSummary,
   initialGameIdea,
   tone,
@@ -62,7 +62,6 @@ export default async function createChapter({
       chapterNumber,
     });
   }
-  logger.debug("initialGameIdea", initialGameIdea);
   // Gather all character ideas from existing chapters plus new ones
   const allChapterCharacterIdeas = [
     ...existingCharacterIdeas,
@@ -228,7 +227,7 @@ export default async function createChapter({
 }
 
 if (import.meta.main) {
-  createChapter({
+  genChapter({
     worldSummary: testWorldSummary,
     initialGameIdea: testInitialGameIdea,
     chapterNumber: 0,

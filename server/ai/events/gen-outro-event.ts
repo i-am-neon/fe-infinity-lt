@@ -34,6 +34,7 @@ The event should:
 - be sure to include the Chapter Idea's newNonBattleCharacters as characters in the event, as mentioned in the "intro" section of the Chapter Idea
 - if a character is mentioned in the outro, it must be included in the event
 - you may only give speaking roles to characters mentioned in the outro, not any other characters
+- you must have characters speak to each other in the scene
 `;
 
   const prompt = `World Summary: ${JSON.stringify(worldSummary, null, 2)}

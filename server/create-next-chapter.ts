@@ -1,16 +1,14 @@
-import createChapter from "@/ai/create-chapter.ts";
-import genSubsequentChapterIdea from "@/ai/gen-subsequent-chapter.ts";
+import genChapter from "./ai/gen-chapter.ts";
+
 import { ChapterIdea } from "@/ai/types/chapter-idea.ts";
 import { getGameByNid, insertGame } from "@/db/games.ts";
 import { deleteSuspendSave } from "@/game-engine-io/delete-suspend-save.ts";
-import { removeStubEvent } from "./game-engine-io/write-chapter/remove-stub-event.ts";
-import { removeStubLevel } from "./game-engine-io/write-chapter/remove-stub-level.ts";
 import writeChapter from "@/game-engine-io/write-chapter/write-chapter.ts";
 import writeStubChapter from "@/game-engine-io/write-chapter/write-stub-chapter.ts";
-import {
-  getCurrentLogger,
-  setCurrentLoggerProject,
-} from "@/lib/current-logger.ts";
+import { getCurrentLogger } from "@/lib/current-logger.ts";
+import { removeStubEvent } from "./game-engine-io/write-chapter/remove-stub-event.ts";
+import { removeStubLevel } from "./game-engine-io/write-chapter/remove-stub-level.ts";
+import genChapterIdea from "@/ai/gen-chapter-idea.ts";
 
 export default async function createNextChapter({
   projectNameEndingInDotLtProj,
@@ -20,7 +18,6 @@ export default async function createNextChapter({
   gameNid: string;
 }): Promise<void> {
   const logger = getCurrentLogger();
-  logger.debug("createNextChapter", { projectNameEndingInDotLtProj, gameNid });
   // Retrieve existing game from DB
   const existingGame = getGameByNid(gameNid);
   if (!existingGame) {
@@ -30,25 +27,20 @@ export default async function createNextChapter({
   const nextChapterNumber = existingGame.chapters.length;
 
   // Generate the new chapter idea using all context
-  const newChapterIdea: ChapterIdea = await genSubsequentChapterIdea({
+  const newChapterIdea: ChapterIdea = await genChapterIdea({
     worldSummary: existingGame.worldSummary!,
-    initialGameIdea: existingGame.initialGameIdea!,
-    chapters: existingGame.chapters,
-    nextChapterNumber,
+    chapterNumber: nextChapterNumber,
     tone: existingGame.tone,
+    existingChapters: existingGame.chapters,
   });
-
-  logger.debug("newChapterIdeas", { newChapterIdea });
 
   // Remove the old stub
   await removeStubLevel(projectNameEndingInDotLtProj);
   await removeStubEvent(projectNameEndingInDotLtProj);
   deleteSuspendSave();
 
-  logger.debug("existingGame", { existingGame });
-
   // Create the actual next chapter
-  const { chapter } = await createChapter({
+  const { chapter } = await genChapter({
     worldSummary: existingGame.worldSummary!,
     initialGameIdea: existingGame.initialGameIdea!,
     tone: existingGame.tone,
@@ -56,6 +48,8 @@ export default async function createNextChapter({
     chapterIdea: newChapterIdea,
     existingCharacterIdeas: existingGame.characters.map((c) => c.characterIdea),
   });
+
+  logger.debug("created chapter", { chapter });
 
   // Add the new chapter to the game
   existingGame.chapters.push(chapter);

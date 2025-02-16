@@ -41,7 +41,8 @@ It should:
 - unless a character enters the scene later, all characters in the event should be added with "add_portrait" before anyone speaks
 - be sure to include the Chapter Idea's newNonBattleCharacters as characters in the event, as mentioned in the "intro" section of the Chapter Idea
 - if a character is mentioned in the intro, it must be included in the event
-- you may only give speaking roles to characters mentioned in the intro, not any other characters`;
+- you may only give speaking roles to characters mentioned in the intro, not any other characters
+- you must have characters speak to each other in the scene`;
 
   return generateStructuredData({
     fnName: "genPrologueIntroEvent",

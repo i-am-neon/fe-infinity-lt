@@ -1,5 +1,5 @@
 import chooseTopLevelMusic from "@/ai/choose-top-level-music.ts";
-import createChapter from "@/ai/create-chapter.ts";
+import genChapter from "../ai/gen-chapter.ts";
 import genInitialGameIdea from "@/ai/gen-initial-game-idea.ts";
 import genWorldSummary from "@/ai/gen-world-summary.ts";
 import { insertGame } from "@/db/games.ts";
@@ -63,7 +63,7 @@ export async function handleCreateGame(req: Request): Promise<Response> {
     });
 
     // 5) create the prologue (chapterNumber=0)
-    const { chapter, usedPortraits, musicToCopy } = await createChapter({
+    const { chapter, usedPortraits, musicToCopy } = await genChapter({
       worldSummary,
       initialGameIdea,
       tone,
