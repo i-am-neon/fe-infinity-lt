@@ -82,6 +82,7 @@ export async function handleCreateGame(req: Request): Promise<Response> {
     await writeStubChapter({
       projectNameEndingInDotLtProj,
       chapterNumber: 1,
+      previousTilemapNid: chapter.tilemap.nid,
     });
 
     const newGame: Game = {

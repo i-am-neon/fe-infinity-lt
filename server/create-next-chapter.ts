@@ -67,6 +67,7 @@ export default async function createNextChapter({
   await writeStubChapter({
     projectNameEndingInDotLtProj,
     chapterNumber: nextChapterNumber + 1,
+    previousTilemapNid: chapter.tilemap.nid,
   });
 
   // Update the DB with the newly appended chapters

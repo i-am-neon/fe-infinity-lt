@@ -1,6 +1,5 @@
 {
   "tasks": {
-    "main": "deno run --allow-all main.ts",
     "server": "deno run --allow-all --watch server.ts"
   },
   "imports": {

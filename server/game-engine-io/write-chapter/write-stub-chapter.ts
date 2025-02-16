@@ -4,16 +4,18 @@ import { appendLevel } from "@/game-engine-io/write-chapter/append-level.ts";
 export default async function writeStubChapter({
   projectNameEndingInDotLtProj,
   chapterNumber,
+  previousTilemapNid,
 }: {
   projectNameEndingInDotLtProj: string;
   chapterNumber: number;
+  previousTilemapNid: string;
 }): Promise<void> {
   await appendLevel({
     projectNameEndingInDotLtProj,
     newLevel: {
       nid: `${chapterNumber}`,
       name: `Chapter ${chapterNumber}`,
-      tilemap: "(7)Ch01_Diff_Tileset__by_Shin19",
+      tilemap: previousTilemapNid,
       music: {
         player_phase: "memories-of-green",
         enemy_phase: "Distant Roads",

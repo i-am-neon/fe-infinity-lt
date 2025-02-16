@@ -34,7 +34,11 @@ export const CharacterIdeaSchema = z
       z.literal("ally"),
       z.literal("allied NPC"),
       z.literal("enemy non-boss"),
-      z.literal("boss"),
+      z
+        .literal("boss")
+        .describe(
+          'If the character is set as a boss, firstSeenAs must be "boss"'
+        ),
     ]),
     physicalDescription: z
       .string()
