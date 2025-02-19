@@ -12,62 +12,38 @@ const gameIdeas = [
   {
     title: "Revenant Oath",
     description:
-      "A once-feared warlord reawakens, determined to reclaim a lost empire. As the undead legions grow, questions of redemption or damnation loom over every choice.",
-    tone: "dark, vengeful",
+      "A once-feared warlord reawakens, determined to reclaim a lost empire. As the undead legions grow, every choice teeters between redemption and eternal damnation.",
+    tone: "dark fantasy, vengeful",
   },
   {
-    title: "Echoes of the Forsaken",
+    title: "The Grand Tourney",
     description:
-      "Two ancient factions awaken from centuries of slumber, and the protagonist stands at the crossroads of war and forgotten prophecies. Each chapter unearths buried secrets with dire consequences.",
-    tone: "tragic, mystical",
+      "Once a year, the kingdom hosts a grand festival where duels, wits, and whispers decide the fates of nobles and commoners alike. Every move in the arena or the court can forge alliances or fuel rivalries.",
+    tone: "whimsical, courtly intrigue",
   },
   {
     title: "Fractured Bonds",
     description:
-      "A kingdom splinters under the weight of rival claimants to the throne. Political schemes ensnare the player, forcing alliances that may shatter trust in unexpected ways.",
-    tone: "political intrigue",
+      "A crumbling kingdom is torn by rival factions vying for the throne. Trust is a fragile currency in this world of spies, shifting loyalties, and high-stakes diplomacy.",
+    tone: "political intrigue, strategic",
   },
   {
     title: "Celestial Ruin",
     description:
-      "Sacred relics once upheld an empire’s glory, but now their power fades. Embark on a pilgrimage across a mystical land to either restore the divine or break the cycle forever.",
-    tone: "grand, epic",
-  },
-  {
-    title: "Wings of Virtue",
-    description:
-      "Legend speaks of a realm protected by skybound knights and griffon riders. When a malevolent force encroaches, the player’s valor could unite the knights—or bring the clouds crashing down.",
-    tone: "heroic, high fantasy",
-  },
-  {
-    title: "Blossoms of Dawn",
-    description:
-      "A peaceful continent flourishes under the guidance of enchanted forests and gentle magic. As tensions rise between nature’s guardians and ambitious nobles, alliances and loyalties bloom or wither.",
-    tone: "hopeful, high fantasy",
+      "The sacred relics that upheld an empire’s power are fading. A desperate pilgrimage begins to either restore the divine or shatter the cycle forever.",
+    tone: "grand adventure, epic",
   },
   {
     title: "Arcane Rebellion",
     description:
-      "Spellcasters are hunted by a tyrannical empire intent on controlling all magic. The rebellion’s fate hinges on whether the protagonist can unify warring mage factions—or watch them tear each other apart.",
-    tone: "rebellious, tense",
-  },
-  {
-    title: "Moonlit Masquerade",
-    description:
-      "Every year, nobles and commoners gather for a festival under moonlit skies to broker alliances and host covert duels. Danger lurks behind every mask, and the player’s every dance step could spark a feud—or a romance.",
-    tone: "whimsical, courtly intrigue",
+      "A tyrannical empire has outlawed magic, forcing spellcasters into hiding. Can the player unite the warring mage factions before they destroy each other?",
+    tone: "rebellion, tense",
   },
   {
     title: "Twin Fates",
     description:
-      "Long-separated royal siblings believe each other lost to war. With each passing battle, they inch closer to a heart-wrenching reunion and the resolution of a kingdom’s fate.",
+      "Two royal siblings, separated by war, believe each other dead. As their armies march closer, a reunion seems inevitable—but will it be as family, or as enemies?",
     tone: "bittersweet, emotional",
-  },
-  {
-    title: "Goblin Guffaws",
-    description:
-      "A troop of mischievous goblins gatecrashes the royal tournament, turning serious quests into comedic misadventures. Whether you join their antics or thwart them could reshape the kingdom’s destiny—in the silliest way possible.",
-    tone: "lighthearted, playful",
   },
 ];
 
