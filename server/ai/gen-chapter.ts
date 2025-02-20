@@ -184,7 +184,17 @@ export default async function genChapter({
     .filter(
       (idea, index, self) =>
         index === self.findIndex((i) => i.firstName === idea.firstName)
-    );
+    )
+    // Remove dead characters
+    .filter(
+      (idea) =>
+        ![...allDeadCharacters, ...newlyDeadThisChapter].some(
+          (dc) => dc.name === idea.firstName
+        )
+    )
+    // Remove characters who are not playable
+    .filter((idea) => idea.firstSeenAs !== "boss");
+
   logger.debug("allLivingPlayerCharacterIdeas", {
     allLivingPlayerCharacterIdeas,
     existingCharacterIdeas,

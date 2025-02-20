@@ -75,8 +75,16 @@ Important continuity rules for dead characters:
 Chapter Idea: ${JSON.stringify(chapterIdea)}\nTone: ${tone}
 Existing Character Ideas: ${JSON.stringify(existingCharacterIdeas, null, 2)}
 Existing Chapters: ${JSON.stringify(existingChapters, null, 2)}
-All Dead Characters: ${JSON.stringify(allDeadCharacters, null, 2)}
-Newly Dead This Chapter: ${JSON.stringify(newlyDeadThisChapter, null, 2)}`,
+All Dead Characters: ${JSON.stringify(
+      allDeadCharacters,
+      null,
+      2
+    )}. You must NOT give these characters speaking roles in the current chapter idea! They are dead and the story can reference and change because of that, but dead characters can never show up again in any scenes.
+Newly Dead This Chapter: ${JSON.stringify(
+      newlyDeadThisChapter,
+      null,
+      2
+    )}. You must NOT give these characters speaking roles in the current chapter idea! They are dead and the story can reference and change because of that, but dead characters can never show up again in any scenes.`,
     schema: AIEventSchema,
     temperature: 0.7,
   });

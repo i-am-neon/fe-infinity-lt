@@ -24,7 +24,8 @@ In your response, include:
 - Any additional notes or details that would be important for establishing the tone and setup of the game.
 
 Requirements that MUST be met:
-- You must include at least 2 character ideas. Anything less will result in an error.`;
+- You must include at least 2 character ideas. Anything less will result in an error.
+- If you mention a character that will have a speaking role in the prologue, you must include a character idea for them.`;
 
   const prompt = `World Summary: ${JSON.stringify(
     worldSummary,
