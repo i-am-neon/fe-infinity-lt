@@ -44,7 +44,7 @@ Given the user's Fire Emblem chapter idea, provide a brief single-line string (n
 
   // 2) Embed and run similarity search
   const embedding = await createEmbedding({ text: searchQuery });
-  const topResults = await similaritySearch(embedding, 20, "maps");
+  const topResults = await similaritySearch(embedding, 5, "maps");
   if (!topResults.length) {
     throw new Error("No map results found for this query.");
   }
@@ -112,3 +112,4 @@ if (import.meta.main) {
       console.error("Error choosing map:", err);
     });
 }
+

@@ -73,6 +73,9 @@ export default async function genChapter({
     });
   }
   const newCharacterIdeas: CharacterIdea[] = [
+    ...(initialGameIdea && chapterNumber === 0
+      ? initialGameIdea.characterIdeas
+      : []),
     chapterIdea.boss,
     ...(chapterIdea.newPlayableUnits ?? []),
     ...(chapterIdea.newNonBattleCharacters ?? []),
@@ -80,6 +83,7 @@ export default async function genChapter({
 
   // Decide which portraits are already used, if any
   const usedSoFar = usedPortraitsSoFar ?? [];
+  logger.debug("Used portraits so far", { usedSoFar });
 
   // Choose new portraits for these new characters
   const portraitMap = await choosePortraits({
@@ -171,9 +175,26 @@ export default async function genChapter({
     };
   });
 
+  const allLivingPlayerCharacterIdeas = [
+    ...(initialGameIdea?.characterIdeas ?? []),
+    ...existingCharacterIdeas,
+    ...newCharacterIdeas,
+  ]
+    // Remove duplicates
+    .filter(
+      (idea, index, self) =>
+        index === self.findIndex((i) => i.firstName === idea.firstName)
+    );
+  logger.debug("allLivingPlayerCharacterIdeas", {
+    allLivingPlayerCharacterIdeas,
+    existingCharacterIdeas,
+    initialGameIdeaCharacterIdeas: initialGameIdea?.characterIdeas,
+    newCharacterIdeas,
+  });
+
   // Separate the player's initial unit data if it belongs to the initialGameIdea
   const playerUnitDatas = unitDatas.filter((c) =>
-    initialGameIdea.characterIdeas.some((idea) => idea.firstName === c.nid)
+    allLivingPlayerCharacterIdeas.some((idea) => idea.firstName === c.nid)
   );
 
   // Find boss
@@ -197,7 +218,7 @@ export default async function genChapter({
   });
 
   // Construct the level with all the units
-  const level = await assembleLevel({
+  const level = assembleLevel({
     chapterIdea,
     chapterNumber,
     chosenMapName,

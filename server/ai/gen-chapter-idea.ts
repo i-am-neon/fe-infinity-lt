@@ -65,7 +65,7 @@ Initial Game Idea: ${JSON.stringify(initialGameIdea, null, 2)}
 Tone: ${tone}`;
 
     return generateStructuredData<ChapterIdea>({
-      fnName: "genChapterIdeaPrologue",
+      fnName: "genChapterIdea: Prologue",
       systemMessage,
       prompt,
       schema: ChapterIdeaSchema.omit({ newPlayableUnits: true }),
@@ -116,7 +116,7 @@ Output must strictly match the ChapterIdea schema.`;
     });
 
     return generateStructuredData<ChapterIdea>({
-      fnName: "genChapterIdeaSubsequent",
+      fnName: `genChapterIdea: Ch ${chapterNumber}`,
       systemMessage,
       prompt,
       schema: ChapterIdeaSchema,
