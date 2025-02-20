@@ -25,7 +25,6 @@ import genIntroEvent from "@/ai/events/gen-intro-event.ts";
 import { CharacterIdea } from "@/ai/types/character-idea.ts";
 import chooseMap from "@/ai/choose-map.ts";
 import getLevelUnits from "@/ai/level/get-level-units.ts";
-import { Unit } from "@/types/level.ts";
 import { DeadCharacterRecord } from "@/types/dead-character-record.ts";
 
 /**
@@ -42,7 +41,7 @@ export default async function genChapter({
   chapterNumber,
   usedPortraitsSoFar,
   chapterIdea,
-  existingCharacterIdeas = [],
+  existingCharacters = [],
   existingChapters = [],
   allDeadCharacters = [],
   newlyDeadThisChapter = [],
@@ -53,7 +52,7 @@ export default async function genChapter({
   chapterNumber: number;
   usedPortraitsSoFar?: string[];
   chapterIdea?: ChapterIdea;
-  existingCharacterIdeas?: CharacterIdea[];
+  existingCharacters?: Character[];
   existingChapters?: Chapter[];
   allDeadCharacters?: DeadCharacterRecord[];
   newlyDeadThisChapter?: DeadCharacterRecord[];
@@ -92,7 +91,7 @@ export default async function genChapter({
   });
 
   // Create the unit data for the new characters
-  const unitDatas = await createUnitDatas({
+  const newCharacterUnitDatas = await createUnitDatas({
     characterIdeas: newCharacterIdeas,
     chapterNumber,
   });
@@ -109,7 +108,7 @@ export default async function genChapter({
     tone,
     initialGameIdea: chapterNumber === 0 ? initialGameIdea : undefined,
     existingChapters,
-    existingCharacterIdeas,
+    existingCharacterIdeas: existingCharacters.map((c) => c.characterIdea),
     allDeadCharacters,
     newlyDeadThisChapter,
   });
@@ -158,7 +157,7 @@ export default async function genChapter({
   };
 
   // Build newCharacters array
-  const newCharacters: Character[] = unitDatas.map((ud) => {
+  const newCharacters: Character[] = newCharacterUnitDatas.map((ud) => {
     const portraitNid = portraitMap[ud.nid];
     const pm = allPortraitOptions.find((p) => p.originalName === portraitNid);
     if (!pm) {
@@ -177,7 +176,7 @@ export default async function genChapter({
 
   const allLivingPlayerCharacterIdeas = [
     ...(initialGameIdea?.characterIdeas ?? []),
-    ...existingCharacterIdeas,
+    ...existingCharacters.map((c) => c.characterIdea),
     ...newCharacterIdeas,
   ]
     // Remove duplicates
@@ -197,18 +196,23 @@ export default async function genChapter({
 
   logger.debug("allLivingPlayerCharacterIdeas", {
     allLivingPlayerCharacterIdeas,
-    existingCharacterIdeas,
+    existingCharacters,
     initialGameIdeaCharacterIdeas: initialGameIdea?.characterIdeas,
     newCharacterIdeas,
+    allDeadCharacters,
+    newlyDeadThisChapter,
   });
 
   // Separate the player's initial unit data if it belongs to the initialGameIdea
-  const playerUnitDatas = unitDatas.filter((c) =>
+  const playerUnitDatas = [
+    ...newCharacterUnitDatas,
+    ...existingCharacters.map((c) => c.unitData),
+  ].filter((c) =>
     allLivingPlayerCharacterIdeas.some((idea) => idea.firstName === c.nid)
   );
 
   // Find boss
-  const bossUnitData = unitDatas.find(
+  const bossUnitData = newCharacterUnitDatas.find(
     (c) => c.nid === chapterIdea.boss.firstName
   );
   if (!bossUnitData) {

@@ -41,7 +41,7 @@ clean-saves:
     deno run --allow-all server/game-engine-io/clean-saves.ts
 
 clean-logs:
-    rm -rf server/logs/*
+    rm -rf server/_logs/*
 # Run a script in the server directory, passing in the relative path from the root directory
 run path:
     source /opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh && conda activate fe-i-lt && cd server && set -a; source .env; set +a; cd .. && deno run --allow-all --config server/deno.json "{{path}}"

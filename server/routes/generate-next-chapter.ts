@@ -1,17 +1,12 @@
 import createNextChapter from "@/create-next-chapter.ts";
+import { getCurrentLogger } from "@/lib/current-logger.ts";
 import runGame from "@/run-game.ts";
-import {
-  getCurrentLogger,
-  setCurrentLoggerProject,
-} from "@/lib/current-logger.ts";
 
 export async function handleGenerateNextChapter(
   req: Request
 ): Promise<Response> {
   try {
     const { directory, gameNid } = await req.json();
-    setCurrentLoggerProject(directory);
-    const logger = getCurrentLogger();
     if (!directory || !gameNid) {
       return new Response(
         JSON.stringify({

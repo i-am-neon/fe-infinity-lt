@@ -5,9 +5,9 @@ import { getGameByNid, insertGame } from "@/db/games.ts";
 import { deleteSuspendSave } from "@/game-engine-io/delete-suspend-save.ts";
 import writeChapter from "@/game-engine-io/write-chapter/write-chapter.ts";
 import writeStubChapter from "@/game-engine-io/write-chapter/write-stub-chapter.ts";
-import { getCurrentLogger } from "@/lib/current-logger.ts";
-import { removeStubEvent } from "./game-engine-io/write-chapter/remove-stub-event.ts";
-import { removeStubLevel } from "./game-engine-io/write-chapter/remove-stub-level.ts";
+import { getCurrentLogger, setCurrentLogger } from "@/lib/current-logger.ts";
+import { removeStubEvent } from "@/game-engine-io/write-chapter/remove-stub-event.ts";
+import { removeStubLevel } from "@/game-engine-io/write-chapter/remove-stub-level.ts";
 import genChapterIdea from "@/ai/gen-chapter-idea.ts";
 import getChapterResults from "@/game-engine-io/get-chapter-results.ts";
 import { determineRoleForDeadUnit } from "@/lib/determine-role-for-dead-unit.ts";
@@ -20,7 +20,6 @@ export default async function createNextChapter({
   projectNameEndingInDotLtProj: string;
   gameNid: string;
 }): Promise<void> {
-  const logger = getCurrentLogger();
   // Retrieve existing game from DB
   const existingGame = getGameByNid(gameNid);
   if (!existingGame) {
@@ -28,6 +27,12 @@ export default async function createNextChapter({
   }
 
   const nextChapterNumber = existingGame.chapters.length;
+
+  setCurrentLogger({
+    projectName: projectNameEndingInDotLtProj,
+    chapterNumber: nextChapterNumber,
+  });
+  const logger = getCurrentLogger();
 
   const { lastChoice, deadCharacters } = await getChapterResults({
     // Take out the leading underscore
@@ -86,7 +91,7 @@ export default async function createNextChapter({
     tone: existingGame.tone,
     chapterNumber: nextChapterNumber,
     chapterIdea: newChapterIdea,
-    existingCharacterIdeas: existingGame.characters.map((c) => c.characterIdea),
+    existingCharacters: existingGame.characters,
     existingChapters: existingGame.chapters,
     usedPortraitsSoFar: existingGame.usedPortraits,
   });

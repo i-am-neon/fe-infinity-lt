@@ -8,6 +8,7 @@ import { Level } from "@/types/level.ts";
 import { FE8ClassToLTNidMap } from "@/types/fe8-class.ts";
 import decideGenericUnitLevel from "@/ai/level/decide-generic-unit-level.ts";
 import decideUnitWeapons from "@/ai/create-unit-data/item-options/decide-unit-weapons.ts";
+import { getCurrentLogger } from "@/lib/current-logger.ts";
 
 export default async function getLevelUnits({
   chosenMapName,
@@ -22,6 +23,12 @@ export default async function getLevelUnits({
   playerUnitDatas: UnitData[];
   bossUnitData: UnitData;
 }): Promise<Level["units"]> {
+  const logger = getCurrentLogger();
+  logger.debug("getLevelUnits", {
+    chapterNumber,
+    playerUnitDatas,
+    bossUnitData,
+  });
   const mapMetadata = allMapOptions.find(
     (m) => m.originalName === chosenMapName
   );

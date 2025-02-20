@@ -1,4 +1,4 @@
 db/local.db
 .env
-logs/*
+_logs/*
 assets/music/mp3/*

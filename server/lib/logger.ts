@@ -13,18 +13,37 @@ interface LogOptions {
 export class Logger {
   private baseLogDir: string;
   private projectName: string;
+  private chapterNumber: number | null = null;
   private stream: Deno.FsFile | null = null;
 
   constructor(projectName: string) {
-    this.projectName = projectName;
-    this.baseLogDir = getPathWithinServer("logs");
+    this.projectName = projectName || "-";
+    this.baseLogDir = getPathWithinServer("_logs");
+    this.openLogFile();
+  }
+
+  private openLogFile() {
+    if (this.stream) {
+      this.stream.close();
+      this.stream = null;
+    }
     ensureDirSync(this.baseLogDir);
-    const logFilePath = join(this.baseLogDir, `${projectName}.log`);
+    const projectDir = join(this.baseLogDir, this.projectName);
+    ensureDirSync(projectDir);
+
+    const fileName = this.chapterNumber !== null ? `${this.chapterNumber}.log` : `-.log`;
+    const logFilePath = join(projectDir, fileName);
+
     this.stream = Deno.openSync(logFilePath, {
       write: true,
       create: true,
       append: true,
     });
+  }
+
+  public setChapterNumber(chapter: number | null) {
+    this.chapterNumber = chapter;
+    this.openLogFile();
   }
 
   private writeLog({ level, message, metadata }: LogOptions) {
@@ -33,22 +52,26 @@ export class Logger {
       timestamp: new Date().toISOString(),
       level,
       message,
-      metadata: metadata ?? {},
+      metadata: {
+        ...metadata,
+        chapter: this.chapterNumber !== null ? this.chapterNumber : "-",
+      },
     };
-    this.stream.writeSync(
-      new TextEncoder().encode(JSON.stringify(logEntry, null, 2) + "\n")
-    );
+    this.stream.writeSync(new TextEncoder().encode(JSON.stringify(logEntry) + "\n"));
   }
 
   debug(message: string, metadata?: Record<string, unknown>) {
     this.writeLog({ level: "debug", message, metadata });
   }
+
   info(message: string, metadata?: Record<string, unknown>) {
     this.writeLog({ level: "info", message, metadata });
   }
+
   warn(message: string, metadata?: Record<string, unknown>) {
     this.writeLog({ level: "warn", message, metadata });
   }
+
   error(message: string, metadata?: Record<string, unknown>) {
     this.writeLog({ level: "error", message, metadata });
   }
@@ -80,10 +103,12 @@ export function closeLogger(projectName: string) {
 
 if (import.meta.main) {
   const logger = getLogger("demo-project");
+  logger.setChapterNumber(0);
   logger.info("Hello from the logger in main", { greeting: true });
   logger.debug("Some debug info", { debug: "details" });
   logger.error("Simulating an error", { code: 500 });
+  logger.setChapterNumber(1);
+  logger.info("Now on chapter 1", { example: "someValue" });
   logger.close();
   console.log("Finished logging in demo-project logger.");
 }
-

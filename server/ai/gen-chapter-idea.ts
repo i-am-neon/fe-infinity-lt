@@ -105,6 +105,7 @@ Important continuity rules for dead characters:
 ## New Characters
 - All new characters must be human.
 - When adding Non Battle Characters, use them in the intro/outro as needed.
+- When creating a boss character, you must not use any bosses from past chapters. You must create a new boss character.
 
 Output must strictly match the ChapterIdea schema.`;
 
