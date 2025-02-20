@@ -24,7 +24,8 @@ const decideSchema = z.object({
 });
 
 export default async function chooseMap(
-  chapterIdea: ChapterIdea
+  chapterIdea: ChapterIdea,
+  usedMapNames: string[] = []
 ): Promise<string> {
   // 1) Generate search query
   const systemMessageForQuery = `You are a query generator for an advanced map search system.
@@ -48,8 +49,17 @@ Given the user's Fire Emblem chapter idea, provide a brief single-line string (n
     throw new Error("No map results found for this query.");
   }
 
+  const filteredResults = topResults.filter((res) => {
+    const originalName = (res.metadata?.originalName as string) || "";
+    return !usedMapNames.includes(originalName);
+  });
+
+  if (!filteredResults.length) {
+    throw new Error("No new map results found (all are used).");
+  }
+
   // Keep top 3
-  const ephemeralOptions: EphemeralMapOption[] = topResults
+  const ephemeralOptions: EphemeralMapOption[] = filteredResults
     .slice(0, 3)
     .map((res, idx) => {
       const ephemeralId = idx === 0 ? "A" : idx === 1 ? "B" : "C";

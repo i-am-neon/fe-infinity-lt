@@ -47,6 +47,7 @@ export default async function createNextChapter({
     chapterNumber: nextChapterNumber,
     chapterIdea: newChapterIdea,
     existingCharacterIdeas: existingGame.characters.map((c) => c.characterIdea),
+    existingChapters: existingGame.chapters,
   });
 
   logger.debug("created chapter", { chapter });

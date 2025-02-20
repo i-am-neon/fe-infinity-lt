@@ -41,6 +41,7 @@ export default async function genChapter({
   usedPortraitsSoFar,
   chapterIdea,
   existingCharacterIdeas = [],
+  existingChapters = [],
 }: {
   worldSummary: WorldSummary;
   initialGameIdea: InitialGameIdea;
@@ -49,6 +50,7 @@ export default async function genChapter({
   usedPortraitsSoFar?: string[];
   chapterIdea?: ChapterIdea;
   existingCharacterIdeas?: CharacterIdea[];
+  existingChapters?: Chapter[];
 }): Promise<{
   chapter: Chapter;
   usedPortraits: string[];
@@ -178,8 +180,8 @@ export default async function genChapter({
     throw new Error("Could not find boss in unitDatas");
   }
 
-  const chosenMapName = await chooseMap(chapterIdea);
-
+  const usedMapNames = existingChapters.map((c) => c.tilemap.nid);
+  const chosenMapName = await chooseMap(chapterIdea, usedMapNames);
   const units = await getLevelUnits({
     chosenMapName,
     chapterIdea,
@@ -242,4 +244,3 @@ if (import.meta.main) {
     tone: testTone,
   }).then(console.log);
 }
-
