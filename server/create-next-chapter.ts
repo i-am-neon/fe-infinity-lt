@@ -9,6 +9,7 @@ import { getCurrentLogger } from "@/lib/current-logger.ts";
 import { removeStubEvent } from "./game-engine-io/write-chapter/remove-stub-event.ts";
 import { removeStubLevel } from "./game-engine-io/write-chapter/remove-stub-level.ts";
 import genChapterIdea from "@/ai/gen-chapter-idea.ts";
+import getChapterResults from "@/game-engine-io/get-chapter-results.ts";
 
 export default async function createNextChapter({
   projectNameEndingInDotLtProj,
@@ -25,6 +26,16 @@ export default async function createNextChapter({
   }
 
   const nextChapterNumber = existingGame.chapters.length;
+
+  const { lastChoice, deadCharacters } = await getChapterResults({
+    gameNid,
+    levelNid: nextChapterNumber.toString(),
+  });
+  logger.debug("chapter results", {
+    lastChoice,
+    deadCharacters,
+    finishedChapterNumber: existingGame.chapters.length,
+  });
 
   // Generate the new chapter idea using all context
   const newChapterIdea: ChapterIdea = await genChapterIdea({
