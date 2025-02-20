@@ -65,8 +65,30 @@ Given the user's Fire Emblem character idea, provide a brief single-line string 
     );
   });
   if (!filteredResults.length) {
-    logger.warn("No unused portraits remain", { searchQuery });
-    throw new Error("No unused portrait matches found.");
+    logger.warn("No unused portraits remain for top 5, re-searching with topK=10 ...", { searchQuery });
+    const biggerResults = await similaritySearch(embedding, 10, "portraits");
+    const biggerFiltered = biggerResults.filter((res) => {
+      const md = res.metadata as { originalName?: string; gender?: string };
+      return (
+        md.originalName &&
+        md.gender === characterIdea.gender &&
+        !usedPortraits.includes(md.originalName)
+      );
+    });
+    if (!biggerFiltered.length) {
+      logger.warn("No unused portraits remain at topK=10", { searchQuery });
+      throw new Error("No unused portrait matches found after second attempt.");
+    }
+    const randomIndex = Math.floor(Math.random() * biggerFiltered.length);
+    const chosen = biggerFiltered[randomIndex];
+    const chosenPortraitName = chosen.metadata!.originalName as string;
+
+    logger.info("Chose portrait for character after second attempt", {
+      characterIdea,
+      chosenPortrait: chosen,
+      elapsedTimeMs: Date.now() - start,
+    });
+    return chosenPortraitName;
   }
 
   // 3) Pick a random portrait from the filtered results
@@ -92,4 +114,3 @@ if (import.meta.main) {
       console.error("Error choosing portrait:", err);
     });
 }
-
