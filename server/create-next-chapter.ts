@@ -11,6 +11,7 @@ import { removeStubLevel } from "./game-engine-io/write-chapter/remove-stub-leve
 import genChapterIdea from "@/ai/gen-chapter-idea.ts";
 import getChapterResults from "@/game-engine-io/get-chapter-results.ts";
 import { determineRoleForDeadUnit } from "@/lib/determine-role-for-dead-unit.ts";
+import { DeadCharacterRecord } from "@/types/dead-character-record.ts";
 
 export default async function createNextChapter({
   projectNameEndingInDotLtProj,
@@ -44,6 +45,7 @@ export default async function createNextChapter({
   const lastChapterIndex = existingGame.chapters.length - 1;
   const lastChapter = existingGame.chapters[lastChapterIndex];
 
+  const newlyDeadThisChapter: DeadCharacterRecord[] = [];
   for (const newlyDead of deadCharacters) {
     const existingRecord = existingGame.deadCharacters?.find(
       (dc) => dc.name === newlyDead
@@ -55,6 +57,7 @@ export default async function createNextChapter({
       });
       if (role) {
         existingGame.deadCharacters?.push({ name: newlyDead, role });
+        newlyDeadThisChapter.push({ name: newlyDead, role });
       }
     }
   }
@@ -68,7 +71,7 @@ export default async function createNextChapter({
     tone: existingGame.tone,
     existingChapters: existingGame.chapters,
     allDeadCharacters: existingGame.deadCharacters,
-    newlyDeadThisChapter: deadCharacters,
+    newlyDeadThisChapter,
   });
 
   // Remove the old stub

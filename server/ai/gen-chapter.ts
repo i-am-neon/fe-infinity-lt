@@ -26,6 +26,7 @@ import { CharacterIdea } from "@/ai/types/character-idea.ts";
 import chooseMap from "@/ai/choose-map.ts";
 import getLevelUnits from "@/ai/level/get-level-units.ts";
 import { Unit } from "@/types/level.ts";
+import { DeadCharacterRecord } from "@/types/dead-character-record.ts";
 
 /**
  * Creates the next chapter based on the given data.
@@ -43,6 +44,8 @@ export default async function genChapter({
   chapterIdea,
   existingCharacterIdeas = [],
   existingChapters = [],
+  allDeadCharacters = [],
+  newlyDeadThisChapter = [],
 }: {
   worldSummary: WorldSummary;
   initialGameIdea: InitialGameIdea;
@@ -52,6 +55,8 @@ export default async function genChapter({
   chapterIdea?: ChapterIdea;
   existingCharacterIdeas?: CharacterIdea[];
   existingChapters?: Chapter[];
+  allDeadCharacters?: DeadCharacterRecord[];
+  newlyDeadThisChapter?: DeadCharacterRecord[];
 }): Promise<{
   chapter: Chapter;
   usedPortraits: string[];
@@ -67,30 +72,21 @@ export default async function genChapter({
       chapterNumber,
     });
   }
-  // Gather all character ideas from existing chapters plus new ones
-  const allChapterCharacterIdeas = [
-    ...existingCharacterIdeas,
-    ...initialGameIdea.characterIdeas,
+  const newCharacterIdeas: CharacterIdea[] = [
     chapterIdea.boss,
     ...(chapterIdea.newPlayableUnits ?? []),
     ...(chapterIdea.newNonBattleCharacters ?? []),
   ];
-  const uniqueSet = new Map<string, boolean>();
-  const finalCharacterIdeas = allChapterCharacterIdeas.filter((c) => {
-    if (uniqueSet.has(c.firstName)) return false;
-    uniqueSet.set(c.firstName, true);
-    return true;
-  });
 
   // Decide which portraits are already used, if any
   const usedSoFar = usedPortraitsSoFar ?? [];
 
   // Choose new portraits for these new characters
-  const portraitMap = await choosePortraits(finalCharacterIdeas);
+  const portraitMap = await choosePortraits(newCharacterIdeas);
 
   // Create the unit data for the new characters
   const unitDatas = await createUnitDatas({
-    characterIdeas: finalCharacterIdeas,
+    characterIdeas: newCharacterIdeas,
     chapterNumber,
   });
 
@@ -105,6 +101,10 @@ export default async function genChapter({
     chapterIdea,
     tone,
     initialGameIdea: chapterNumber === 0 ? initialGameIdea : undefined,
+    existingChapters,
+    existingCharacterIdeas,
+    allDeadCharacters,
+    newlyDeadThisChapter,
   });
   const introMusic = await chooseMusic(chapterIdea.intro);
 
@@ -159,7 +159,7 @@ export default async function genChapter({
       throw new Error(`No portrait metadata found for ${portraitNid}`);
     }
     return {
-      characterIdea: finalCharacterIdeas.find((c) => c.firstName === ud.nid)!, // We know this will exist
+      characterIdea: newCharacterIdeas.find((c) => c.firstName === ud.nid)!, // We know this will exist
       unitData: {
         ...ud,
         portrait_nid: ud.nid,
