@@ -82,7 +82,10 @@ export default async function genChapter({
   const usedSoFar = usedPortraitsSoFar ?? [];
 
   // Choose new portraits for these new characters
-  const portraitMap = await choosePortraits(newCharacterIdeas);
+  const portraitMap = await choosePortraits({
+    characterIdeas: newCharacterIdeas,
+    usedPortraits: usedSoFar,
+  });
 
   // Create the unit data for the new characters
   const unitDatas = await createUnitDatas({

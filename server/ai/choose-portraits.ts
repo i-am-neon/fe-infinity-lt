@@ -5,10 +5,13 @@ import {
 } from "@/ai/test-data/character-ideas.ts";
 import { CharacterIdea } from "@/ai/types/character-idea.ts";
 
-export async function choosePortraits(
-  characterIdeas: Array<CharacterIdea>
-): Promise<Record<string, string>> {
-  const usedPortraits: string[] = [];
+export async function choosePortraits({
+  characterIdeas,
+  usedPortraits,
+}: {
+  characterIdeas: Array<CharacterIdea>;
+  usedPortraits: string[];
+}): Promise<Record<string, string>> {
   const result: Record<string, string> = {};
 
   for (const character of characterIdeas) {
@@ -24,6 +27,9 @@ export async function choosePortraits(
 }
 
 if (import.meta.main) {
-  choosePortraits([testCharIdeaAislin, testCharIdeaThorne]).then(console.log);
+  choosePortraits({
+    characterIdeas: [testCharIdeaAislin, testCharIdeaThorne],
+    usedPortraits: [],
+  }).then(console.log);
 }
 
