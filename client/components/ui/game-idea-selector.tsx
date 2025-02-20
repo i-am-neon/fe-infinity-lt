@@ -19,7 +19,7 @@ const gameIdeas = [
     title: "The Grand Tourney",
     description:
       "Once a year, the kingdom hosts a grand festival where duels, wits, and whispers decide the fates of nobles and commoners alike. Every move in the arena or the court can forge alliances or fuel rivalries.",
-    tone: "whimsical, courtly intrigue",
+    tone: "whimsical, light-hearted, comedy",
   },
   {
     title: "Fractured Bonds",

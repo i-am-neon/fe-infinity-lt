@@ -10,21 +10,23 @@ import decideGenericUnitLevel from "@/ai/level/decide-generic-unit-level.ts";
 import decideUnitWeapons from "@/ai/create-unit-data/item-options/decide-unit-weapons.ts";
 
 export default async function getLevelUnits({
-  chosenMap,
+  chosenMapName,
   chapterIdea,
   chapterNumber,
   playerUnitDatas,
   bossUnitData,
 }: {
-  chosenMap: string;
+  chosenMapName: string;
   chapterIdea: ChapterIdea;
   chapterNumber: number;
   playerUnitDatas: UnitData[];
   bossUnitData: UnitData;
 }): Promise<Level["units"]> {
-  const mapMetadata = allMapOptions.find((m) => m.originalName === chosenMap);
+  const mapMetadata = allMapOptions.find(
+    (m) => m.originalName === chosenMapName
+  );
   if (!mapMetadata) {
-    throw new Error(`No metadata found for map ${chosenMap}`);
+    throw new Error(`No metadata found for map ${chosenMapName}`);
   }
   const {
     boss: bossCoords,
@@ -32,7 +34,7 @@ export default async function getLevelUnits({
     playerUnits,
     greenUnits,
   } = await assembleUnitPlacement({
-    terrainGrid: getTerrainGridFromMapName(chosenMap),
+    terrainGrid: getTerrainGridFromMapName(chosenMapName),
     chapterIdea,
     mapMetadata,
     chapterNumber,
@@ -102,3 +104,4 @@ export default async function getLevelUnits({
 
   return units;
 }
+

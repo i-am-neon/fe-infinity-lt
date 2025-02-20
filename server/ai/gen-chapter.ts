@@ -23,6 +23,8 @@ import { Event } from "@/types/events/event.ts";
 import { Tilemap } from "@/types/maps/tilemap.ts";
 import genIntroEvent from "@/ai/events/gen-intro-event.ts";
 import { CharacterIdea } from "@/ai/types/character-idea.ts";
+import chooseMap from "@/ai/choose-map.ts";
+import getLevelUnits from "@/ai/level/get-level-units.ts";
 
 /**
  * Creates the next chapter based on the given data.
@@ -176,12 +178,22 @@ export default async function genChapter({
     throw new Error("Could not find boss in unitDatas");
   }
 
-  // Construct the level with all the units
-  const level = await assembleLevel({
+  const chosenMapName = await chooseMap(chapterIdea);
+
+  const units = await getLevelUnits({
+    chosenMapName,
     chapterIdea,
     chapterNumber,
     playerUnitDatas,
     bossUnitData,
+  });
+
+  // Construct the level with all the units
+  const level = await assembleLevel({
+    chapterIdea,
+    chapterNumber,
+    chosenMapName,
+    units,
     playerPhaseMusic,
     enemyPhaseMusic,
   });
