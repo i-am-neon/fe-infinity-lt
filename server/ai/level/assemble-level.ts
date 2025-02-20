@@ -1,7 +1,7 @@
 import { ChapterIdea } from "@/ai/types/chapter-idea.ts";
 import { Level, Unit } from "@/types/level.ts";
 
-export default async function assembleLevel({
+export default function assembleLevel({
   chapterIdea,
   chapterNumber,
   chosenMapName,
@@ -15,7 +15,7 @@ export default async function assembleLevel({
   units: Unit[];
   playerPhaseMusic: string;
   enemyPhaseMusic: string;
-}): Promise<Level> {
+}): Level {
   return {
     nid: chapterNumber.toString(),
     name:
