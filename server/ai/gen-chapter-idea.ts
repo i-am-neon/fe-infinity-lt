@@ -25,12 +25,16 @@ export default function genChapterIdea({
   tone,
   initialGameIdea,
   existingChapters = [],
+  allDeadCharacters = [],
+  newlyDeadThisChapter = [],
 }: {
   worldSummary: WorldSummary;
   chapterNumber: number;
   tone: string;
   initialGameIdea?: InitialGameIdea;
   existingChapters?: Chapter[];
+  allDeadCharacters?: string[];
+  newlyDeadThisChapter?: string[];
 }): Promise<ChapterIdea> {
   if (chapterNumber === 0 && initialGameIdea) {
     // Prologue logic
@@ -40,8 +44,18 @@ The user provides:
 1) A World Summary
 2) An Initial Game Idea
 3) A tone
-
+4) A list of all previously dead characters: ${JSON.stringify(
+      allDeadCharacters
+    )}
+5) Characters who died specifically in the last chapter: ${JSON.stringify(
+      newlyDeadThisChapter
+    )}
 They want you to generate a single new chapter that logically follows from them for the Prologue (chapterNumber=0).
+
+Important continuity rules:
+- Any dead characters must remain dead and not reappear if they existed prior (in a hypothetical scenario).
+- The death of characters central to the storyline must be referenced in the story, and will likely change the direction of the next chapter.
+- Minor unit deaths should be referenced in the story, but will likely only alter the next chapter slightly.
 
 ## New Characters
 - All new characters must be human.
@@ -67,9 +81,17 @@ Tone: ${tone}`;
 We already have:
 - A World Summary
 - A list of existing chapters
+- A list of all characters who have died in previous chapters: ${JSON.stringify(
+      allDeadCharacters
+    )}
+- Characters who died specifically in the last chapter: ${JSON.stringify(
+      newlyDeadThisChapter
+    )}
 We are about to create chapter ${chapterNumber}, continuing from the prior chapters' story.
 
-Use the entire context to maintain consistency. Provide a cohesive storyline that references prior events or details if needed.
+Important continuity rules:
+- Any dead characters must remain dead and not reappear.
+- You may reference their death in the story if relevant.
 
 ## New Characters
 - All new characters must be human.

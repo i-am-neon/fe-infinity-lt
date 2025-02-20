@@ -3,20 +3,6 @@ import { initializeDatabase } from "@/db/init.ts";
 import { Game } from "@/types/game.ts";
 
 /**
- * This file sets up a local SQLite database in Deno and uses it to store Game objects.
- */
-type GameRow = [
-  nid: string,
-  title: string,
-  directory: string,
-  description: string,
-  tone: string,
-  chaptersJson: string,
-  charactersJson: string,
-  usedPortraitsJson: string
-];
-
-/**
  * Insert a Game into the database.
  * If a row with the same nid already exists, this query will REPLACE it.
  */
@@ -32,8 +18,20 @@ export function insertGame(game: Game): void {
     : "";
   db.query(
     `
-      INSERT OR REPLACE INTO games (nid, title, directory, description, tone, chapters, characters, used_portraits, world_summary, initial_game_idea)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT OR REPLACE INTO games (
+        nid,
+        title,
+        directory,
+        description,
+        tone,
+        chapters,
+        characters,
+        used_portraits,
+        world_summary,
+        initial_game_idea,
+        dead_characters
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `,
     [
       game.nid,
@@ -46,6 +44,7 @@ export function insertGame(game: Game): void {
       usedPortraitsJson,
       worldSummaryJson,
       initialGameIdeaJson,
+      JSON.stringify(game.deadCharacters || []),
     ]
   );
 }
@@ -65,10 +64,11 @@ export function getGameByNid(nid: string): Game | null {
       string,
       string,
       string?,
+      string?,
       string?
     ]
   >(
-    "SELECT nid, title, directory, description, tone, chapters, characters, used_portraits, world_summary, initial_game_idea FROM games WHERE nid = ? LIMIT 1",
+    "SELECT nid, title, directory, description, tone, chapters, characters, used_portraits, world_summary, initial_game_idea, dead_characters FROM games WHERE nid = ? LIMIT 1",
     [nid]
   );
   if (query.length === 0) {
@@ -85,19 +85,22 @@ export function getGameByNid(nid: string): Game | null {
     dbUsedPortraitsJson,
     dbWorldSummaryJson,
     dbInitialGameIdeaJson,
+    dbDeadCharactersJson,
   ] = query[0];
+
   let chapters = [];
   let characters = [];
   try {
     chapters = JSON.parse(dbChaptersJson) || [];
   } catch {
-    // If JSON parse fails, keep chapters as empty array
+    chapters = [];
   }
   try {
     characters = JSON.parse(dbCharactersJson) || [];
   } catch {
-    // If JSON parse fails, keep characters as empty array
+    characters = [];
   }
+
   let usedPortraits: string[] = [];
   try {
     const parsed = JSON.parse(dbUsedPortraitsJson) || [];
@@ -107,17 +110,29 @@ export function getGameByNid(nid: string): Game | null {
   }
 
   let worldSummary = undefined;
-  let initialGameIdea = undefined;
   try {
     if (dbWorldSummaryJson) {
       worldSummary = JSON.parse(dbWorldSummaryJson);
     }
   } catch (_) {}
+
+  let initialGameIdea = undefined;
   try {
     if (dbInitialGameIdeaJson) {
       initialGameIdea = JSON.parse(dbInitialGameIdeaJson);
     }
   } catch (_) {}
+
+  let deadCharacters: string[] = [];
+  try {
+    if (dbDeadCharactersJson) {
+      const parsedDc = JSON.parse(dbDeadCharactersJson);
+      if (Array.isArray(parsedDc)) {
+        deadCharacters = parsedDc;
+      }
+    }
+  } catch (_) {}
+
   return {
     nid: dbNid,
     title: dbTitle,
@@ -127,6 +142,7 @@ export function getGameByNid(nid: string): Game | null {
     chapters,
     characters,
     usedPortraits,
+    deadCharacters,
     worldSummary,
     initialGameIdea,
   };
@@ -152,6 +168,7 @@ export function getAllGames(): Game[] {
   >(
     "SELECT nid, title, directory, description, tone, chapters, characters, used_portraits, world_summary, initial_game_idea FROM games"
   );
+
   const games: Game[] = [];
   for (const row of query) {
     const [
@@ -166,18 +183,20 @@ export function getAllGames(): Game[] {
       dbWorldSummaryJson,
       dbInitialGameIdeaJson,
     ] = row;
+
     let chapters = [];
     let characters = [];
     try {
       chapters = JSON.parse(dbChaptersJson) || [];
     } catch {
-      // If JSON parse fails, keep chapters as empty array
+      chapters = [];
     }
     try {
       characters = JSON.parse(dbCharactersJson) || [];
     } catch {
-      // If JSON parse fails, keep characters as empty array
+      characters = [];
     }
+
     let usedPortraits: string[] = [];
     try {
       const parsed = JSON.parse(dbUsedPortraitsJson) || [];
@@ -187,17 +206,19 @@ export function getAllGames(): Game[] {
     }
 
     let worldSummary = undefined;
-    let initialGameIdea = undefined;
     try {
       if (dbWorldSummaryJson) {
         worldSummary = JSON.parse(dbWorldSummaryJson);
       }
     } catch (_) {}
+
+    let initialGameIdea = undefined;
     try {
       if (dbInitialGameIdeaJson) {
         initialGameIdea = JSON.parse(dbInitialGameIdeaJson);
       }
     } catch (_) {}
+
     games.push({
       nid: dbNid,
       title: dbTitle,
@@ -243,4 +264,3 @@ if (import.meta.main) {
   const retrieved = getGameByNid("example-game");
   console.log("Retrieved Game:", retrieved);
 }
-

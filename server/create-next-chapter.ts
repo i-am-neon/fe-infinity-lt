@@ -28,7 +28,8 @@ export default async function createNextChapter({
   const nextChapterNumber = existingGame.chapters.length;
 
   const { lastChoice, deadCharacters } = await getChapterResults({
-    gameNid,
+    // Take out the leading underscore
+    gameNid: gameNid.replace("_", ""),
     levelNid: nextChapterNumber.toString(),
   });
   logger.debug("chapter results", {
@@ -38,11 +39,20 @@ export default async function createNextChapter({
   });
 
   // Generate the new chapter idea using all context
+  existingGame.deadCharacters = existingGame.deadCharacters || [];
+  for (const newlyDead of deadCharacters) {
+    if (!existingGame.deadCharacters.includes(newlyDead)) {
+      existingGame.deadCharacters.push(newlyDead);
+    }
+  }
+
   const newChapterIdea: ChapterIdea = await genChapterIdea({
     worldSummary: existingGame.worldSummary!,
     chapterNumber: nextChapterNumber,
     tone: existingGame.tone,
     existingChapters: existingGame.chapters,
+    allDeadCharacters: existingGame.deadCharacters,
+    newlyDeadThisChapter: deadCharacters,
   });
 
   // Remove the old stub

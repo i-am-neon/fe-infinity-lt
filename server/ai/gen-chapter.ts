@@ -25,6 +25,7 @@ import genIntroEvent from "@/ai/events/gen-intro-event.ts";
 import { CharacterIdea } from "@/ai/types/character-idea.ts";
 import chooseMap from "@/ai/choose-map.ts";
 import getLevelUnits from "@/ai/level/get-level-units.ts";
+import { Unit } from "@/types/level.ts";
 
 /**
  * Creates the next chapter based on the given data.
@@ -182,6 +183,8 @@ export default async function genChapter({
 
   const usedMapNames = existingChapters.map((c) => c.tilemap.nid);
   const chosenMapName = await chooseMap(chapterIdea, usedMapNames);
+
+  // use the empty array for quick testing by skipping enemy generics
   const units = await getLevelUnits({
     chosenMapName,
     chapterIdea,
@@ -244,3 +247,4 @@ if (import.meta.main) {
     tone: testTone,
   }).then(console.log);
 }
+

@@ -16,7 +16,8 @@ export function initializeDatabase() {
       characters TEXT,
       used_portraits TEXT,
       world_summary TEXT,
-      initial_game_idea TEXT
+      initial_game_idea TEXT,
+      dead_characters TEXT
     )
   `);
 }

@@ -12,7 +12,7 @@ export interface Game {
   chapters: Chapter[];
   characters: Character[];
   usedPortraits: string[];
+  deadCharacters?: string[];
   worldSummary?: WorldSummary;
   initialGameIdea?: InitialGameIdea;
 }
-
