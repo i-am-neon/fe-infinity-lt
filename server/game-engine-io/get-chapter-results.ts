@@ -4,10 +4,9 @@ import runPythonScript from "@/lib/run-python-script.ts";
 import { getPathWithinLtMaker } from "@/file-io/get-path-within-lt-maker.ts";
 import { getHighestSaveNumber } from "@/game-engine-io/get-highest-save-number.ts";
 
-// We only return lastChoice and an array of killee names
 export type ChapterResults = {
   lastChoice: string;
-  kills: string[]; // list of character names who died eg [ "Lute", "O'Neill" ]
+  deadCharacters: string[]; // list of character names who died eg [ "Lute", "O'Neill" ]
 };
 
 export default async function getChapterResults({
@@ -36,7 +35,7 @@ export default async function getChapterResults({
   const lines = output.trim().split("\n");
   const lastLine = lines[lines.length - 1].trim();
 
-  let results: ChapterResults = { lastChoice: "", kills: [] };
+  let results: ChapterResults = { lastChoice: "", deadCharacters: [] };
 
   try {
     // parse the final JSON line
@@ -51,7 +50,7 @@ export default async function getChapterResults({
       ? parsed.kills.map((killObj: any) => killObj.killee)
       : [];
 
-    results = { lastChoice, kills };
+    results = { lastChoice, deadCharacters: kills };
   } catch (jsonErr) {
     console.error("Could not parse JSON from Python script:", jsonErr);
   }
@@ -60,10 +59,10 @@ export default async function getChapterResults({
 }
 
 if (import.meta.main) {
-  getChapterResults({ gameNid: "new", levelNid: "1" })
+  getChapterResults({ gameNid: "_the-grand-tourney", levelNid: "0" })
     .then((res) => {
       console.log("Last Choice:", res.lastChoice);
-      console.log("Kills:", res.kills);
+      console.log("Dead Characters:", res.deadCharacters);
     })
     .catch((err) => {
       console.error("Failed to get chapter results:", err);
