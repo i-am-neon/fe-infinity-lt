@@ -94,6 +94,8 @@ export default async function createNextChapter({
     existingCharacters: existingGame.characters,
     existingChapters: existingGame.chapters,
     usedPortraitsSoFar: existingGame.usedPortraits,
+    allDeadCharacters: existingGame.deadCharacters,
+    newlyDeadThisChapter,
   });
 
   logger.debug("created chapter", { chapter });

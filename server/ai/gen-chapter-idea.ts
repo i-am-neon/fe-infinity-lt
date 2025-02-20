@@ -85,13 +85,13 @@ We already have:
 - A list of existing chapters
 - A list of all previously dead characters (an array of { name, role }), each role is "boss", "player", or "green": ${JSON.stringify(
       allDeadCharacters
-    )}. You must NOT give these characters speaking roles in the current chapter idea! They are dead and the story can reference and change because of that, but dead characters can never show up again in any scenes.
+    )}. You must NOT give these characters speaking roles or any actions in the current chapter idea! They are dead and the story can reference and change because of that, but dead characters can never show up again in any scenes.
 - Characters who died specifically in the last chapter (also { name, role } records): ${JSON.stringify(
       newlyDeadThisChapter
-    )}. You must NOT give these characters speaking roles in the current chapter idea! They are dead and the story can reference and change because of that, but dead characters can never show up again in any scenes.
+    )}. You must NOT give these characters speaking roles or any actions in the current chapter idea! They are dead and the story can reference and change because of that, but dead characters can never show up again in any scenes.
 - Characters who died specifically in the last chapter: ${JSON.stringify(
       newlyDeadThisChapter
-    )}. You must NOT give these characters speaking roles in the current chapter idea! They are dead and the story can reference and change because of that, but dead characters can never show up again in any scenes.
+    )}. You must NOT give these characters speaking roles or any actions in the current chapter idea! They are dead and the story can reference and change because of that, but dead characters can never show up again in any scenes.
 We are about to create chapter ${chapterNumber}, continuing from the prior chapters' story.
 
 Important continuity rules for dead characters:

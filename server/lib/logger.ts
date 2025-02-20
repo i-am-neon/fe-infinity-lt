@@ -31,7 +31,8 @@ export class Logger {
     const projectDir = join(this.baseLogDir, this.projectName);
     ensureDirSync(projectDir);
 
-    const fileName = this.chapterNumber !== null ? `${this.chapterNumber}.log` : `-.log`;
+    const fileName =
+      this.chapterNumber !== null ? `${this.chapterNumber}.log` : `-.log`;
     const logFilePath = join(projectDir, fileName);
 
     this.stream = Deno.openSync(logFilePath, {
@@ -57,7 +58,9 @@ export class Logger {
         chapter: this.chapterNumber !== null ? this.chapterNumber : "-",
       },
     };
-    this.stream.writeSync(new TextEncoder().encode(JSON.stringify(logEntry) + "\n"));
+    this.stream.writeSync(
+      new TextEncoder().encode(JSON.stringify(logEntry, null, 2) + "\n")
+    );
   }
 
   debug(message: string, metadata?: Record<string, unknown>) {
