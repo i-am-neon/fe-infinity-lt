@@ -44,7 +44,7 @@ export function insertGame(game: Game): void {
       usedPortraitsJson,
       worldSummaryJson,
       initialGameIdeaJson,
-      JSON.stringify(game.deadCharacters || []),
+        JSON.stringify(game.deadCharacters ?? []),
     ]
   );
 }
@@ -123,7 +123,7 @@ export function getGameByNid(nid: string): Game | null {
     }
   } catch (_) {}
 
-  let deadCharacters: string[] = [];
+  let deadCharacters = [];
   try {
     if (dbDeadCharactersJson) {
       const parsedDc = JSON.parse(dbDeadCharactersJson);

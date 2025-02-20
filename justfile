@@ -35,6 +35,9 @@ clean:
     find lt-maker-fork -maxdepth 1 -type d -name "*.ltproj" ! -name "default.ltproj" ! -name "testing_proj.ltproj" -exec rm -rf {} +
     rm -f server/db/local.db
     just clean-logs
+    just clean-saves
+
+clean-saves:
     deno run --allow-all server/game-engine-io/clean-saves.ts
 
 clean-logs:

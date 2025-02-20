@@ -10,6 +10,7 @@ import { removeStubEvent } from "./game-engine-io/write-chapter/remove-stub-even
 import { removeStubLevel } from "./game-engine-io/write-chapter/remove-stub-level.ts";
 import genChapterIdea from "@/ai/gen-chapter-idea.ts";
 import getChapterResults from "@/game-engine-io/get-chapter-results.ts";
+import { determineRoleForDeadUnit } from "@/lib/determine-role-for-dead-unit.ts";
 
 export default async function createNextChapter({
   projectNameEndingInDotLtProj,
@@ -40,11 +41,26 @@ export default async function createNextChapter({
 
   // Generate the new chapter idea using all context
   existingGame.deadCharacters = existingGame.deadCharacters || [];
+  const lastChapterIndex = existingGame.chapters.length - 1;
+  const lastChapter = existingGame.chapters[lastChapterIndex];
+
   for (const newlyDead of deadCharacters) {
-    if (!existingGame.deadCharacters.includes(newlyDead)) {
-      existingGame.deadCharacters.push(newlyDead);
+    const existingRecord = existingGame.deadCharacters?.find(
+      (dc) => dc.name === newlyDead
+    );
+    if (!existingRecord) {
+      const role = determineRoleForDeadUnit({
+        deadName: newlyDead,
+        lastChapter,
+      });
+      if (role) {
+        existingGame.deadCharacters?.push({ name: newlyDead, role });
+      }
     }
   }
+  logger.debug("updated dead characters", {
+    deadCharacters: existingGame.deadCharacters,
+  });
 
   const newChapterIdea: ChapterIdea = await genChapterIdea({
     worldSummary: existingGame.worldSummary!,

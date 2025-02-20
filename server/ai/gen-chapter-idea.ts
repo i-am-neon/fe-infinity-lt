@@ -8,6 +8,7 @@ import {
   testTone,
   testInitialGameIdea,
 } from "@/ai/test-data/initial.ts";
+import { DeadCharacterRecord } from "@/types/dead-character-record.ts";
 
 /**
  * Generates a chapter idea for either the prologue (chapterNumber=0) if initialGameIdea is provided,
@@ -33,7 +34,7 @@ export default function genChapterIdea({
   tone: string;
   initialGameIdea?: InitialGameIdea;
   existingChapters?: Chapter[];
-  allDeadCharacters?: string[];
+  allDeadCharacters?: DeadCharacterRecord[];
   newlyDeadThisChapter?: string[];
 }): Promise<ChapterIdea> {
   if (chapterNumber === 0 && initialGameIdea) {
@@ -51,11 +52,6 @@ The user provides:
       newlyDeadThisChapter
     )}
 They want you to generate a single new chapter that logically follows from them for the Prologue (chapterNumber=0).
-
-Important continuity rules:
-- Any dead characters must remain dead and not reappear if they existed prior (in a hypothetical scenario).
-- The death of characters central to the storyline must be referenced in the story, and will likely change the direction of the next chapter.
-- Minor unit deaths should be referenced in the story, but will likely only alter the next chapter slightly.
 
 ## New Characters
 - All new characters must be human.
@@ -81,17 +77,25 @@ Tone: ${tone}`;
 We already have:
 - A World Summary
 - A list of existing chapters
-- A list of all characters who have died in previous chapters: ${JSON.stringify(
+- A list of all previously dead characters (an array of { name, role }), each role is "boss", "player", or "green": ${JSON.stringify(
       allDeadCharacters
+    )}
+- Characters who died specifically in the last chapter (also { name, role } records): ${JSON.stringify(
+      newlyDeadThisChapter
+    )}
     )}
 - Characters who died specifically in the last chapter: ${JSON.stringify(
       newlyDeadThisChapter
     )}
 We are about to create chapter ${chapterNumber}, continuing from the prior chapters' story.
 
-Important continuity rules:
-- Any dead characters must remain dead and not reappear.
-- You may reference their death in the story if relevant.
+Important continuity rules for dead characters:
+- Any dead characters must remain dead and not reappear in any dialogue.
+- Living player characters might reference the deaths of dead player characters, highlighting the relationship between them and the deceased.
+- The death of characters central to the storyline must be referenced in the story, and will likely change the direction of the next chapter.
+- Minor unit deaths should be referenced in the story, but will likely only alter the next chapter slightly.
+- When referencing dead boss characters, make sure to never refer to them as part of the player party.
+
 
 ## New Characters
 - All new characters must be human.

@@ -10,6 +10,7 @@ import { setCurrentLoggerProject } from "@/lib/current-logger.ts";
 import removeExistingGame from "@/lib/remove-existing-game.ts";
 import runGame from "@/run-game.ts";
 import { Game } from "@/types/game.ts";
+import { sluggify } from "@/lib/sluggify.ts";
 
 export async function handleCreateGame(req: Request): Promise<Response> {
   try {
@@ -36,13 +37,13 @@ export async function handleCreateGame(req: Request): Promise<Response> {
     const tone = body.tone;
 
     // 1) remove existing game if it exists
-    setCurrentLoggerProject(projectName);
     await removeExistingGame(projectName);
 
     // 2) initialize a new project
     const { projectNameEndingInDotLtProj, gameNid } = await initializeProject(
       projectName
     );
+    setCurrentLoggerProject(projectNameEndingInDotLtProj);
 
     // 3) generate world summary & top-level music
     const worldSummary = await genWorldSummary({
