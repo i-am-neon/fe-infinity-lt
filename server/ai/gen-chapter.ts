@@ -1,17 +1,15 @@
+import chooseMap from "@/ai/choose-map.ts";
 import chooseMusic from "@/ai/choose-music.ts";
 import { choosePortraits } from "@/ai/choose-portraits.ts";
 import createUnitDatas from "@/ai/create-unit-data/create-unit-datas.ts";
 import chooseBackground from "@/ai/events/choose-background.ts";
 import convertAIEventToEvent from "@/ai/events/convert-ai-event-to-event.ts";
+import genIntroEvent from "@/ai/events/gen-intro-event.ts";
 import genOutroEvent from "@/ai/events/gen-outro-event.ts";
 import genChapterIdea from "@/ai/gen-chapter-idea.ts";
 import assembleLevel from "@/ai/level/assemble-level.ts";
-import {
-  testInitialGameIdea,
-  testTone,
-  testWorldSummary,
-} from "./test-data/prologueTestData.ts";
-import { ChapterIdea } from "@/ai/types/chapter-idea.ts";
+import getLevelUnits from "@/ai/level/get-level-units.ts";
+import { CharacterIdea } from "@/ai/types/character-idea.ts";
 import { InitialGameIdea } from "@/ai/types/initial-game-idea.ts";
 import { WorldSummary } from "@/ai/types/world-summary.ts";
 import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
@@ -19,13 +17,14 @@ import { getCurrentLogger } from "@/lib/current-logger.ts";
 import { allPortraitOptions } from "@/portrait-processing/all-portrait-options.ts";
 import { Chapter } from "@/types/chapter.ts";
 import { Character } from "@/types/character/character.ts";
+import { DeadCharacterRecord } from "@/types/dead-character-record.ts";
 import { Event } from "@/types/events/event.ts";
 import { Tilemap } from "@/types/maps/tilemap.ts";
-import genIntroEvent from "@/ai/events/gen-intro-event.ts";
-import { CharacterIdea } from "@/ai/types/character-idea.ts";
-import chooseMap from "@/ai/choose-map.ts";
-import getLevelUnits from "@/ai/level/get-level-units.ts";
-import { DeadCharacterRecord } from "@/types/dead-character-record.ts";
+import {
+  testInitialGameIdea,
+  testTone,
+  testWorldSummary,
+} from "./test-data/prologueTestData.ts";
 
 /**
  * Creates the next chapter based on the given data.
@@ -40,7 +39,6 @@ export default async function genChapter({
   tone,
   chapterNumber,
   usedPortraitsSoFar,
-  chapterIdea,
   existingCharacters = [],
   existingChapters = [],
   allDeadCharacters = [],
@@ -51,7 +49,6 @@ export default async function genChapter({
   tone: string;
   chapterNumber: number;
   usedPortraitsSoFar?: string[];
-  chapterIdea?: ChapterIdea;
   existingCharacters?: Character[];
   existingChapters?: Chapter[];
   allDeadCharacters?: DeadCharacterRecord[];
@@ -63,17 +60,15 @@ export default async function genChapter({
 }> {
   const logger = getCurrentLogger();
 
-  if (!chapterIdea) {
-    chapterIdea = await genChapterIdea({
-      worldSummary,
-      initialGameIdea,
-      tone,
-      chapterNumber,
-      previousChapterIdeas: existingChapters.map((c) => c.idea),
-      allDeadCharacters,
-      newlyDeadThisChapter,
-    });
-  }
+  const chapterIdea = await genChapterIdea({
+    worldSummary,
+    initialGameIdea,
+    tone,
+    chapterNumber,
+    previousChapterIdeas: existingChapters.map((c) => c.idea),
+    allDeadCharacters,
+    newlyDeadThisChapter,
+  });
 
   // Build array of new characters from initialGameIdea (if prologue) plus boss + new units
   const newCharacterIdeas: CharacterIdea[] = [

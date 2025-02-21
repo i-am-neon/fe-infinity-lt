@@ -1,15 +1,13 @@
 import genChapter from "./ai/gen-chapter.ts";
 
-import { ChapterIdea } from "@/ai/types/chapter-idea.ts";
 import { getGameByNid, insertGame } from "@/db/games.ts";
 import { deleteSuspendSave } from "@/game-engine-io/delete-suspend-save.ts";
+import getChapterResults from "@/game-engine-io/get-chapter-results.ts";
+import { removeStubEvent } from "@/game-engine-io/write-chapter/remove-stub-event.ts";
+import { removeStubLevel } from "@/game-engine-io/write-chapter/remove-stub-level.ts";
 import writeChapter from "@/game-engine-io/write-chapter/write-chapter.ts";
 import writeStubChapter from "@/game-engine-io/write-chapter/write-stub-chapter.ts";
 import { getCurrentLogger, setCurrentLogger } from "@/lib/current-logger.ts";
-import { removeStubEvent } from "@/game-engine-io/write-chapter/remove-stub-event.ts";
-import { removeStubLevel } from "@/game-engine-io/write-chapter/remove-stub-level.ts";
-import genChapterIdea from "@/ai/gen-chapter-idea.ts";
-import getChapterResults from "@/game-engine-io/get-chapter-results.ts";
 import { determineRoleForDeadUnit } from "@/lib/determine-role-for-dead-unit.ts";
 import { DeadCharacterRecord } from "@/types/dead-character-record.ts";
 
@@ -70,15 +68,6 @@ export default async function createNextChapter({
     deadCharacters: existingGame.deadCharacters,
   });
 
-  const newChapterIdea: ChapterIdea = await genChapterIdea({
-    worldSummary: existingGame.worldSummary!,
-    chapterNumber: nextChapterNumber,
-    tone: existingGame.tone,
-    previousChapterIdeas: existingGame.chapters.map((c) => c.idea),
-    allDeadCharacters: existingGame.deadCharacters,
-    newlyDeadThisChapter,
-  });
-
   // Remove the old stub
   await removeStubLevel(projectNameEndingInDotLtProj);
   await removeStubEvent(projectNameEndingInDotLtProj);
@@ -90,7 +79,6 @@ export default async function createNextChapter({
     initialGameIdea: existingGame.initialGameIdea!,
     tone: existingGame.tone,
     chapterNumber: nextChapterNumber,
-    chapterIdea: newChapterIdea,
     existingCharacters: existingGame.characters,
     existingChapters: existingGame.chapters,
     usedPortraitsSoFar: existingGame.usedPortraits,
