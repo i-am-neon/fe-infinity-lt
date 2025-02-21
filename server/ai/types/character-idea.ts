@@ -6,7 +6,7 @@ export const CharacterIdeaSchema = z
     firstName: z
       .string()
       .describe(
-        "The character's first name or nickname. Must be unique. Avoid these common names and variations on them: Eliara, Liora, Gareth, Lyra, Kaelin"
+        "The character's first name or nickname. Must be unique. Avoid these common names and variations on them: Eliara, Liora, Gareth, Lyra, Kaelin, Kael"
       ),
     fullName: z
       .string()
