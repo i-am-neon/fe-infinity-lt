@@ -3,7 +3,7 @@ import {
   testInitialGameIdea,
   testTone,
   testWorldSummary,
-} from "../test-data/prologue.ts";
+} from "../test-data/prologueTestData.ts";
 import { AIEvent, AIEventSchema } from "@/ai/types/ai-event.ts";
 import { ChapterIdea } from "@/ai/types/chapter-idea.ts";
 import { InitialGameIdea } from "@/ai/types/initial-game-idea.ts";
@@ -67,3 +67,4 @@ if (import.meta.main) {
     .then((event) => console.log(JSON.stringify(event, null, 2)))
     .catch(console.error);
 }
+

@@ -10,7 +10,7 @@ import {
   testInitialGameIdea,
   testTone,
   testWorldSummary,
-} from "@/ai/test-data/prologue.ts";
+} from "./test-data/prologueTestData.ts";
 import { ChapterIdea } from "@/ai/types/chapter-idea.ts";
 import { InitialGameIdea } from "@/ai/types/initial-game-idea.ts";
 import { WorldSummary } from "@/ai/types/world-summary.ts";

@@ -1,7 +1,7 @@
+import { genAndCheck } from "@/ai/lib/generator-checker.ts";
 import { ChapterIdea, ChapterIdeaSchema } from "@/ai/types/chapter-idea.ts";
 import { InitialGameIdea } from "@/ai/types/initial-game-idea.ts";
 import { WorldSummary } from "@/ai/types/world-summary.ts";
-import generateStructuredData from "@/lib/generate-structured-data.ts";
 import { Chapter } from "@/types/chapter.ts";
 import { DeadCharacterRecord } from "@/types/dead-character-record.ts";
 import { z } from "zod";
@@ -9,9 +9,9 @@ import {
   testPrologueChapter,
   testTone,
   testWorldSummary,
-} from "./test-data/prologue.ts";
+} from "./test-data/prologueTestData.ts";
 
-export default async function genChapterIdea({
+export default function genChapterIdea({
   worldSummary,
   chapterNumber,
   tone,
@@ -28,213 +28,98 @@ export default async function genChapterIdea({
   allDeadCharacters?: DeadCharacterRecord[];
   newlyDeadThisChapter?: DeadCharacterRecord[];
 }): Promise<ChapterIdea> {
-  /**
-   * The subfunction that calls our standard generateStructuredData with a "generator" approach.
-   */
-  async function generateCandidate(
-    systemMessage: string,
-    prompt: string,
-    skipSchema?: boolean,
-    partial?: Partial<ChapterIdea>
-  ): Promise<ChapterIdea> {
-    let finalPrompt = prompt;
-    if (partial) {
-      finalPrompt += `\n\nPotential fix for previous attempt: ${JSON.stringify(
-        partial,
-        null,
-        2
-      )}`;
-    }
+  const isPrologue = chapterNumber === 0 && initialGameIdea;
 
-    const schemaToUse = skipSchema
-      ? (ChapterIdeaSchema.partial() as z.ZodSchema<ChapterIdea>)
-      : ChapterIdeaSchema;
-
-    const { ...candidate } = await generateStructuredData<ChapterIdea>({
-      fnName: "genChapterIdea: generator",
-      systemMessage,
-      prompt: finalPrompt,
-      schema: schemaToUse,
-      temperature: 1, // generator approach
-      model: "gpt-4o",
-    });
-    return candidate as ChapterIdea;
-  }
-
-  /**
-   * The subfunction that calls generateStructuredData with a "checker" approach, returning either an "ok" or fix instructions.
-   */
-  async function checkCandidate(
-    candidate: ChapterIdea,
-    systemMessage: string
-  ): Promise<{
-    ok: boolean;
-    fixText?: string;
-    fixObject?: Partial<ChapterIdea>;
-  }> {
-    // We'll incorporate checks for references to dead or old bosses, plus ensure that any newPlayableUnits or newNonBattleCharacters are each mentioned in intro/battle/outro if present.
-    const prompt = `Here is the candidate chapter idea:\n${JSON.stringify(
-      candidate,
-      null,
-      2
-    )}\n
-We have these constraints to check:
-1) The chapter must not reuse or resurrect any dead character from the array ${JSON.stringify(
-      allDeadCharacters
-    )}.
-2) Must not reuse a previous boss from earlier chapters, i.e. the boss from any existingChapters.
-3) If newPlayableUnits or newNonBattleCharacters is non-empty, each newly introduced character's firstName must appear in at least one of "intro", "battle", or "outro".
-   For example, if newPlayableUnits has someone with firstName = "Elara", then the substring "Elara" must appear in the "intro" or "battle" or "outro".
-If any violation is found, provide a fix with { "fixText": "...", "fixObject": { ... } }. Otherwise return { "fixText": "None", "fixObject": {} } with no commentary.`;
-
-    const res = await generateStructuredData<{
-      fixText: string;
-      fixObject: Partial<ChapterIdea>;
-    }>({
-      fnName: "genChapterIdea: checker",
-      systemMessage,
-      prompt,
-      schema: z.object({
-        fixText: z.string(),
-        fixObject: ChapterIdeaSchema.partial(),
-      }),
-      temperature: 0, // checker approach
-    });
-
-    if (res.fixText === "None") {
-      return { ok: true };
-    } else {
-      return { ok: false, fixText: res.fixText, fixObject: res.fixObject };
-    }
-  }
-
-  // Build the base systemMessage and basePrompt
-  let baseSystemMessage: string;
-  let basePrompt: string;
-
-  // For prologue
-  if (chapterNumber === 0 && initialGameIdea) {
-    baseSystemMessage = `You are a Fire Emblem Fangame Chapter Idea Generator (generator).
+  const generatorSystemMessage = isPrologue
+    ? `You are a Fire Emblem Fangame Chapter Idea Generator (generator).
 
 The user provides:
 1) A World Summary
 2) An Initial Game Idea
 3) A tone
 4) A list of all previously dead characters: ${JSON.stringify(
-      allDeadCharacters
-    )}
+        allDeadCharacters
+      )}
 5) Characters who died specifically in the last chapter: ${JSON.stringify(
-      newlyDeadThisChapter
-    )}
+        newlyDeadThisChapter
+      )}
 We want to generate a single new chapter that logically follows them for the Prologue (chapterNumber=0).
 
-## Requirements:
-- Must not reuse or resurrect any dead characters from the arrays given
+Requirements:
+- Must not reuse or resurrect any dead characters
 - Must not reuse a previous boss from earlier chapters
-- If you add newPlayableUnits (70% chance is typical, but optional) or newNonBattleCharacters, you MUST mention them by name in the "intro", "battle", or "outro".
+- If you add newPlayableUnits or newNonBattleCharacters, mention them in intro/battle/outro
 - Must produce a new Chapter Idea that strictly matches the ChapterIdea schema.
-- If new characters appear, they must be human.
+- Return only JSON.`
+    : `You are a Fire Emblem Fangame Chapter Idea Generator (generator).
 
-Focus on the prologue storyline. Make sure not to break continuity with the initial game idea or resurrect any dead characters. Return only JSON matching ChapterIdea. No commentary.`;
-
-    basePrompt = `World Summary: ${JSON.stringify(
-      worldSummary,
-      null,
-      2
-    )}\nInitial Game Idea: ${JSON.stringify(
-      initialGameIdea,
-      null,
-      2
-    )}\nTone: ${tone}`;
-  } else {
-    // For subsequent chapters
-    baseSystemMessage = `You are a Fire Emblem Fangame Chapter Idea Generator (generator).
-
-We already have:
+We have:
 - A World Summary
-- A list of existing chapters
-- A list of all previously dead characters: ${JSON.stringify(allDeadCharacters)}
-- Characters who died specifically last chapter: ${JSON.stringify(
-      newlyDeadThisChapter
-    )}
-We want you to create chapter ${chapterNumber} continuing from previous chapters.
+- Existing chapters
+- Dead characters: ${JSON.stringify(allDeadCharacters)}
+- Newly dead: ${JSON.stringify(newlyDeadThisChapter)}
+We want chapter ${chapterNumber}. Return only valid JSON, no commentary.
+Constraints: No resurrecting the dead, no reusing old bosses, mention new chars in intro/battle/outro, must match ChapterIdea schema.
 
-## Requirements:
-- Must not reuse or resurrect any dead characters from the arrays given
+Requirements:
+- Must not reuse or resurrect any dead characters
 - Must not reuse a previous boss from earlier chapters
-- If you add newPlayableUnits (70% chance is typical, but optional) or newNonBattleCharacters, you MUST mention them by name in the "intro", "battle", or "outro".
+- If you add newPlayableUnits or newNonBattleCharacters, mention them in intro/battle/outro
 - Must produce a new Chapter Idea that strictly matches the ChapterIdea schema.
-- If new characters appear, they must be human.
+- Return only JSON.`;
 
-Return only valid JSON. No commentary.`;
+  const basePrompt = isPrologue
+    ? `World Summary: ${JSON.stringify(worldSummary, null, 2)}
+Initial Game Idea: ${JSON.stringify(initialGameIdea, null, 2)}
+Tone: ${tone}`
+    : JSON.stringify({
+        worldSummary,
+        existingChapters,
+        chapterNumber,
+        tone,
+        allDeadCharacters,
+        newlyDeadThisChapter,
+      });
 
-    basePrompt = JSON.stringify({
-      worldSummary,
-      existingChapters,
-      chapterNumber,
-      tone,
-    });
-  }
+  const checkerSystemMessage = `You are a Fire Emblem Fangame Chapter Idea Checker (checker).
+Verify no mention or resurrection of the dead, no old bosses reused, new chars must appear.
+Return { fixText: "None", fixObject: {} } if good; else fix instructions. Only JSON.`;
 
-  let candidate: ChapterIdea | null = null;
+  return genAndCheck<ChapterIdea>({
+    generatorSystemMessage,
+    generatorPrompt: basePrompt,
+    generatorSchema: ChapterIdeaSchema,
 
-  // Up to 3 attempts: generate -> check -> possibly fix
-  for (let attempt = 1; attempt <= 3; attempt++) {
-    candidate = await generateCandidate(
-      baseSystemMessage,
-      basePrompt,
-      false,
-      candidate || undefined
-    );
+    checkerSystemMessage,
+    checkerPrompt: (candidate) => {
+      return `Candidate:\n${JSON.stringify(candidate, null, 2)}
+Constraints:
+1) No resurrecting these dead: ${JSON.stringify(allDeadCharacters)}
+2) No old bosses from existingChapters
+3) If there are newPlayableUnits or newNonBattleCharacters, they must appear in one of: intro, battle, or outro
+If all good => fixText=None. Otherwise => fixObject.`;
+    },
+    checkerSchema: z.object({
+      fixText: z.string(),
+      fixObject: ChapterIdeaSchema.partial(),
+    }),
 
-    // Now check it
-    const checkerMessage = `You are a Fire Emblem Fangame Chapter Idea Checker (checker).
-Your job is to verify no dead or old boss references appear, and also if newPlayableUnits or newNonBattleCharacters exist, each is named in intro/battle/outro. If valid, output { "fixText": "None", "fixObject": {} }. Otherwise supply fixes. Return only strict JSON.`;
-
-    const checkRes = await checkCandidate(candidate, checkerMessage);
-    if (checkRes.ok) {
-      return candidate;
-    } else {
-      if (attempt === 3) {
-        throw new Error(
-          `Failed to produce a valid ChapterIdea after 3 tries. Last fix request: ${checkRes.fixText}`
-        );
-      }
-      // incorporate fix instructions if any
-      const fixPrompt = `The checker requests changes: ${checkRes.fixText}.
-Apply them to the partial chapter idea. The partial fix object is: ${JSON.stringify(
-        checkRes.fixObject
-      )}.
-Generate a new or updated version of the ChapterIdea that is valid and meets all requirements.
-Only output JSON. Do not mention the reason or commentary.`;
-
-      candidate = await generateCandidate(
-        baseSystemMessage,
-        fixPrompt,
-        false,
-        checkRes.fixObject
-      );
-    }
-  }
-
-  // fallback
-  if (!candidate) {
-    throw new Error(
-      "No candidate produced. Unexpected error in genChapterIdea."
-    );
-  }
-  return candidate;
+    generatorModel: "gpt-4o",
+    temperatureGenerator: 1,
+    checkerModel: "gpt-4o",
+    temperatureChecker: 0,
+    maxAttempts: 3,
+  });
 }
 
 if (import.meta.main) {
-  // Example for subsequent
   genChapterIdea({
     worldSummary: testWorldSummary,
     chapterNumber: 1,
     tone: testTone,
     existingChapters: [testPrologueChapter],
   }).then((res) => {
-    console.log("Subsequent Chapter Idea:", JSON.stringify(res, null, 2));
+    console.log("Chapter Idea:", JSON.stringify(res, null, 2));
   });
 }
 

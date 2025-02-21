@@ -4,7 +4,7 @@ import {
   testGameDescription,
   testGameName,
   testTone,
-} from "./test-data/prologue.ts";
+} from "./test-data/prologueTestData.ts";
 
 export default function genWorldSummary({
   gameName,
