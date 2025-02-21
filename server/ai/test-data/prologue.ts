@@ -186,7 +186,7 @@ export const testInitialGameIdea: InitialGameIdea = {
     "The tone is cheerful but should allow for subtle hints of deeper political undertones, potentially leading to future conflicts in the storyline.",
 };
 
-const testCharInitialAlliedNpcJohannes: Character = {
+export const testCharInitialAlliedNpcJohannes: Character = {
   characterIdea: {
     firstName: "Johannes",
     fullName: "Johannes Leclair",
@@ -271,7 +271,7 @@ const testCharInitialAlliedNpcJohannes: Character = {
     smilingOffset: [24, 40],
   },
 };
-const testCharInitialPlayerLilith: Character = {
+export const testCharInitialPlayerLilith: Character = {
   characterIdea: {
     firstName: "Lilith",
     fullName: "Lilith Bellamy",
@@ -358,7 +358,7 @@ const testCharInitialPlayerLilith: Character = {
     smilingOffset: [24, 48],
   },
 };
-const testCharInitialPlayerBastian: Character = {
+export const testCharInitialPlayerBastian: Character = {
   characterIdea: {
     firstName: "Bastian",
     fullName: "Bastian Greywell",
@@ -443,7 +443,7 @@ const testCharInitialPlayerBastian: Character = {
     smilingOffset: [24, 40],
   },
 };
-const testCharInitialBossMordred: Character = {
+export const testCharInitialBossMordred: Character = {
   characterIdea: {
     firstName: "Mordred",
     fullName: "Mordred Tremayne",
@@ -529,7 +529,7 @@ const testCharInitialBossMordred: Character = {
     smilingOffset: [24, 40],
   },
 };
-const testCharInitialEnemyNonBossAmelia: Character = {
+export const testCharInitialEnemyNonBossAmelia: Character = {
   characterIdea: {
     firstName: "Amelia",
     fullName: "Amelia Whitlock",
@@ -618,7 +618,7 @@ const testCharInitialEnemyNonBossAmelia: Character = {
   },
 };
 
-const prologueChapter: Chapter = {
+export const testPrologueChapter: Chapter = {
   title: "The Missing Custodian Mystery",
   number: 0,
   level: {
@@ -1711,7 +1711,7 @@ export const testGame: Game = {
   title: testGameName,
   directory: "_the-grand-tourney.ltproj",
   description: testGameDescription,
-  chapters: [prologueChapter],
+  chapters: [testPrologueChapter],
   characters: [
     testCharInitialAlliedNpcJohannes,
     testCharInitialPlayerLilith,

@@ -1,8 +1,3 @@
-import {
-  testInitialGameIdea,
-  testTone,
-  testWorldSummary,
-} from "./test-data/prologue.ts";
 import { ChapterIdea, ChapterIdeaSchema } from "@/ai/types/chapter-idea.ts";
 import { InitialGameIdea } from "@/ai/types/initial-game-idea.ts";
 import { WorldSummary } from "@/ai/types/world-summary.ts";
@@ -10,6 +5,11 @@ import generateStructuredData from "@/lib/generate-structured-data.ts";
 import { Chapter } from "@/types/chapter.ts";
 import { DeadCharacterRecord } from "@/types/dead-character-record.ts";
 import { z } from "zod";
+import {
+  testPrologueChapter,
+  testTone,
+  testWorldSummary,
+} from "./test-data/prologue.ts";
 
 export default async function genChapterIdea({
   worldSummary,
@@ -227,22 +227,12 @@ Only output JSON. Do not mention the reason or commentary.`;
 }
 
 if (import.meta.main) {
-  // Prologue example
-  genChapterIdea({
-    worldSummary: testWorldSummary,
-    chapterNumber: 0,
-    tone: testTone,
-    initialGameIdea: testInitialGameIdea,
-  }).then((res) => {
-    console.log("Prologue Chapter Idea:", JSON.stringify(res, null, 2));
-  });
-
   // Example for subsequent
   genChapterIdea({
     worldSummary: testWorldSummary,
     chapterNumber: 1,
     tone: testTone,
-    existingChapters: [],
+    existingChapters: [testPrologueChapter],
   }).then((res) => {
     console.log("Subsequent Chapter Idea:", JSON.stringify(res, null, 2));
   });
