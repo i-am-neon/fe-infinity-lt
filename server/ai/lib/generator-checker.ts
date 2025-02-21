@@ -1,5 +1,5 @@
 import generateStructuredData from "@/lib/generate-structured-data.ts";
-import { ZodSchema } from "zod";
+import { z, ZodSchema, ZodObject } from "zod";
 import { OpenAIChatModelId } from "@ai-sdk/openai/internal";
 
 export interface CheckerOutputFix<T> {
@@ -11,20 +11,28 @@ export interface GeneratorCheckerAllInOneParams<T> {
   generatorSystemMessage: string;
   generatorPrompt: string;
   generatorSchema: ZodSchema<T>;
-
   checkerSystemMessage: string;
   checkerPrompt: (candidate: T) => string;
-  checkerSchema: ZodSchema<CheckerOutputFix<T>>;
-
   generatorModel?: OpenAIChatModelId;
-  temperatureGenerator?: number;
-
+  generatorTemperature?: number;
   checkerModel?: OpenAIChatModelId;
-  temperatureChecker?: number;
-
+  checkerTemperature?: number;
   maxAttempts?: number;
+  fnBaseName: string;
 }
 
+// Accept string/null/undefined for fixText so it won't fail when null is returned
+const rawCheckerSchema = z.object({
+  fixText: z.union([z.string(), z.null()]).optional(),
+  fixObject: z.unknown().optional(),
+});
+
+type RawCheckerOutput = z.infer<typeof rawCheckerSchema>;
+
+/**
+ * Attempts to generate a structured object using an LLM, then checks it with a second LLM call.
+ * If the checker proposes fixes, we attempt to apply them. If fixText is "None", we accept immediately.
+ */
 export async function genAndCheck<T>(
   params: GeneratorCheckerAllInOneParams<T>
 ): Promise<T> {
@@ -34,58 +42,74 @@ export async function genAndCheck<T>(
     generatorSchema,
     checkerSystemMessage,
     checkerPrompt,
-    checkerSchema,
     generatorModel = "gpt-4o",
-    temperatureGenerator = 1,
+    generatorTemperature = 1,
     checkerModel = "gpt-4o-mini",
-    temperatureChecker = 0,
+    checkerTemperature = 0,
     maxAttempts = 3,
+    fnBaseName,
   } = params;
 
-  let partialFix: Partial<T> | undefined;
+  if (!(generatorSchema instanceof ZodObject)) {
+    throw new Error(
+      "[genAndCheck] generatorSchema must be a ZodObject to allow partial fixObject."
+    );
+  }
+
+  let partialFix: Partial<T> = {};
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    // 1) Generate candidate
     let finalGeneratorPrompt = generatorPrompt;
-    if (partialFix && Object.keys(partialFix).length > 0) {
+    if (Object.keys(partialFix).length > 0) {
       finalGeneratorPrompt += `\n\nPotential fix for previous attempt:\n${JSON.stringify(
         partialFix,
         null,
         2
       )}`;
     }
+
+    // 1) Generate the candidate from the generator LLM
     const candidate = await generateStructuredData<T>({
-      fnName: "generatorCheckerAllInOne: generator",
+      fnName: `${fnBaseName}_generator_attempt${attempt}`,
       systemMessage: generatorSystemMessage,
       prompt: finalGeneratorPrompt,
       schema: generatorSchema,
-      temperature: temperatureGenerator,
+      temperature: generatorTemperature,
       model: generatorModel,
     });
 
-    // 2) Check candidate
-    const finalCheckerPrompt = checkerPrompt(candidate);
-    const fixCheck = await generateStructuredData<CheckerOutputFix<T>>({
-      fnName: "generatorCheckerAllInOne: checker",
+    // 2) Check the candidate with the checker LLM, using the raw schema
+    const rawFixCheck = await generateStructuredData<RawCheckerOutput>({
+      fnName: `${fnBaseName}_checker_attempt${attempt}`,
       systemMessage: checkerSystemMessage,
-      prompt: finalCheckerPrompt,
-      schema: checkerSchema,
-      temperature: temperatureChecker,
+      prompt: checkerPrompt(candidate),
+      schema: rawCheckerSchema,
+      temperature: checkerTemperature,
       model: checkerModel,
     });
 
-    if (fixCheck.fixText === "None") {
+    // Convert the raw data into a CheckerOutputFix<T>, defaulting to "None" if fixText is null/undefined
+    const fixCheck: CheckerOutputFix<T> = {
+      fixText: rawFixCheck.fixText ?? "None",
+      fixObject: (rawFixCheck.fixObject as Partial<T>) ?? {},
+    };
+
+    // If fixText is "None", no changes needed; return the candidate
+    if (!fixCheck.fixText || fixCheck.fixText === "None") {
       return candidate;
     }
 
+    // If we reached the last attempt and still have a fix required, throw
     if (attempt === maxAttempts) {
       throw new Error(
         `Failed after ${maxAttempts} attempts. Last fixText: ${fixCheck.fixText}`
       );
     }
-    partialFix = fixCheck.fixObject || {};
+
+    // Otherwise incorporate partial fix and continue
+    partialFix = fixCheck.fixObject;
   }
 
-  throw new Error("Unreachable code in generatorCheckerAllInOne");
+  throw new Error("Unreachable code in genAndCheck");
 }
 

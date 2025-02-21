@@ -1,13 +1,12 @@
-import { WorldSummary } from "@/ai/types/world-summary.ts";
+import { genAndCheck } from "@/ai/lib/generator-checker.ts";
 import {
-  initialGameIdeaSchema,
   InitialGameIdea,
+  initialGameIdeaSchema,
 } from "@/ai/types/initial-game-idea.ts";
+import { WorldSummary } from "@/ai/types/world-summary.ts";
 import { Chapter } from "@/types/chapter.ts";
 import { DeadCharacterRecord } from "@/types/dead-character-record.ts";
-import { z } from "zod";
 import { testTone, testWorldSummary } from "./test-data/prologueTestData.ts";
-import { genAndCheck } from "@/ai/lib/generator-checker.ts";
 
 export default function genInitialGameIdea({
   worldSummary,
@@ -40,10 +39,10 @@ Check constraints:
 If valid => fixText=None. Otherwise => fix instructions as fixObject.`;
 
   return genAndCheck<InitialGameIdea>({
+    fnBaseName: "genInitialGameIdea",
     generatorSystemMessage,
     generatorPrompt: userPrompt,
     generatorSchema: initialGameIdeaSchema,
-
     checkerSystemMessage,
     checkerPrompt: (candidate) => {
       return `Candidate:\n${JSON.stringify(candidate, null, 2)}
@@ -52,16 +51,6 @@ Constraints:
 - No resurrecting: ${JSON.stringify(allDeadCharacters)}
 If good => fixText=None. Else => fix instructions.`;
     },
-    checkerSchema: z.object({
-      fixText: z.string(),
-      fixObject: initialGameIdeaSchema.partial(),
-    }),
-
-    generatorModel: "gpt-4o",
-    temperatureGenerator: 1,
-    checkerModel: "gpt-4o-mini",
-    temperatureChecker: 0,
-    maxAttempts: 3,
   });
 }
 

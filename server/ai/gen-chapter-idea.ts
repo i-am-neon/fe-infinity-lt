@@ -4,7 +4,6 @@ import { InitialGameIdea } from "@/ai/types/initial-game-idea.ts";
 import { WorldSummary } from "@/ai/types/world-summary.ts";
 import { Chapter } from "@/types/chapter.ts";
 import { DeadCharacterRecord } from "@/types/dead-character-record.ts";
-import { z } from "zod";
 import {
   testPrologueChapter,
   testTone,
@@ -88,10 +87,10 @@ Verify no mention or resurrection of the dead, no old bosses reused, new chars m
 Return { fixText: "None", fixObject: {} } if good; else fix instructions. Only JSON.`;
 
   return genAndCheck<ChapterIdea>({
+    fnBaseName: "genChapterIdea",
     generatorSystemMessage,
     generatorPrompt: basePrompt,
     generatorSchema: ChapterIdeaSchema,
-
     checkerSystemMessage,
     checkerPrompt: (candidate) => {
       return `Candidate:\n${JSON.stringify(candidate, null, 2)}
@@ -101,16 +100,6 @@ Constraints:
 3) If there are newPlayableUnits or newNonBattleCharacters, they must appear in one of: intro, battle, or outro. For each new character's firstName, check if it is present in candidate.intro + candidate.battle + candidate.outro. If not found, fix.
 If all good => fixText=None. Otherwise => fixObject.`;
     },
-    checkerSchema: z.object({
-      fixText: z.string(),
-      fixObject: ChapterIdeaSchema.partial(),
-    }),
-
-    generatorModel: "gpt-4o",
-    temperatureGenerator: 1,
-    checkerModel: "gpt-4o-mini",
-    temperatureChecker: 0,
-    maxAttempts: 3,
   });
 }
 
