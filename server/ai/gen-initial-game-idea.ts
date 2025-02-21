@@ -7,7 +7,7 @@ import { Chapter } from "@/types/chapter.ts";
 import { DeadCharacterRecord } from "@/types/dead-character-record.ts";
 import generateStructuredData from "@/lib/generate-structured-data.ts";
 import { z } from "zod";
-import { testTone, testWorldSummary } from "@/ai/test-data/initial.ts";
+import { testTone, testWorldSummary } from "./test-data/prologue.ts";
 
 /**
  * Generates an InitialGameIdea for the prologue chapter using a generator-checker approach.

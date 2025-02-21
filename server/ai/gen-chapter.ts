@@ -10,7 +10,7 @@ import {
   testInitialGameIdea,
   testTone,
   testWorldSummary,
-} from "@/ai/test-data/initial.ts";
+} from "@/ai/test-data/prologue.ts";
 import { ChapterIdea } from "@/ai/types/chapter-idea.ts";
 import { InitialGameIdea } from "@/ai/types/initial-game-idea.ts";
 import { WorldSummary } from "@/ai/types/world-summary.ts";
@@ -69,8 +69,13 @@ export default async function genChapter({
       initialGameIdea,
       tone,
       chapterNumber,
+      existingChapters,
+      allDeadCharacters,
+      newlyDeadThisChapter,
     });
   }
+
+  // Build array of new characters from initialGameIdea (if prologue) plus boss + new units
   const newCharacterIdeas: CharacterIdea[] = [
     ...(initialGameIdea && chapterNumber === 0
       ? initialGameIdea.characterIdeas
@@ -84,48 +89,53 @@ export default async function genChapter({
   const usedSoFar = usedPortraitsSoFar ?? [];
   logger.debug("Used portraits so far", { usedSoFar });
 
-  // Choose new portraits for these new characters
-  const portraitMap = await choosePortraits({
-    characterIdeas: newCharacterIdeas,
-    usedPortraits: usedSoFar,
-  });
-
-  // Create the unit data for the new characters
-  const newCharacterUnitDatas = await createUnitDatas({
-    characterIdeas: newCharacterIdeas,
-    chapterNumber,
-  });
-
-  // We get the music for this chapter's start. Typically "player phase" and "enemy phase".
-  const [playerPhaseMusic, enemyPhaseMusic] = await Promise.all([
-    chooseMusic(`exciting, intense, heroic ${chapterIdea.battle}`),
-    chooseMusic(`ominous, menacing, villainous ${chapterIdea.battle}`),
+  // Run these in parallel for performance
+  const [
+    portraitMap,
+    newCharacterUnitDatas,
+    [playerPhaseMusic, enemyPhaseMusic],
+    introAIEvent,
+    outroAIEvent,
+    introMusic,
+    outroMusic,
+  ] = await Promise.all([
+    choosePortraits({
+      characterIdeas: newCharacterIdeas,
+      usedPortraits: usedSoFar,
+    }),
+    createUnitDatas({
+      characterIdeas: newCharacterIdeas,
+      chapterNumber,
+    }),
+    Promise.all([
+      chooseMusic(`exciting, intense, heroic ${chapterIdea.battle}`),
+      chooseMusic(`ominous, menacing, villainous ${chapterIdea.battle}`),
+    ]),
+    genIntroEvent({
+      worldSummary,
+      chapterIdea,
+      tone,
+      initialGameIdea: chapterNumber === 0 ? initialGameIdea : undefined,
+      existingChapters,
+      existingCharacterIdeas: existingCharacters.map((c) => c.characterIdea),
+      allDeadCharacters,
+      newlyDeadThisChapter,
+    }),
+    genOutroEvent({
+      worldSummary,
+      initialGameIdea,
+      chapterIdea,
+      tone,
+    }),
+    chooseMusic(chapterIdea.intro),
+    chooseMusic(`Reflective conclusion for chapter: ${chapterIdea.outro}`),
   ]);
 
-  const introAIEvent = await genIntroEvent({
-    worldSummary,
-    chapterIdea,
-    tone,
-    initialGameIdea: chapterNumber === 0 ? initialGameIdea : undefined,
-    existingChapters,
-    existingCharacterIdeas: existingCharacters.map((c) => c.characterIdea),
-    allDeadCharacters,
-    newlyDeadThisChapter,
-  });
-  const introMusic = await chooseMusic(chapterIdea.intro);
+  const [introBackgroundChoice, outroBackgroundChoice] = await Promise.all([
+    chooseBackground(introAIEvent),
+    chooseBackground(outroAIEvent),
+  ]);
 
-  // Generate the outro event
-  const outroAIEvent = await genOutroEvent({
-    worldSummary,
-    initialGameIdea,
-    chapterIdea,
-    tone,
-  });
-  const outroMusic = await chooseMusic(
-    `Reflective conclusion for chapter: ${chapterIdea.outro}`
-  );
-
-  const introBackgroundChoice = await chooseBackground(introAIEvent);
   const introEvent = convertAIEventToEvent({
     aiEvent: introAIEvent,
     backgroundChoice: introBackgroundChoice,
@@ -134,7 +144,6 @@ export default async function genChapter({
     showChapterTitle: true,
   });
 
-  const outroBackgroundChoice = await chooseBackground(outroAIEvent);
   const outroEvent = convertAIEventToEvent({
     aiEvent: outroAIEvent,
     backgroundChoice: outroBackgroundChoice,
@@ -165,7 +174,7 @@ export default async function genChapter({
       throw new Error(`No portrait metadata found for ${portraitNid}`);
     }
     return {
-      characterIdea: newCharacterIdeas.find((c) => c.firstName === ud.nid)!, // We know this will exist
+      characterIdea: newCharacterIdeas.find((c) => c.firstName === ud.nid)!,
       unitData: {
         ...ud,
         portrait_nid: ud.nid,
@@ -174,6 +183,7 @@ export default async function genChapter({
     };
   });
 
+  // For living player characters, filter out the dead
   const allLivingPlayerCharacterIdeas = [
     ...(initialGameIdea?.characterIdeas ?? []),
     ...existingCharacters.map((c) => c.characterIdea),
@@ -203,7 +213,7 @@ export default async function genChapter({
     newlyDeadThisChapter,
   });
 
-  // Separate the player's initial unit data if it belongs to the initialGameIdea
+  // Gather the player's current unit datas
   const playerUnitDatas = [
     ...newCharacterUnitDatas,
     ...existingCharacters.map((c) => c.unitData),
@@ -211,27 +221,22 @@ export default async function genChapter({
     allLivingPlayerCharacterIdeas.some((idea) => idea.firstName === c.nid)
   );
 
-  // Find boss
-  const bossUnitData = newCharacterUnitDatas.find(
-    (c) => c.nid === chapterIdea.boss.firstName
-  );
-  if (!bossUnitData) {
-    throw new Error("Could not find boss in unitDatas");
-  }
-
+  // Finally pick map
   const usedMapNames = existingChapters.map((c) => c.tilemap.nid);
   const chosenMapName = await chooseMap(chapterIdea, usedMapNames);
 
-  // use the empty array for quick testing by skipping enemy generics
+  // Place units
   const units = await getLevelUnits({
     chosenMapName,
     chapterIdea,
     chapterNumber,
     playerUnitDatas,
-    bossUnitData,
+    bossUnitData: newCharacterUnitDatas.find(
+      (c) => c.nid === chapterIdea.boss.firstName
+    )!,
   });
 
-  // Construct the level with all the units
+  // Construct the level
   const level = assembleLevel({
     chapterIdea,
     chapterNumber,
@@ -247,7 +252,7 @@ export default async function genChapter({
   );
   const tilemap: Tilemap = JSON.parse(tilemapRaw);
 
-  // Construct the final Chapter object
+  // Build final Chapter object
   const newChapter: Chapter = {
     title: chapterIdea.title,
     number: chapterNumber,
@@ -258,11 +263,11 @@ export default async function genChapter({
     enemyFaction: chapterIdea.enemyFaction,
   };
 
-  // Collect new used portraits
+  // Update used portraits
   const newlyUsedPortraits = Object.values(portraitMap);
   const updatedUsedPortraits = [...usedSoFar, ...newlyUsedPortraits];
 
-  // Return all info
+  // Collect any new music to copy
   const musicToCopy = [
     playerPhaseMusic,
     enemyPhaseMusic,

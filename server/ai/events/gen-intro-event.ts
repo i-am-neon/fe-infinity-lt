@@ -6,7 +6,7 @@ import {
   testInitialGameIdea,
   testTone,
   testWorldSummary,
-} from "@/ai/test-data/initial.ts";
+} from "../test-data/prologue.ts";
 import { ChapterIdea } from "@/ai/types/chapter-idea.ts";
 import { testChapterIdea } from "@/ai/test-data/chapter-ideas.ts";
 import { Chapter } from "@/types/chapter.ts";

@@ -5,7 +5,7 @@ import { insertGame } from "@/db/games.ts";
 import initializeProject from "@/game-engine-io/initialize-project.ts";
 import writeChapter from "@/game-engine-io/write-chapter/write-chapter.ts";
 import writeStubChapter from "@/game-engine-io/write-chapter/write-stub-chapter.ts";
-import { setCurrentLogger } from "@/lib/current-logger.ts";
+import { getCurrentLogger, setCurrentLogger } from "@/lib/current-logger.ts";
 import removeExistingGame from "@/lib/remove-existing-game.ts";
 import runGame from "@/run-game.ts";
 import { Game } from "@/types/game.ts";
@@ -13,6 +13,7 @@ import genChapter from "@/ai/gen-chapter.ts";
 
 export async function handleCreateGame(req: Request): Promise<Response> {
   try {
+    const startTime = Date.now();
     const body = (await req.json()) as {
       title?: string;
       description?: string;
@@ -46,6 +47,7 @@ export async function handleCreateGame(req: Request): Promise<Response> {
       projectName: projectNameEndingInDotLtProj,
       chapterNumber: 0,
     });
+    const logger = getCurrentLogger();
 
     // 3) generate world summary & top-level music
     const worldSummary = await genWorldSummary({
@@ -103,6 +105,9 @@ export async function handleCreateGame(req: Request): Promise<Response> {
 
     insertGame(newGame);
 
+    const duration = Date.now() - startTime;
+    logger.info("New Game Created", { newGame, duration });
+
     // run the game
     void runGame(projectNameEndingInDotLtProj);
 
@@ -123,4 +128,3 @@ export async function handleCreateGame(req: Request): Promise<Response> {
     });
   }
 }
-

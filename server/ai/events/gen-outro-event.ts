@@ -3,7 +3,7 @@ import {
   testInitialGameIdea,
   testTone,
   testWorldSummary,
-} from "@/ai/test-data/initial.ts";
+} from "../test-data/prologue.ts";
 import { AIEvent, AIEventSchema } from "@/ai/types/ai-event.ts";
 import { ChapterIdea } from "@/ai/types/chapter-idea.ts";
 import { InitialGameIdea } from "@/ai/types/initial-game-idea.ts";
