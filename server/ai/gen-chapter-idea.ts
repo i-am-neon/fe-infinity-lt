@@ -50,7 +50,8 @@ Requirements:
 - Must not reuse a previous boss from earlier chapters
 - If you add newPlayableUnits or newNonBattleCharacters, mention them in intro/battle/outro
 - Must produce a new Chapter Idea that strictly matches the ChapterIdea schema.
-- Return only JSON.`
+- Return only JSON.
+Additionally, the 'intro' and 'outro' fields must each be a single full paragraph summarizing all the events, dialogue, and interactions that happen in those scenes.`
     : `You are a Fire Emblem Fangame Chapter Idea Generator (generator).
 
 We have:
@@ -66,7 +67,8 @@ Requirements:
 - Must not reuse a previous boss from earlier chapters
 - If you add newPlayableUnits or newNonBattleCharacters, mention them in intro/battle/outro
 - Must produce a new Chapter Idea that strictly matches the ChapterIdea schema.
-- Return only JSON.`;
+- Return only JSON.
+Additionally, the 'intro' and 'outro' fields must each be a single full paragraph summarizing all the events, dialogue, and interactions that happen in those scenes.`;
 
   const basePrompt = isPrologue
     ? `World Summary: ${JSON.stringify(worldSummary, null, 2)}
@@ -122,4 +124,3 @@ if (import.meta.main) {
     console.log("Chapter Idea:", JSON.stringify(res, null, 2));
   });
 }
-
