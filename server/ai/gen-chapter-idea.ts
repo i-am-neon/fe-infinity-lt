@@ -96,7 +96,7 @@ Return { fixText: "None", fixObject: {} } if good; else fix instructions. Only J
 Constraints:
 1) No resurrecting these dead: ${JSON.stringify(allDeadCharacters)}
 2) No old bosses from existingChapters
-3) If there are newPlayableUnits or newNonBattleCharacters, they must appear in one of: intro, battle, or outro
+3) If there are newPlayableUnits or newNonBattleCharacters, they must appear in one of: intro, battle, or outro. For each new character's firstName, check if it is present in candidate.intro + candidate.battle + candidate.outro. If not found, fix.
 If all good => fixText=None. Otherwise => fixObject.`;
     },
     checkerSchema: z.object({
