@@ -1,15 +1,14 @@
+import {
+  testInitialGameIdea,
+  testTone,
+  testWorldSummary,
+} from "@/ai/test-data/initial.ts";
 import { ChapterIdea, ChapterIdeaSchema } from "@/ai/types/chapter-idea.ts";
 import { InitialGameIdea } from "@/ai/types/initial-game-idea.ts";
 import { WorldSummary } from "@/ai/types/world-summary.ts";
-import { Chapter } from "@/types/chapter.ts";
 import generateStructuredData from "@/lib/generate-structured-data.ts";
-import {
-  testWorldSummary,
-  testTone,
-  testInitialGameIdea,
-} from "@/ai/test-data/initial.ts";
+import { Chapter } from "@/types/chapter.ts";
 import { DeadCharacterRecord } from "@/types/dead-character-record.ts";
-import { getCurrentLogger } from "@/lib/current-logger.ts";
 import { z } from "zod";
 
 export default async function genChapterIdea({
@@ -29,8 +28,6 @@ export default async function genChapterIdea({
   allDeadCharacters?: DeadCharacterRecord[];
   newlyDeadThisChapter?: DeadCharacterRecord[];
 }): Promise<ChapterIdea> {
-  const logger = getCurrentLogger();
-
   /**
    * The subfunction that calls our standard generateStructuredData with a "generator" approach.
    */
@@ -59,6 +56,7 @@ export default async function genChapterIdea({
       prompt: finalPrompt,
       schema: schemaToUse,
       temperature: 1, // generator approach
+      model: "gpt-4o",
     });
     return candidate as ChapterIdea;
   }
@@ -249,3 +247,4 @@ if (import.meta.main) {
     console.log("Subsequent Chapter Idea:", JSON.stringify(res, null, 2));
   });
 }
+

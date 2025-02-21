@@ -48,6 +48,7 @@ export default async function genInitialGameIdea({
       systemMessage,
       prompt: finalPrompt,
       temperature: 1, // more creative
+      model: "gpt-4o",
     });
     return candidate;
   }
@@ -176,3 +177,4 @@ if (import.meta.main) {
     )
     .catch(console.error);
 }
+

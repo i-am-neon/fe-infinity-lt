@@ -19,6 +19,7 @@ export const worldSummarySchema = z.object({
     ),
   }),
   history: z.string(),
+  mythology: z.string().describe("How the world was created, gods, etc."),
   factions: z.array(
     z.object({
       name: z.string(),
@@ -28,3 +29,4 @@ export const worldSummarySchema = z.object({
 });
 
 export type WorldSummary = z.infer<typeof worldSummarySchema>;
+
