@@ -69,7 +69,7 @@ export default async function genChapter({
       initialGameIdea,
       tone,
       chapterNumber,
-      existingChapters,
+      previousChapterIdeas: existingChapters.map((c) => c.idea),
       allDeadCharacters,
       newlyDeadThisChapter,
     });
@@ -261,6 +261,7 @@ export default async function genChapter({
     newCharacters,
     tilemap,
     enemyFaction: chapterIdea.enemyFaction,
+    idea: chapterIdea,
   };
 
   // Update used portraits

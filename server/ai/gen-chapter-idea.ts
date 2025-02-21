@@ -2,7 +2,6 @@ import { genAndCheck } from "@/ai/lib/generator-checker.ts";
 import { ChapterIdea, ChapterIdeaSchema } from "@/ai/types/chapter-idea.ts";
 import { InitialGameIdea } from "@/ai/types/initial-game-idea.ts";
 import { WorldSummary } from "@/ai/types/world-summary.ts";
-import { Chapter } from "@/types/chapter.ts";
 import { DeadCharacterRecord } from "@/types/dead-character-record.ts";
 import {
   testPrologueChapter,
@@ -15,7 +14,7 @@ export default function genChapterIdea({
   chapterNumber,
   tone,
   initialGameIdea,
-  existingChapters = [],
+  previousChapterIdeas = [],
   allDeadCharacters = [],
   newlyDeadThisChapter = [],
 }: {
@@ -23,7 +22,7 @@ export default function genChapterIdea({
   chapterNumber: number;
   tone: string;
   initialGameIdea?: InitialGameIdea;
-  existingChapters?: Chapter[];
+  previousChapterIdeas?: ChapterIdea[];
   allDeadCharacters?: DeadCharacterRecord[];
   newlyDeadThisChapter?: DeadCharacterRecord[];
 }): Promise<ChapterIdea> {
@@ -75,7 +74,7 @@ Initial Game Idea: ${JSON.stringify(initialGameIdea, null, 2)}
 Tone: ${tone}`
     : JSON.stringify({
         worldSummary,
-        existingChapters,
+        previousChapterIdeas,
         chapterNumber,
         tone,
         allDeadCharacters,
@@ -108,7 +107,7 @@ if (import.meta.main) {
     worldSummary: testWorldSummary,
     chapterNumber: 1,
     tone: testTone,
-    existingChapters: [testPrologueChapter],
+    previousChapterIdeas: [testPrologueChapter.idea],
   }).then((res) => {
     console.log("Chapter Idea:", JSON.stringify(res, null, 2));
   });

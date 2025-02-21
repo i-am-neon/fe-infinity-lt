@@ -74,7 +74,7 @@ export default async function createNextChapter({
     worldSummary: existingGame.worldSummary!,
     chapterNumber: nextChapterNumber,
     tone: existingGame.tone,
-    existingChapters: existingGame.chapters,
+    previousChapterIdeas: existingGame.chapters.map((c) => c.idea),
     allDeadCharacters: existingGame.deadCharacters,
     newlyDeadThisChapter,
   });
