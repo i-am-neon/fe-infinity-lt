@@ -108,7 +108,7 @@ If all good => fixText=None. Otherwise => fixObject.`;
 
     generatorModel: "gpt-4o",
     temperatureGenerator: 1,
-    checkerModel: "gpt-4o",
+    checkerModel: "gpt-4o-mini",
     temperatureChecker: 0,
     maxAttempts: 3,
   });
@@ -124,3 +124,4 @@ if (import.meta.main) {
     console.log("Chapter Idea:", JSON.stringify(res, null, 2));
   });
 }
+

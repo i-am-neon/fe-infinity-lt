@@ -59,7 +59,7 @@ If good => fixText=None. Else => fix instructions.`;
 
     generatorModel: "gpt-4o",
     temperatureGenerator: 1,
-    checkerModel: "gpt-4o",
+    checkerModel: "gpt-4o-mini",
     temperatureChecker: 0,
     maxAttempts: 3,
   });
