@@ -24,7 +24,7 @@ import {
   testInitialGameIdea,
   testTone,
   testWorldSummary,
-} from "./test-data/prologueTestData.ts";
+} from "@/ai/test-data/prologueTestData.ts";
 
 /**
  * Creates the next chapter based on the given data.
