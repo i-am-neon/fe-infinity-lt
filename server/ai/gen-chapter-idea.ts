@@ -49,7 +49,7 @@ Requirements:
 - If you add newPlayableUnits or newNonBattleCharacters, mention them in intro/battle/outro
 - Must produce a new Chapter Idea that strictly matches the ChapterIdea schema.
 - Return only JSON.
-Additionally, the 'intro' and 'outro' fields must each be a single full paragraph summarizing all the events, dialogue, and interactions that happen in those scenes.`
+Additionally, the 'intro' must be a thorough single paragraph explaining the reason for the battle, who the boss is, etc. The 'battle' should be brief, focusing primarily on the scenario's setting or map. The 'outro' must be a single paragraph that resolves the chapter's events.`
     : `You are a Fire Emblem Fangame Chapter Idea Generator (generator).
 
 We have:
@@ -112,4 +112,3 @@ if (import.meta.main) {
     console.log("Chapter Idea:", JSON.stringify(res, null, 2));
   });
 }
-
