@@ -3,7 +3,7 @@ import generateStructuredData from "@/lib/generate-structured-data.ts";
 import createEmbedding from "@/vector-db/create-embedding.ts";
 import similaritySearch from "@/vector-db/similarity-search.ts";
 import { z } from "zod";
-import { testChapterIdea } from "@/ai/test-data/chapter-ideas.ts";
+import { testPrologueChapter } from "@/ai/test-data/prologueTestData.ts";
 
 interface EphemeralMapOption {
   ephemeralId: "A" | "B" | "C";
@@ -104,7 +104,7 @@ Return a JSON object { "chosenId": "A" } or "B" or "C" with no extra commentary.
 }
 
 if (import.meta.main) {
-  chooseMap(testChapterIdea)
+  chooseMap(testPrologueChapter.idea)
     .then((chosenMap) => {
       console.log("Chosen map:", chosenMap);
     })

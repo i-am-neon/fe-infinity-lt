@@ -1,17 +1,17 @@
+import correctUnitPlacement from "@/ai/level/unit-placement/correct-unit-placement.ts";
+import { testPrologueChapter } from "@/ai/test-data/prologueTestData.ts";
+import { testMapMetadata } from "@/ai/test-data/unit-placement.ts";
 import { ChapterIdea } from "@/ai/types/chapter-idea.ts";
-import { z } from "zod";
+import {
+  BossCoords,
+  GreenUnit,
+  PlayerUnitStartCoords,
+} from "@/ai/types/unit-placement.ts";
 import generateStructuredData from "@/lib/generate-structured-data.ts";
 import { ch4TerrainGrid } from "@/map-processing/test-data/terrain-grid.ts";
 import { MapMetadata } from "@/types/maps/map-metadata.ts";
 import { TerrainGrid } from "@/types/maps/terrain-grid.ts";
-import {
-  BossCoords,
-  PlayerUnitStartCoords,
-  GreenUnit,
-} from "@/ai/types/unit-placement.ts";
-import correctUnitPlacement from "./correct-unit-placement.ts";
-import { testChapterIdea } from "@/ai/test-data/chapter-ideas.ts";
-import { testMapMetadata } from "@/ai/test-data/unit-placement.ts";
+import { z } from "zod";
 
 export default async function genBossAndPlayerAndGreenUnitCoords({
   terrainGrid,
@@ -187,7 +187,7 @@ if (import.meta.main) {
     // ch4 has green units
     const result = await genBossAndPlayerAndGreenUnitCoords({
       terrainGrid: ch4TerrainGrid,
-      chapterIdea: testChapterIdea,
+      chapterIdea: testPrologueChapter.idea,
       mapMetadata: testMapMetadata,
     });
     console.log("Boss and Player coords:", result);

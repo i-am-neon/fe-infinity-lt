@@ -1,4 +1,4 @@
-import { testChapterIdea } from "@/ai/test-data/chapter-ideas.ts";
+import { testPrologueChapter } from "@/ai/test-data/prologueTestData.ts";
 import { ChapterIdea } from "@/ai/types/chapter-idea.ts";
 import { EnemyComposition } from "@/ai/types/enemy-composition.ts";
 import { RegionSquadInfo } from "@/ai/types/region-squad-info.ts";
@@ -6,19 +6,18 @@ import {
   EnemyGenericUnit,
   EnemyGenericUnitSchema,
 } from "@/ai/types/unit-placement.ts";
-import { getAllClassOptions } from "./get-all-class-options.ts";
-import getEnemyComposition from "./get-enemy-composition.ts";
-import getSubTerrainGrid from "./get-sub-terrain-grid.ts";
-import { availableClasses } from "./shared-prompts/available-classes.ts";
-import { UNIT_TERRAIN_PLACEMENT_CONSTRAINTS } from "./shared-prompts/unit-terrain-placement-constraints.ts";
-import { unpromotedVsPromotedUnits } from "./shared-prompts/unpromoted-vs-promoted-units.ts";
 import generateStructuredData from "@/lib/generate-structured-data.ts";
 import { ch1TerrainGrid } from "@/map-processing/test-data/terrain-grid.ts";
 import { MapMetadata } from "@/types/maps/map-metadata.ts";
 import { TerrainGrid } from "@/types/maps/terrain-grid.ts";
 import { z } from "zod";
 import { testMapMetadata } from "../../test-data/unit-placement.ts";
-import { EnemyAIGroupSchema } from "@/ai/types/enemy-ai-group.ts";
+import { getAllClassOptions } from "./get-all-class-options.ts";
+import getEnemyComposition from "./get-enemy-composition.ts";
+import getSubTerrainGrid from "./get-sub-terrain-grid.ts";
+import { availableClasses } from "./shared-prompts/available-classes.ts";
+import { UNIT_TERRAIN_PLACEMENT_CONSTRAINTS } from "./shared-prompts/unit-terrain-placement-constraints.ts";
+import { unpromotedVsPromotedUnits } from "./shared-prompts/unpromoted-vs-promoted-units.ts";
 
 export default async function placeEnemyGenericUnits({
   terrainGrid,
@@ -100,7 +99,7 @@ Place the same number of units as specified in the "numberOfGenericEnemies" fiel
 if (import.meta.main) {
   const res = await placeEnemyGenericUnits({
     terrainGrid: ch1TerrainGrid,
-    chapterIdea: testChapterIdea,
+    chapterIdea: testPrologueChapter.idea,
     mapMetadata: testMapMetadata,
     regionSquadInfo: [
       {

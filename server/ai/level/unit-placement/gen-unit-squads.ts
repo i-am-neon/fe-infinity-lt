@@ -14,12 +14,12 @@ import {
   RegionSquadInfoSchema,
 } from "@/ai/types/region-squad-info.ts";
 import { getTerrainGridSize } from "./get-terrain-grid-size.ts";
-import { testChapterIdea } from "@/ai/test-data/chapter-ideas.ts";
 import { testMapMetadata } from "../../test-data/unit-placement.ts";
 import { getAllClassOptions } from "./get-all-class-options.ts";
 import { availableClasses } from "./shared-prompts/available-classes.ts";
 import { UNIT_TERRAIN_PLACEMENT_CONSTRAINTS } from "./shared-prompts/unit-terrain-placement-constraints.ts";
 import { unpromotedVsPromotedUnits } from "./shared-prompts/unpromoted-vs-promoted-units.ts";
+import { testPrologueChapter } from "@/ai/test-data/prologueTestData.ts";
 
 export default async function genUnitSquads({
   terrainGrid,
@@ -130,10 +130,11 @@ if (import.meta.main) {
   const composition = getEnemyComposition(1);
   const enemyCountRange = getGenericEnemyNumberRange({
     mapSize: getTerrainGridSize(ch1TerrainGrid),
+    chapter: 0,
   });
   genUnitSquads({
     terrainGrid: ch1TerrainGrid,
-    chapterIdea: testChapterIdea,
+    chapterIdea: testPrologueChapter.idea,
     mapMetadata: testMapMetadata,
     enemyComposition: composition,
     enemyCountRange,
