@@ -11,7 +11,7 @@ import { WorldSummary } from "@/ai/types/world-summary.ts";
 import generateStructuredData from "@/lib/generate-structured-data.ts";
 
 /**
- * Generates an AIEvent that serves as the prologue's outro scene, wrapping up the chapter.
+ * Generates an AIEvent that serves as the outro scene for the chapter, wrapping up the chapter's story.
  */
 export default function genOutroEvent({
   worldSummary,
@@ -20,12 +20,16 @@ export default function genOutroEvent({
   tone,
 }: {
   worldSummary: WorldSummary;
-  initialGameIdea: InitialGameIdea;
+  initialGameIdea?: InitialGameIdea;
   chapterIdea: ChapterIdea;
   tone: string;
 }): Promise<AIEvent> {
-  const systemMessage = `You are a Fire Emblem Fangame Prologue Outro Event Writer!
-The user provides a world summary, an initial game idea, a chapter idea, and a tone. You will create the event that wraps up the chapter.
+  const systemMessage = `You are a Fire Emblem Fangame Outro Event Writer!
+${
+  initialGameIdea
+    ? `This is the prologue outro event. You can include concluding remarks that wrap up the initial story setup as it's the first chapter.`
+    : `This is a subsequent chapter's outro event. Summarize and wrap up the chapter's conflict.`
+}
 
 The event should:
 - use the Chapter Idea's outro as the basis for the event
@@ -38,10 +42,11 @@ The event should:
 - you must have characters speak to each other in the scene
 `;
 
-  const prompt = `World Summary: ${JSON.stringify(worldSummary, null, 2)}
-Initial Game Idea: ${JSON.stringify(initialGameIdea, null, 2)}
-Chapter Idea: ${JSON.stringify(chapterIdea)}
-Tone: ${tone}`;
+  const prompt = `World Summary: ${JSON.stringify(worldSummary, null, 2)}${
+    initialGameIdea
+      ? `\nInitial Game Idea: ${JSON.stringify(initialGameIdea, null, 2)}`
+      : ""
+  }\nChapter Idea: ${JSON.stringify(chapterIdea)}\nTone: ${tone}`;
 
   return generateStructuredData<AIEvent>({
     fnName: "genOutroEvent",
@@ -62,4 +67,3 @@ if (import.meta.main) {
     .then((event) => console.log(JSON.stringify(event, null, 2)))
     .catch(console.error);
 }
-
