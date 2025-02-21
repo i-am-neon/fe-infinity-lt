@@ -67,7 +67,8 @@ Important continuity rules for dead characters:
 - Minor unit deaths should be referenced in the story, but will likely only alter the next chapter slightly.
 - When referencing dead boss characters, make sure to never refer to them as part of the player party.
 
-We want to produce a single AIEvent object. It must strictly match the AIEvent schema. Return only JSON, no additional commentary.`;
+We want to produce a single AIEvent object. It must strictly match the AIEvent schema. Return only JSON, no additional commentary.
+Additionally, if the chapter idea's intro mentions a 'boss' or 'newPlayableUnits' or 'newNonBattleCharacters', ensure they appear in the event. They can speak or appear in a cameo. The boss may have a line or be introduced if it makes sense.`;
 
   const generatorPrompt = `World Summary: ${JSON.stringify(
     worldSummary,
@@ -99,6 +100,7 @@ We have an AIEvent candidate. We must ensure:
 2) The event only uses "add_portrait", "speak", "narrate" commands from the sourceAsObject schema. 
 3) Characters mentioned in the event who appear from the start must have "add_portrait" before "speak" unless they deliberately enter mid-scene.
 4) The event must not mention or speak for newlyDeadThisChapter.
+5) If the chapter idea's intro references a 'boss' or 'newPlayableUnits' or 'newNonBattleCharacters', ensure they appear in the final event.
 If the candidate is valid, return { "fixText": "None" }. Otherwise, provide fix instructions in fixText/fixObject.`;
 
   return genAndCheck<AIEvent>({

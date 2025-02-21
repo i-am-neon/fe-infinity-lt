@@ -1,8 +1,7 @@
-import { WorldSummary } from "@/ai/types/world-summary.ts";
 import { InitialGameIdea } from "@/ai/types/initial-game-idea.ts";
-import { Game } from "@/types/game.ts";
-import { Character } from "@/types/character/character.ts";
+import { WorldSummary } from "@/ai/types/world-summary.ts";
 import { Chapter } from "@/types/chapter.ts";
+import { Game } from "@/types/game.ts";
 
 export const testGameName = "The Grand Tourney";
 export const testGameDescription =

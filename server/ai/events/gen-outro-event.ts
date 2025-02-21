@@ -41,7 +41,8 @@ The event should:
 - you may only give speaking roles to characters mentioned in the outro, not any other characters
 - you must have characters speak to each other in the scene
 
-We want to produce a single AIEvent object. It must match the AIEvent schema. Return only JSON, no extra commentary.`;
+We want to produce a single AIEvent object. It must match the AIEvent schema. Return only JSON, no additional commentary.
+Additionally, if the chapter idea's outro mentions a 'boss' or 'newPlayableUnits' or 'newNonBattleCharacters', ensure they appear in the event. They can speak or appear in a cameo. The boss may have a line or be introduced if it makes sense.`;
 
   const generatorPrompt = `World Summary: ${JSON.stringify(
     worldSummary,
@@ -60,6 +61,7 @@ We have an AIEvent candidate. We must ensure:
 1) No resurrected or reintroduced dead characters.
 2) If a character speaks, ensure an add_portrait command is used first unless they appear mid-scene intentionally.
 3) The event must only use valid commands from SourceAsObject ("add_portrait", "speak", "narrate").
+4) If the chapter idea's outro references a 'boss' or 'newPlayableUnits' or 'newNonBattleCharacters', ensure they appear in the final event.
 If valid, fixText=None, else propose fix instructions.`;
 
   return genAndCheck<AIEvent>({
