@@ -33,16 +33,14 @@ ${prologueNote}
 
 The event should:
 - use the Chapter Idea's outro as the basis for the event
-- have the characters talk about something that closes out the chapter with the "add_portrait" command for each character and then use the "speak" command for them to speak
-- unless a character enters the scene later, all characters in the event should be added with "add_portrait" before anyone speaks
-  - if a character appears in or enters the scene later, add them with "add_portrait" when they enter
+- ensure that any character who speaks has an "add_portrait" command somewhere earlier in the event script
 - be sure to include the Chapter Idea's newNonBattleCharacters as characters in the event, as mentioned in the "intro" section of the Chapter Idea
 - if a character is mentioned in the outro, it must be included in the event
 - you may only give speaking roles to characters mentioned in the outro, not any other characters
 - you must have characters speak to each other in the scene
 
 We want to produce a single AIEvent object. It must match the AIEvent schema. Return only JSON, no additional commentary.
-Additionally, if the chapter idea's outro mentions a 'boss' or 'newPlayableUnits' or 'newNonBattleCharacters', ensure they appear in the event. They can speak or appear in a cameo. The boss may have a line or be introduced if it makes sense.`;
+Additionally, if the chapter idea's outro references a 'boss' or 'newPlayableUnits' or 'newNonBattleCharacters', ensure they appear in the event. They can speak or appear in a cameo. The boss may have a line or be introduced if it makes sense.`;
 
   const generatorPrompt = `World Summary: ${JSON.stringify(
     worldSummary,
@@ -59,10 +57,10 @@ Tone: ${tone}`;
   const checkerSystemMessage = `You are a Fire Emblem Fangame Outro Event Checker (checker).
 We have an AIEvent candidate. We must ensure:
 1) No resurrected or reintroduced dead characters.
-2) If a character speaks, ensure an add_portrait command is used first unless they appear mid-scene intentionally.
-3) The event must only use valid commands from SourceAsObject ("add_portrait", "speak", "narrate").
+2) Each speaking character has an "add_portrait" command at some point before their first "speak" command.
+3) The event must only use valid commands ("add_portrait", "speak", "narrate").
 4) If the chapter idea's outro references a 'boss' or 'newPlayableUnits' or 'newNonBattleCharacters', ensure they appear in the final event.
-If valid, fixText=None, else propose fix instructions.`;
+If valid => fixText=None, else fix instructions.`;
 
   return genAndCheck<AIEvent>({
     fnBaseName: "genOutroEvent",
@@ -74,8 +72,8 @@ If valid, fixText=None, else propose fix instructions.`;
       return `Candidate:\n${JSON.stringify(candidate, null, 2)}
 Constraints:
 1) Must not resurrect dead characters or mention them as living.
-2) Must use only valid commands from the SourceAsObject schema.
-3) Must provide "add_portrait" before "speak" if they appear at the start, or intentionally show they enter mid-scene.
+2) Must only use valid commands ("add_portrait", "speak", "narrate").
+3) Must provide "add_portrait" for each speaking character prior to their first line.
 If all good => fixText=None, else fix instructions.`;
     },
   });
@@ -91,4 +89,3 @@ if (import.meta.main) {
     .then((event) => console.log(JSON.stringify(event, null, 2)))
     .catch(console.error);
 }
-

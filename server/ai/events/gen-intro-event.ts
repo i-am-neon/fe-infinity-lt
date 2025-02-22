@@ -68,7 +68,7 @@ Important continuity rules for dead characters:
 - When referencing dead boss characters, make sure to never refer to them as part of the player party.
 
 We want to produce a single AIEvent object. It must strictly match the AIEvent schema. Return only JSON, no additional commentary.
-Additionally, if the chapter idea's intro mentions a 'boss' or 'newPlayableUnits' or 'newNonBattleCharacters', ensure they appear in the event. They can speak or appear in a cameo. The boss may have a line or be introduced if it makes sense.`;
+Additionally, if the chapter idea's intro mentions a 'boss' or 'newPlayableUnits' or 'newNonBattleCharacters', ensure they appear in the final event. They can speak or appear in a cameo. The boss may have a line or be introduced if it makes sense.`;
 
   const generatorPrompt = `World Summary: ${JSON.stringify(
     worldSummary,
@@ -97,11 +97,28 @@ Newly Dead This Chapter: ${JSON.stringify(
   const checkerSystemMessage = `You are a Fire Emblem Fangame Intro Event Checker (checker).
 We have an AIEvent candidate. We must ensure:
 1) It does not resurrect or give speaking roles to dead characters.
-2) The event only uses "add_portrait", "speak", "narrate" commands from the sourceAsObject schema. 
-3) Characters mentioned in the event who appear from the start must have "add_portrait" before "speak" unless they deliberately enter mid-scene.
+2) The event only uses "add_portrait", "speak", "narrate" commands from the sourceAsObject schema.
+3) Each speaking character must have an "add_portrait" command somewhere before their first "speak" command.
 4) The event must not mention or speak for newlyDeadThisChapter.
 5) If the chapter idea's intro references a 'boss' or 'newPlayableUnits' or 'newNonBattleCharacters', ensure they appear in the final event.
 If the candidate is valid, return { "fixText": "None" }. Otherwise, provide fix instructions in fixText/fixObject.`;
+
+  const checkerPrompt = (candidate: AIEvent) => {
+    return `Candidate:\n${JSON.stringify(candidate, null, 2)}
+Check the following constraints carefully:
+1) Must not include or resurrect dead characters from: ${JSON.stringify(
+      allDeadCharacters,
+      null,
+      2
+    )} or newlyDeadThisChapter: ${JSON.stringify(
+      newlyDeadThisChapter,
+      null,
+      2
+    )}.
+2) Must have "add_portrait" commands for any speaking characters at some point before they speak.
+3) Must follow the AIEvent schema exactly and only use valid commands ("add_portrait", "speak", "narrate").
+If all is correct => fixText=None. Otherwise => fix instructions.`;
+  };
 
   return genAndCheck<AIEvent>({
     fnBaseName: "genIntroEvent",
@@ -109,22 +126,7 @@ If the candidate is valid, return { "fixText": "None" }. Otherwise, provide fix 
     generatorPrompt,
     generatorSchema: AIEventSchema,
     checkerSystemMessage,
-    checkerPrompt: (candidate) => {
-      return `Candidate:\n${JSON.stringify(candidate, null, 2)}
-Check the following constraints carefully:
-1) Must not include or resurrect dead characters from: ${JSON.stringify(
-        allDeadCharacters,
-        null,
-        2
-      )} or newlyDeadThisChapter: ${JSON.stringify(
-        newlyDeadThisChapter,
-        null,
-        2
-      )}.
-2) Must have "add_portrait" commands for any speaking characters at the start, unless the script intentionally has them enter mid-scene.
-3) Must follow the AIEvent schema exactly and only use valid commands ("add_portrait", "speak", "narrate").
-If all is correct => fixText=None. Otherwise => fix instructions.`;
-    },
+    checkerPrompt,
   });
 }
 
@@ -146,4 +148,3 @@ if (import.meta.main) {
     JSON.stringify(testAIEventPrologueIntro, null, 2)
   );
 }
-
