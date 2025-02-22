@@ -24,6 +24,7 @@ export interface GeneratorCheckerAllInOneParams<T> {
 
 // Accept string/null/undefined for fixText so it won't fail when null is returned
 const rawCheckerSchema = z.object({
+  passesCheck: z.boolean(),
   fixText: z.union([z.string(), z.null()]).optional(),
   fixObject: z.unknown().optional(),
 });
@@ -40,7 +41,7 @@ export async function genAndCheck<T>({
   generatorSchema,
   checkerSystemMessage,
   checkerPrompt,
-  generatorModel = "gpt-4o",
+  generatorModel = "gpt-4o-mini",
   generatorTemperature = 1,
   checkerModel = "gpt-4o-mini",
   checkerTemperature = 0,
@@ -89,16 +90,15 @@ export async function genAndCheck<T>({
         model: checkerModel,
       });
 
-      // Convert the raw data into a CheckerOutputFix<T>, defaulting to "None" if fixText is null/undefined
-      const fixCheck: CheckerOutputFix<T> = {
-        fixText: rawFixCheck.fixText ?? "None",
-        fixObject: (rawFixCheck.fixObject as Partial<T>) ?? {},
-      };
-
-      // If fixText is "None", no changes needed; return the candidate
-      if (!fixCheck.fixText || fixCheck.fixText === "None") {
+      const passesCheck = rawFixCheck.passesCheck;
+      if (passesCheck) {
         return candidate;
       }
+
+      const fixCheck: CheckerOutputFix<T> = {
+        fixText: rawFixCheck.fixText ?? "No fix instructions provided",
+        fixObject: (rawFixCheck.fixObject as Partial<T>) ?? {},
+      };
 
       // If we reached the last attempt and still have a fix required, throw
       if (attempt === maxAttempts) {
