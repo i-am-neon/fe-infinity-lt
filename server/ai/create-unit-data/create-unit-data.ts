@@ -17,7 +17,10 @@ export default async function createUnitData({
   chapterNumber: number;
 }): Promise<UnitData> {
   let { isPromoted, level } = decideLevel(chapterNumber);
-  if (characterIdea.firstSeenAs === "ally" || characterIdea.firstSeenAs === "allied NPC") {
+  if (
+    characterIdea.firstSeenAs === "ally" ||
+    characterIdea.firstSeenAs === "allied NPC"
+  ) {
     level += 2;
     if (!isPromoted && level > 20) {
       level = 20;

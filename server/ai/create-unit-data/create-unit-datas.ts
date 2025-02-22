@@ -5,6 +5,7 @@ import {
   testCharIdeaAislin,
   testCharIdeaThorne,
 } from "@/ai/test-data/character-ideas.ts";
+import { getCurrentLogger } from "@/lib/current-logger.ts";
 
 export default function createUnitDatas({
   characterIdeas,
@@ -13,11 +14,17 @@ export default function createUnitDatas({
   characterIdeas: CharacterIdea[];
   chapterNumber: number;
 }): Promise<UnitData[]> {
+  const logger = getCurrentLogger();
+  const start = Date.now();
   return Promise.all(
     characterIdeas.map((idea) =>
       createUnitData({ characterIdea: idea, chapterNumber })
     )
-  );
+  ).then((datas) => {
+    const duration = Date.now() - start;
+    logger.info("createUnitDatas completed", { duration, count: datas.length });
+    return datas;
+  });
 }
 
 if (import.meta.main) {

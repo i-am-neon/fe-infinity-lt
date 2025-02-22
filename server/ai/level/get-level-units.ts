@@ -24,6 +24,7 @@ export default async function getLevelUnits({
   bossUnitData: UnitData;
 }): Promise<Level["units"]> {
   const logger = getCurrentLogger();
+  const start = Date.now();
   logger.debug("getLevelUnits", {
     chapterNumber,
     playerUnitDatas,
@@ -76,39 +77,41 @@ export default async function getLevelUnits({
   });
 
   // Add generic enemies. Comment this out to skip generics for quick testing
-  // genericEnemies.forEach((ge) => {
-  //   if (!ge.class) {
-  //     throw new Error(`No class found for generic enemy ${ge}`);
-  //   }
-  //   // For now just hard code items
-  //   ge.startingItems = ge.startingItems ?? [];
-  //   // insert items at beginning of array before special items
-  //   ge.startingItems.unshift(
-  //     ...decideUnitWeapons({ fe8Class: ge.class, level: 1, isPromoted: false })
-  //   );
-  //   units.push({
-  //     nid: shortUuid(),
-  //     team: "enemy",
-  //     ai: ge.aiGroup,
-  //     // TODO: figure out generic levels
-  //     level: decideGenericUnitLevel({
-  //       chapter: chapterNumber,
-  //       fe8Class: ge.class,
-  //     }),
-  //     // TODO: factions
-  //     faction: chapterIdea.enemyFaction.nid,
-  //     klass: FE8ClassToLTNidMap[ge.class],
-  //     roam_ai: null,
-  //     ai_group: "",
-  //     starting_position: [ge.x, ge.y],
-  //     starting_items: ge.startingItems,
-  //     starting_traveler: null,
-  //     generic: true,
-  //   });
-  // });
+  genericEnemies.forEach((ge) => {
+    if (!ge.class) {
+      throw new Error(`No class found for generic enemy ${ge}`);
+    }
+    // For now just hard code items
+    ge.startingItems = ge.startingItems ?? [];
+    // insert items at beginning of array before special items
+    ge.startingItems.unshift(
+      ...decideUnitWeapons({ fe8Class: ge.class, level: 1, isPromoted: false })
+    );
+    units.push({
+      nid: shortUuid(),
+      team: "enemy",
+      ai: ge.aiGroup,
+      // TODO: figure out generic levels
+      level: decideGenericUnitLevel({
+        chapter: chapterNumber,
+        fe8Class: ge.class,
+      }),
+      // TODO: factions
+      faction: chapterIdea.enemyFaction.nid,
+      klass: FE8ClassToLTNidMap[ge.class],
+      roam_ai: null,
+      ai_group: "",
+      starting_position: [ge.x, ge.y],
+      starting_items: ge.startingItems,
+      starting_traveler: null,
+      generic: true,
+    });
+  });
 
   // TODO: green units
 
+  const duration = Date.now() - start;
+  logger.info("getLevelUnits completed", { duration, unitCount: units.length });
   return units;
 }
 
