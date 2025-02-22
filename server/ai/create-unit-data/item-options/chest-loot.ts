@@ -356,3 +356,4 @@ if (import.meta.main) {
     console.log(`Chapter ${ch} => Chest Loot: `, getChestLoot(ch));
   }
 }
+
