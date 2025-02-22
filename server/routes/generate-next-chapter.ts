@@ -1,6 +1,7 @@
 import createNextChapter from "@/create-next-chapter.ts";
 import { getCurrentLogger } from "@/lib/current-logger.ts";
 import runGame from "@/run-game.ts";
+import { getGameByNid } from "@/db/games.ts";
 
 export async function handleGenerateNextChapter(
   req: Request
@@ -20,12 +21,26 @@ export async function handleGenerateNextChapter(
       );
     }
 
-    // Immediately return to avoid request timeout
+    const existingGame = getGameByNid(gameNid);
+    if (!existingGame) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: "No game found for that nid",
+        }),
+        {
+          status: 404,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
     const quickResponse = new Response(
       JSON.stringify({
         success: true,
+        gameNid,
         message:
-          "Generating next chapter in the background. You can retrieve the updated game using list-games or get-game endpoints soon.",
+          "Generating next chapter in the background. You can retrieve the updated game soon.",
       }),
       {
         headers: { "Content-Type": "application/json" },
@@ -48,8 +63,8 @@ export async function handleGenerateNextChapter(
           duration,
         });
 
-        // Optionally run the game after generating the next chapter
-        await runGame(directory);
+        // Optionally run the game in background
+        runGame(directory);
       } catch (err) {
         console.error("Error in background next chapter creation:", err);
       }

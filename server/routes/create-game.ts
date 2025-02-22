@@ -35,34 +35,49 @@ export async function handleCreateGame(req: Request): Promise<Response> {
     const description = body.description;
     const tone = body.tone;
 
-    // Respond immediately to avoid timeouts
+    // 1) remove existing game if it exists, initialize project to get gameNid
+    await removeExistingGame(projectName);
+    const { projectNameEndingInDotLtProj, gameNid } = await initializeProject(
+      projectName
+    );
+
+    // Insert a minimal game record so that the DB definitely has the game
+    const partialGame: Game = {
+      nid: gameNid,
+      title: projectName,
+      directory: projectNameEndingInDotLtProj,
+      description,
+      chapters: [],
+      characters: [],
+      tone,
+      usedPortraits: [],
+    };
+    insertGame(partialGame);
+
+    // 2) respond now that we have a minimal record
     const quickResponse = new Response(
       JSON.stringify({
         success: true,
+        gameNid,
         message:
-          "Game creation is being processed in the background. Poll for the new game using list-games or get-game endpoints.",
+          "Initial game record created. Generation tasks are continuing in the background.",
       }),
       {
         headers: { "Content-Type": "application/json" },
       }
     );
 
+    // 3) run the rest of the tasks in the background
     (async () => {
       const startTime = Date.now();
       try {
-        // 1) remove existing game if it exists
-        await removeExistingGame(projectName);
-
-        // 2) initialize a new project
-        const { projectNameEndingInDotLtProj, gameNid } =
-          await initializeProject(projectName);
         setCurrentLogger({
           projectName: projectNameEndingInDotLtProj,
           chapterNumber: 0,
         });
         const logger = getCurrentLogger();
 
-        // 3) generate world summary & top-level music
+        // generate world summary & top-level music
         const worldSummary = await genWorldSummary({
           gameName: projectName,
           gameDescription: description,
@@ -74,13 +89,13 @@ export async function handleCreateGame(req: Request): Promise<Response> {
           tone,
         });
 
-        // 4) generate the initial game idea
+        // generate the initial game idea
         const initialGameIdea = await genInitialGameIdea({
           worldSummary,
           tone,
         });
 
-        // 5) create the prologue (chapterNumber=0)
+        // create the prologue
         const { chapter, usedPortraits, musicToCopy } = await genChapter({
           worldSummary,
           initialGameIdea,
@@ -88,23 +103,22 @@ export async function handleCreateGame(req: Request): Promise<Response> {
           chapterNumber: 0,
         });
 
-        // 6) write the prologue to the LT files
-        // also add top level musics
+        // write the prologue to LT
         await writeChapter({
           projectNameEndingInDotLtProj,
           chapter,
           music: [...topLevelMusics, ...musicToCopy],
         });
 
-        // write a stub for chapter 1
+        // write a stub for the next chapter
         await writeStubChapter({
           projectNameEndingInDotLtProj,
           chapterNumber: 1,
           previousTilemapNid: chapter.tilemap.nid,
         });
 
-        // 7) Insert into DB
-        const newGame: Game = {
+        // The minimal record is already inserted. Let's update it now that we have full data.
+        const updatedGame: Game = {
           nid: gameNid,
           title: projectName,
           directory: projectNameEndingInDotLtProj,
@@ -116,14 +130,13 @@ export async function handleCreateGame(req: Request): Promise<Response> {
           worldSummary,
           initialGameIdea,
         };
-
-        insertGame(newGame);
+        insertGame(updatedGame);
 
         const duration = Date.now() - startTime;
-        logger.info("New Game Created", { newGame, duration });
+        logger.info("New Game Created", { newGame: updatedGame, duration });
 
-        // 8) optionally run the game
-        await runGame(projectNameEndingInDotLtProj);
+        // optional runGame
+        runGame(projectNameEndingInDotLtProj);
       } catch (err) {
         console.error("Error in background game creation:", err);
       }
@@ -132,8 +145,7 @@ export async function handleCreateGame(req: Request): Promise<Response> {
     return quickResponse;
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : String(error);
-    const errBody = JSON.stringify({ success: false, error: msg });
-    return new Response(errBody, {
+    return new Response(JSON.stringify({ success: false, error: msg }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });

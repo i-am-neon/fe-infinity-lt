@@ -47,13 +47,33 @@ export default function GameDetailPage() {
   }, [searchParams]);
   const [dialogOpen, setDialogOpen] = useState(false);
 
+  // Poll for newly created game if "new" query param is present
   useEffect(() => {
     if (!loading && newGameModalOpen) {
-      // Auto-dismiss the modal 3 seconds after game data has loaded
-      const timer = setTimeout(() => setNewGameModalOpen(false), 3000);
-      return () => clearTimeout(timer);
+      const intervalId = setInterval(async () => {
+        try {
+          const res = await apiCall<{
+            success: boolean;
+            game?: Game;
+            error?: string;
+          }>(`games/${nid}`);
+          if (res.success && res.game && res.game.chapters.length > 0) {
+            setData(res);
+            setNewGameModalOpen(false);
+            clearInterval(intervalId);
+            // remove ?new=true from URL
+            window.history.replaceState(null, "", `/games/${nid}`);
+          } else {
+            setData(res);
+          }
+        } catch (err) {
+          console.error("Polling error:", err);
+        }
+      }, 3000);
+
+      return () => clearInterval(intervalId);
     }
-  }, [loading, newGameModalOpen]);
+  }, [newGameModalOpen, loading, nid]);
 
   useEffect(() => {
     let canceled = false;
@@ -81,15 +101,44 @@ export default function GameDetailPage() {
     });
   }, [data]);
 
+  const [oldChapterCount, setOldChapterCount] = useState<number | null>(null);
+
   const handleGenerateNextChapter = useCallback(() => {
+    if (!data?.game) return;
+    setOldChapterCount(data.game.chapters.length);
     setLoadingAction("generate");
     startTransition(async () => {
-      if (data?.game) {
-        await generateNextChapter(data.game.directory, data.game.nid);
-      }
-      setLoadingAction(null);
+      await generateNextChapter(data.game!.directory, data.game!.nid);
     });
   }, [data]);
+
+  // Poll for generate next chapter completion
+  useEffect(() => {
+    if (loadingAction === "generate" && oldChapterCount !== null) {
+      const pollId = setInterval(async () => {
+        try {
+          const res = await apiCall<{
+            success: boolean;
+            game?: Game;
+            error?: string;
+          }>(`games/${nid}`);
+          if (res.success && res.game) {
+            setData(res);
+            // Compare new chapters count to old
+            if (res.game.chapters.length > oldChapterCount) {
+              setLoadingAction(null);
+              setOldChapterCount(null);
+              clearInterval(pollId);
+            }
+          }
+        } catch (err) {
+          console.error("Error polling after generate next chapter:", err);
+        }
+      }, 3000);
+
+      return () => clearInterval(pollId);
+    }
+  }, [loadingAction, oldChapterCount, nid]);
 
   const handleConfirmDelete = useCallback(() => {
     setDialogOpen(false);
@@ -134,7 +183,9 @@ export default function GameDetailPage() {
           <>
             <h1 className="text-2xl font-bold">Game: {data.game.title}</h1>
             <p>Description: {data.game.description}</p>
-            <p className="italic text-sm text-muted-foreground">Tone: {data.game.tone}</p>
+            <p className="italic text-sm text-muted-foreground">
+              Tone: {data.game.tone}
+            </p>
 
             <div className="flex flex-col sm:flex-row sm:items-center gap-2">
               <Button onClick={handlePlay} disabled={disabled}>
@@ -200,3 +251,4 @@ export default function GameDetailPage() {
     </>
   );
 }
+

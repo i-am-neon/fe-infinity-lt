@@ -20,6 +20,7 @@ export default function Home() {
   const router = useRouter();
   const [isCreating, setIsCreating] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [creatingGameModalOpen, setCreatingGameModalOpen] = useState(false);
   const [gameIdea, setGameIdea] = useState("");
 
   const handleCreateGame = useCallback(async () => {
@@ -37,13 +38,17 @@ export default function Home() {
       );
       return;
     }
+    setDialogOpen(false);
+    setCreatingGameModalOpen(true);
     setIsCreating(true);
+
     try {
       const res = await createGame({ title, description, tone });
       if (res.success && res.gameNid) {
         router.push(`/games/${res.gameNid}?new=true`);
       }
     } finally {
+      // We do not close creatingGameModalOpen, because we redirect
       setIsCreating(false);
     }
   }, [router, gameIdea]);
@@ -84,6 +89,21 @@ export default function Home() {
                 Confirm
               </Button>
             </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog
+          open={creatingGameModalOpen}
+          onOpenChange={setCreatingGameModalOpen}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Game is being generated</DialogTitle>
+            </DialogHeader>
+            <div className="flex items-center gap-2">
+              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+              <p>The game is being created. Please wait...</p>
+            </div>
           </DialogContent>
         </Dialog>
 
