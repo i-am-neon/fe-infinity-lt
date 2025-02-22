@@ -13,7 +13,6 @@ import genChapter from "@/ai/gen-chapter.ts";
 
 export async function handleCreateGame(req: Request): Promise<Response> {
   try {
-    const startTime = Date.now();
     const body = (await req.json()) as {
       title?: string;
       description?: string;
@@ -36,89 +35,101 @@ export async function handleCreateGame(req: Request): Promise<Response> {
     const description = body.description;
     const tone = body.tone;
 
-    // 1) remove existing game if it exists
-    await removeExistingGame(projectName);
-
-    // 2) initialize a new project
-    const { projectNameEndingInDotLtProj, gameNid } = await initializeProject(
-      projectName
+    // Respond immediately to avoid timeouts
+    const quickResponse = new Response(
+      JSON.stringify({
+        success: true,
+        message:
+          "Game creation is being processed in the background. Poll for the new game using list-games or get-game endpoints.",
+      }),
+      {
+        headers: { "Content-Type": "application/json" },
+      }
     );
-    setCurrentLogger({
-      projectName: projectNameEndingInDotLtProj,
-      chapterNumber: 0,
-    });
-    const logger = getCurrentLogger();
 
-    // 3) generate world summary & top-level music
-    const worldSummary = await genWorldSummary({
-      gameName: projectName,
-      gameDescription: description,
-      tone,
-    });
-    const topLevelMusics = await chooseTopLevelMusic({
-      projectNameEndingInDotLtProj,
-      gameDescription: description,
-      tone,
-    });
+    (async () => {
+      const startTime = Date.now();
+      try {
+        // 1) remove existing game if it exists
+        await removeExistingGame(projectName);
 
-    // 4) generate the initial game idea
-    const initialGameIdea = await genInitialGameIdea({
-      worldSummary,
-      tone,
-    });
+        // 2) initialize a new project
+        const { projectNameEndingInDotLtProj, gameNid } =
+          await initializeProject(projectName);
+        setCurrentLogger({
+          projectName: projectNameEndingInDotLtProj,
+          chapterNumber: 0,
+        });
+        const logger = getCurrentLogger();
 
-    // 5) create the prologue (chapterNumber=0)
-    const { chapter, usedPortraits, musicToCopy } = await genChapter({
-      worldSummary,
-      initialGameIdea,
-      tone,
-      chapterNumber: 0,
-    });
+        // 3) generate world summary & top-level music
+        const worldSummary = await genWorldSummary({
+          gameName: projectName,
+          gameDescription: description,
+          tone,
+        });
+        const topLevelMusics = await chooseTopLevelMusic({
+          projectNameEndingInDotLtProj,
+          gameDescription: description,
+          tone,
+        });
 
-    // 6) write the prologue to the LT files
-    // also add top level musics
-    await writeChapter({
-      projectNameEndingInDotLtProj,
-      chapter,
-      music: [...topLevelMusics, ...musicToCopy],
-    });
+        // 4) generate the initial game idea
+        const initialGameIdea = await genInitialGameIdea({
+          worldSummary,
+          tone,
+        });
 
-    // write a stub for chapter 1
-    await writeStubChapter({
-      projectNameEndingInDotLtProj,
-      chapterNumber: 1,
-      previousTilemapNid: chapter.tilemap.nid,
-    });
+        // 5) create the prologue (chapterNumber=0)
+        const { chapter, usedPortraits, musicToCopy } = await genChapter({
+          worldSummary,
+          initialGameIdea,
+          tone,
+          chapterNumber: 0,
+        });
 
-    const newGame: Game = {
-      nid: gameNid,
-      title: projectName,
-      directory: projectNameEndingInDotLtProj,
-      description,
-      chapters: [chapter],
-      characters: chapter.newCharacters,
-      tone,
-      usedPortraits,
-      worldSummary,
-      initialGameIdea,
-    };
+        // 6) write the prologue to the LT files
+        // also add top level musics
+        await writeChapter({
+          projectNameEndingInDotLtProj,
+          chapter,
+          music: [...topLevelMusics, ...musicToCopy],
+        });
 
-    insertGame(newGame);
+        // write a stub for chapter 1
+        await writeStubChapter({
+          projectNameEndingInDotLtProj,
+          chapterNumber: 1,
+          previousTilemapNid: chapter.tilemap.nid,
+        });
 
-    const duration = Date.now() - startTime;
-    logger.info("New Game Created", { newGame, duration });
+        // 7) Insert into DB
+        const newGame: Game = {
+          nid: gameNid,
+          title: projectName,
+          directory: projectNameEndingInDotLtProj,
+          description,
+          chapters: [chapter],
+          characters: chapter.newCharacters,
+          tone,
+          usedPortraits,
+          worldSummary,
+          initialGameIdea,
+        };
 
-    // run the game
-    void runGame(projectNameEndingInDotLtProj);
+        insertGame(newGame);
 
-    const responseBody = JSON.stringify({
-      success: true,
-      projectNameEndingInDotLtProj,
-      gameNid,
-    });
-    return new Response(responseBody, {
-      headers: { "Content-Type": "application/json" },
-    });
+        const duration = Date.now() - startTime;
+        logger.info("New Game Created", { newGame, duration });
+
+        // 8) optionally run the game
+        await runGame(projectNameEndingInDotLtProj);
+      } catch (err) {
+        console.error("Error in background game creation:", err);
+      }
+    })();
+
+    return quickResponse;
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : String(error);
     const errBody = JSON.stringify({ success: false, error: msg });

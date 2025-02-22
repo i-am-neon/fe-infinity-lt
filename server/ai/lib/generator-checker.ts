@@ -1,6 +1,7 @@
 import generateStructuredData from "@/lib/generate-structured-data.ts";
 import { z, ZodSchema, ZodObject } from "zod";
 import { OpenAIChatModelId } from "@ai-sdk/openai/internal";
+import { getCurrentLogger } from "@/lib/current-logger.ts";
 
 export interface CheckerOutputFix<T> {
   fixText: string;
@@ -36,6 +37,7 @@ type RawCheckerOutput = z.infer<typeof rawCheckerSchema>;
 export async function genAndCheck<T>(
   params: GeneratorCheckerAllInOneParams<T>
 ): Promise<T> {
+  const logger = getCurrentLogger();
   const {
     generatorSystemMessage,
     generatorPrompt,
@@ -108,6 +110,10 @@ export async function genAndCheck<T>(
 
     // Otherwise incorporate partial fix and continue
     partialFix = fixCheck.fixObject;
+    logger.warn(`${fnBaseName}_generator_attempt${attempt} FAILED:`, {
+      fixCheck,
+      candidate,
+    });
   }
 
   throw new Error("Unreachable code in genAndCheck");

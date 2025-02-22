@@ -20,18 +20,42 @@ export async function handleGenerateNextChapter(
       );
     }
 
-    await createNextChapter({
-      projectNameEndingInDotLtProj: directory,
-      gameNid,
-    });
+    // Immediately return to avoid request timeout
+    const quickResponse = new Response(
+      JSON.stringify({
+        success: true,
+        message:
+          "Generating next chapter in the background. You can retrieve the updated game using list-games or get-game endpoints soon.",
+      }),
+      {
+        headers: { "Content-Type": "application/json" },
+      }
+    );
 
-    console.log("✅ generated next chapter. Running game...");
+    (async () => {
+      const startTime = Date.now();
+      try {
+        await createNextChapter({
+          projectNameEndingInDotLtProj: directory,
+          gameNid,
+        });
 
-    await runGame(directory);
+        const logger = getCurrentLogger();
+        const duration = Date.now() - startTime;
+        logger.info("Next chapter generation completed", {
+          directory,
+          gameNid,
+          duration,
+        });
 
-    return new Response(JSON.stringify({ success: true }), {
-      headers: { "Content-Type": "application/json" },
-    });
+        // Optionally run the game after generating the next chapter
+        await runGame(directory);
+      } catch (err) {
+        console.error("Error in background next chapter creation:", err);
+      }
+    })();
+
+    return quickResponse;
   } catch (error: unknown) {
     const logger = getCurrentLogger();
     if (error instanceof Error) {
@@ -57,14 +81,3 @@ export async function handleGenerateNextChapter(
     }
   }
 }
-
-if (import.meta.main) {
-  const mockRequest = new Request("https://example.com/generate-next-chapter", {
-    method: "POST",
-    body: JSON.stringify({ directory: "_new.ltproj", gameNid: "new" }),
-  });
-  handleGenerateNextChapter(mockRequest).then(async (res) => {
-    console.log("Response:", await res.json());
-  });
-}
-
