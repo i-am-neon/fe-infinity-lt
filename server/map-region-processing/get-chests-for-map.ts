@@ -12,7 +12,7 @@ interface ChestObject {
 
 /**
  * Gets chest regions from a specific map JSON file
- * @param filePath Path to the map JSON file
+ * @param filePath Path to the map JSON file (use getPathWithinServer when passing this in, this fn doesn't do that)
  * @returns Array of chest objects
  */
 export async function getChestsForMap(
@@ -98,3 +98,4 @@ if (import.meta.main) {
     }
   })();
 }
+
