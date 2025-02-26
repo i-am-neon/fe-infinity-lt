@@ -15,13 +15,11 @@ interface ChestObject {
  * @param filePath Path to the map JSON file (use getPathWithinServer when passing this in, this fn doesn't do that)
  * @returns Array of chest objects
  */
-export async function getChestsForMap(
-  filePath: string
-): Promise<ChestObject[]> {
+export function getChestsForMap(filePath: string): ChestObject[] {
   const chests: ChestObject[] = [];
 
   try {
-    const fileContent = await Deno.readTextFile(filePath);
+    const fileContent = Deno.readTextFileSync(filePath);
     const mapData = JSON.parse(fileContent);
 
     // Process each layer in the map
