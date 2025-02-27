@@ -1,7 +1,7 @@
 import { Event } from "@/types/events/event.ts";
 import { getChestsForMap } from "@/map-region-processing/get-chests-for-map.ts";
 import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
-import getChestLoot from "@/ai/create-unit-data/item-options/chest-loot.ts";
+import getLoot from "../ai/create-unit-data/item-options/get-loot.ts";
 import { LevelRegion } from "@/types/level.ts";
 
 export default function getChestEventsAndRegions({
@@ -39,7 +39,7 @@ export default function getChestEventsAndRegions({
         _source: [
           "unlock;{unit}",
           `show_layer;${chest.layerNid}`,
-          `give_item;{unit};${getChestLoot(chapterNumber)}`,
+          `give_item;{unit};${getLoot(chapterNumber)}`,
         ],
       } satisfies Event,
     };

@@ -337,7 +337,7 @@ function pickStatBooster(): string {
 /**
  * Returns an item NID for the chest, based on the current chapter's progression.
  */
-export default function getChestLoot(chapterNumber: number): string {
+export default function getLoot(chapterNumber: number): string {
   const roll = Math.random() * 100;
   if (roll < 15) {
     return pickHealingItem(chapterNumber);
@@ -353,7 +353,7 @@ export default function getChestLoot(chapterNumber: number): string {
 if (import.meta.main) {
   const testChapters = [1, 8, 9, 12, 13, 16, 17, 20, 21, 25];
   for (const ch of testChapters) {
-    console.log(`Chapter ${ch} => Chest Loot: `, getChestLoot(ch));
+    console.log(`Chapter ${ch} => Chest Loot: `, getLoot(ch));
   }
 }
 
