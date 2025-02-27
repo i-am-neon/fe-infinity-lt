@@ -69,18 +69,18 @@
     ],
     "project": "tiled-tilesets.tiled-project",
     "recentFiles": [
-        "maps/vanilla-chpt-3.tsj",
-        "6E.tsj",
-        "ddd.tsj",
+        "10.tsj",
+        "03.tsj",
         "1A.tsj",
-        "8A.tsj",
-        "7B.tsj",
-        "61.tsj",
-        "52.tsj",
-        "44.tsj",
-        "3E.tsj",
         "30.tsj",
-        "10.tsj"
+        "3E.tsj",
+        "44.tsj",
+        "52.tsj",
+        "61.tsj",
+        "6E.tsj",
+        "7B.tsj",
+        "8A.tsj",
+        "maps/vanilla-chpt-3.tsj"
     ],
     "tileset.lastUsedFormat": "json",
     "tileset.tileSize": {

@@ -29,6 +29,7 @@ import getChestEventsAndRegions from "../map-region-processing/get-chest-events-
 import getDoorEventsAndRegions from "@/map-region-processing/get-door-events-and-regions.ts";
 import getBreakableWallEventsAndUnits from "@/map-region-processing/get-breakable-wall-events.ts";
 import { LevelRegion } from "@/types/level.ts";
+import getSnagEventsAndUnits from "@/map-region-processing/get-snag-events-and-units.ts";
 
 /**
  * Creates the next chapter based on the given data.
@@ -225,7 +226,7 @@ export default async function genChapter({
   const chosenMapName = await chooseMap(chapterIdea, usedMapNames);
 
   // Place units
-  const units = await getLevelUnits({
+  const levelUnits = await getLevelUnits({
     chosenMapName,
     chapterIdea,
     chapterNumber,
@@ -250,22 +251,34 @@ export default async function genChapter({
     chapterNumber,
   });
 
+  const snagEventsAndUnits = getSnagEventsAndUnits({
+    mapName: chosenMapName,
+    chapterNumber,
+  });
+
   const interactableRegions: LevelRegion[] = [
     ...chestEventsAndRegions.map(({ region }) => region),
     ...doorEventsAndRegions.map(({ region }) => region),
   ];
+
   const interactableEvents: Event[] = [
     ...chestEventsAndRegions.map(({ event }) => event),
     ...doorEventsAndRegions.map(({ event }) => event),
     ...breakableWallEventsAndUnits.map(({ events }) => events).flat(),
+    ...snagEventsAndUnits.map(({ event }) => event),
   ];
+
+  // Add breakable wall units to level units
+  const wallUnits = breakableWallEventsAndUnits.flatMap(({ units }) => units);
+  // Add snag units to level units
+  const snagUnits = snagEventsAndUnits.map(({ unit }) => unit);
 
   // Construct the level
   const level = assembleLevel({
     chapterIdea,
     chapterNumber,
     chosenMapName,
-    units,
+    units: [...levelUnits, ...wallUnits, ...snagUnits],
     playerPhaseMusic,
     enemyPhaseMusic,
     regions: interactableRegions,
@@ -276,10 +289,6 @@ export default async function genChapter({
     getPathWithinServer(`assets/maps/${level.tilemap}.json`)
   );
   const tilemap: Tilemap = JSON.parse(tilemapRaw);
-
-  // Add breakable wall units to level units
-  const wallUnits = breakableWallEventsAndUnits.flatMap(({ units }) => units);
-  level.units = [...level.units, ...wallUnits];
 
   // Build final Chapter object
   const newChapter: Chapter = {
@@ -320,3 +329,4 @@ if (import.meta.main) {
     tone: testTone,
   }).then(console.log);
 }
+
