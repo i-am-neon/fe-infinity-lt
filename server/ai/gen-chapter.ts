@@ -247,10 +247,12 @@ export default async function genChapter({
     chapterNumber,
   });
 
-  const houseAndVillageEventsAndRegions = getHouseAndVillageEventsAndRegions({
-    mapName: chosenMapName,
-    chapterNumber,
-  });
+  const houseAndVillageEventsAndRegions =
+    await getHouseAndVillageEventsAndRegions({
+      mapName: chosenMapName,
+      chapterNumber,
+      chapterIdea,
+    });
 
   const breakableWallEventsAndUnits = getBreakableWallEventsAndUnits({
     mapName: chosenMapName,

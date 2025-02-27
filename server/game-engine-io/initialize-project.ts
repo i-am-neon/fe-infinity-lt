@@ -10,6 +10,7 @@ import copyTilesetsToProject from "@/file-io/copy-tilesets-to-project.ts";
 import appendAllTilesetsData from "@/game-engine-io/write-chapter/append-all-tilesets-data.ts";
 import modifyConstant from "@/game-engine-io/modify-constant.ts";
 import { copyMusicAndUpdateJson } from "@/game-engine-io/write-chapter/copy-music.ts";
+import copyGenericPortraitsToProject from "@/file-io/copy-generic-portraits-to-project.ts";
 
 export default async function initializeProject(projectName: string) {
   const initProjectScriptPath = getPathWithinLtMaker("create_new_project.py");
@@ -146,6 +147,9 @@ export default async function initializeProject(projectName: string) {
     relativePath: `${newProjectNameEndingInDotLtProj}/resources/portraits`,
     preserveDirectory: true,
   });
+
+  // Add generic villager portraits
+  await copyGenericPortraitsToProject(newProjectNameEndingInDotLtProj);
 
   // Remove tilemaps
   await removeWithinLtMaker({
