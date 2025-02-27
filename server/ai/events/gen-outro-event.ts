@@ -57,10 +57,17 @@ Tone: ${tone}`;
   const checkerSystemMessage = `You are a Fire Emblem Fangame Outro Event Checker (checker).
 We have an AIEvent candidate. We must ensure:
 1) No resurrected or reintroduced dead characters.
-2) Each speaking character has an "add_portrait" command at some point before their first "speak" command.
+2) Each speaking character has an "add_portrait" command at some point before their first "speak" command. This is CRITICAL.
 3) The event must only use valid commands ("add_portrait", "speak", "narrate").
 4) If the chapter idea's outro references a 'boss' or 'newPlayableUnits' or 'newNonBattleCharacters', ensure they appear in the final event.
-If valid => fixText=None, else fix instructions.`;
+
+DETAILED CHECK PROCEDURE:
+- First, get a list of all characters added with "add_portrait" commands
+- Then, check each "speak" command to make sure the character has been added earlier
+- If any character speaks without an "add_portrait" first, RETURN SPECIFIC FIXES
+- The fixObject should include the full fixed sourceObjects array if needed
+
+If the candidate is valid, return { "fixText": "None", "passesCheck": true }. Otherwise, provide fix instructions in fixText and the fixed sourceObjects in fixObject if possible.`;
 
   return genAndCheck<AIEvent>({
     fnBaseName: "genOutroEvent",
@@ -74,7 +81,14 @@ Constraints:
 1) Must not resurrect dead characters or mention them as living.
 2) Must only use valid commands ("add_portrait", "speak", "narrate").
 3) Must provide "add_portrait" for each speaking character prior to their first line.
-If all good => fixText=None, else fix instructions.`;
+   STEP 1: List all characters added with "add_portrait"
+   STEP 2: Check each "speak" command to ensure character is in that list
+   STEP 3: If a character speaks without prior add_portrait, return specific fix
+
+If all is correct => fixText="None" and passesCheck=true.
+If there are issues => provide detailed fixText and set passesCheck=false.
+
+For portrait validation issues, you can provide a fixObject with a corrected sourceObjects array that adds the missing "add_portrait" commands before the first speak command.`;
     },
   });
 }

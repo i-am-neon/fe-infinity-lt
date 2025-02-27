@@ -98,10 +98,17 @@ Newly Dead This Chapter: ${JSON.stringify(
 We have an AIEvent candidate. We must ensure:
 1) It does not resurrect or give speaking roles to dead characters.
 2) The event only uses "add_portrait", "speak", "narrate" commands from the sourceAsObject schema.
-3) Each speaking character must have an "add_portrait" command somewhere before their first "speak" command.
+3) Each speaking character must have an "add_portrait" command somewhere before their first "speak" command. This is CRITICAL.
 4) The event must not mention or speak for newlyDeadThisChapter.
 5) If the chapter idea's intro references a 'boss' or 'newPlayableUnits' or 'newNonBattleCharacters', ensure they appear in the final event.
-If the candidate is valid, return { "fixText": "None" }. Otherwise, provide fix instructions in fixText/fixObject.`;
+
+DETAILED CHECK PROCEDURE:
+- First, get a list of all characters added with "add_portrait" commands
+- Then, check each "speak" command to make sure the character has been added earlier
+- If any character speaks without an "add_portrait" first, RETURN SPECIFIC FIXES
+- The fixObject should include the full fixed sourceObjects array if needed
+
+If the candidate is valid, return { "fixText": "None", "passesCheck": true }. Otherwise, provide fix instructions in fixText and the fixed sourceObjects in fixObject if possible.`;
 
   const checkerPrompt = (candidate: AIEvent) => {
     return `Candidate:\n${JSON.stringify(candidate, null, 2)}
@@ -116,8 +123,15 @@ Check the following constraints carefully:
       2
     )}.
 2) Must have "add_portrait" commands for any speaking characters at some point before they speak.
+   STEP 1: List all characters added with "add_portrait"
+   STEP 2: Check each "speak" command to ensure character is in that list
+   STEP 3: If a character speaks without prior add_portrait, return specific fix
 3) Must follow the AIEvent schema exactly and only use valid commands ("add_portrait", "speak", "narrate").
-If all is correct => fixText=None. Otherwise => fix instructions.`;
+
+If all is correct => fixText="None" and passesCheck=true.
+If there are issues => provide detailed fixText and set passesCheck=false.
+
+For portrait validation issues, you can provide a fixObject with a corrected sourceObjects array that adds the missing "add_portrait" commands before the first speak command.`;
   };
 
   return genAndCheck<AIEvent>({
@@ -141,10 +155,5 @@ if (import.meta.main) {
       console.log(JSON.stringify(res, null, 2));
     })
     .catch(console.error);
-
-  // Quick test with existing testAIEventPrologueIntro
-  console.log(
-    "Example input for dev/test: ",
-    JSON.stringify(testAIEventPrologueIntro, null, 2)
-  );
 }
+
