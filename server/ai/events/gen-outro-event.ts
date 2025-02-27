@@ -1,14 +1,15 @@
-import { AIEvent, AIEventSchema } from "@/ai/types/ai-event.ts";
-import { WorldSummary } from "@/ai/types/world-summary.ts";
-import { InitialGameIdea } from "@/ai/types/initial-game-idea.ts";
-import { ChapterIdea } from "@/ai/types/chapter-idea.ts";
+import { validateAiEventPortraits } from "@/ai/events/validate-ai-event.ts";
 import { genAndCheck } from "@/ai/lib/generator-checker.ts";
 import {
-  testTone,
-  testWorldSummary,
   testInitialGameIdea,
   testPrologueChapter,
+  testTone,
+  testWorldSummary,
 } from "@/ai/test-data/prologueTestData.ts";
+import { AIEvent, AIEventSchema } from "@/ai/types/ai-event.ts";
+import { ChapterIdea } from "@/ai/types/chapter-idea.ts";
+import { InitialGameIdea } from "@/ai/types/initial-game-idea.ts";
+import { WorldSummary } from "@/ai/types/world-summary.ts";
 
 /**
  * Generates an AIEvent that serves as the outro scene for the chapter, wrapping up the chapter's story.
@@ -39,8 +40,8 @@ The event should:
 - you may only give speaking roles to characters mentioned in the outro, not any other characters
 - you must have characters speak to each other in the scene
 
-We want to produce a single AIEvent object. It must match the AIEvent schema. Return only JSON, no additional commentary.
-Additionally, if the chapter idea's outro references a 'boss' or 'newPlayableUnits' or 'newNonBattleCharacters', ensure they appear in the event. They can speak or appear in a cameo. The boss may have a line or be introduced if it makes sense.`;
+We want one AIEvent object strictly matching the AIEvent schema. Return only JSON, no commentary.
+If the outro references a 'boss', 'newPlayableUnits', or 'newNonBattleCharacters', ensure they appear if it makes sense.`;
 
   const generatorPrompt = `World Summary: ${JSON.stringify(
     worldSummary,
@@ -57,14 +58,10 @@ Tone: ${tone}`;
   const checkerSystemMessage = `You are a Fire Emblem Fangame Outro Event Checker (checker).
 We have an AIEvent candidate. We must ensure:
 1) No resurrected or reintroduced dead characters.
-2) Each speaking character has an "add_portrait" command at some point before their first "speak" command. This is CRITICAL.
-3) The event must only use valid commands ("add_portrait", "speak", "narrate").
-4) If the chapter idea's outro references a 'boss' or 'newPlayableUnits' or 'newNonBattleCharacters', ensure they appear in the final event.
+2) The event must only use valid commands ("add_portrait", "speak", "narrate").
+3) If the chapter idea's outro references a 'boss', 'newPlayableUnits', or 'newNonBattleCharacters', ensure they appear in the event.
 
 DETAILED CHECK PROCEDURE:
-- First, get a list of all characters added with "add_portrait" commands
-- Then, check each "speak" command to make sure the character has been added earlier
-- If any character speaks without an "add_portrait" first, RETURN SPECIFIC FIXES
 - The fixObject should include the full fixed sourceObjects array if needed
 
 If the candidate is valid, return { "fixText": "None", "passesCheck": true }. Otherwise, provide fix instructions in fixText and the fixed sourceObjects in fixObject if possible.`;
@@ -77,19 +74,16 @@ If the candidate is valid, return { "fixText": "None", "passesCheck": true }. Ot
     checkerSystemMessage,
     checkerPrompt: (candidate) => {
       return `Candidate:\n${JSON.stringify(candidate, null, 2)}
+
 Constraints:
 1) Must not resurrect dead characters or mention them as living.
 2) Must only use valid commands ("add_portrait", "speak", "narrate").
-3) Must provide "add_portrait" for each speaking character prior to their first line.
-   STEP 1: List all characters added with "add_portrait"
-   STEP 2: Check each "speak" command to ensure character is in that list
-   STEP 3: If a character speaks without prior add_portrait, return specific fix
+3) If the chapter idea's intro mentions a 'boss', 'newPlayableUnits', or 'newNonBattleCharacters', ensure they appear in the final event.
 
 If all is correct => fixText="None" and passesCheck=true.
-If there are issues => provide detailed fixText and set passesCheck=false.
-
-For portrait validation issues, you can provide a fixObject with a corrected sourceObjects array that adds the missing "add_portrait" commands before the first speak command.`;
+If there are issues => provide detailed fixText and set passesCheck=false.`;
     },
+    validators: [validateAiEventPortraits],
   });
 }
 
@@ -103,3 +97,4 @@ if (import.meta.main) {
     .then((event) => console.log(JSON.stringify(event, null, 2)))
     .catch(console.error);
 }
+

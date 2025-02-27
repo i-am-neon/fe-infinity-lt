@@ -1,18 +1,18 @@
-import { AIEvent, AIEventSchema } from "@/ai/types/ai-event.ts";
-import { WorldSummary } from "@/ai/types/world-summary.ts";
-import { ChapterIdea } from "@/ai/types/chapter-idea.ts";
-import { InitialGameIdea } from "@/ai/types/initial-game-idea.ts";
-import { DeadCharacterRecord } from "@/types/dead-character-record.ts";
-import { CharacterIdea } from "@/ai/types/character-idea.ts";
-import { Chapter } from "@/types/chapter.ts";
+import { validateAiEventPortraits } from "@/ai/events/validate-ai-event.ts";
 import { genAndCheck } from "@/ai/lib/generator-checker.ts";
-import { testAIEventPrologueIntro } from "@/ai/test-data/events.ts";
 import {
-  testTone,
-  testWorldSummary,
   testInitialGameIdea,
   testPrologueChapter,
+  testTone,
+  testWorldSummary,
 } from "@/ai/test-data/prologueTestData.ts";
+import { AIEvent, AIEventSchema } from "@/ai/types/ai-event.ts";
+import { ChapterIdea } from "@/ai/types/chapter-idea.ts";
+import { CharacterIdea } from "@/ai/types/character-idea.ts";
+import { InitialGameIdea } from "@/ai/types/initial-game-idea.ts";
+import { WorldSummary } from "@/ai/types/world-summary.ts";
+import { Chapter } from "@/types/chapter.ts";
+import { DeadCharacterRecord } from "@/types/dead-character-record.ts";
 
 /**
  * Generates an AIEvent that serves as the intro scene for the chapter, introducing the story.
@@ -50,7 +50,7 @@ Write the event that will open this chapter of the game.
 
 ${prologueNote}
 
-It should:
+The event must:
 - use the Chapter Idea's intro as the basis for the event
 - make characters speak with the "add_portrait" command for each character and then use the "speak" command for them to speak
 - unless a character enters the scene later, all characters in the event should be added with "add_portrait" before anyone speaks
@@ -67,8 +67,8 @@ Important continuity rules for dead characters:
 - Minor unit deaths should be referenced in the story, but will likely only alter the next chapter slightly.
 - When referencing dead boss characters, make sure to never refer to them as part of the player party.
 
-We want to produce a single AIEvent object. It must strictly match the AIEvent schema. Return only JSON, no additional commentary.
-Additionally, if the chapter idea's intro mentions a 'boss' or 'newPlayableUnits' or 'newNonBattleCharacters', ensure they appear in the final event. They can speak or appear in a cameo. The boss may have a line or be introduced if it makes sense.`;
+We want a single AIEvent that strictly matches the AIEvent schema. Return only JSON, no extra commentary.
+If the chapter idea's intro references a 'boss', 'newPlayableUnits', or 'newNonBattleCharacters', ensure they appear. They can speak or cameo if it makes sense.`;
 
   const generatorPrompt = `World Summary: ${JSON.stringify(
     worldSummary,
@@ -95,23 +95,24 @@ Newly Dead This Chapter: ${JSON.stringify(
   )}. You must NOT give these characters speaking roles in the current chapter idea! They are dead and the story can reference and change because of that, but dead characters can never show up again in any scenes.`;
 
   const checkerSystemMessage = `You are a Fire Emblem Fangame Intro Event Checker (checker).
-We have an AIEvent candidate. We must ensure:
+We must ensure:
 1) It does not resurrect or give speaking roles to dead characters.
 2) The event only uses "add_portrait", "speak", "narrate" commands from the sourceAsObject schema.
-3) Each speaking character must have an "add_portrait" command somewhere before their first "speak" command. This is CRITICAL.
-4) The event must not mention or speak for newlyDeadThisChapter.
-5) If the chapter idea's intro references a 'boss' or 'newPlayableUnits' or 'newNonBattleCharacters', ensure they appear in the final event.
+3) The event must not mention or speak for newlyDeadThisChapter.
+4) If the chapter idea's intro mentions a 'boss', 'newPlayableUnits', or 'newNonBattleCharacters', ensure they appear in the final event.
 
 DETAILED CHECK PROCEDURE:
-- First, get a list of all characters added with "add_portrait" commands
-- Then, check each "speak" command to make sure the character has been added earlier
-- If any character speaks without an "add_portrait" first, RETURN SPECIFIC FIXES
 - The fixObject should include the full fixed sourceObjects array if needed
 
 If the candidate is valid, return { "fixText": "None", "passesCheck": true }. Otherwise, provide fix instructions in fixText and the fixed sourceObjects in fixObject if possible.`;
 
   const checkerPrompt = (candidate: AIEvent) => {
+    // Let's use our algorithmic validation for portrait checking
+    const portraitValidation = validateAiEventPortraits(candidate);
+
     return `Candidate:\n${JSON.stringify(candidate, null, 2)}
+Portrait Validation Result: ${JSON.stringify(portraitValidation)}
+
 Check the following constraints carefully:
 1) Must not include or resurrect dead characters from: ${JSON.stringify(
       allDeadCharacters,
@@ -122,16 +123,13 @@ Check the following constraints carefully:
       null,
       2
     )}.
-2) Must have "add_portrait" commands for any speaking characters at some point before they speak.
-   STEP 1: List all characters added with "add_portrait"
-   STEP 2: Check each "speak" command to ensure character is in that list
-   STEP 3: If a character speaks without prior add_portrait, return specific fix
+2) Portrait validation is now handled by the algorithm and the result is shown above.
 3) Must follow the AIEvent schema exactly and only use valid commands ("add_portrait", "speak", "narrate").
 
 If all is correct => fixText="None" and passesCheck=true.
 If there are issues => provide detailed fixText and set passesCheck=false.
 
-For portrait validation issues, you can provide a fixObject with a corrected sourceObjects array that adds the missing "add_portrait" commands before the first speak command.`;
+For portrait validation issues, the algorithm has already checked this for you. Only raise portrait-related issues if the algorithm detected problems (isValid=false).`;
   };
 
   return genAndCheck<AIEvent>({
@@ -141,6 +139,7 @@ For portrait validation issues, you can provide a fixObject with a corrected sou
     generatorSchema: AIEventSchema,
     checkerSystemMessage,
     checkerPrompt,
+    validators: [validateAiEventPortraits],
   });
 }
 

@@ -1,14 +1,21 @@
+import { getCurrentLogger } from "@/lib/current-logger.ts";
 import { openai } from "@ai-sdk/openai";
 import { OpenAIChatModelId } from "@ai-sdk/openai/internal";
 import { generateObject } from "ai";
 import "jsr:@std/dotenv/load";
-import { z, ZodSchema, ZodObject } from "zod";
-import { getCurrentLogger } from "@/lib/current-logger.ts";
+import { z, ZodObject, ZodSchema } from "zod";
 
 export interface CheckerOutputFix<T> {
   fixText: string;
   fixObject: Partial<T>;
 }
+
+export interface ValidationResult {
+  isValid: boolean;
+  errors: string[];
+}
+
+export type ValidatorFunction<T> = (candidate: T) => ValidationResult;
 
 export interface GeneratorCheckerAllInOneParams<T> {
   generatorSystemMessage: string;
@@ -22,6 +29,7 @@ export interface GeneratorCheckerAllInOneParams<T> {
   checkerTemperature?: number;
   maxAttempts?: number;
   fnBaseName: string;
+  validators?: ValidatorFunction<T>[];
 }
 
 // Accept string/null/undefined for fixText so it won't fail when null is returned
@@ -49,6 +57,7 @@ export async function genAndCheck<T>({
   checkerTemperature = 0,
   maxAttempts = 3,
   fnBaseName,
+  validators,
 }: GeneratorCheckerAllInOneParams<T>): Promise<T> {
   const logger = getCurrentLogger();
   const startTime = Date.now();
@@ -120,31 +129,82 @@ No additional commentary or text outside these JSON objects.`;
         continue;
       }
 
-      // Run internal validation before checking with LLM
-      if (fnBaseName.includes("Event")) {
-        // Try to fix portrait issues programmatically first
-        try {
-          candidate = validateAndFixPortraits(
-            candidate,
-            fnBaseName,
-            attempt,
-            logger
-          );
-        } catch (validationError) {
-          logger.warn(
-            `[genAndCheck: ${fnBaseName}] Internal validation failed on attempt ${attempt}`,
-            { error: validationError }
-          );
-        }
-      }
-
       // 2) Check the candidate with the checker LLM, using the raw schema
       try {
+        // Run validators if provided
+        const validationResults: Record<string, ValidationResult> = {};
+        let algorithmicValidationFailed = false;
+
+        if (validators && validators.length > 0) {
+          for (let i = 0; i < validators.length; i++) {
+            const validatorName = `validator_${i + 1}`;
+            const validationResult = validators[i](candidate);
+            validationResults[validatorName] = validationResult;
+
+            if (!validationResult.isValid) {
+              algorithmicValidationFailed = true;
+              logger.warn(
+                `[genAndCheck: ${fnBaseName}] Validator ${validatorName} failed on attempt ${attempt}`,
+                { validationResult }
+              );
+            }
+          }
+        }
+
+        // If algorithmic validation already failed, we can short-circuit and trigger a retry
+        if (algorithmicValidationFailed) {
+          throw new Error(
+            "Algorithmic validation failed. Retrying with a new generation."
+          );
+        }
+
+        // Get the checker result
+        const checkerResult = checkerPrompt(candidate);
+
+        // For backward compatibility - extract algorithmic validation results if they exist in the prompt
+        if (
+          typeof checkerResult === "string" &&
+          checkerResult.includes("Portrait Validation Result")
+        ) {
+          const validationMatch = checkerResult.match(
+            /Portrait Validation Result: ({.*?})/
+          );
+          if (validationMatch) {
+            try {
+              const validationResult = JSON.parse(validationMatch[1]);
+              if (validationResult && validationResult.isValid === false) {
+                algorithmicValidationFailed = true;
+                logger.warn(
+                  `[genAndCheck: ${fnBaseName}] Embedded algorithmic validation failed on attempt ${attempt}`,
+                  { validationResult }
+                );
+                throw new Error(
+                  "Embedded algorithmic validation failed. Retrying with a new generation."
+                );
+              }
+            } catch (e) {
+              // Parsing error, just continue
+              logger.debug(
+                `[genAndCheck: ${fnBaseName}] Error parsing validation result`,
+                { error: e }
+              );
+            }
+          }
+        }
+
+        // Add validation results to the checker prompt
+        const checkerPromptWithValidations =
+          Object.keys(validationResults).length > 0
+            ? `${checkerResult}\n\nValidation Results: ${JSON.stringify(
+                validationResults
+              )}`
+            : checkerResult;
+
         const { object: rawFixCheck } = await generateObject({
           model: openai(checkerModel),
           schema: rawCheckerSchema,
           system: checkerSystemMessage,
-          prompt: checkerPrompt(candidate),
+          prompt: checkerPromptWithValidations,
           temperature: checkerTemperature,
         });
 
@@ -164,7 +224,7 @@ No additional commentary or text outside these JSON objects.`;
         lastFixText = fixCheck.fixText;
         lastCandidate = candidate;
 
-        // If the check fails, see if fix instructions are "None" - some checkers use this convention
+        // If the check fails, see if fix instructions are "None"
         if (fixCheck.fixText === "None") {
           logger.info(
             `[genAndCheck: ${fnBaseName}] Checker responded with "None" as fixText, considering it passing`
@@ -199,34 +259,6 @@ No additional commentary or text outside these JSON objects.`;
               return lastChanceFixedCandidate;
             }
 
-            // If final fix attempt failed, but we have internal portrait validation
-            if (fnBaseName.includes("Event")) {
-              try {
-                const finalFixedCandidate = validateAndFixPortraits(
-                  lastChanceFixedCandidate,
-                  fnBaseName,
-                  attempt + 0.5,
-                  logger
-                );
-
-                // Do a final manual validation before accepting
-                if (manuallyValidateEvent(finalFixedCandidate)) {
-                  logger.info(
-                    `[genAndCheck: ${fnBaseName}] Final portrait validation succeeded on attempt ${
-                      attempt + 0.5
-                    }`
-                  );
-                  return finalFixedCandidate;
-                }
-              } catch (finalValidationError) {
-                logger.warn(
-                  `[genAndCheck: ${fnBaseName}] Final portrait validation failed`,
-                  { finalValidationError }
-                );
-              }
-            }
-
-            // If final fix attempt failed
             throw new Error(
               `Failed after ${maxAttempts} attempts with fixes. Last fixText: ${fixCheck.fixText}`
             );
@@ -242,30 +274,13 @@ No additional commentary or text outside these JSON objects.`;
         }
 
         // 3) Try to fix the candidate for the next check
-        let fixedCandidate = await fixCandidate({
+        const fixedCandidate = await fixCandidate({
           candidate,
           fixCheck,
           generatorSchema,
           fnBaseName,
           attemptNumber: attempt,
         });
-
-        // Add additional internal validation
-        if (fnBaseName.includes("Event")) {
-          try {
-            fixedCandidate = validateAndFixPortraits(
-              fixedCandidate,
-              fnBaseName,
-              attempt + 0.25,
-              logger
-            );
-          } catch (validationError) {
-            logger.warn(
-              `[genAndCheck: ${fnBaseName}] Post-fix validation failed on attempt ${attempt}`,
-              { validationError }
-            );
-          }
-        }
 
         // 4) Check if the fix worked
         const { object: verifyFixCheck } = await generateObject({
@@ -291,7 +306,7 @@ No additional commentary or text outside these JSON objects.`;
           }
         );
 
-        // If this is the second-to-last attempt, try one more fix with the new feedback
+        // If this is the second-to-last attempt, try one more fix
         if (attempt === maxAttempts - 1) {
           try {
             const lastChanceFixedCandidate = await fixCandidate({
@@ -306,71 +321,25 @@ No additional commentary or text outside these JSON objects.`;
               attemptNumber: attempt + 0.5,
             });
 
-            // One more internal validation pass
-            if (fnBaseName.includes("Event")) {
-              try {
-                const finalValidatedCandidate = validateAndFixPortraits(
-                  lastChanceFixedCandidate,
-                  fnBaseName,
-                  attempt + 0.75,
-                  logger
-                );
+            // Check if that final fix worked
+            const { object: finalCheckResult } = await generateObject({
+              model: openai(checkerModel),
+              schema: rawCheckerSchema,
+              system: checkerSystemMessage,
+              prompt: checkerPrompt(lastChanceFixedCandidate),
+              temperature: checkerTemperature,
+            });
 
-                // Check if this last fix worked
-                const { object: finalCheckResult } = await generateObject({
-                  model: openai(checkerModel),
-                  schema: rawCheckerSchema,
-                  system: checkerSystemMessage,
-                  prompt: checkerPrompt(finalValidatedCandidate),
-                  temperature: checkerTemperature,
-                });
-
-                if (
-                  finalCheckResult.passesCheck ||
-                  finalCheckResult.fixText === "None"
-                ) {
-                  logger.info(
-                    `[genAndCheck: ${fnBaseName}] Last-chance final validation succeeded on attempt ${
-                      attempt + 0.75
-                    }`
-                  );
-                  return finalValidatedCandidate;
-                }
-
-                // If even this doesn't work, do a manual validation as last resort
-                if (manuallyValidateEvent(finalValidatedCandidate)) {
-                  logger.info(
-                    `[genAndCheck: ${fnBaseName}] Manual validation succeeded as last resort`
-                  );
-                  return finalValidatedCandidate;
-                }
-              } catch (finalValidationError) {
-                logger.warn(
-                  `[genAndCheck: ${fnBaseName}] Final validation failed`,
-                  { finalValidationError }
-                );
-              }
-            } else {
-              // For non-event types, just check the LLM result
-              const { object: finalCheckResult } = await generateObject({
-                model: openai(checkerModel),
-                schema: rawCheckerSchema,
-                system: checkerSystemMessage,
-                prompt: checkerPrompt(lastChanceFixedCandidate),
-                temperature: checkerTemperature,
-              });
-
-              if (
-                finalCheckResult.passesCheck ||
-                finalCheckResult.fixText === "None"
-              ) {
-                logger.info(
-                  `[genAndCheck: ${fnBaseName}] Last-chance additional fix succeeded on attempt ${
-                    attempt + 0.5
-                  }`
-                );
-                return lastChanceFixedCandidate;
-              }
+            if (
+              finalCheckResult.passesCheck ||
+              finalCheckResult.fixText === "None"
+            ) {
+              logger.info(
+                `[genAndCheck: ${fnBaseName}] Last-chance additional fix succeeded on attempt ${
+                  attempt + 0.5
+                }`
+              );
+              return lastChanceFixedCandidate;
             }
           } catch (additionalFixError) {
             logger.warn(
@@ -385,7 +354,7 @@ No additional commentary or text outside these JSON objects.`;
           { error: checkError }
         );
 
-        // If this is the last attempt, save the candidate and continue to the end
+        // If this is the last attempt, store the candidate
         if (attempt === maxAttempts) {
           lastCandidate = candidate;
           lastFixText =
@@ -396,32 +365,9 @@ No additional commentary or text outside these JSON objects.`;
       }
     }
 
-    // If we got here, we've exhausted all attempts, but we have a last candidate
+    // If we got here, we've exhausted attempts, but we have a last candidate
     if (lastCandidate) {
-      // As a final attempt, try our internal validation if it's an event
-      if (fnBaseName.includes("Event")) {
-        try {
-          const finalFixedCandidate = validateAndFixPortraits(
-            lastCandidate,
-            fnBaseName,
-            maxAttempts + 1,
-            logger
-          );
-
-          if (manuallyValidateEvent(finalFixedCandidate)) {
-            logger.info(
-              `[genAndCheck: ${fnBaseName}] Final manual validation succeeded at last attempt`
-            );
-            return finalFixedCandidate;
-          }
-        } catch (finalError) {
-          logger.error(
-            `[genAndCheck: ${fnBaseName}] Final manual validation failed`,
-            { finalError }
-          );
-        }
-      }
-
+      // We simply return the last candidate as-is
       logger.warn(
         `[genAndCheck: ${fnBaseName}] Using last candidate despite failed checks`
       );
@@ -436,110 +382,7 @@ No additional commentary or text outside these JSON objects.`;
 }
 
 /**
- * Manually validates an event to ensure all speaking characters have portraits
- */
-function manuallyValidateEvent<T>(candidate: T): boolean {
-  // Early return if not an event
-  if (!(candidate as any)?.sourceObjects) {
-    return true;
-  }
-
-  const aiEvent = candidate as any;
-  if (!aiEvent.sourceObjects || !Array.isArray(aiEvent.sourceObjects)) {
-    return true;
-  }
-
-  const addedCharacters = new Set<string>();
-
-  for (const obj of aiEvent.sourceObjects) {
-    if (obj.command === "add_portrait" && obj.args?.length >= 1) {
-      addedCharacters.add(obj.args[0]);
-    } else if (
-      obj.command === "speak" &&
-      obj.args?.length >= 1 &&
-      !addedCharacters.has(obj.args[0])
-    ) {
-      return false; // Found a character speaking without a portrait
-    }
-  }
-
-  return true;
-}
-
-/**
- * Validates and fixes portrait issues in events programmatically
- */
-function validateAndFixPortraits<T>(
-  candidate: T,
-  fnBaseName: string,
-  attemptNumber: number,
-  logger: any
-): T {
-  // Early return if not an event
-  if (!(candidate as any)?.sourceObjects) {
-    return candidate;
-  }
-
-  const aiEvent = candidate as any;
-  if (!aiEvent.sourceObjects || !Array.isArray(aiEvent.sourceObjects)) {
-    return candidate;
-  }
-
-  // Track characters that have been added with add_portrait
-  const addedCharacters = new Set<string>();
-  const fixedSourceObjects = [];
-  let hasChanges = false;
-
-  // First pass: collect all characters that have add_portrait commands
-  for (const obj of aiEvent.sourceObjects) {
-    if (obj.command === "add_portrait" && obj.args?.length >= 1) {
-      addedCharacters.add(obj.args[0]);
-    }
-  }
-
-  // Second pass: fix any speak commands for characters without portraits
-  for (let i = 0; i < aiEvent.sourceObjects.length; i++) {
-    const obj = aiEvent.sourceObjects[i];
-
-    if (obj.command === "speak" && obj.args?.length >= 1) {
-      const speakerRaw = obj.args[0];
-      const speakerName = speakerRaw.replace(/\(.*?\)/g, "").trim();
-
-      if (!addedCharacters.has(speakerName)) {
-        logger.debug(
-          `[validateAndFixPortraits: ${fnBaseName}] Adding missing portrait for ${speakerRaw} at attempt ${attemptNumber}`
-        );
-
-        fixedSourceObjects.push({
-          command: "add_portrait",
-          args: [speakerName, "OffscreenRight"],
-        });
-
-        addedCharacters.add(speakerName);
-        hasChanges = true;
-      }
-    }
-
-    fixedSourceObjects.push(obj);
-  }
-
-  if (hasChanges) {
-    const fixedCandidate = {
-      ...aiEvent,
-      sourceObjects: fixedSourceObjects,
-    };
-    logger.debug(
-      `[validateAndFixPortraits: ${fnBaseName}] Applied portrait fixes at attempt ${attemptNumber}`
-    );
-    return fixedCandidate as T;
-  }
-
-  return candidate;
-}
-
-/**
  * Attempts to fix a candidate based on the checker's feedback.
- * Uses an LLM to make surgical fixes rather than regenerating from scratch.
  */
 async function fixCandidate<T>({
   candidate,
@@ -556,7 +399,7 @@ async function fixCandidate<T>({
 }): Promise<T> {
   const logger = getCurrentLogger();
 
-  // If fixObject is provided and has meaningful content, apply it directly
+  // If fixObject is provided with content, apply it directly
   const hasFixObject =
     fixCheck.fixObject && Object.keys(fixCheck.fixObject).length > 0;
   if (hasFixObject) {
@@ -566,54 +409,14 @@ async function fixCandidate<T>({
     return { ...candidate, ...fixCheck.fixObject };
   }
 
-  // Special handling for AIEvent objects with character portrait validation issues
-  if (
-    fnBaseName.includes("Event") &&
-    (fixCheck.fixText?.includes("add_portrait") ||
-      fixCheck.fixText?.includes("portrait") ||
-      fixCheck.fixText?.includes("character") ||
-      fixCheck.fixText?.includes("speak"))
-  ) {
-    try {
-      // Try to fix character portrait validation issues programmatically
-      logger.debug(
-        `[fixCandidate: ${fnBaseName}] Attempting specialized AIEvent fix for attempt ${attemptNumber}`
-      );
-
-      const fixedCandidate = validateAndFixPortraits(
-        candidate,
-        fnBaseName,
-        attemptNumber,
-        logger
-      );
-
-      logger.debug(
-        `[fixCandidate: ${fnBaseName}] Applied specialized AIEvent fix for attempt ${attemptNumber}`
-      );
-
-      return fixedCandidate;
-    } catch (error) {
-      logger.warn(
-        `[fixCandidate: ${fnBaseName}] Specialized AIEvent fix failed on attempt ${attemptNumber}`,
-        { error }
-      );
-    }
-  }
-
-  // Otherwise, use an LLM to fix it
+  // Otherwise, try the LLM to fix
   const fixerSystemMessage = `You are a surgical fixer for a generated response. You've been given:
 1. An original candidate object
 2. A description of issues with that object
 
 Your job is to make minimal, precise changes to fix the specific issues while preserving everything else.
 DO NOT rewrite everything. Only modify what needs to be fixed.
-DO NOT add commentary, explanation, or notes. ONLY return the fixed JSON object.
-
-Common fixes you should handle:
-- For AIEvents, ensure each character who speaks has an "add_portrait" command before their first speaking line
-- Check that characters mentioned in "speak" commands have been added with "add_portrait" earlier
-- Correct any malformed or invalid commands
-- Remove references to or speaking roles for dead characters`;
+DO NOT add commentary, explanation, or notes. ONLY return the fixed JSON object.`;
 
   const fixerPrompt = `Original candidate:
 ${JSON.stringify(candidate, null, 2)}
@@ -633,7 +436,7 @@ Return only the fixed JSON object with no additional commentary.`;
       schema: generatorSchema,
       system: fixerSystemMessage,
       prompt: fixerPrompt,
-      temperature: 0.2, // Lower temperature for more precise fixes
+      temperature: 0.2,
     });
 
     logger.debug(
@@ -646,12 +449,13 @@ Return only the fixed JSON object with no additional commentary.`;
       { error }
     );
 
-    // If all else fails, just return the original candidate with any fixObject applied
+    // If there's a fixObject, return candidate merged with fixObject
     if (hasFixObject) {
       return { ...candidate, ...fixCheck.fixObject };
     }
 
-    // Last resort - return the original
+    // Return the original candidate if everything else fails
     return candidate;
   }
 }
+
