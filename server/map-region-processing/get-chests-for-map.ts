@@ -1,5 +1,6 @@
 import { join } from "https://deno.land/std/path/mod.ts";
 import { openChestSprites } from "@/map-region-processing/open-chest-sprites.ts";
+import { Tilemap } from "@/types/maps/tilemap.ts";
 
 // Define the structure of a chest object
 interface ChestObject {
@@ -20,10 +21,12 @@ export function getChestsForMap(filePath: string): ChestObject[] {
 
   try {
     const fileContent = Deno.readTextFileSync(filePath);
-    const mapData = JSON.parse(fileContent);
+    const mapData = JSON.parse(fileContent) as Tilemap;
 
     // Process each layer in the map
-    for (const layer of mapData.layers) {
+    for (const layer of mapData.layers.filter(
+      (layer) => layer.nid !== "base"
+    )) {
       const layerNid = layer.nid;
       const spriteGrid = layer.sprite_grid;
 

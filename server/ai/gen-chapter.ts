@@ -25,7 +25,7 @@ import {
   testTone,
   testWorldSummary,
 } from "@/ai/test-data/prologueTestData.ts";
-import getChestEventsAndRegions from "./events/get-chest-events-and-regions.ts";
+import getChestEventsAndRegions from "../map-region-processing/get-chest-events-and-regions.ts";
 
 /**
  * Creates the next chapter based on the given data.
