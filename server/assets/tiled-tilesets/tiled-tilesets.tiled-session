@@ -58,6 +58,10 @@
         "ddd.tsj": {
             "scaleInDock": 1,
             "scaleInEditor": 1
+        },
+        "maps/vanilla-chpt-3.tsj": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         }
     },
     "last.imagePath": "/Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/lt-maker-fork/default.ltproj/resources/tilesets",
@@ -65,6 +69,7 @@
     ],
     "project": "tiled-tilesets.tiled-project",
     "recentFiles": [
+        "maps/vanilla-chpt-3.tsj",
         "6E.tsj",
         "ddd.tsj",
         "1A.tsj",
@@ -75,8 +80,7 @@
         "44.tsj",
         "3E.tsj",
         "30.tsj",
-        "10.tsj",
-        "03.tsj"
+        "10.tsj"
     ],
     "tileset.lastUsedFormat": "json",
     "tileset.tileSize": {
