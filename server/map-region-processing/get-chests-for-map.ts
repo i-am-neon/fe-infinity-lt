@@ -3,7 +3,7 @@ import { openChestSprites } from "@/map-region-processing/open-chest-sprites.ts"
 import { Tilemap } from "@/types/maps/tilemap.ts";
 
 // Define the structure of a chest object
-interface ChestObject {
+interface ChestRegion {
   layerNid: string;
   coordinates: {
     x: number;
@@ -16,8 +16,8 @@ interface ChestObject {
  * @param filePath Path to the map JSON file (use getPathWithinServer when passing this in, this fn doesn't do that)
  * @returns Array of chest objects
  */
-export function getChestsForMap(filePath: string): ChestObject[] {
-  const chests: ChestObject[] = [];
+export function getChestsForMap(filePath: string): ChestRegion[] {
+  const chests: ChestRegion[] = [];
 
   try {
     const fileContent = Deno.readTextFileSync(filePath);
