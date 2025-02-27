@@ -36,6 +36,7 @@ export const TriggerEnumSchema = z.enum([
   "roaming_interrupt",
   "Chest",
   "Door",
+  "Visit",
 ])
   .describe(`- \`level_start\`: This trigger fires at the very beginning of the chapter. Useful for introductory dialogue or additional level setup.
 - \`level_end\`: This trigger fires at the end of the chapter. Useful for ending chapter dialogue.
@@ -55,7 +56,8 @@ export const TriggerEnumSchema = z.enum([
 - \`on_base_convo\` {\`unit\`}: This trigger fires when the player selects a base conversation to view. For this trigger, \`unit\` contains the title of the base conversation.
 - \`Seize\`: This trigger fires when a unit Seizes a gate, marking the end of the chapter.
 - \`Chest\`: This trigger fires when a unit opens a chest in battle.
-- \`Door\`: This trigger fires when a unit opens a door in battle.`);
+- \`Door\`: This trigger fires when a unit opens a door in battle.
+- \`Visit\`: This trigger fires when a unit visits a house in battle.`);
 
 export type TriggerEnum = z.infer<typeof TriggerEnumSchema>;
 

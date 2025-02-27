@@ -25,11 +25,12 @@ import {
   testTone,
   testWorldSummary,
 } from "@/ai/test-data/prologueTestData.ts";
-import getChestEventsAndRegions from "../map-region-processing/get-chest-events-and-regions.ts";
+import getChestEventsAndRegions from "@/map-region-processing/get-chest-events-and-regions.ts";
 import getDoorEventsAndRegions from "@/map-region-processing/get-door-events-and-regions.ts";
 import getBreakableWallEventsAndUnits from "@/map-region-processing/get-breakable-wall-events.ts";
 import { LevelRegion } from "@/types/level.ts";
 import getSnagEventsAndUnits from "@/map-region-processing/get-snag-events-and-units.ts";
+import getHouseAndVillageEventsAndRegions from "@/map-region-processing/get-house-and-village-events-and-regions.ts";
 
 /**
  * Creates the next chapter based on the given data.
@@ -246,6 +247,11 @@ export default async function genChapter({
     chapterNumber,
   });
 
+  const houseAndVillageEventsAndRegions = getHouseAndVillageEventsAndRegions({
+    mapName: chosenMapName,
+    chapterNumber,
+  });
+
   const breakableWallEventsAndUnits = getBreakableWallEventsAndUnits({
     mapName: chosenMapName,
     chapterNumber,
@@ -259,11 +265,13 @@ export default async function genChapter({
   const interactableRegions: LevelRegion[] = [
     ...chestEventsAndRegions.map(({ region }) => region),
     ...doorEventsAndRegions.map(({ region }) => region),
+    ...houseAndVillageEventsAndRegions.map(({ region }) => region),
   ];
 
   const interactableEvents: Event[] = [
     ...chestEventsAndRegions.map(({ event }) => event),
     ...doorEventsAndRegions.map(({ event }) => event),
+    ...houseAndVillageEventsAndRegions.map(({ event }) => event),
     ...breakableWallEventsAndUnits.map(({ events }) => events).flat(),
     ...snagEventsAndUnits.map(({ event }) => event),
   ];
