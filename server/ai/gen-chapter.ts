@@ -25,6 +25,7 @@ import {
   testTone,
   testWorldSummary,
 } from "@/ai/test-data/prologueTestData.ts";
+import getChestEvents from "@/ai/events/get-chest-events.ts";
 
 /**
  * Creates the next chapter based on the given data.
@@ -247,12 +248,14 @@ export default async function genChapter({
   );
   const tilemap: Tilemap = JSON.parse(tilemapRaw);
 
+  const chestEvents = getChestEvents({ mapName: tilemap.nid, chapterNumber });
+
   // Build final Chapter object
   const newChapter: Chapter = {
     title: chapterIdea.title,
     number: chapterNumber,
     level,
-    events: [introEvent, outroEvent, defeatBossEvent],
+    events: [introEvent, outroEvent, defeatBossEvent, ...chestEvents],
     newCharacters,
     tilemap,
     enemyFaction: chapterIdea.enemyFaction,

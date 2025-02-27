@@ -18,7 +18,7 @@ export default function getChestEvents({
       ({
         name: chest.layerNid,
         trigger: "Chest",
-        level_nid: "3",
+        level_nid: chapterNumber.toString(),
         condition: `region.nid == '${chest.layerNid}'`,
         commands: [],
         only_once: false,

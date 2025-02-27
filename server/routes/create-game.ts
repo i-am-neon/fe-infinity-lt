@@ -138,7 +138,9 @@ export async function handleCreateGame(req: Request): Promise<Response> {
         // optional runGame
         runGame(projectNameEndingInDotLtProj);
       } catch (err) {
-        console.error("Error in background game creation:", err);
+        const logger = getCurrentLogger();
+        logger.error("Error creating game", { error: err });
+        throw err;
       }
     })();
 
@@ -151,3 +153,4 @@ export async function handleCreateGame(req: Request): Promise<Response> {
     });
   }
 }
+
