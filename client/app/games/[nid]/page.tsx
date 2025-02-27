@@ -89,11 +89,7 @@ export default function GameDetailPage() {
           } else if (pollAttempts >= maxPollAttempts) {
             // Timeout - too many attempts
             setCreationError(
-              "Game creation timed out. Please try again later." +
-                "maxPollAttempts: " +
-                maxPollAttempts +
-                "pollAttempts: " +
-                pollAttempts
+              "Game creation timed out. Please try again later."
             );
             clearInterval(intervalId);
           } else {

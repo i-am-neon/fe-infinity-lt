@@ -7,7 +7,7 @@ import {
   testPrologueChapter,
   testTone,
   testWorldSummary,
-} from "./test-data/prologueTestData.ts";
+} from "@/ai/test-data/prologueTestData.ts";
 
 export default function genChapterIdea({
   worldSummary,
@@ -95,13 +95,13 @@ Return { fixText: "None", fixObject: {} } if good; else fix instructions. Only J
       return `Candidate:\n${JSON.stringify(candidate, null, 2)}
 Constraints:
 1) No resurrecting these dead: ${JSON.stringify(allDeadCharacters)}
+  a) Note it is allowed for there to be themes of resurrection, zombies, undead, etc within the story line.
 2) No old bosses from existingChapters
-3) If there are newPlayableUnits or newNonBattleCharacters, they must appear in one of: intro, battle, or outro. For each new character's firstName, check if it is present in candidate.intro + candidate.battle + candidate.outro. If not found, fix.
-If all good => fixText=None. Otherwise => fixObject.`;
+3) If there are newPlayableUnits or newNonBattleCharacters, ensure they are actually mentioned by name in the intro, battle, or outro text. Look for their exact firstName in the text.
+If all good => fixText="None". Otherwise => fix instructions.`;
     },
   });
 }
-
 if (import.meta.main) {
   genChapterIdea({
     worldSummary: testWorldSummary,
@@ -112,3 +112,4 @@ if (import.meta.main) {
     console.log("Chapter Idea:", JSON.stringify(res, null, 2));
   });
 }
+
