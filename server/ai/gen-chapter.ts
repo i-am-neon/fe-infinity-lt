@@ -27,6 +27,7 @@ import {
 } from "@/ai/test-data/prologueTestData.ts";
 import getChestEventsAndRegions from "../map-region-processing/get-chest-events-and-regions.ts";
 import getDoorEventsAndRegions from "@/map-region-processing/get-door-events-and-regions.ts";
+import getBreakableWallEventsAndUnits from "@/map-region-processing/get-breakable-wall-events.ts";
 import { LevelRegion } from "@/types/level.ts";
 
 /**
@@ -244,6 +245,11 @@ export default async function genChapter({
     chapterNumber,
   });
 
+  const breakableWallEventsAndUnits = getBreakableWallEventsAndUnits({
+    mapName: chosenMapName,
+    chapterNumber,
+  });
+
   const interactableRegions: LevelRegion[] = [
     ...chestEventsAndRegions.map(({ region }) => region),
     ...doorEventsAndRegions.map(({ region }) => region),
@@ -251,6 +257,7 @@ export default async function genChapter({
   const interactableEvents: Event[] = [
     ...chestEventsAndRegions.map(({ event }) => event),
     ...doorEventsAndRegions.map(({ event }) => event),
+    ...breakableWallEventsAndUnits.map(({ event }) => event),
   ];
 
   // Construct the level
@@ -269,6 +276,10 @@ export default async function genChapter({
     getPathWithinServer(`assets/maps/${level.tilemap}.json`)
   );
   const tilemap: Tilemap = JSON.parse(tilemapRaw);
+
+  // Add breakable wall units to level units
+  const wallUnits = breakableWallEventsAndUnits.flatMap(({ units }) => units);
+  level.units = [...level.units, ...wallUnits];
 
   // Build final Chapter object
   const newChapter: Chapter = {
@@ -309,4 +320,3 @@ if (import.meta.main) {
     tone: testTone,
   }).then(console.log);
 }
-
