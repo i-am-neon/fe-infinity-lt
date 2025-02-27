@@ -1,0 +1,86 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "",
+    "expandedProjectPaths": [
+    ],
+    "fileStates": {
+        "03.tsj": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1.5164
+        },
+        "03.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "10.tsj": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1.4081
+        },
+        "1A.tsj": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1.548
+        },
+        "30.tsj": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1.5763
+        },
+        "3E.tsj": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1.5387
+        },
+        "44.tsj": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1.54
+        },
+        "52.tsj": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1.5904
+        },
+        "61.tsj": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1.56
+        },
+        "6E.tsj": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1.549
+        },
+        "7B.tsj": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1.7557
+        },
+        "8A.tsj": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1.8191
+        },
+        "ddd.tsj": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        }
+    },
+    "last.imagePath": "/Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/server/assets/maps/images",
+    "openFiles": [
+    ],
+    "project": "tiled-tilesets.tiled-project",
+    "recentFiles": [
+        "ddd.tsj",
+        "1A.tsj",
+        "8A.tsj",
+        "7B.tsj",
+        "6E.tsj",
+        "61.tsj",
+        "52.tsj",
+        "44.tsj",
+        "3E.tsj",
+        "30.tsj",
+        "10.tsj",
+        "03.tsj"
+    ],
+    "tileset.lastUsedFormat": "json",
+    "tileset.tileSize": {
+        "height": 16,
+        "width": 16
+    }
+}

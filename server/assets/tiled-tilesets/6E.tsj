@@ -1,0 +1,14 @@
+{ "columns":32,
+ "image":"..\/tilesets\/6C00A36E.png",
+ "imageheight":512,
+ "imagewidth":512,
+ "margin":0,
+ "name":"6E",
+ "spacing":0,
+ "tilecount":1024,
+ "tiledversion":"1.11.2",
+ "tileheight":16,
+ "tilewidth":16,
+ "type":"tileset",
+ "version":"1.10"
+}
