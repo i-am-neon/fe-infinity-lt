@@ -57,9 +57,15 @@ Tone: ${tone}`;
 
   const checkerSystemMessage = `You are a Fire Emblem Fangame Outro Event Checker (checker).
 We have an AIEvent candidate. We must ensure:
-1) No resurrected or reintroduced dead characters.
+1) No resurrected or reintroduced actual dead characters from previous chapters.
 2) The event must only use valid commands ("add_portrait", "speak", "narrate").
 3) If the chapter idea's outro references a 'boss', 'newPlayableUnits', or 'newNonBattleCharacters', ensure they appear in the event.
+
+IMPORTANT NOTES:
+- Allow narrative devices like "thought dead" or "has returned" for storytelling
+- Allow characters to speak from offscreen positions
+- Allow boss characters to be introduced in whatever way makes sense for the story
+- Distinguish between actual dead characters and narrative elements
 
 DETAILED CHECK PROCEDURE:
 - The fixObject should include the full fixed sourceObjects array if needed
@@ -75,10 +81,16 @@ If the candidate is valid, return { "fixText": "None", "passesCheck": true }. Ot
     checkerPrompt: (candidate) => {
       return `Candidate:\n${JSON.stringify(candidate, null, 2)}
 
-Constraints:
-1) Must not resurrect dead characters or mention them as living.
+Constraints (apply leniently):
+1) Must not resurrect ACTUAL dead characters from previous chapters or mention them as living.
 2) Must only use valid commands ("add_portrait", "speak", "narrate").
 3) If the chapter idea's intro mentions a 'boss', 'newPlayableUnits', or 'newNonBattleCharacters', ensure they appear in the final event.
+
+IMPORTANT:
+- Allow storytelling with references to characters being "thought dead" or returned
+- Allow boss characters and antagonists to speak from offscreen positions
+- Allow narrative introduction of new characters
+- Only flag actual resurrections of characters in previously established dead lists
 
 If all is correct => fixText="None" and passesCheck=true.
 If there are issues => provide detailed fixText and set passesCheck=false.`;
@@ -97,4 +109,3 @@ if (import.meta.main) {
     .then((event) => console.log(JSON.stringify(event, null, 2)))
     .catch(console.error);
 }
-

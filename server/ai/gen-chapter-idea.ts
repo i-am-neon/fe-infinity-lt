@@ -87,7 +87,9 @@ Tone: ${tone}`
       });
 
   const checkerSystemMessage = `You are a Fire Emblem Fangame Chapter Idea Checker (checker).
-Verify no mention or resurrection of the dead, no old bosses reused, new chars must appear.
+Check that all required fields are present and that new characters are mentioned in the text.
+Themes of resurrection, undead, etc. are perfectly fine in the story - only check that actual dead characters from previous chapters aren't brought back as active characters.
+Dramatic language in death quotes (like "I'll rise again") is completely acceptable.
 Return { fixText: "None", fixObject: {} } if good; else fix instructions. Only JSON.`;
 
   return genAndCheck<ChapterIdea>({
@@ -100,9 +102,11 @@ Return { fixText: "None", fixObject: {} } if good; else fix instructions. Only J
       return `Candidate:\n${JSON.stringify(candidate, null, 2)}
 Constraints:
 1) MUST have all required fields: title, intro, battle, outro, boss, enemyFaction. Verify each is present and properly formatted.
-2) No resurrecting these dead: ${JSON.stringify(allDeadCharacters)}
-  a) Note it is allowed for there to be themes of resurrection, zombies, undead, etc within the story line.
-3) No old bosses from existingChapters
+2) ONLY check that dead characters from this list: ${JSON.stringify(allDeadCharacters)} don't appear as active characters in the new chapter.
+  a) It is completely fine for the story to have themes of resurrection, zombies, undead, etc.
+  b) Dramatic language in death quotes (like "I will rise again" or similar) is completely acceptable.
+  c) New bosses and characters are always allowed even if they talk about resurrection themes.
+3) Only check that boss characters from previous chapters aren't reused with the same name and role.
 4) If there are newPlayableUnits or newNonBattleCharacters arrays present, ensure each character in these arrays is explicitly mentioned BY NAME (their exact firstName) in the intro, battle, or outro text. The boss character is already a required field and doesn't need this validation.
 If all good => fixText="None". Otherwise => fix instructions.`;
     },

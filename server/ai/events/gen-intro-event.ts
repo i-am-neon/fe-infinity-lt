@@ -96,13 +96,19 @@ Newly Dead This Chapter: ${JSON.stringify(
 
   const checkerSystemMessage = `You are a Fire Emblem Fangame Intro Event Checker (checker).
 We must ensure:
-1) It does not resurrect or give speaking roles to dead characters.
+1) It does not resurrect or give speaking roles to actually dead characters from previous chapters (those in allDeadCharacters list).
 2) The event only uses "add_portrait", "speak", "narrate" commands from the sourceAsObject schema.
 3) The event must not mention or speak for newlyDeadThisChapter.
-4) If the chapter idea's intro mentions a 'boss', 'newPlayableUnits', or 'newNonBattleCharacters', ensure they appear in the final event.
+4) Characters can be introduced naturally in the narrative, including:
+   - Narrative references to historical/lore figures being "thought dead" or returning
+   - Characters speaking from "OffscreenLeft" or "OffscreenRight" positions
+   - Bosses and antagonists mentioned in the chapter intro
 
-DETAILED CHECK PROCEDURE:
-- The fixObject should include the full fixed sourceObjects array if needed
+IMPORTANT NOTES:
+- Allow narrative devices like "thought dead" or "has returned" for storytelling
+- Allow characters to speak from offscreen positions
+- Allow boss characters to be introduced in whatever way makes sense for the story
+- Distinguish between actual dead characters (from allDeadCharacters) and narrative elements
 
 If the candidate is valid, return { "fixText": "None", "passesCheck": true }. Otherwise, provide fix instructions in fixText and the fixed sourceObjects in fixObject if possible.`;
 
@@ -113,8 +119,8 @@ If the candidate is valid, return { "fixText": "None", "passesCheck": true }. Ot
     return `Candidate:\n${JSON.stringify(candidate, null, 2)}
 Portrait Validation Result: ${JSON.stringify(portraitValidation)}
 
-Check the following constraints carefully:
-1) Must not include or resurrect dead characters from: ${JSON.stringify(
+Check the following constraints carefully but leniently:
+1) Must not include or resurrect ACTUAL dead characters from: ${JSON.stringify(
       allDeadCharacters,
       null,
       2
@@ -125,6 +131,12 @@ Check the following constraints carefully:
     )}.
 2) Portrait validation is now handled by the algorithm and the result is shown above.
 3) Must follow the AIEvent schema exactly and only use valid commands ("add_portrait", "speak", "narrate").
+
+IMPORTANT:
+- Allow storytelling with references to characters being "thought dead" or returned
+- Allow boss characters and antagonists to speak from offscreen positions
+- Allow narrative introduction of new characters
+- Only flag actual resurrections of characters in the dead lists
 
 If all is correct => fixText="None" and passesCheck=true.
 If there are issues => provide detailed fixText and set passesCheck=false.
@@ -155,4 +167,3 @@ if (import.meta.main) {
     })
     .catch(console.error);
 }
-
