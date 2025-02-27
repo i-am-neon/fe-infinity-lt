@@ -47,7 +47,6 @@ export function getDoorsForMap(filePath: string): DoorRegion[] {
         doorTiles.push({ x, y });
       }
     }
-
     // 2. Use the door tiles to find each's layer, then return that layer nid and tiles within that region
 
     doorTiles.forEach((doorTile) => {
@@ -55,11 +54,18 @@ export function getDoorsForMap(filePath: string): DoorRegion[] {
         .filter((l) => l.nid !== "base")
         .forEach((layer) => {
           if (layer.sprite_grid[`${doorTile.x},${doorTile.y}`]) {
+            // Create a set of adjacent coords (non-diagonal)
+            const adjacentCoords = [
+              { x: doorTile.x, y: doorTile.y },     // Center
+              { x: doorTile.x + 1, y: doorTile.y }, // Right
+              { x: doorTile.x - 1, y: doorTile.y }, // Left
+              { x: doorTile.x, y: doorTile.y + 1 }, // Down
+              { x: doorTile.x, y: doorTile.y - 1 }, // Up
+            ];
+            
             doors.push({
               layerNid: layer.nid,
-              tiles: Object.keys(layer.sprite_grid)
-                .map((coordStr) => coordStr.split(",").map(Number))
-                .map(([x, y]) => ({ x, y })),
+              tiles: adjacentCoords,
             });
           }
         });
@@ -74,28 +80,34 @@ export function getDoorsForMap(filePath: string): DoorRegion[] {
 
 if (import.meta.main) {
   const mapsDir = join(Deno.cwd(), "server", "assets", "maps");
-  (async () => {
-    try {
-      const mapFiles: string[] = [];
-      for await (const entry of Deno.readDir(mapsDir)) {
-        if (entry.isFile && entry.name.endsWith(".json")) {
-          mapFiles.push(entry.name);
-        }
-      }
+  // (async () => {
+  //   try {
+  //     const mapFiles: string[] = [];
+  //     for await (const entry of Deno.readDir(mapsDir)) {
+  //       if (entry.isFile && entry.name.endsWith(".json")) {
+  //         mapFiles.push(entry.name);
+  //       }
+  //     }
 
-      for (const mapFile of mapFiles) {
-        const filePath = join(mapsDir, mapFile);
-        const foundDoors = getDoorsForMap(filePath);
+  //     for (const mapFile of mapFiles) {
+  //       const filePath = join(mapsDir, mapFile);
+  //       const foundDoors = getDoorsForMap(filePath);
 
-        if (foundDoors.length > 0) {
-          console.log(`Map: ${mapFile.replace(".json", "")}`);
-          console.log(JSON.stringify(foundDoors, null, 2));
-          console.log("----------------------------");
-        }
-      }
-    } catch (error) {
-      console.error("Error reading maps directory:", error);
-    }
-  })();
+  //       if (foundDoors.length > 0) {
+  //         console.log(`Map: ${mapFile.replace(".json", "")}`);
+  //         console.log(JSON.stringify(foundDoors, null, 2));
+  //         console.log("----------------------------");
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.error("Error reading maps directory:", error);
+  //   }
+  // })();
+  // same just for Nobles_Evil_Doers_5_(6C_00_A3_6E)__by_Aura_Wolf:
+  const mapFile = "Nobles_Evil_Doers_5_(6C_00_A3_6E)__by_Aura_Wolf.json";
+  const filePath = join(mapsDir, mapFile);
+  const foundDoors = getDoorsForMap(filePath);
+  console.log(`Map: ${mapFile.replace(".json", "")}`);
+  console.log(JSON.stringify(foundDoors, null, 2));
+  console.log("----------------------------");
 }
-

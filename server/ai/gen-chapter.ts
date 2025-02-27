@@ -26,6 +26,8 @@ import {
   testWorldSummary,
 } from "@/ai/test-data/prologueTestData.ts";
 import getChestEventsAndRegions from "../map-region-processing/get-chest-events-and-regions.ts";
+import getDoorEventsAndRegions from "@/map-region-processing/get-door-events-and-regions.ts";
+import { LevelRegion } from "@/types/level.ts";
 
 /**
  * Creates the next chapter based on the given data.
@@ -237,6 +239,20 @@ export default async function genChapter({
     chapterNumber,
   });
 
+  const doorEventsAndRegions = getDoorEventsAndRegions({
+    mapName: chosenMapName,
+    chapterNumber,
+  });
+
+  const interactableRegions: LevelRegion[] = [
+    ...chestEventsAndRegions.map(({ region }) => region),
+    ...doorEventsAndRegions.map(({ region }) => region),
+  ];
+  const interactableEvents: Event[] = [
+    ...chestEventsAndRegions.map(({ event }) => event),
+    ...doorEventsAndRegions.map(({ event }) => event),
+  ];
+
   // Construct the level
   const level = assembleLevel({
     chapterIdea,
@@ -245,7 +261,7 @@ export default async function genChapter({
     units,
     playerPhaseMusic,
     enemyPhaseMusic,
-    regions: chestEventsAndRegions.map(({ region }) => region),
+    regions: interactableRegions,
   });
 
   // Grab tilemap from local assets
@@ -259,12 +275,7 @@ export default async function genChapter({
     title: chapterIdea.title,
     number: chapterNumber,
     level,
-    events: [
-      introEvent,
-      outroEvent,
-      defeatBossEvent,
-      ...chestEventsAndRegions.map(({ event }) => event),
-    ],
+    events: [introEvent, outroEvent, defeatBossEvent, ...interactableEvents],
     newCharacters,
     tilemap,
     enemyFaction: chapterIdea.enemyFaction,
