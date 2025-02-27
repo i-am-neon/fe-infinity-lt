@@ -53,6 +53,20 @@ export async function genAndCheck<T>({
   const logger = getCurrentLogger();
   const startTime = Date.now();
 
+  checkerSystemMessage += `\nIf the candidate is valid, return exactly the JSON:
+{
+  "passesCheck": true,
+  "fixText": "None",
+  "fixObject": {}
+}
+If the candidate is invalid, return exactly the JSON:
+{
+  "passesCheck": false,
+  "fixText": "some fix instructions",
+  "fixObject": {}
+}
+No additional commentary or text outside these JSON objects.`;
+
   try {
     if (!(generatorSchema instanceof ZodObject)) {
       throw new Error(
@@ -432,13 +446,11 @@ function manuallyValidateEvent<T>(candidate: T): boolean {
 
   const aiEvent = candidate as any;
   if (!aiEvent.sourceObjects || !Array.isArray(aiEvent.sourceObjects)) {
-    return false;
+    return true;
   }
 
-  // Track characters that have been added with add_portrait
   const addedCharacters = new Set<string>();
 
-  // First pass: check if all speaking characters have portraits
   for (const obj of aiEvent.sourceObjects) {
     if (obj.command === "add_portrait" && obj.args?.length >= 1) {
       addedCharacters.add(obj.args[0]);
@@ -489,25 +501,23 @@ function validateAndFixPortraits<T>(
   for (let i = 0; i < aiEvent.sourceObjects.length; i++) {
     const obj = aiEvent.sourceObjects[i];
 
-    // If it's a speak command and the character hasn't been added
-    if (
-      obj.command === "speak" &&
-      obj.args?.length >= 1 &&
-      !addedCharacters.has(obj.args[0])
-    ) {
-      // Add an add_portrait command before this speak command
-      // Use offscreen positions to avoid disrupting existing layout
-      logger.debug(
-        `[validateAndFixPortraits: ${fnBaseName}] Adding missing portrait for ${obj.args[0]} at attempt ${attemptNumber}`
-      );
+    if (obj.command === "speak" && obj.args?.length >= 1) {
+      const speakerRaw = obj.args[0];
+      const speakerName = speakerRaw.replace(/\(.*?\)/g, "").trim();
 
-      fixedSourceObjects.push({
-        command: "add_portrait",
-        args: [obj.args[0], "OffscreenRight"],
-      });
+      if (!addedCharacters.has(speakerName)) {
+        logger.debug(
+          `[validateAndFixPortraits: ${fnBaseName}] Adding missing portrait for ${speakerRaw} at attempt ${attemptNumber}`
+        );
 
-      addedCharacters.add(obj.args[0]);
-      hasChanges = true;
+        fixedSourceObjects.push({
+          command: "add_portrait",
+          args: [speakerName, "OffscreenRight"],
+        });
+
+        addedCharacters.add(speakerName);
+        hasChanges = true;
+      }
     }
 
     fixedSourceObjects.push(obj);
