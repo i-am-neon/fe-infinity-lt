@@ -3,8 +3,8 @@ import { getBreakableWallsForMap } from "@/map-region-processing/get-breakable-w
 import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
 import { Unit } from "@/types/level.ts";
 
-interface WallEventAndUnit {
-  event: Event;
+interface BreakableWallResult {
+  events: Event[];
   units: Unit[];
 }
 
@@ -14,13 +14,13 @@ export default function getBreakableWallEventsAndUnits({
 }: {
   mapName: string;
   chapterNumber: number;
-}): WallEventAndUnit[] {
+}): BreakableWallResult[] {
   const mapBreakableWalls = getBreakableWallsForMap(
     getPathWithinServer(`assets/maps/${mapName}.json`)
   );
 
   return mapBreakableWalls.map((wall, wallIndex) => {
-    // Generate wall units for each position in the wall group
+    // Create all the units for this wall
     const units: Unit[] = [];
     const unitNids: string[] = [];
 
@@ -46,36 +46,36 @@ export default function getBreakableWallEventsAndUnits({
       });
     });
     
-    // Create a condition that checks if any of the wall units is dead
-    const condition = unitNids.map(nid => `unit.nid == '${nid}'`).join(' or ');
-    
-    // Create source array with standard commands
-    const sourceCommands = [
-      `map_anim;Snag;{position}`,
-      `show_layer;${wall.layerNid}`,
-    ];
-    
-    // Add kill_unit commands for all OTHER units in this wall group
-    // We need conditional kill commands that only kill the units that weren't the trigger
-    unitNids.forEach(nid => {
-      // For each unit in the group, add a command that checks if this WASN'T the unit that died
-      // and kills it if it wasn't
-      sourceCommands.push(`if;unit.nid != '${nid}';kill_unit;${nid}`);
-    });
-    
-    return {
-      event: {
-        name: wall.layerNid,
+    // Create events for each unit in this wall
+    const events: Event[] = units.map((unit) => {
+      const thisUnitNid = unit.nid;
+      
+      // Create the kill commands for all OTHER units in the group
+      const killCommands = unitNids
+        .filter(nid => nid !== thisUnitNid)
+        .map(nid => `kill_unit;${nid}`);
+      
+      // Create source array with standard commands
+      const sourceCommands = [
+        `map_anim;Snag;{position}`,
+        `show_layer;${wall.layerNid}`,
+        ...killCommands
+      ];
+      
+      return {
+        // Make the event name unique by adding the unit's ID
+        name: `${wall.layerNid}_${thisUnitNid}`,
         trigger: "unit_death",
         level_nid: chapterNumber.toString(),
-        condition,
+        condition: `unit.nid == '${thisUnitNid}'`,
         commands: [],
-        only_once: false,
+        only_once: true,
         priority: 20,
         _source: sourceCommands,
-      },
-      units,
-    };
+      };
+    });
+
+    return { events, units };
   });
 }
 

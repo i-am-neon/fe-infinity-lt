@@ -257,7 +257,7 @@ export default async function genChapter({
   const interactableEvents: Event[] = [
     ...chestEventsAndRegions.map(({ event }) => event),
     ...doorEventsAndRegions.map(({ event }) => event),
-    ...breakableWallEventsAndUnits.map(({ event }) => event),
+    ...breakableWallEventsAndUnits.map(({ events }) => events).flat(),
   ];
 
   // Construct the level
