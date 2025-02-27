@@ -43,12 +43,15 @@ The user provides:
       )}
 We want to generate a single new chapter that logically follows them for the Prologue (chapterNumber=0).
 
-Requirements:
+CRITICAL REQUIREMENTS:
+- Must include ALL required fields: title, intro, battle, outro, boss, enemyFaction
+- enemyFaction MUST be included with nid, name, desc, and icon_nid
+- If you add newPlayableUnits or newNonBattleCharacters, you MUST mention EACH CHARACTER BY NAME explicitly in intro, battle, or outro text
 - Must not reuse or resurrect any dead characters
 - Must not reuse a previous boss from earlier chapters
-- If you add newPlayableUnits or newNonBattleCharacters, mention them in intro/battle/outro
-- Must produce a new Chapter Idea that strictly matches the ChapterIdea schema.
-- Return only JSON.
+- Must produce a new Chapter Idea that strictly matches the ChapterIdea schema
+- Return only JSON without any commentary
+
 Additionally, the 'intro' must be a thorough single paragraph explaining the reason for the battle, who the boss is, etc. The 'battle' should be brief, focusing primarily on the scenario's setting or map. The 'outro' must be a single paragraph that resolves the chapter's events.`
     : `You are a Fire Emblem Fangame Chapter Idea Generator (generator).
 
@@ -58,14 +61,16 @@ We have:
 - Dead characters: ${JSON.stringify(allDeadCharacters)}
 - Newly dead: ${JSON.stringify(newlyDeadThisChapter)}
 We want chapter ${chapterNumber}. Return only valid JSON, no commentary.
-Constraints: No resurrecting the dead, no reusing old bosses, mention new chars in intro/battle/outro, must match ChapterIdea schema.
 
-Requirements:
+CRITICAL REQUIREMENTS:
+- Must include ALL required fields: title, intro, battle, outro, boss, enemyFaction
+- enemyFaction MUST be included with nid, name, desc, and icon_nid
+- If you add newPlayableUnits or newNonBattleCharacters, you MUST mention EACH CHARACTER BY NAME explicitly in intro, battle, or outro text
 - Must not reuse or resurrect any dead characters
 - Must not reuse a previous boss from earlier chapters
-- If you add newPlayableUnits or newNonBattleCharacters, mention them in intro/battle/outro
-- Must produce a new Chapter Idea that strictly matches the ChapterIdea schema.
-- Return only JSON.
+- Must produce a new Chapter Idea that strictly matches the ChapterIdea schema
+- Return only JSON without any commentary
+
 Additionally, the 'intro' and 'outro' fields must each be a single full paragraph summarizing all the events, dialogue, and interactions that happen in those scenes.`;
 
   const basePrompt = isPrologue
@@ -94,10 +99,11 @@ Return { fixText: "None", fixObject: {} } if good; else fix instructions. Only J
     checkerPrompt: (candidate) => {
       return `Candidate:\n${JSON.stringify(candidate, null, 2)}
 Constraints:
-1) No resurrecting these dead: ${JSON.stringify(allDeadCharacters)}
+1) MUST have all required fields: title, intro, battle, outro, boss, enemyFaction. Verify each is present and properly formatted.
+2) No resurrecting these dead: ${JSON.stringify(allDeadCharacters)}
   a) Note it is allowed for there to be themes of resurrection, zombies, undead, etc within the story line.
-2) No old bosses from existingChapters
-3) If there are newPlayableUnits or newNonBattleCharacters, ensure they are actually mentioned by name in the intro, battle, or outro text. Look for their exact firstName in the text.
+3) No old bosses from existingChapters
+4) If there are newPlayableUnits or newNonBattleCharacters arrays present, ensure each character in these arrays is explicitly mentioned BY NAME (their exact firstName) in the intro, battle, or outro text. The boss character is already a required field and doesn't need this validation.
 If all good => fixText="None". Otherwise => fix instructions.`;
     },
   });
@@ -112,4 +118,3 @@ if (import.meta.main) {
     console.log("Chapter Idea:", JSON.stringify(res, null, 2));
   });
 }
-
