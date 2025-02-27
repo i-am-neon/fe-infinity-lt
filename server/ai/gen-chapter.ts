@@ -25,7 +25,7 @@ import {
   testTone,
   testWorldSummary,
 } from "@/ai/test-data/prologueTestData.ts";
-import getChestEvents from "@/ai/events/get-chest-events.ts";
+import getChestEventsAndRegions from "./events/get-chest-events-and-regions.ts";
 
 /**
  * Creates the next chapter based on the given data.
@@ -232,6 +232,11 @@ export default async function genChapter({
     )!,
   });
 
+  const chestEventsAndRegions = getChestEventsAndRegions({
+    mapName: chosenMapName,
+    chapterNumber,
+  });
+
   // Construct the level
   const level = assembleLevel({
     chapterIdea,
@@ -240,6 +245,7 @@ export default async function genChapter({
     units,
     playerPhaseMusic,
     enemyPhaseMusic,
+    regions: chestEventsAndRegions.map(({ region }) => region),
   });
 
   // Grab tilemap from local assets
@@ -248,14 +254,17 @@ export default async function genChapter({
   );
   const tilemap: Tilemap = JSON.parse(tilemapRaw);
 
-  const chestEvents = getChestEvents({ mapName: tilemap.nid, chapterNumber });
-
   // Build final Chapter object
   const newChapter: Chapter = {
     title: chapterIdea.title,
     number: chapterNumber,
     level,
-    events: [introEvent, outroEvent, defeatBossEvent, ...chestEvents],
+    events: [
+      introEvent,
+      outroEvent,
+      defeatBossEvent,
+      ...chestEventsAndRegions.map(({ event }) => event),
+    ],
     newCharacters,
     tilemap,
     enemyFaction: chapterIdea.enemyFaction,

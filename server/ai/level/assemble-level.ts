@@ -1,5 +1,5 @@
 import { ChapterIdea } from "@/ai/types/chapter-idea.ts";
-import { Level, Unit } from "@/types/level.ts";
+import { Level, LevelRegion, Unit } from "@/types/level.ts";
 
 export default function assembleLevel({
   chapterIdea,
@@ -8,6 +8,7 @@ export default function assembleLevel({
   units,
   playerPhaseMusic,
   enemyPhaseMusic,
+  regions,
 }: {
   chapterIdea: ChapterIdea;
   chapterNumber: number;
@@ -15,6 +16,7 @@ export default function assembleLevel({
   units: Unit[];
   playerPhaseMusic: string;
   enemyPhaseMusic: string;
+  regions: LevelRegion[];
 }): Level {
   return {
     nid: chapterNumber.toString(),
@@ -45,7 +47,7 @@ export default function assembleLevel({
     go_to_overworld: false,
     should_record: true,
     units,
-    regions: [],
+    regions,
     unit_groups: [],
     ai_groups: [],
   };

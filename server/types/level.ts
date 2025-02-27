@@ -43,6 +43,18 @@ export interface UnitGroup {
   positions: Record<string, Position>;
 }
 
+export interface LevelRegion {
+  nid: string;
+  region_type: string;
+  position: number[];
+  size: number[];
+  sub_nid: string;
+  condition: string;
+  time_left: null;
+  only_once: boolean;
+  interrupt_move: boolean;
+}
+
 export interface Level {
   nid: string;
   name: string;
@@ -57,7 +69,7 @@ export interface Level {
   should_record: boolean;
   tags?: string[];
   units: Unit[];
-  regions: any[];
+  regions: LevelRegion[];
   unit_groups: UnitGroup[];
   ai_groups: any[];
 }
