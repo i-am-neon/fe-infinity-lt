@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState, useCallback, useTransition } from "react";
-import { useSearchParams } from "next/navigation";
-import { Loader2 } from "lucide-react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { AlertCircle, Loader2 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { Game } from "@/types/game";
 import { openGame, generateNextChapter, deleteGame } from "@/app/actions";
@@ -21,18 +21,23 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
 
 export default function GameDetailPage() {
   const { nid } = useParams() as { nid: string };
+  const router = useRouter();
 
   const [data, setData] = useState<{
     success: boolean;
     game?: Game;
     error?: string;
+    creationError?: string;
   } | null>(null);
 
   const [loading, setLoading] = useState(true);
+  const [creationError, setCreationError] = useState<string | null>(null);
 
   const [loadingAction, setLoadingAction] = useState<
     "play" | "generate" | "delete" | null
@@ -50,24 +55,59 @@ export default function GameDetailPage() {
   // Poll for newly created game if "new" query param is present
   useEffect(() => {
     if (!loading && newGameModalOpen) {
+      let pollAttempts = 0;
+      const maxPollAttempts = 200; // About 10 minutes of polling (200 * 3s)
+
       const intervalId = setInterval(async () => {
         try {
+          pollAttempts++;
           const res = await apiCall<{
             success: boolean;
             game?: Game;
             error?: string;
+            creationError?: string;
           }>(`games/${nid}`);
+
+          // If we received a creation error from the server
+          if (res.creationError) {
+            setCreationError(res.creationError);
+            clearInterval(intervalId);
+            return;
+          }
+
           if (res.success && res.game && res.game.chapters.length > 0) {
+            // Game created successfully
             setData(res);
             setNewGameModalOpen(false);
             clearInterval(intervalId);
             // remove ?new=true from URL
             window.history.replaceState(null, "", `/games/${nid}`);
+          } else if (res.error) {
+            // API returned an error
+            setCreationError(res.error);
+            clearInterval(intervalId);
+          } else if (pollAttempts >= maxPollAttempts) {
+            // Timeout - too many attempts
+            setCreationError(
+              "Game creation timed out. Please try again later." +
+                "maxPollAttempts: " +
+                maxPollAttempts +
+                "pollAttempts: " +
+                pollAttempts
+            );
+            clearInterval(intervalId);
           } else {
             setData(res);
           }
         } catch (err) {
           console.error("Polling error:", err);
+          if (pollAttempts >= 3) {
+            // After a few connection failures, give up and show error
+            setCreationError(
+              "Connection to server failed. Please check if the server is running."
+            );
+            clearInterval(intervalId);
+          }
         }
       }, 3000);
 
@@ -156,18 +196,58 @@ export default function GameDetailPage() {
   return (
     <>
       {newGameModalOpen && (
-        <Dialog open={newGameModalOpen} onOpenChange={setNewGameModalOpen}>
+        <Dialog
+          open={newGameModalOpen}
+          onOpenChange={(open) => {
+            // Only allow closing if there's an error
+            if (creationError || !open) {
+              setNewGameModalOpen(open);
+            }
+          }}
+        >
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Game is being created</DialogTitle>
+              <DialogTitle>
+                {creationError
+                  ? "Game Creation Failed"
+                  : "Game is being created"}
+              </DialogTitle>
+              {creationError && (
+                <DialogDescription className="text-destructive">
+                  An error occurred while creating your game
+                </DialogDescription>
+              )}
             </DialogHeader>
-            <div className="flex items-center gap-2">
-              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-              <p>
-                Your game is being created and will open automatically when
-                finished.
-              </p>
-            </div>
+
+            {creationError ? (
+              <div className="flex flex-col gap-4">
+                <div className="flex items-start gap-2 p-3 bg-destructive/10 rounded-md text-destructive border border-destructive">
+                  <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
+                  <p>{creationError}</p>
+                </div>
+                <DialogFooter>
+                  <Button onClick={() => router.push("/")} variant="secondary">
+                    Return to Home
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setCreationError(null);
+                      setNewGameModalOpen(false);
+                    }}
+                  >
+                    Close
+                  </Button>
+                </DialogFooter>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                <p>
+                  Your game is being created and will open automatically when
+                  finished.
+                </p>
+              </div>
+            )}
           </DialogContent>
         </Dialog>
       )}

@@ -11,6 +11,14 @@ import runGame from "@/run-game.ts";
 import { Game } from "@/types/game.ts";
 import genChapter from "@/ai/gen-chapter.ts";
 
+// In-memory store for game creation errors
+const gameCreationErrors = new Map<string, string>();
+
+// Expose method to get creation errors for other endpoints
+export function getGameCreationError(gameNid: string): string | undefined {
+  return gameCreationErrors.get(gameNid);
+}
+
 export async function handleCreateGame(req: Request): Promise<Response> {
   try {
     const body = (await req.json()) as {
@@ -139,8 +147,11 @@ export async function handleCreateGame(req: Request): Promise<Response> {
         runGame(projectNameEndingInDotLtProj);
       } catch (err) {
         const logger = getCurrentLogger();
-        logger.error("Error creating game", { error: err });
-        throw err;
+        const errorMsg = err instanceof Error ? err.message : String(err);
+        logger.error("Error creating game", { error: errorMsg });
+        
+        // Store error in memory map for retrieval
+        gameCreationErrors.set(gameNid, errorMsg);
       }
     })();
 
@@ -153,4 +164,3 @@ export async function handleCreateGame(req: Request): Promise<Response> {
     });
   }
 }
-

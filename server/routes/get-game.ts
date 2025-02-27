@@ -1,4 +1,5 @@
 import { getGameByNid } from "@/db/games.ts";
+import { getGameCreationError } from "./create-game.ts";
 
 export async function handleGetGame(req: Request): Promise<Response> {
   try {
@@ -27,10 +28,20 @@ export async function handleGetGame(req: Request): Promise<Response> {
         }
       );
     }
+    
+    // Check if there was an error during game creation
+    const creationError = getGameCreationError(nid);
 
-    return new Response(JSON.stringify({ success: true, game }), {
-      headers: { "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({
+        success: true,
+        game,
+        creationError
+      }),
+      {
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   } catch (error: unknown) {
     if (error instanceof Error) {
       return new Response(
