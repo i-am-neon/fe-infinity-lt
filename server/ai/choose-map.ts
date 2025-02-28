@@ -28,7 +28,7 @@ export default async function chooseMap(
   usedMapNames: string[] = []
 ): Promise<string> {
   // For chest map testing
-  return "Chapter7OstiasRebellion_Diff_Tileset__by_Shin19";
+  return "Knights_Villagers_Bandits_1_(01_00_02_03)__by_Aura_Wolf";
   // 1) Generate search query
   const systemMessageForQuery = `You are a query generator for an advanced map search system.
 Given the user's Fire Emblem chapter idea, provide a brief single-line string (no more than 70 characters) that captures the essential attributes of a suitable map (e.g. size, terrain style, vibe). Do not wrap the string in quotes.`;

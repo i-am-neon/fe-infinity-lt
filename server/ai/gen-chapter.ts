@@ -300,6 +300,12 @@ export default async function genChapter({
   );
   const tilemap: Tilemap = JSON.parse(tilemapRaw);
 
+  // Set up level vars
+  houseAndVillageEventsAndRegions.forEach(({ region }, i) => {
+    introEvent._source.push(`level_var;${region.nid}_visited;False`);
+    introEvent._source.push(`level_var;${region.nid}_destroyed;False`);
+  });
+
   // Build final Chapter object
   const newChapter: Chapter = {
     title: chapterIdea.title,
