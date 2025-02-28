@@ -320,7 +320,7 @@ export default async function genChapter({
   if (chapterNumber > 0) {
     introEvent._source.push("prep;true");
   }
-  // If prologue add market items
+  // If prologue add market items and give gold
   if (chapterNumber === 0) {
     introEvent._source.push("add_market_item;Iron_Sword");
     introEvent._source.push("add_market_item;Iron_Axe");
@@ -332,6 +332,8 @@ export default async function genChapter({
     introEvent._source.push("add_market_item;Vulnerary");
     introEvent._source.push("add_market_item;Chest_Key");
     introEvent._source.push("add_market_item;Door_Key");
+
+    introEvent._source.push("give_money;1000;;no_banner=True");
   }
   // Add base screen to end of chapter
   outroEvent._source.push("game_var;_base_market;True");

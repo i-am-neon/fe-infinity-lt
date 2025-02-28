@@ -70,7 +70,7 @@ export default async function getHouseAndVillageEventsAndRegions({
         "change_background",
         "transition;Open",
         `give_item;{unit};${item}`,
-        "give_xp;{unit};15",
+        "give_exp;{unit};15",
       ];
 
       // Add show_layer command if normalLayerNid exists
