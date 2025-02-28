@@ -8,6 +8,7 @@ import getWeaponExp from "@/ai/create-unit-data/get-weapon-exp.ts";
 import { FE8ClassToLTNidMap } from "@/types/fe8-class.ts";
 import decideUnitWeapons from "../../item-options/decide-unit-weapons.ts";
 import decideStartingNonWeaponItems from "../../item-options/decide-starting-non-weapon-items.ts";
+import hasLockpick from "@/item-options/has-lockpick.ts";
 
 export default async function createUnitData({
   characterIdea,
@@ -34,6 +35,22 @@ export default async function createUnitData({
     level,
     isPromoted,
   });
+  // Combine all starting items
+  const startingItems = [
+    ...decideUnitWeapons({ fe8Class: klass, level, isPromoted }),
+    ...decideStartingNonWeaponItems({
+      isBoss: characterIdea.firstSeenAs === "boss",
+      isPromoted,
+      level,
+      chapterNumber,
+    }),
+  ];
+
+  // Always give thieves, rogues, and assassins a lockpick if they don't have one
+  if ((klass === "Thief" || klass === "Rogue" || klass === "Assassin") && !hasLockpick(startingItems)) {
+    startingItems.push(["Lockpick", false]);
+  }
+
   return {
     nid: characterIdea.firstName,
     name: characterIdea.firstName,
@@ -45,15 +62,7 @@ export default async function createUnitData({
     bases: baseStats,
     growths: growthRates,
     stat_cap_modifiers: {},
-    starting_items: [
-      ...decideUnitWeapons({ fe8Class: klass, level, isPromoted }),
-      ...decideStartingNonWeaponItems({
-        isBoss: characterIdea.firstSeenAs === "boss",
-        isPromoted,
-        level,
-        chapterNumber,
-      }),
-    ],
+    starting_items: startingItems,
     learned_skills: [],
     unit_notes: [],
     wexp_gain: getWeaponExp({ className: klass, level, isPromoted }),
@@ -69,4 +78,3 @@ if (import.meta.main) {
     console.log
   );
 }
-

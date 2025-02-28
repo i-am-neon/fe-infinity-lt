@@ -22,6 +22,8 @@ import { unpromotedVsPromotedUnits } from "./shared-prompts/unpromoted-vs-promot
 import { testPrologueChapter } from "@/ai/test-data/prologueTestData.ts";
 import { getHousesAndVillagesForMap } from "@/map-region-processing/get-houses-and-villages-for-map.ts";
 import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
+import { getChestsForMap } from "@/map-region-processing/get-chests-for-map.ts";
+import { getDoorsForMap } from "@/map-region-processing/get-doors-for-map.ts";
 
 export async function genUnitSquads({
   terrainGrid,
@@ -42,7 +44,15 @@ export async function genUnitSquads({
   const housesAndVillages = getHousesAndVillagesForMap(
     getPathWithinServer(`assets/maps/${mapName}.json`)
   );
+  const chests = getChestsForMap(
+    getPathWithinServer(`assets/maps/${mapName}.json`)
+  );
+  const doors = getDoorsForMap(
+    getPathWithinServer(`assets/maps/${mapName}.json`)
+  );
   const hasVillages = housesAndVillages.length > 0;
+  const hasChests = chests.length > 0;
+  const hasDoors = doors.length > 0;
 
   const allClassOptions = getAllClassOptions();
   const filteredClassOptions =
@@ -60,6 +70,16 @@ You should include some Brigands, Pirates, Berserkers, or Warriors in your squad
 
 When suggesting these units, mention that they will be targeting villages/houses for destruction.
 `;
+  }
+
+  if (hasChests || hasDoors) {
+    villagesGuidance += `
+## Chests and Doors
+This map has ${hasChests ? chests.length : 0} chests and ${
+      hasDoors ? doors.length : 0
+    } doors.
+You should
+ include some Thieves, Assassins, or Rogues in your squad composition, as these units will be assigned to pursue and open chests and doors.`;
   }
 
   const systemMessage = `

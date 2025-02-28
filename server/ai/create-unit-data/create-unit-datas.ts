@@ -1,13 +1,13 @@
-import { CharacterIdea } from "@/ai/types/character-idea.ts";
 import createUnitData from "@/ai/create-unit-data/create-unit-data.ts";
-import { UnitData } from "@/types/character/unit-data.ts";
 import {
   testCharIdeaAislin,
   testCharIdeaThorne,
 } from "@/ai/test-data/character-ideas.ts";
+import { CharacterIdea } from "@/ai/types/character-idea.ts";
 import { getCurrentLogger } from "@/lib/current-logger.ts";
+import { UnitData } from "@/types/character/unit-data.ts";
 
-export default function createUnitDatas({
+export default async function createUnitDatas({
   characterIdeas,
   chapterNumber,
 }: {
@@ -16,15 +16,14 @@ export default function createUnitDatas({
 }): Promise<UnitData[]> {
   const logger = getCurrentLogger();
   const start = Date.now();
-  return Promise.all(
+  const datas = await Promise.all(
     characterIdeas.map((idea) =>
       createUnitData({ characterIdea: idea, chapterNumber })
     )
-  ).then((datas) => {
-    const duration = Date.now() - start;
-    logger.info("createUnitDatas completed", { duration, count: datas.length });
-    return datas;
-  });
+  );
+  const duration = Date.now() - start;
+  logger.info("createUnitDatas completed", { duration, count: datas.length });
+  return datas;
 }
 
 if (import.meta.main) {

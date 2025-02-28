@@ -83,12 +83,21 @@ Place the same number of units as specified in the "numberOfGenericEnemies" fiel
         // Assign PursueVillage AI to appropriate unit types
         const regionUnits = rawResult.units.map((u) => {
           let aiGroup = u.aiGroup;
-          
+
           // If the unit is one of the village raider types, assign PursueVillage AI
-          if (["Brigand", "Pirate", "Berserker", "Warrior"].includes(u.class || "")) {
+          if (
+            ["Brigand", "Pirate", "Berserker", "Warrior"].includes(
+              u.class || ""
+            )
+          ) {
             aiGroup = "PursueVillage";
           }
-          
+
+          // If the unit is a thief-type unit, assign either Thief or SimpleThief AI with a 50/50 chance
+          if (["Thief", "Rogue", "Assassin"].includes(u.class || "")) {
+            aiGroup = Math.random() < 0.5 ? "Thief" : "SimpleThief";
+          }
+
           const corrected = {
             ...u,
             class: u.class,
