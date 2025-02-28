@@ -316,6 +316,26 @@ export default async function genChapter({
   });
   // Place the player units on the formation tiles
   introEvent._source.push("arrange_formation");
+  // Add prep screen if not prologue
+  if (chapterNumber > 0) {
+    introEvent._source.push("prep;true");
+  }
+  // If prologue add market items
+  if (chapterNumber === 0) {
+    introEvent._source.push("add_market_item;Iron_Sword");
+    introEvent._source.push("add_market_item;Iron_Axe");
+    introEvent._source.push("add_market_item;Iron_Lance");
+    introEvent._source.push("add_market_item;Iron_Bow");
+    introEvent._source.push("add_market_item;Fire");
+    introEvent._source.push("add_market_item;Lightning");
+    introEvent._source.push("add_market_item;Flux");
+    introEvent._source.push("add_market_item;Vulnerary");
+    introEvent._source.push("add_market_item;Chest_Key");
+    introEvent._source.push("add_market_item;Door_Key");
+  }
+  // Add base screen to end of chapter
+  outroEvent._source.push("game_var;_base_market;True");
+  outroEvent._source.push(`base;${outroBackgroundChoice}`);
 
   const newCharacterDeathEvents: Event[] = newCharacters.map((ch) => ({
     name: `Death${ch.unitData.nid}`,
