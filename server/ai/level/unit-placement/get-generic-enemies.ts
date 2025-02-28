@@ -8,12 +8,12 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
 import { TerrainGrid } from "@/types/maps/terrain-grid.ts";
 import assignDoorAndChestKeys from "@/ai/level/unit-placement/assign-door-and-chest-keys.ts";
 import correctUnitPlacement from "@/ai/level/unit-placement/correct-unit-placement.ts";
-import genUnitSquads from "@/ai/level/unit-placement/gen-unit-squads.ts";
 import getEnemyComposition from "@/ai/level/unit-placement/get-enemy-composition.ts";
 import getGenericEnemyCountNumberRange from "@/ai/level/unit-placement/get-generic-enemy-number-range.ts";
 import { getTerrainGridSize } from "@/ai/level/unit-placement/get-terrain-grid-size.ts";
 import placeEnemyGenericUnits from "@/ai/level/unit-placement/place-enemy-generic-units.ts";
 import { testPrologueChapter } from "@/ai/test-data/prologueTestData.ts";
+import { genUnitSquads } from "@/ai/level/unit-placement/gen-unit-squads.ts";
 
 export default async function getGenericEnemies({
   terrainGrid,
@@ -37,6 +37,7 @@ export default async function getGenericEnemies({
     mapMetadata,
     enemyComposition,
     enemyCountRange,
+    mapName: mapMetadata.originalName,
   });
   const enemyGenericUnitPlacement = await placeEnemyGenericUnits({
     terrainGrid,

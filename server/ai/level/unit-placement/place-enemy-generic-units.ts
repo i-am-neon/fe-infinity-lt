@@ -80,10 +80,19 @@ Place the same number of units as specified in the "numberOfGenericEnemies" fiel
           }),
         });
 
+        // Assign PursueVillage AI to appropriate unit types
         const regionUnits = rawResult.units.map((u) => {
+          let aiGroup = u.aiGroup;
+          
+          // If the unit is one of the village raider types, assign PursueVillage AI
+          if (["Brigand", "Pirate", "Berserker", "Warrior"].includes(u.class || "")) {
+            aiGroup = "PursueVillage";
+          }
+          
           const corrected = {
             ...u,
             class: u.class,
+            aiGroup,
           };
           return EnemyGenericUnitSchema.parse(corrected);
         });
@@ -166,4 +175,3 @@ if (import.meta.main) {
   });
   console.log("Result of placing enemy units region-by-region:", res);
 }
-

@@ -20,25 +20,48 @@ import { availableClasses } from "./shared-prompts/available-classes.ts";
 import { UNIT_TERRAIN_PLACEMENT_CONSTRAINTS } from "./shared-prompts/unit-terrain-placement-constraints.ts";
 import { unpromotedVsPromotedUnits } from "./shared-prompts/unpromoted-vs-promoted-units.ts";
 import { testPrologueChapter } from "@/ai/test-data/prologueTestData.ts";
+import { getHousesAndVillagesForMap } from "@/map-region-processing/get-houses-and-villages-for-map.ts";
+import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
 
-export default async function genUnitSquads({
+export async function genUnitSquads({
   terrainGrid,
   chapterIdea,
   mapMetadata,
   enemyComposition,
   enemyCountRange,
+  mapName,
 }: {
   terrainGrid: TerrainGrid;
   chapterIdea: ChapterIdea;
   mapMetadata: MapMetadata;
   enemyComposition: EnemyComposition;
   enemyCountRange: EnemyCountRange;
+  mapName: string;
 }): Promise<RegionSquadInfo[]> {
+  // Check if the map has houses/villages
+  const housesAndVillages = getHousesAndVillagesForMap(
+    getPathWithinServer(`assets/maps/${mapName}.json`)
+  );
+  const hasVillages = housesAndVillages.length > 0;
+
   const allClassOptions = getAllClassOptions();
   const filteredClassOptions =
     enemyComposition.unpromoted === 100
       ? allClassOptions.filter((c) => c.promotionLevel === "unpromoted")
       : allClassOptions;
+
+  let villagesGuidance = "";
+  if (hasVillages) {
+    villagesGuidance = `
+## Villages and Houses
+This map has ${housesAndVillages.length} village/house tiles that players can visit for rewards.
+
+You should include some Brigands, Pirates, Berserkers, or Warriors in your squad composition, as these units will be assigned to pursue and destroy villages. This creates tension for the player who must race to visit villages before enemies destroy them.
+
+When suggesting these units, mention that they will be targeting villages/houses for destruction.
+`;
+  }
+
   const systemMessage = `
 You are an elite Fire Emblem Tactician. Your task is to analyze the provided terrain grid, chapter idea, and map metadata to generate strategic recommendations for forming unit squads in each distinct region.
 
@@ -47,7 +70,7 @@ ${availableClasses(filteredClassOptions)}
 ${unpromotedVsPromotedUnits(enemyComposition)}
 
 ${UNIT_TERRAIN_PLACEMENT_CONSTRAINTS}
-
+${villagesGuidance}
 ## Number of Units
 
 The recommended range for the number of generic enemies is from ${
@@ -138,6 +161,7 @@ if (import.meta.main) {
     mapMetadata: testMapMetadata,
     enemyComposition: composition,
     enemyCountRange,
+    mapName: "Knights_Villagers_Bandits_3_(0E_00_72_10)__by_Aura_Wolf",
   })
     .then((result) => {
       console.log("Unit Squads Recommendations:", result);
