@@ -22,9 +22,9 @@ export default async function genBossAndPlayerAndGreenUnitCoords({
   chapterIdea: ChapterIdea;
   mapMetadata: MapMetadata;
 }): Promise<{
-  boss: BossCoords;
-  playerUnits: PlayerUnitStartCoords;
-  greenUnits: GreenUnit[];
+  bossCoords: BossCoords;
+  playerUnitsCoords: PlayerUnitStartCoords;
+  greenUnitsCoords: GreenUnit[];
 }> {
   const systemMessage = `
 You are a Fire Emblem Tactician. Choose exactly one region from mapMetadata.distinctRegions for the boss, and one or more regions for the player units to start. Base your choice on the sceneOverview:
@@ -172,12 +172,12 @@ Coordinates must lie within their chosen region(s). The sceneOverview might indi
   // }
 
   return {
-    boss: {
+    bossCoords: {
       x: correctedBoss.x,
       y: correctedBoss.y,
     },
-    playerUnits: correctedPlayers.map((u) => ({ x: u.x, y: u.y })),
-    greenUnits: correctedGreens.map((g) => ({
+    playerUnitsCoords: correctedPlayers.map((u) => ({ x: u.x, y: u.y })),
+    greenUnitsCoords: correctedGreens.map((g) => ({
       x: g.x,
       y: g.y,
       class: g.class!,
@@ -198,3 +198,4 @@ if (import.meta.main) {
     console.log("Boss and Player coords:", result);
   })();
 }
+

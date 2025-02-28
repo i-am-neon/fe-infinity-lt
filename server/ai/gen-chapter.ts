@@ -229,7 +229,7 @@ export default async function genChapter({
   const chosenMapName = await chooseMap(chapterIdea, usedMapNames);
 
   // Place units
-  const levelUnits = await getLevelUnits({
+  const { units: levelUnits, formationRegions } = await getLevelUnits({
     chosenMapName,
     chapterIdea,
     chapterNumber,
@@ -300,7 +300,7 @@ export default async function genChapter({
     units: [...levelUnits, ...wallUnits, ...snagUnits],
     playerPhaseMusic,
     enemyPhaseMusic,
-    regions: interactableRegions,
+    regions: [...interactableRegions, ...formationRegions],
   });
 
   // Grab tilemap from local assets
@@ -314,6 +314,8 @@ export default async function genChapter({
     introEvent._source.push(`level_var;${region.nid}_visited;False`);
     introEvent._source.push(`level_var;${region.nid}_destroyed;False`);
   });
+  // Place the player units on the formation tiles
+  introEvent._source.push("arrange_formation");
 
   const newCharacterDeathEvents: Event[] = newCharacters.map((ch) => ({
     name: `Death${ch.unitData.nid}`,

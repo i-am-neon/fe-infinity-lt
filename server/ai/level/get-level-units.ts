@@ -1,14 +1,14 @@
+import decideGenericUnitLevel from "@/ai/level/decide-generic-unit-level.ts";
 import assembleUnitPlacement from "@/ai/level/unit-placement/assemble-unit-placement.ts";
 import getTerrainGridFromMapName from "@/ai/level/unit-placement/get-terrain-grid-from-tilemap.ts";
 import { ChapterIdea } from "@/ai/types/chapter-idea.ts";
+import { getCurrentLogger } from "@/lib/current-logger.ts";
 import shortUuid from "@/lib/short-uuid.ts";
 import { allMapOptions } from "@/map-processing/all-map-options.ts";
 import { UnitData } from "@/types/character/unit-data.ts";
-import { Level } from "@/types/level.ts";
 import { FE8ClassToLTNidMap } from "@/types/fe8-class.ts";
-import decideGenericUnitLevel from "@/ai/level/decide-generic-unit-level.ts";
+import { Level } from "@/types/level.ts";
 import decideUnitWeapons from "../../item-options/decide-unit-weapons.ts";
-import { getCurrentLogger } from "@/lib/current-logger.ts";
 
 export default async function getLevelUnits({
   chosenMapName,
@@ -22,7 +22,7 @@ export default async function getLevelUnits({
   chapterNumber: number;
   playerUnitDatas: UnitData[];
   bossUnitData: UnitData;
-}): Promise<Level["units"]> {
+}): Promise<{ units: Level["units"]; formationRegions: Level["regions"] }> {
   const logger = getCurrentLogger();
   const start = Date.now();
   logger.debug("getLevelUnits", {
@@ -36,29 +36,24 @@ export default async function getLevelUnits({
   if (!mapMetadata) {
     throw new Error(`No metadata found for map ${chosenMapName}`);
   }
-  const {
-    boss: bossCoords,
-    genericEnemies,
-    playerUnits,
-    greenUnits,
-  } = await assembleUnitPlacement({
-    terrainGrid: getTerrainGridFromMapName(chosenMapName),
-    chapterIdea,
-    mapMetadata,
-    chapterNumber,
-  });
+  const { bossCoords, genericEnemies, playerUnitsCoords, greenUnits } =
+    await assembleUnitPlacement({
+      terrainGrid: getTerrainGridFromMapName(chosenMapName),
+      chapterIdea,
+      mapMetadata,
+      chapterNumber,
+    });
   const units: Level["units"] = [];
 
   // Add player units
-  playerUnitDatas.forEach((ud, index) => {
-    const { x, y } = playerUnits[index];
+  playerUnitDatas.forEach((ud) => {
     units.push({
       nid: ud.nid,
       team: "player",
       ai: "None",
       roam_ai: null,
       ai_group: null,
-      starting_position: [x, y],
+      starting_position: null,
       starting_traveler: null,
       generic: false,
     });
@@ -91,7 +86,6 @@ export default async function getLevelUnits({
       nid: shortUuid(),
       team: "enemy",
       ai: ge.aiGroup,
-      // TODO: figure out generic levels
       level: decideGenericUnitLevel({
         chapter: chapterNumber,
         fe8Class: ge.class,
@@ -110,8 +104,27 @@ export default async function getLevelUnits({
 
   // TODO: green units
 
+  // Create formation regions for player units
+  const formationRegions: Level["regions"] = playerUnitsCoords.map(
+    (pos, index) => ({
+      nid: (index + 1).toString(),
+      region_type: "formation",
+      position: [pos.x, pos.y],
+      size: [1, 1],
+      sub_nid: "",
+      condition: "True",
+      time_left: null,
+      only_once: false,
+      interrupt_move: false,
+    })
+  );
+
   const duration = Date.now() - start;
-  logger.info("getLevelUnits completed", { duration, unitCount: units.length });
-  return units;
+  logger.info("getLevelUnits completed", {
+    duration,
+    unitCount: units.length,
+    formationRegions: formationRegions.length,
+  });
+  return { units, formationRegions };
 }
 
