@@ -1,7 +1,7 @@
 import getAllWeaponOptions, {
   RawItemData,
   WeaponOption,
-} from "@/ai/create-unit-data/item-options/get-all-weapon-options.ts";
+} from "./get-all-weapon-options.ts";
 import { WeaponType } from "@/types/character/weapon-type.ts";
 import { weaponRankExpMap } from "@/ai/create-unit-data/get-weapon-exp.ts";
 import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";

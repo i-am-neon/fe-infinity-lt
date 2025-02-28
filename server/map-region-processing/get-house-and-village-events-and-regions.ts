@@ -1,4 +1,4 @@
-import getLoot from "@/ai/create-unit-data/item-options/get-loot.ts";
+import getLoot from "../item-options/get-loot.ts";
 import genVillagerDialogue from "@/ai/gen-villager-dialogue.ts";
 import { testPrologueChapter } from "@/ai/test-data/prologueTestData.ts";
 import { ChapterIdea } from "@/ai/types/chapter-idea.ts";

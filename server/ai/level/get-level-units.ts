@@ -7,7 +7,7 @@ import { UnitData } from "@/types/character/unit-data.ts";
 import { Level } from "@/types/level.ts";
 import { FE8ClassToLTNidMap } from "@/types/fe8-class.ts";
 import decideGenericUnitLevel from "@/ai/level/decide-generic-unit-level.ts";
-import decideUnitWeapons from "@/ai/create-unit-data/item-options/decide-unit-weapons.ts";
+import decideUnitWeapons from "../../item-options/decide-unit-weapons.ts";
 import { getCurrentLogger } from "@/lib/current-logger.ts";
 
 export default async function getLevelUnits({

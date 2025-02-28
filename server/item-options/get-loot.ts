@@ -1,4 +1,4 @@
-import { WeaponOption } from "@/ai/create-unit-data/item-options/get-all-weapon-options.ts";
+import { WeaponOption } from "./get-all-weapon-options.ts";
 
 const specialWeaponNids = [
   "Killing_Edge",

@@ -1,7 +1,7 @@
 import {
   attributeIncreaseItems,
   promotionItems,
-} from "@/ai/create-unit-data/item-options/non-weapon-item-options.ts";
+} from "./non-weapon-item-options.ts";
 
 /**
  * Decides the non-weapon items for a player unit, green unit, or boss.
@@ -120,3 +120,4 @@ if (import.meta.main) {
     console.log("Options:", tc, "=> items", res);
   }
 }
+
