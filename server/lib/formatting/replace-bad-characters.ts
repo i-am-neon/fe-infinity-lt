@@ -2,6 +2,7 @@ export default function replaceBadCharacters(input: string): string {
   const replacements: { [key: string]: string } = {
     "—": "-",
     "’": "'",
+    "‘": "'",
     ";": ":",
   };
 
@@ -16,3 +17,4 @@ export default function replaceBadCharacters(input: string): string {
 if (import.meta.main) {
   console.log(replaceBadCharacters("’Hello—world;"));
 }
+

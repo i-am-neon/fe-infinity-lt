@@ -3,8 +3,10 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "",
+    "activeFile": "10.tsj",
     "expandedProjectPaths": [
+        "maps",
+        "."
     ],
     "fileStates": {
         "03.tsj": {
@@ -59,6 +61,14 @@
             "scaleInDock": 1,
             "scaleInEditor": 1
         },
+        "maps/Mages_Mercenaries_1_(0E_00_72_10)__by_Aura_Wolf.tsj": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "maps/Nobles_Evil_Doers_11_(3C_00_68_3E)__by_Aura_Wolf.tsj": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
         "maps/vanilla-chpt-3.tsj": {
             "scaleInDock": 1,
             "scaleInEditor": 1
@@ -70,21 +80,23 @@
     },
     "last.imagePath": "/Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/server/assets/maps/images",
     "openFiles": [
+        "maps/Mages_Mercenaries_1_(0E_00_72_10)__by_Aura_Wolf.tsj",
+        "10.tsj"
     ],
     "project": "tiled-tilesets.tiled-project",
     "recentFiles": [
+        "maps/Mages_Mercenaries_1_(0E_00_72_10)__by_Aura_Wolf.tsj",
+        "10.tsj",
+        "maps/Nobles_Evil_Doers_11_(3C_00_68_3E)__by_Aura_Wolf.tsj",
         "maps/vanilla-chpt-5.tsj",
         "3E.tsj",
         "03.tsj",
-        "10.tsj",
         "1A.tsj",
         "30.tsj",
         "44.tsj",
         "52.tsj",
         "61.tsj",
-        "6E.tsj",
-        "7B.tsj",
-        "8A.tsj"
+        "6E.tsj"
     ],
     "tileset.lastUsedFormat": "json",
     "tileset.tileSize": {

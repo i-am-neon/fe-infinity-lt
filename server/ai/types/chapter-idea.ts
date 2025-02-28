@@ -28,6 +28,19 @@ export const ChapterIdeaSchema = z.object({
       "New playable characters introduced in this chapter, if any. Includes units that start as player units, NPCs, or enemies but can be recruited."
     ),
   enemyFaction: EnemyFactionSchema,
+  endOfChapterChoice: z
+    .object({
+      displayText: z.string(),
+      options: z
+        .array(z.string())
+        .min(2)
+        .describe(
+          "2-5 The options the player can choose from. These should be choices that will affect the story broadly. Options may NOT include attempting to recruit a certain character."
+        ),
+    })
+    .describe(
+      "The choice the player can make at the end of the chapter. This should follow the events of the outro and make sense with the storyline"
+    ),
 });
 
 export type ChapterIdea = z.infer<typeof ChapterIdeaSchema>;

@@ -48,6 +48,13 @@ export default async function createNextChapter({
   const lastChapterIndex = existingGame.chapters.length - 1;
   const lastChapter = existingGame.chapters[lastChapterIndex];
 
+  // Extract previous chapter's choice options for context
+  const lastChapterChoiceOptions = lastChapter?.idea?.endOfChapterChoice || [];
+  logger.debug("previous choice context", {
+    lastChoice,
+    choiceOptions: lastChapterChoiceOptions,
+  });
+
   const newlyDeadThisChapter: DeadCharacterRecord[] = [];
   for (const newlyDead of deadCharacters) {
     const existingRecord = existingGame.deadCharacters?.find(
@@ -84,6 +91,8 @@ export default async function createNextChapter({
     usedPortraitsSoFar: existingGame.usedPortraits,
     allDeadCharacters: existingGame.deadCharacters,
     newlyDeadThisChapter,
+    choiceQuestion: lastChapterChoiceOptions.displayText,
+    playerChoice: lastChoice,
   });
 
   logger.debug("created chapter", { chapter });

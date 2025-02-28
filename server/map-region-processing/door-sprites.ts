@@ -3,7 +3,7 @@ export const doorSprites: Record<string, { x: number; y: number }[]> = {
   // "03": [{ x: 1, y: 0 }], // No doors on this map
   "10": [
     { x: 4, y: 11 },
-    { x: 5, y: 1 },
+    { x: 5, y: 11 },
     { x: 10, y: 19 },
     { x: 11, y: 19 },
   ],

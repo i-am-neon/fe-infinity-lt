@@ -51,6 +51,8 @@ export default async function genChapter({
   existingChapters = [],
   allDeadCharacters = [],
   newlyDeadThisChapter = [],
+  choiceQuestion,
+  playerChoice,
 }: {
   worldSummary: WorldSummary;
   initialGameIdea: InitialGameIdea;
@@ -61,6 +63,8 @@ export default async function genChapter({
   existingChapters?: Chapter[];
   allDeadCharacters?: DeadCharacterRecord[];
   newlyDeadThisChapter?: DeadCharacterRecord[];
+  choiceQuestion?: string;
+  playerChoice?: string;
 }): Promise<{
   chapter: Chapter;
   usedPortraits: string[];
@@ -76,6 +80,8 @@ export default async function genChapter({
     previousChapterIdeas: existingChapters.map((c) => c.idea),
     allDeadCharacters,
     newlyDeadThisChapter,
+    choiceQuestion,
+    playerChoice,
   });
 
   // Build array of new characters from initialGameIdea (if prologue) plus boss + new units
@@ -333,8 +339,14 @@ export default async function genChapter({
     introEvent._source.push("add_market_item;Chest_Key");
     introEvent._source.push("add_market_item;Door_Key");
 
-    introEvent._source.push("give_money;1000;;no_banner=True");
+    introEvent._source.push("give_money;1000;no_banner");
   }
+  // Add the choice at the end of the chapter
+  outroEvent._source.push(
+    `choice;${chapterNumber}_choice;${
+      chapterIdea.endOfChapterChoice.displayText
+    };${chapterIdea.endOfChapterChoice.options.map((opt) => `${opt}`)}`
+  );
   // Add base screen to end of chapter
   outroEvent._source.push("game_var;_base_market;True");
   outroEvent._source.push(`base;${outroBackgroundChoice}`);

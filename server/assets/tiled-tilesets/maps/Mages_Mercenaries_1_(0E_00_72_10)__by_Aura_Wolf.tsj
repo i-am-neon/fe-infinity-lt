@@ -1,0 +1,14 @@
+{ "columns":16,
+ "image":"..\/..\/maps\/images\/Mages_Mercenaries_1_(0E_00_72_10)__by_Aura_Wolf.png",
+ "imageheight":320,
+ "imagewidth":256,
+ "margin":0,
+ "name":"Mages_Mercenaries_1_(0E_00_72_10)__by_Aura_Wolf",
+ "spacing":0,
+ "tilecount":320,
+ "tiledversion":"1.11.2",
+ "tileheight":16,
+ "tilewidth":16,
+ "type":"tileset",
+ "version":"1.10"
+}

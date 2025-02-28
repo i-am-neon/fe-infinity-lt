@@ -17,6 +17,8 @@ export default function genChapterIdea({
   previousChapterIdeas = [],
   allDeadCharacters = [],
   newlyDeadThisChapter = [],
+  choiceQuestion,
+  playerChoice,
 }: {
   worldSummary: WorldSummary;
   chapterNumber: number;
@@ -25,6 +27,8 @@ export default function genChapterIdea({
   previousChapterIdeas?: ChapterIdea[];
   allDeadCharacters?: DeadCharacterRecord[];
   newlyDeadThisChapter?: DeadCharacterRecord[];
+  choiceQuestion?: string;
+  playerChoice?: string;
 }): Promise<ChapterIdea> {
   const isPrologue = chapterNumber === 0 && initialGameIdea;
 
@@ -65,9 +69,13 @@ We have:
 - Existing chapters
 - Dead characters: ${JSON.stringify(allDeadCharacters)}
 - Newly dead: ${JSON.stringify(newlyDeadThisChapter)}
+- Player's choice from previous chapter: "${playerChoice}" (chosen from question: ${choiceQuestion})
 We want chapter ${chapterNumber}. Return only valid JSON, no commentary.
 
 CRITICAL REQUIREMENTS:
+- The story of this chapter MUST be heavily influenced by the player's last choice "${playerChoice}"
+- The narrative should clearly show the consequences of this choice
+- Character interactions, plot development, and chapter setting should all reflect this decision
 - Must include ALL required fields: title, intro, battle, outro, boss, enemyFaction
 - enemyFaction MUST be included with nid, name, desc, and icon_nid
 - For each newPlayableUnit or newNonBattleCharacter:
@@ -80,6 +88,7 @@ CRITICAL REQUIREMENTS:
 - Must not reuse or resurrect any dead characters
 - Must not reuse a previous boss from earlier chapters
 - Must produce a new Chapter Idea that strictly matches the ChapterIdea schema
+  - When creating the endOfChapterChoice, ensure none of the options include attempting to recruit a certain character
 - Return only JSON without any commentary
 
 Additionally, the 'intro' and 'outro' fields must each be a single full paragraph summarizing all the events, dialogue, and interactions that happen in those scenes. Make sure new characters' introductions feel natural and their reasons for joining are compelling and tied to their backstories.`;
@@ -95,6 +104,8 @@ Tone: ${tone}`
         tone,
         allDeadCharacters,
         newlyDeadThisChapter,
+        choiceQuestion,
+        playerChoice,
       });
 
   const checkerSystemMessage = `You are a Fire Emblem Fangame Chapter Idea Checker (checker).
@@ -131,7 +142,10 @@ if (import.meta.main) {
     chapterNumber: 1,
     tone: testTone,
     previousChapterIdeas: [testPrologueChapter.idea],
+    choiceQuestion: "What will you do with the captured enemy commander?",
+    playerChoice: "Kill him.",
   }).then((res) => {
     console.log("Chapter Idea:", JSON.stringify(res, null, 2));
   });
 }
+
