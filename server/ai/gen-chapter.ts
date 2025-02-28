@@ -315,7 +315,6 @@ export default async function genChapter({
     introEvent._source.push(`level_var;${region.nid}_destroyed;False`);
   });
 
-  // Build final Chapter object
   const newCharacterDeathEvents: Event[] = newCharacters.map((ch) => ({
     name: `Death${ch.unitData.nid}`,
     trigger: "unit_death",
@@ -332,6 +331,7 @@ export default async function genChapter({
     ],
   }));
 
+  // Build final Chapter object
   const newChapter: Chapter = {
     title: chapterIdea.title,
     number: chapterNumber,
