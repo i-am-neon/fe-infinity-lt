@@ -56,13 +56,13 @@ export function getDoorsForMap(filePath: string): DoorRegion[] {
           if (layer.sprite_grid[`${doorTile.x},${doorTile.y}`]) {
             // Create a set of adjacent coords (non-diagonal)
             const adjacentCoords = [
-              { x: doorTile.x, y: doorTile.y },     // Center
+              { x: doorTile.x, y: doorTile.y }, // Center
               { x: doorTile.x + 1, y: doorTile.y }, // Right
               { x: doorTile.x - 1, y: doorTile.y }, // Left
               { x: doorTile.x, y: doorTile.y + 1 }, // Down
               { x: doorTile.x, y: doorTile.y - 1 }, // Up
             ];
-            
+
             doors.push({
               layerNid: layer.nid,
               tiles: adjacentCoords,
@@ -104,10 +104,11 @@ if (import.meta.main) {
   //   }
   // })();
   // same just for Nobles_Evil_Doers_5_(6C_00_A3_6E)__by_Aura_Wolf:
-  const mapFile = "Nobles_Evil_Doers_5_(6C_00_A3_6E)__by_Aura_Wolf.json";
+  const mapFile = "Nobles_Evil_Doers_11_(3C_00_68_3E)__by_Aura_Wolf.json";
   const filePath = join(mapsDir, mapFile);
   const foundDoors = getDoorsForMap(filePath);
   console.log(`Map: ${mapFile.replace(".json", "")}`);
   console.log(JSON.stringify(foundDoors, null, 2));
   console.log("----------------------------");
 }
+

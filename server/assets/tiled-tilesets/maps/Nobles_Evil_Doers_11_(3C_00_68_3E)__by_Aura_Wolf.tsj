@@ -1,0 +1,14 @@
+{ "columns":21,
+ "image":"..\/..\/maps\/images\/Nobles_Evil_Doers_11_(3C_00_68_3E)__by_Aura_Wolf.png",
+ "imageheight":352,
+ "imagewidth":336,
+ "margin":0,
+ "name":"Nobles_Evil_Doers_11_(3C_00_68_3E)__by_Aura_Wolf",
+ "spacing":0,
+ "tilecount":462,
+ "tiledversion":"1.11.2",
+ "tileheight":16,
+ "tilewidth":16,
+ "type":"tileset",
+ "version":"1.10"
+}

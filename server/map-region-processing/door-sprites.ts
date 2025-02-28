@@ -26,6 +26,7 @@ export const doorSprites: Record<string, { x: number; y: number }[]> = {
   "3E": [
     { x: 0, y: 13 },
     { x: 1, y: 13 },
+    { x: 1, y: 14 },
     { x: 2, y: 13 },
     { x: 0, y: 14 },
     { x: 0, y: 15 },
