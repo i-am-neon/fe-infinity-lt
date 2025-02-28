@@ -31,6 +31,7 @@ import getBreakableWallEventsAndUnits from "@/map-region-processing/get-breakabl
 import { LevelRegion } from "@/types/level.ts";
 import getSnagEventsAndUnits from "@/map-region-processing/get-snag-events-and-units.ts";
 import getHouseAndVillageEventsAndRegions from "@/map-region-processing/get-house-and-village-events-and-regions.ts";
+import getArmoryAndVendorEventsAndRegions from "@/map-region-processing/get-armory-and-vendor-events-and-regions.ts";
 
 /**
  * Creates the next chapter based on the given data.
@@ -247,13 +248,6 @@ export default async function genChapter({
     chapterNumber,
   });
 
-  const houseAndVillageEventsAndRegions =
-    await getHouseAndVillageEventsAndRegions({
-      mapName: chosenMapName,
-      chapterNumber,
-      chapterIdea,
-    });
-
   const breakableWallEventsAndUnits = getBreakableWallEventsAndUnits({
     mapName: chosenMapName,
     chapterNumber,
@@ -264,10 +258,23 @@ export default async function genChapter({
     chapterNumber,
   });
 
+  const houseAndVillageEventsAndRegions =
+    await getHouseAndVillageEventsAndRegions({
+      mapName: chosenMapName,
+      chapterNumber,
+      chapterIdea,
+    });
+
+  const armoryAndVendorEventsAndRegions = getArmoryAndVendorEventsAndRegions({
+    mapName: chosenMapName,
+    chapterNumber,
+  });
+
   const interactableRegions: LevelRegion[] = [
     ...chestEventsAndRegions.map(({ region }) => region),
     ...doorEventsAndRegions.map(({ region }) => region),
     ...houseAndVillageEventsAndRegions.map(({ region }) => region),
+    ...armoryAndVendorEventsAndRegions.map(({ region }) => region),
   ];
 
   const interactableEvents: Event[] = [
@@ -276,6 +283,7 @@ export default async function genChapter({
     ...houseAndVillageEventsAndRegions.map(({ event }) => event),
     ...breakableWallEventsAndUnits.map(({ events }) => events).flat(),
     ...snagEventsAndUnits.map(({ event }) => event),
+    ...armoryAndVendorEventsAndRegions.map(({ event }) => event),
   ];
 
   // Add breakable wall units to level units
@@ -301,7 +309,7 @@ export default async function genChapter({
   const tilemap: Tilemap = JSON.parse(tilemapRaw);
 
   // Set up level vars
-  houseAndVillageEventsAndRegions.forEach(({ region }, i) => {
+  houseAndVillageEventsAndRegions.forEach(({ region }) => {
     introEvent._source.push(`level_var;${region.nid}_visited;False`);
     introEvent._source.push(`level_var;${region.nid}_destroyed;False`);
   });

@@ -38,6 +38,8 @@ export const TriggerEnumSchema = z.enum([
   "Door",
   "Visit",
   "Destructible",
+  "Armory",
+  "Vendor",
 ])
   .describe(`- \`level_start\`: This trigger fires at the very beginning of the chapter. Useful for introductory dialogue or additional level setup.
 - \`level_end\`: This trigger fires at the end of the chapter. Useful for ending chapter dialogue.
