@@ -32,6 +32,7 @@ import { LevelRegion } from "@/types/level.ts";
 import getSnagEventsAndUnits from "@/map-region-processing/get-snag-events-and-units.ts";
 import getHouseAndVillageEventsAndRegions from "@/map-region-processing/get-house-and-village-events-and-regions.ts";
 import getArmoryAndVendorEventsAndRegions from "@/map-region-processing/get-armory-and-vendor-events-and-regions.ts";
+import cleanGameText from "@/lib/formatting/clean-game-text.ts";
 
 /**
  * Creates the next chapter based on the given data.
@@ -315,11 +316,33 @@ export default async function genChapter({
   });
 
   // Build final Chapter object
+  const newCharacterDeathEvents: Event[] = newCharacters.map((ch) => ({
+    name: `Death${ch.unitData.nid}`,
+    trigger: "unit_death",
+    level_nid: chapterNumber.toString(),
+    condition: `unit.nid == '${ch.unitData.nid}'`,
+    commands: [],
+    only_once: false,
+    priority: 20,
+    _source: [
+      `add_portrait;${ch.unitData.nid};FarRight`,
+      `speak;${ch.unitData.nid};${cleanGameText(ch.characterIdea.deathQuote)}`,
+      `expression;${ch.unitData.nid};CloseEyes`,
+      `remove_portrait;${ch.unitData.nid}`,
+    ],
+  }));
+
   const newChapter: Chapter = {
     title: chapterIdea.title,
     number: chapterNumber,
     level,
-    events: [introEvent, outroEvent, defeatBossEvent, ...interactableEvents],
+    events: [
+      introEvent,
+      outroEvent,
+      defeatBossEvent,
+      ...interactableEvents,
+      ...newCharacterDeathEvents,
+    ],
     newCharacters,
     tilemap,
     enemyFaction: chapterIdea.enemyFaction,
