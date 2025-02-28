@@ -147,6 +147,7 @@ Coordinates must lie within their chosen region(s). The sceneOverview might indi
   const correctedPlayers = correctUnitPlacement({
     terrainGrid,
     units: playerUnits,
+    existingPositions: [{ x: correctedBoss.x, y: correctedBoss.y }],
   });
 
   let correctedGreens: GreenUnit[] = [];
@@ -163,6 +164,10 @@ Coordinates must lie within their chosen region(s). The sceneOverview might indi
   //         desc: chapterIdea.greenUnits![idx].description,
   //       };
   //     }),
+  //     existingPositions: [
+  //       { x: correctedBoss.x, y: correctedBoss.y },
+  //       ...correctedPlayers.map(p => ({ x: p.x, y: p.y })),
+  //     ],
   //   });
   // }
 
@@ -193,4 +198,3 @@ if (import.meta.main) {
     console.log("Boss and Player coords:", result);
   })();
 }
-
