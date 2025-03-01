@@ -5,15 +5,18 @@ import {
 import { FE8Class } from "@/types/fe8-class.ts";
 import filterWeapons from "./filter-weapons.ts";
 import getBasicWeapon from "./get-basic-weapon.ts";
+import { specialWeaponNids } from "@/item-options/special-weapons.ts";
 
 export default function decideUnitWeapons({
   fe8Class,
   level,
   isPromoted,
+  isBoss = false,
 }: {
   fe8Class: FE8Class;
   level: number;
   isPromoted: boolean;
+  isBoss?: boolean;
 }): [string, boolean][] {
   // Determine rank for basic weapon
   let rank: keyof typeof weaponRankExpMap = "E";
@@ -82,7 +85,44 @@ export default function decideUnitWeapons({
     extraPool.splice(randIndex, 1);
   }
 
-  // Convert from WeaponOption to [weaponNid, false]
+  // Now determine which weapon should be droppable
+  // First, check if there are any special weapons in the list
+  const specialWeapons = weapons.filter(([nid]) =>
+    specialWeaponNids.includes(nid)
+  );
+
+  // If there are special weapons, give them priority for being droppable
+  if (specialWeapons.length > 0) {
+    // Calculate chance based on whether it's a boss
+    const dropChance = isBoss ? 0.6 : 0.3;
+    if (Math.random() < dropChance) {
+      // Randomly choose one special weapon to be droppable
+      const randomIndex = Math.floor(Math.random() * specialWeapons.length);
+      const specialWeaponNid = specialWeapons[randomIndex][0];
+
+      // Mark the special weapon as droppable
+      for (let i = 0; i < weapons.length; i++) {
+        if (weapons[i][0] === specialWeaponNid) {
+          weapons[i] = [weapons[i][0], true];
+          break;
+        }
+      }
+
+      // Return with one special weapon droppable
+      return weapons;
+    }
+  }
+
+  // If no special weapons or they weren't chosen to be droppable, check normal weapons for generics
+  if (!isBoss) {
+    // 30% chance for a normal weapon to be droppable for generics
+    if (Math.random() < 0.3) {
+      // Randomly choose one weapon to be droppable
+      const randomIndex = Math.floor(Math.random() * weapons.length);
+      weapons[randomIndex] = [weapons[randomIndex][0], true];
+    }
+  }
+
   return weapons;
 }
 
@@ -105,5 +145,12 @@ if (import.meta.main) {
     isPromoted: false,
   });
   console.log("shaman", shaman);
+  const bossShaman = decideUnitWeapons({
+    fe8Class: "Shaman",
+    level: 12,
+    isPromoted: false,
+    isBoss: true,
+  });
+  console.log("bossShaman", bossShaman);
 }
 

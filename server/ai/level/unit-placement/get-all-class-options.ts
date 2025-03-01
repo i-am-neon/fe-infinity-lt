@@ -64,7 +64,7 @@ function getDescription(fe8Class: FE8Class): string {
   return fe8Class;
 }
 
-function isPromotedClass(cls: FE8Class): cls is PromotedFE8Class {
+export function isPromotedClass(cls: FE8Class): cls is PromotedFE8Class {
   return (PromotedFE8Classes as readonly FE8Class[]).includes(cls);
 }
 

@@ -37,7 +37,12 @@ export default async function createUnitData({
   });
   // Combine all starting items
   const startingItems = [
-    ...decideUnitWeapons({ fe8Class: klass, level, isPromoted }),
+    ...decideUnitWeapons({
+      fe8Class: klass,
+      level,
+      isPromoted,
+      isBoss: characterIdea.firstSeenAs === "boss"
+    }),
     ...decideStartingNonWeaponItems({
       isBoss: characterIdea.firstSeenAs === "boss",
       isPromoted,
@@ -45,6 +50,18 @@ export default async function createUnitData({
       chapterNumber,
     }),
   ];
+
+  // Post-processing to ensure only one item is droppable
+  let foundDroppable = false;
+  for (let i = 0; i < startingItems.length; i++) {
+    if (startingItems[i][1]) {
+      if (foundDroppable) {
+        startingItems[i] = [startingItems[i][0], false];
+      } else {
+        foundDroppable = true;
+      }
+    }
+  }
 
   // Always give thieves, rogues, and assassins a lockpick if they don't have one
   if ((klass === "Thief" || klass === "Rogue" || klass === "Assassin") && !hasLockpick(startingItems)) {

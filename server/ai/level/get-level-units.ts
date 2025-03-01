@@ -9,6 +9,7 @@ import { UnitData } from "@/types/character/unit-data.ts";
 import { FE8ClassToLTNidMap } from "@/types/fe8-class.ts";
 import { Level } from "@/types/level.ts";
 import decideUnitWeapons from "../../item-options/decide-unit-weapons.ts";
+import { isPromotedClass } from "@/ai/level/unit-placement/get-all-class-options.ts";
 
 export default async function getLevelUnits({
   chosenMapName,
@@ -80,7 +81,12 @@ export default async function getLevelUnits({
     ge.startingItems = ge.startingItems ?? [];
     // insert items at beginning of array before special items
     ge.startingItems.unshift(
-      ...decideUnitWeapons({ fe8Class: ge.class, level: 1, isPromoted: false })
+      ...decideUnitWeapons({
+        fe8Class: ge.class,
+        level: 1,
+        isPromoted: isPromotedClass(ge.class),
+        isBoss: false,
+      })
     );
     units.push({
       nid: shortUuid(),
