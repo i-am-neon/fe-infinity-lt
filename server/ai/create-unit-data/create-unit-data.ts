@@ -51,10 +51,16 @@ export default async function createUnitData({
     }),
   ];
 
-  // Post-processing to ensure only one item is droppable
+  // Post-processing to ensure only one item is droppable and player units never have droppable items
+  const isPlayerUnit = characterIdea.firstSeenAs === "ally" || characterIdea.firstSeenAs === "allied NPC";
   let foundDroppable = false;
   for (let i = 0; i < startingItems.length; i++) {
-    if (startingItems[i][1]) {
+    // If this is a player unit, make sure no items are droppable
+    if (isPlayerUnit) {
+      startingItems[i] = [startingItems[i][0], false];
+    }
+    // Otherwise ensure only one item is droppable
+    else if (startingItems[i][1]) {
       if (foundDroppable) {
         startingItems[i] = [startingItems[i][0], false];
       } else {
