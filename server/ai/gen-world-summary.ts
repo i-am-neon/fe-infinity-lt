@@ -1,5 +1,5 @@
 import { WorldSummary, worldSummarySchema } from "@/ai/types/world-summary.ts";
-import generateStructuredData from "@/lib/generate-structured-data.ts";
+import generateStructuredData from "./lib/generate-structured-data.ts";
 import {
   testGameDescription,
   testGameName,

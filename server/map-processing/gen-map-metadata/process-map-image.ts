@@ -1,5 +1,5 @@
 import { MapSetting } from "@/types/maps/map-setting.ts";
-import generateStructuredDataWithImage from "@/lib/generate-structured-data-with-image.ts";
+import generateStructuredDataWithImage from "../../ai/lib/generate-structured-data-with-image.ts";
 import {
   MapVisualSummary,
   MapVisualSummarySchema,

@@ -6,7 +6,7 @@ import {
   EnemyGenericUnit,
   EnemyGenericUnitSchema,
 } from "@/ai/types/unit-placement.ts";
-import generateStructuredData from "@/lib/generate-structured-data.ts";
+import generateStructuredData from "../../lib/generate-structured-data.ts";
 import { ch1TerrainGrid } from "@/map-processing/test-data/terrain-grid.ts";
 import { MapMetadata } from "@/types/maps/map-metadata.ts";
 import { TerrainGrid } from "@/types/maps/terrain-grid.ts";
@@ -184,3 +184,4 @@ if (import.meta.main) {
   });
   console.log("Result of placing enemy units region-by-region:", res);
 }
+

@@ -1,4 +1,4 @@
-import generateStructuredData from "@/lib/generate-structured-data.ts";
+import generateStructuredData from "../lib/generate-structured-data.ts";
 import { z } from "zod";
 import { AIEvent } from "@/ai/types/ai-event.ts";
 import {

@@ -1,7 +1,7 @@
 import { testCharIdeaAislin } from "@/ai/test-data/character-ideas.ts";
 import { CharacterIdea } from "@/ai/types/character-idea.ts";
 import { getCurrentLogger } from "@/lib/current-logger.ts";
-import generateStructuredData from "@/lib/generate-structured-data.ts";
+import generateStructuredData from "./lib/generate-structured-data.ts";
 import createEmbedding from "@/vector-db/create-embedding.ts";
 import similaritySearch from "@/vector-db/similarity-search.ts";
 import { z } from "zod";
@@ -65,7 +65,10 @@ Given the user's Fire Emblem character idea, provide a brief single-line string 
     );
   });
   if (!filteredResults.length) {
-    logger.warn("No unused portraits remain for top 5, re-searching with topK=10 ...", { searchQuery });
+    logger.warn(
+      "No unused portraits remain for top 5, re-searching with topK=10 ...",
+      { searchQuery }
+    );
     const biggerResults = await similaritySearch(embedding, 10, "portraits");
     const biggerFiltered = biggerResults.filter((res) => {
       const md = res.metadata as { originalName?: string; gender?: string };
@@ -114,3 +117,4 @@ if (import.meta.main) {
       console.error("Error choosing portrait:", err);
     });
 }
+

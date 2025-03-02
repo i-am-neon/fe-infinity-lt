@@ -2,7 +2,7 @@ import {
   PortraitMetadata,
   PortraitMetadataSchema,
 } from "@/types/portraits/portrait-metadata.ts";
-import generateStructuredDataWithImage from "@/lib/generate-structured-data-with-image.ts";
+import generateStructuredDataWithImage from "../ai/lib/generate-structured-data-with-image.ts";
 import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
 import autoFramePortrait from "@/portrait-processing/auto-frame-portrait.ts";
 

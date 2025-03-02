@@ -1,5 +1,5 @@
 import { ChapterIdea } from "@/ai/types/chapter-idea.ts";
-import generateStructuredData from "@/lib/generate-structured-data.ts";
+import generateStructuredData from "./lib/generate-structured-data.ts";
 import { z } from "zod";
 import { testPrologueChapter } from "@/ai/test-data/prologueTestData.ts";
 

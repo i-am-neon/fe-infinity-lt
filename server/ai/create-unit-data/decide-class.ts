@@ -1,6 +1,6 @@
 import { testCharIdeaThorne } from "@/ai/test-data/character-ideas.ts";
 import { CharacterIdea } from "@/ai/types/character-idea.ts";
-import generateStructuredData from "@/lib/generate-structured-data.ts";
+import generateStructuredData from "../lib/generate-structured-data.ts";
 import {
   FE8Class,
   FE8ClassSchema,

@@ -1,5 +1,5 @@
 import { ChapterIdea } from "@/ai/types/chapter-idea.ts";
-import generateStructuredData from "@/lib/generate-structured-data.ts";
+import generateStructuredData from "./lib/generate-structured-data.ts";
 import createEmbedding from "@/vector-db/create-embedding.ts";
 import similaritySearch from "@/vector-db/similarity-search.ts";
 import { z } from "zod";

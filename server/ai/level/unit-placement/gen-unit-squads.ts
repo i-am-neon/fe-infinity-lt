@@ -1,7 +1,7 @@
 import { ChapterIdea } from "@/ai/types/chapter-idea.ts";
 import { TerrainGrid } from "@/types/maps/terrain-grid.ts";
 import { z } from "zod";
-import generateStructuredData from "@/lib/generate-structured-data.ts";
+import generateStructuredData from "../../lib/generate-structured-data.ts";
 import { ch1TerrainGrid } from "@/map-processing/test-data/terrain-grid.ts";
 import { MapMetadata } from "@/types/maps/map-metadata.ts";
 import { EnemyComposition } from "@/ai/types/enemy-composition.ts";

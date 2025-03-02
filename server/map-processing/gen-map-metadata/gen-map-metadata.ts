@@ -3,7 +3,7 @@ import { SubGrid } from "@/types/maps/sub-grid.ts";
 import chunkGridIntoQuadrants from "../lib/chunk-grid-into-quadrants.ts";
 import { MAP_METADATA_EXAMPLES } from "./map-metadata-examples.ts";
 import { ch5TerrainGrid } from "@/map-processing/test-data/terrain-grid.ts";
-import generateStructuredData from "@/lib/generate-structured-data.ts";
+import generateStructuredData from "../../ai/lib/generate-structured-data.ts";
 import getMapSetting from "@/map-processing/gen-map-metadata/get-map-setting.ts";
 import processMapImage from "@/map-processing/gen-map-metadata/process-map-image.ts";
 import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
