@@ -33,7 +33,6 @@ export default async function replaceBackgroundColorInPortraits(): Promise<void>
 
     const encoded = await img.encode();
     await Deno.writeFile(filePath, encoded);
-    console.log(`Processed: ${fileName}`);
   }
 }
 
@@ -42,3 +41,4 @@ if (import.meta.main) {
     console.log("Completed processing all portrait images.");
   });
 }
+

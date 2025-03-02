@@ -6,10 +6,10 @@ export async function seedVectors(): Promise<void> {
   const client = await pool.connect();
   try {
     console.log(
-      "Truncating maps_vectors, portraits_vectors, and music_vectors tables..."
+      "Truncating maps_vectors, portraits_male_vectors, portraits_female_vectors, and music_vectors tables..."
     );
     await client.query(
-      "TRUNCATE TABLE maps_vectors, portraits_vectors, music_vectors;"
+      "TRUNCATE TABLE maps_vectors, portraits_male_vectors, portraits_female_vectors, music_vectors;"
     );
     console.log("Tables truncated. Fresh seeding will begin now.");
   } finally {
@@ -17,7 +17,14 @@ export async function seedVectors(): Promise<void> {
   }
 
   await seedVectorsFromFile("./seed-vectors/maps.json", "maps");
-  await seedVectorsFromFile("./seed-vectors/portraits.json", "portraits");
+  await seedVectorsFromFile(
+    "./seed-vectors/portraits-male.json",
+    "portraits-male"
+  );
+  await seedVectorsFromFile(
+    "./seed-vectors/portraits-female.json",
+    "portraits-female"
+  );
   await seedVectorsFromFile("./seed-vectors/music.json", "music");
   console.log("Seeding complete. Vectors have been stored in the database.");
 }

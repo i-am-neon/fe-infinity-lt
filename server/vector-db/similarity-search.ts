@@ -19,6 +19,10 @@ export default async function similaritySearch(
       tableName = "maps_vectors";
     } else if (vectorType === "portraits") {
       tableName = "portraits_vectors";
+    } else if (vectorType === "portraits-male") {
+      tableName = "portraits_male_vectors";
+    } else if (vectorType === "portraits-female") {
+      tableName = "portraits_female_vectors";
     } else {
       tableName = "music_vectors";
     }
@@ -49,4 +53,3 @@ if (import.meta.main) {
   const res = await similaritySearch(queryEmbedding, 100, "music");
   console.log("similarity search results:", res);
 }
-

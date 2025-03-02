@@ -52,6 +52,7 @@ process-maps:
 
 process-portraits:
     rm -rf server/vector-db/seed-vectors/portraits.json
+    just start-vector-db
     just run server/portrait-processing/process-all-portraits.ts
 
 process-music:

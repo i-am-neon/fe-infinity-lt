@@ -1,6 +1,7 @@
 import { PortraitMetadata } from "@/types/portraits/portrait-metadata.ts";
 import generateAndStoreVector from "@/vector-db/generate-and-store-vector.ts";
 import shortUuid from "@/lib/short-uuid.ts";
+import { VectorType } from "@/vector-db/types/vector-type.ts";
 
 export default async function saveVectorsForAllPortraits(
   portraitMetadatas: PortraitMetadata[]
@@ -17,11 +18,19 @@ Clothing: ${portraitMetadata.clothing}
 Headgear: ${portraitMetadata.headgear || "None"}
 Facial Hair: ${portraitMetadata.facialHair || "None"}
 Accessories: ${portraitMetadata.accessories || "None"}`;
+
+    // Determine which gender-specific table to use
+    const genderSpecificVectorType: VectorType =
+      portraitMetadata.gender === "male"
+        ? "portraits-male"
+        : "portraits-female";
+
+    // Save to gender-specific table
     await generateAndStoreVector({
       id: shortUuid(),
       text,
       metadata: portraitMetadata,
-      vectorType: "portraits",
+      vectorType: genderSpecificVectorType,
     });
   }
 }
@@ -77,3 +86,4 @@ if (import.meta.main) {
     },
   ]);
 }
+

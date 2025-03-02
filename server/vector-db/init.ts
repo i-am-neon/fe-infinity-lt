@@ -18,9 +18,18 @@ export default async function initVectorDb(): Promise<void> {
         metadata JSONB
       );
     `);
-    // Create table for portraits vectors
+    // Create table for male portraits vectors
     await client.query(`
-      CREATE TABLE IF NOT EXISTS portraits_vectors (
+      CREATE TABLE IF NOT EXISTS portraits_male_vectors (
+        id TEXT PRIMARY KEY,
+        embedding vector(1536) NOT NULL,
+        metadata JSONB
+      );
+    `);
+
+    // Create table for female portraits vectors
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS portraits_female_vectors (
         id TEXT PRIMARY KEY,
         embedding vector(1536) NOT NULL,
         metadata JSONB

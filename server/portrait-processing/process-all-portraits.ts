@@ -1,9 +1,9 @@
-import getAllPortraitFileNames from "@/portrait-processing/get-all-portrait-paths.ts";
-import genPortraitMetadata from "@/portrait-processing/gen-portrait-metadata.ts";
 import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
-import writeAllPortraitOptions from "@/portrait-processing/write-all-portrait-options.ts";
+import genPortraitMetadata from "@/portrait-processing/gen-portrait-metadata.ts";
+import getAllPortraitFileNames from "@/portrait-processing/get-all-portrait-paths.ts";
 import replaceBackgroundColorInPortraits from "@/portrait-processing/replace-background-color-in-portraits.ts";
 import saveVectorsForAllPortraits from "@/portrait-processing/save-vectors-for-all-portraits.ts";
+import writeAllPortraitOptions from "@/portrait-processing/write-all-portrait-options.ts";
 
 export default async function processAllPortraits(): Promise<void> {
   await replaceBackgroundColorInPortraits();

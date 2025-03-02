@@ -24,8 +24,12 @@ export default async function generateAndStoreVector({
   function getSeedFilePathByType(type: VectorType): string {
     if (type === "maps") {
       return new URL("./seed-vectors/maps.json", import.meta.url).pathname;
-    } else if (type === "portraits") {
-      return new URL("./seed-vectors/portraits.json", import.meta.url).pathname;
+    } else if (type === "portraits-male") {
+      return new URL("./seed-vectors/portraits-male.json", import.meta.url)
+        .pathname;
+    } else if (type === "portraits-female") {
+      return new URL("./seed-vectors/portraits-female.json", import.meta.url)
+        .pathname;
     } else {
       return new URL("./seed-vectors/music.json", import.meta.url).pathname;
     }
@@ -52,7 +56,12 @@ if (import.meta.main) {
   const id = "sample-id";
   const text = "Hello world. This is a sample text to embed.";
   const metadata = { type: "demo" };
-  await generateAndStoreVector({ id, text, metadata, vectorType: "portraits" });
+  await generateAndStoreVector({
+    id,
+    text,
+    metadata,
+    vectorType: "portraits-male",
+  });
   console.log("Generated and stored embedding for sample-id.");
 }
 

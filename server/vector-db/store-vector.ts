@@ -25,8 +25,10 @@ export default async function storeVector({
     let tableName = "";
     if (vectorType === "maps") {
       tableName = "maps_vectors";
-    } else if (vectorType === "portraits") {
-      tableName = "portraits_vectors";
+    } else if (vectorType === "portraits-male") {
+      tableName = "portraits_male_vectors";
+    } else if (vectorType === "portraits-female") {
+      tableName = "portraits_female_vectors";
     } else {
       tableName = "music_vectors";
     }
@@ -55,7 +57,7 @@ if (import.meta.main) {
     id,
     embedding: sampleEmbedding,
     metadata: sampleMetadata,
-    vectorType: "portraits",
+    vectorType: "portraits-male",
   });
   console.log("Stored sample vector data in 'vectors' table.");
 }

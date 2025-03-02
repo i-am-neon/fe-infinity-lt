@@ -1,1 +1,5 @@
-export type VectorType = "maps" | "portraits" | "music";
+export type VectorType =
+  | "maps"
+  | "portraits-male"
+  | "portraits-female"
+  | "music";
