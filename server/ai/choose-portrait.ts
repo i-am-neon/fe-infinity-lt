@@ -45,7 +45,7 @@ Given the user's Fire Emblem character idea, provide a brief single-line string 
     systemMessage: systemMessageForQuery,
     prompt: JSON.stringify(characterIdea),
     temperature: 0.3,
-    model: "gpt-4o-mini",
+    model: "fast",
   });
 
   // 2) Embed and run similarity search

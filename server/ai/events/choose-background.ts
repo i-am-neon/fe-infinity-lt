@@ -25,7 +25,7 @@ Output a JSON object { "chosenBackground": "OneOfTheBackgroundOptions" }. No add
     schema: resultSchema,
     systemMessage,
     prompt: JSON.stringify(aiEvent),
-    model: "gpt-4o-mini",
+    model: "fast",
     temperature: 0.3,
   });
 

@@ -1,9 +1,13 @@
-import { openai } from "@ai-sdk/openai";
-import { OpenAIChatModelId } from "@ai-sdk/openai/internal";
+import { getCurrentLogger } from "@/lib/current-logger.ts";
+import { anthropic } from "@ai-sdk/anthropic";
 import { generateObject } from "ai";
 import "jsr:@std/dotenv/load";
 import { z, ZodSchema } from "zod";
-import { getCurrentLogger } from "@/lib/current-logger.ts";
+import { openai } from "@ai-sdk/openai";
+
+export type ModelType = "fast" | "strong";
+
+const LLM_PROVIDER: "anthropic" | "openai" = "anthropic";
 
 export default async function generateStructuredData<T>({
   fnName,
@@ -11,43 +15,56 @@ export default async function generateStructuredData<T>({
   systemMessage,
   prompt,
   temperature,
-  model = "gpt-4o-mini",
+  model = "fast",
+  logResults = true,
 }: {
   fnName: string;
   schema: ZodSchema<T>;
   systemMessage: string;
   prompt?: string;
   temperature?: number;
-  model?: OpenAIChatModelId;
+  model?: ModelType;
+  logResults?: boolean;
 }): Promise<T> {
   const logger = getCurrentLogger();
   let lastError: unknown;
 
+  const _model =
+    LLM_PROVIDER === "anthropic"
+      ? model === "fast"
+        ? anthropic("claude-3-5-haiku-latest")
+        : anthropic("claude-3-7-sonnet-20250219")
+      : model === "fast"
+      ? openai("gpt-4o-mini")
+      : openai("gpt-4o");
+
   for (let attempt = 1; attempt <= 3; attempt++) {
     try {
       const { object: result } = await generateObject({
-        model: openai(model),
+        model: _model,
         schema,
         system: systemMessage,
-        prompt: prompt || "",
+        prompt: prompt || "no prompt provided",
         temperature,
       });
-      logger.debug(
-        `[generateStructuredData: ${fnName}] Attempt ${attempt} succeeded`,
-        { result }
-      );
+      logResults &&
+        logger.debug(
+          `[generateStructuredData: ${fnName}] Attempt ${attempt} succeeded`,
+          { model: _model, result }
+        );
       return result;
     } catch (error) {
-      logger.warn(
-        `[generateStructuredData: ${fnName}] Attempt ${attempt} failed`,
-        { error }
-      );
+      logResults &&
+        logger.warn(
+          `[generateStructuredData: ${fnName}] Attempt ${attempt} failed`,
+          { model: _model, error }
+        );
       lastError = error;
       if (attempt === 3) {
         const message = `[generateStructuredData: ${fnName}] All 3 attempts failed: ${String(
           lastError
         )}`;
-        logger.error(message);
+        logResults && logger.error(message);
         throw new Error(message);
       }
     }

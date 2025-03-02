@@ -1,10 +1,10 @@
 import { WorldSummary, worldSummarySchema } from "@/ai/types/world-summary.ts";
-import generateStructuredData from "./lib/generate-structured-data.ts";
+import generateStructuredData from "@/ai/lib/generate-structured-data.ts";
 import {
   testGameDescription,
   testGameName,
   testTone,
-} from "./test-data/prologueTestData.ts";
+} from "@/ai/test-data/prologueTestData.ts";
 
 export default function genWorldSummary({
   gameName,
@@ -46,7 +46,7 @@ Notes:
 Game Description: ${gameDescription}
 Game Tone: ${tone}`,
     schema: worldSummarySchema,
-    temperature: 1,
+    temperature: 0.8,
   });
 }
 

@@ -42,7 +42,7 @@ Given the user's Fire Emblem chapter idea, provide a brief single-line string (n
     systemMessage: systemMessageForQuery,
     prompt: promptForQuery,
     temperature: 0.3,
-    model: "gpt-4o-mini",
+    model: "fast",
   });
 
   // 2) Embed and run similarity search
@@ -93,7 +93,7 @@ Return a JSON object { "chosenId": "A" } or "B" or "C" with no extra commentary.
     systemMessage: systemMessageForDecision,
     prompt: secondCallPrompt,
     temperature: 0.3,
-    model: "gpt-4o-mini",
+    model: "fast",
   });
 
   const chosen = ephemeralOptions.find(

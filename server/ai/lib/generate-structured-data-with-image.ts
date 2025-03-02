@@ -1,5 +1,5 @@
 import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
-import { openai } from "@ai-sdk/openai";
+import { anthropic } from "@ai-sdk/anthropic";
 import { generateObject } from "ai";
 import "jsr:@std/dotenv/load";
 import { readFileSync } from "node:fs";
@@ -22,7 +22,7 @@ export default async function generateStructuredDataWithImage<T>({
   const base64 = fileContents.toString("base64");
 
   const { object: result } = await generateObject({
-    model: openai("gpt-4o"),
+    model: anthropic("claude-3-7-sonnet-20250219"),
     schema,
     system: systemMessage,
     messages: [

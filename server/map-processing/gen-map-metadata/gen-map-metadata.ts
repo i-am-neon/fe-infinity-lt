@@ -70,7 +70,7 @@ export default async function genMapMetadata({
       description: true,
       setting: true,
     }),
-    model: "gpt-4o",
+    model: "strong",
   });
 
   const originalName = imagePath

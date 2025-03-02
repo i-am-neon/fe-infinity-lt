@@ -1,6 +1,8 @@
+import generateStructuredData, {
+  ModelType,
+} from "@/ai/lib/generate-structured-data.ts";
 import { getCurrentLogger } from "@/lib/current-logger.ts";
 import { openai } from "@ai-sdk/openai";
-import { OpenAIChatModelId } from "@ai-sdk/openai/internal";
 import { generateObject } from "ai";
 import "jsr:@std/dotenv/load";
 import { z, ZodObject, ZodSchema } from "zod";
@@ -23,9 +25,9 @@ export interface GeneratorCheckerAllInOneParams<T> {
   generatorSchema: ZodSchema<T>;
   checkerSystemMessage: string;
   checkerPrompt: (candidate: T) => string;
-  generatorModel?: OpenAIChatModelId;
+  generatorModel?: ModelType;
   generatorTemperature?: number;
-  checkerModel?: OpenAIChatModelId;
+  checkerModel?: ModelType;
   checkerTemperature?: number;
   maxAttempts?: number;
   fnBaseName: string;
@@ -51,9 +53,9 @@ export async function genAndCheck<T>({
   generatorSchema,
   checkerSystemMessage,
   checkerPrompt,
-  generatorModel = "gpt-4o-mini",
+  generatorModel = "fast",
   generatorTemperature = 0.8,
-  checkerModel = "gpt-4o-mini",
+  checkerModel = "fast",
   checkerTemperature = 0,
   maxAttempts = 3,
   fnBaseName,
@@ -95,12 +97,14 @@ No additional commentary or text outside these JSON objects.`;
             ? generatorPrompt
             : `${generatorPrompt}\n\nPrevious attempt had issues: ${lastFixText}`;
 
-        const { object: generatedCandidate } = await generateObject({
-          model: openai(generatorModel),
+        const generatedCandidate = await generateStructuredData({
+          fnName: `${fnBaseName}_generator_${attempt}`,
           schema: generatorSchema,
-          system: generatorSystemMessage,
+          systemMessage: generatorSystemMessage,
           prompt: generationPrompt,
           temperature: generatorTemperature,
+          model: generatorModel,
+          logResults: false,
         });
 
         logger.debug(
@@ -112,7 +116,7 @@ No additional commentary or text outside these JSON objects.`;
       } catch (genError) {
         logger.warn(
           `[genAndCheck: ${fnBaseName}] Generation error on attempt ${attempt}`,
-          { error: genError }
+          { error: (genError as Error).message }
         );
 
         // If this is the last attempt, throw the error
@@ -200,12 +204,14 @@ No additional commentary or text outside these JSON objects.`;
               )}`
             : checkerResult;
 
-        const { object: rawFixCheck } = await generateObject({
-          model: openai(checkerModel),
+        const rawFixCheck = await generateStructuredData({
+          fnName: `${fnBaseName}_checker_${attempt}`,
           schema: rawCheckerSchema,
-          system: checkerSystemMessage,
+          systemMessage: checkerSystemMessage,
           prompt: checkerPromptWithValidations,
           temperature: checkerTemperature,
+          model: checkerModel,
+          logResults: false,
         });
 
         const passesCheck = rawFixCheck.passesCheck;
@@ -241,15 +247,18 @@ No additional commentary or text outside these JSON objects.`;
               generatorSchema,
               fnBaseName,
               attemptNumber: attempt,
+              generatorModel,
             });
 
             // Check if the fix worked
-            const { object: finalCheckResult } = await generateObject({
-              model: openai(checkerModel),
+            const finalCheckResult = await generateStructuredData({
+              fnName: `${fnBaseName}_final_check_additional_${attempt}`,
               schema: rawCheckerSchema,
-              system: checkerSystemMessage,
+              systemMessage: checkerSystemMessage,
               prompt: checkerPrompt(lastChanceFixedCandidate),
               temperature: checkerTemperature,
+              model: checkerModel,
+              logResults: false,
             });
 
             if (finalCheckResult.passesCheck) {
@@ -280,15 +289,18 @@ No additional commentary or text outside these JSON objects.`;
           generatorSchema,
           fnBaseName,
           attemptNumber: attempt,
+          generatorModel,
         });
 
         // 4) Check if the fix worked
-        const { object: verifyFixCheck } = await generateObject({
-          model: openai(checkerModel),
+        const verifyFixCheck = await generateStructuredData({
+          fnName: `${fnBaseName}_verify_fix_${attempt}`,
           schema: rawCheckerSchema,
-          system: checkerSystemMessage,
+          systemMessage: checkerSystemMessage,
           prompt: checkerPrompt(fixedCandidate),
           temperature: checkerTemperature,
+          model: checkerModel,
+          logResults: false,
         });
 
         if (verifyFixCheck.passesCheck || verifyFixCheck.fixText === "None") {
@@ -319,6 +331,7 @@ No additional commentary or text outside these JSON objects.`;
               generatorSchema,
               fnBaseName,
               attemptNumber: attempt + 0.5,
+              generatorModel,
             });
 
             // Check if that final fix worked
@@ -344,14 +357,14 @@ No additional commentary or text outside these JSON objects.`;
           } catch (additionalFixError) {
             logger.warn(
               `[genAndCheck: ${fnBaseName}] Additional fix attempt failed`,
-              { additionalFixError }
+              { additionalFixError: (additionalFixError as Error).message }
             );
           }
         }
       } catch (checkError) {
         logger.warn(
           `[genAndCheck: ${fnBaseName}] Check error on attempt ${attempt}`,
-          { error: checkError }
+          { error: (checkError as Error).message }
         );
 
         // If this is the last attempt, store the candidate
@@ -390,12 +403,14 @@ async function fixCandidate<T>({
   generatorSchema,
   fnBaseName,
   attemptNumber,
+  generatorModel,
 }: {
   candidate: T;
   fixCheck: CheckerOutputFix<T>;
   generatorSchema: ZodSchema<T>;
   fnBaseName: string;
   attemptNumber: number;
+  generatorModel: ModelType;
 }): Promise<T> {
   const logger = getCurrentLogger();
 
@@ -431,12 +446,14 @@ Return only the fixed JSON object with no additional commentary.`;
       `[fixCandidate: ${fnBaseName}] Calling fixer LLM on attempt ${attemptNumber}`
     );
 
-    const { object: fixedCandidate } = await generateObject({
-      model: openai("gpt-4o-mini"),
+    const fixedCandidate = await generateStructuredData({
+      fnName: `${fnBaseName}_fixer_${attemptNumber}`,
       schema: generatorSchema,
-      system: fixerSystemMessage,
+      systemMessage: fixerSystemMessage,
       prompt: fixerPrompt,
       temperature: 0.2,
+      model: generatorModel,
+      logResults: false,
     });
 
     logger.debug(
@@ -446,7 +463,7 @@ Return only the fixed JSON object with no additional commentary.`;
   } catch (error) {
     logger.warn(
       `[fixCandidate: ${fnBaseName}] Fixer failed on attempt ${attemptNumber}`,
-      { error }
+      { error: (error as Error).message }
     );
 
     // If there's a fixObject, return candidate merged with fixObject

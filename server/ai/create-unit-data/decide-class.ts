@@ -53,7 +53,7 @@ Use the character idea to pick the best class from that list. Output only JSON: 
     systemMessage,
     prompt,
     temperature: 0.3,
-    model: "gpt-4o-mini",
+    model: "fast",
   });
 
   return chosenClass;
@@ -66,3 +66,4 @@ if (import.meta.main) {
     characterIdea: testCharIdeaThorne,
   }).then((res) => console.log("Chosen class:", res));
 }
+

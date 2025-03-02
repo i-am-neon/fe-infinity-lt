@@ -37,7 +37,7 @@ Consider the context of the villager's location, the events happening around the
     prompt: `Chapter information: ${JSON.stringify(chapterIdea)}
 Item to be given: ${item}`,
     temperature: 1,
-    model: "gpt-4o-mini",
+    model: "fast",
   });
 
   return dialogue;
