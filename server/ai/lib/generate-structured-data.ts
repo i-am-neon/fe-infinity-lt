@@ -7,7 +7,7 @@ import { openai } from "@ai-sdk/openai";
 
 export type ModelType = "fast" | "strong";
 
-const LLM_PROVIDER: "anthropic" | "openai" = "anthropic";
+const LLM_PROVIDER: "anthropic" | "openai" = "openai";
 
 export default async function generateStructuredData<T>({
   fnName,
@@ -50,21 +50,28 @@ export default async function generateStructuredData<T>({
       logResults &&
         logger.debug(
           `[generateStructuredData: ${fnName}] Attempt ${attempt} succeeded`,
-          { model: _model, result }
+          { model: _model.modelId, result }
         );
       return result;
     } catch (error) {
       logResults &&
         logger.warn(
           `[generateStructuredData: ${fnName}] Attempt ${attempt} failed`,
-          { model: _model, error }
+          { model: _model.modelId, error }
         );
       lastError = error;
       if (attempt === 3) {
         const message = `[generateStructuredData: ${fnName}] All 3 attempts failed: ${String(
           lastError
         )}`;
-        logResults && logger.error(message);
+        logResults &&
+          logger.error(
+            `[generateStructuredData: ${fnName}] All 3 attempts failed`,
+            {
+              model: _model.modelId,
+              error: lastError,
+            }
+          );
         throw new Error(message);
       }
     }
