@@ -4,11 +4,8 @@ import { generateObject } from "ai";
 import "jsr:@std/dotenv/load";
 import { z, ZodSchema } from "zod";
 import { openai } from "@ai-sdk/openai";
-
 export type ModelType = "fast" | "strong";
-
 const LLM_PROVIDER: "anthropic" | "openai" = "openai";
-
 export default async function generateStructuredData<T>({
   fnName,
   schema,
@@ -28,6 +25,7 @@ export default async function generateStructuredData<T>({
 }): Promise<T> {
   const logger = getCurrentLogger();
   let lastError: unknown;
+  const startTime = performance.now();
 
   const _model =
     LLM_PROVIDER === "anthropic"
@@ -40,6 +38,7 @@ export default async function generateStructuredData<T>({
 
   for (let attempt = 1; attempt <= 3; attempt++) {
     try {
+      const attemptStartTime = performance.now();
       const { object: result } = await generateObject({
         model: _model,
         schema,
@@ -47,36 +46,65 @@ export default async function generateStructuredData<T>({
         prompt: prompt || "no prompt provided",
         temperature,
       });
+      const attemptDuration = performance.now() - attemptStartTime;
+
       logResults &&
         logger.debug(
           `[generateStructuredData: ${fnName}] Attempt ${attempt} succeeded`,
-          { model: _model.modelId, result }
+          {
+            model: _model.modelId,
+            result,
+            duration_ms: Math.round(attemptDuration),
+          }
         );
+
+      const totalDuration = performance.now() - startTime;
+      logResults &&
+        logger.info(
+          `[generateStructuredData: ${fnName}] Total execution completed successfully`,
+          {
+            model: _model.modelId,
+            attempts: attempt,
+            duration_ms: Math.round(totalDuration),
+          }
+        );
+
       return result;
     } catch (error) {
+      const attemptDuration = performance.now() - startTime;
+
       logResults &&
         logger.warn(
           `[generateStructuredData: ${fnName}] Attempt ${attempt} failed`,
-          { model: _model.modelId, error }
+          {
+            model: _model.modelId,
+            error,
+            duration_ms: Math.round(attemptDuration),
+          }
         );
+
       lastError = error;
       if (attempt === 3) {
+        const totalDuration = performance.now() - startTime;
+
         const message = `[generateStructuredData: ${fnName}] All 3 attempts failed: ${String(
           lastError
         )}`;
+
         logResults &&
           logger.error(
             `[generateStructuredData: ${fnName}] All 3 attempts failed`,
             {
               model: _model.modelId,
               error: lastError,
+              duration_ms: Math.round(totalDuration),
             }
           );
+
         throw new Error(message);
       }
     }
   }
-
   throw new Error("[generateStructuredData] This should never happen.");
 }
 
@@ -85,7 +113,6 @@ if (import.meta.main) {
     name: z.string(),
     age: z.number(),
   });
-
   generateStructuredData({
     fnName: "generatePerson",
     schema,
@@ -94,4 +121,3 @@ if (import.meta.main) {
     console.log(res);
   });
 }
-
