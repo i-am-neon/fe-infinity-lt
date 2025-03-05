@@ -1,13 +1,13 @@
 import { genAndCheck } from "@/ai/lib/generator-checker.ts";
-import { ChapterIdea, ChapterIdeaSchema } from "@/ai/types/chapter-idea.ts";
-import { InitialGameIdea } from "@/ai/types/initial-game-idea.ts";
-import { WorldSummary } from "@/ai/types/world-summary.ts";
-import { DeadCharacterRecord } from "@/types/dead-character-record.ts";
 import {
   testPrologueChapter,
   testTone,
   testWorldSummary,
 } from "@/ai/test-data/prologueTestData.ts";
+import { ChapterIdea, ChapterIdeaSchema } from "@/ai/types/chapter-idea.ts";
+import { InitialGameIdea } from "@/ai/types/initial-game-idea.ts";
+import { WorldSummary } from "@/ai/types/world-summary.ts";
+import { DeadCharacterRecord } from "@/types/dead-character-record.ts";
 
 export default function genChapterIdea({
   worldSummary,
@@ -57,6 +57,11 @@ CRITICAL REQUIREMENTS:
   * Show personality traits from their character description in their dialogue/actions
   * MUST mention EACH CHARACTER BY NAME explicitly in intro, battle, or outro text
 - Must not reuse or resurrect any dead characters
+- The death of characters must significantly impact the story:
+  * Living player characters should reference the deaths of dead player characters, highlighting the relationship between them and the deceased.
+  * The death of characters central to the storyline must be referenced in the story, and will likely change the direction of the next chapter.
+  * Minor unit deaths should be referenced in the story, but will likely only alter the next chapter slightly.
+  * When referencing dead boss characters, make sure to never refer to them as part of the player party.
 - Must not reuse a previous boss from earlier chapters
 - Consider including monetary rewards or special items as part of the narrative.
   - Examples:
@@ -92,6 +97,11 @@ CRITICAL REQUIREMENTS:
   * Ensure their introduction reflects their personality and background
   * MUST mention EACH CHARACTER BY NAME explicitly in intro, battle, or outro text
 - Must not reuse or resurrect any dead characters
+- The death of characters must significantly impact the story:
+  * Living player characters should reference the deaths of dead player characters, highlighting the relationship between them and the deceased.
+  * The death of characters central to the storyline must be referenced in the story, and will likely change the direction of the next chapter.
+  * Minor unit deaths should be referenced in the story, but will likely only alter the next chapter slightly.
+  * When referencing dead boss characters, make sure to never refer to them as part of the player party.
 - Must not reuse a previous boss from earlier chapters
 - Must produce a new Chapter Idea that strictly matches the ChapterIdea schema
   - When creating the endOfChapterChoice, ensure none of the options include attempting to recruit a certain character
@@ -116,6 +126,10 @@ Tone: ${tone}`
 
   const checkerSystemMessage = `You are a Fire Emblem Fangame Chapter Idea Checker (checker).
 Check that all required fields are present and that new characters are mentioned in the text.
+Also check that the story appropriately acknowledges dead characters from previous chapters:
+- The narrative should reference the impact of these deaths on the living characters and storyline
+- Living characters should mention or react to the deaths of significant characters
+- If major characters died, the plot should reflect this change in direction
 Themes of resurrection, undead, etc. are perfectly fine in the story - only check that actual dead characters from previous chapters aren't brought back as active characters.
 Dramatic language in death quotes (like "I'll rise again") is completely acceptable.
 Return { fixText: "None", fixObject: {} } if good; else fix instructions. Only JSON.`;
@@ -138,6 +152,7 @@ Constraints:
   c) New bosses and characters are always allowed even if they talk about resurrection themes.
 3) Only check that boss characters from previous chapters aren't reused with the same name and role.
 4) If there are newPlayableUnits or newNonBattleCharacters arrays present, ensure each character in these arrays is explicitly mentioned BY NAME (their exact firstName) in the intro, battle, or outro text. The boss character is already a required field and doesn't need this validation.
+5) Verify that if there are dead characters (from allDeadCharacters or newlyDeadThisChapter), the chapter narrative acknowledges these deaths in some meaningful way - either through explicit mentions in dialogue, plot consequences, or character reactions.
 If all good => fixText="None". Otherwise => fix instructions.`;
     },
   });
