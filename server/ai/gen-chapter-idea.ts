@@ -137,6 +137,7 @@ Return { fixText: "None", fixObject: {} } if good; else fix instructions. Only J
 
   return genAndCheck<ChapterIdea>({
     fnBaseName: "genChapterIdea",
+    generatorModel: "strong",
     generatorSystemMessage,
     generatorPrompt: basePrompt,
     generatorSchema: ChapterIdeaSchema,

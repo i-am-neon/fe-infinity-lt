@@ -1,6 +1,6 @@
 import { CharacterIdeaSchema } from "@/ai/types/character-idea.ts";
-import { z } from "zod";
 import { EnemyFactionSchema } from "@/ai/types/enemy-faction.ts";
+import { z } from "zod";
 
 export const ChapterIdeaSchema = z.object({
   title: z
@@ -8,11 +8,21 @@ export const ChapterIdeaSchema = z.object({
     .describe(
       "Title of the chapter. Should be unique, just a few words, and not include the chapter number (or 'Prologue')."
     ),
-  intro: z.string().describe("Overview of the starting event of the chapter."),
+  intro: z
+    .string()
+    .describe(
+      "Overview of the starting event of the chapter. If there are new playable units that join in the intro, they should be mentioned here."
+    ),
   battle: z
     .string()
-    .describe("Description of the starting situation of the battle."),
-  outro: z.string().describe("Description of the ending event of the chapter."),
+    .describe(
+      "Description of the starting situation of the battle. If there are new playable units that are recruited during the battle, they should be mentioned here."
+    ),
+  outro: z
+    .string()
+    .describe(
+      "Description of the ending event of the chapter. If there are new playable units that join in the outro, they should be mentioned here."
+    ),
   boss: CharacterIdeaSchema.describe(
     "The boss of the chapter. This chaptacter's firstSeenAs must be 'boss'."
   ),

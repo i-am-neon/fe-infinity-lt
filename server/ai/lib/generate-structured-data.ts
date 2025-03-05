@@ -33,10 +33,10 @@ export default async function generateStructuredData<T>({
     LLM_PROVIDER === "anthropic"
       ? model === "fast"
         ? anthropic("claude-3-5-haiku-latest")
-        : anthropic("claude-3-7-sonnet-20250219")
+        : anthropic("claude-3-5-sonnet-latest")
       : model === "fast"
       ? openai("gpt-4o-mini")
-      : openai("gpt-4o");
+      : openai("gpt-4.5-preview");
 
   for (let attempt = 1; attempt <= 3; attempt++) {
     try {
