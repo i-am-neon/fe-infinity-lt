@@ -50,7 +50,20 @@ Write the event that will open this chapter of the game.
 
 ${prologueNote}
 
-The event must:
+CRITICAL REQUIREMENT - ITEMS AND MONEY:
+When the intro text mentions characters finding, receiving, or obtaining items or money, you MUST add the appropriate command in your event:
+
+Examples:
+- If intro says: "...stumbles upon a Silver Blade" → add command: "give_item;Silver_Blade"
+- If intro says: "...finds a pouch containing 500 gold" → add command: "give_money;500"
+- If intro says: "...the king presents them with an ancient tome" → add command: "give_item;Ancient_Tome"
+- If intro says: "...discovers a healing staff in the ruins" → add command: "give_item;Heal"
+
+The command should come immediately after the dialogue or narration where the item is mentioned.
+Always use underscores instead of spaces in item names.
+This is CRITICAL for gameplay mechanics - if an item is mentioned, the "give_item" command MUST be included.
+
+The event must also:
 - use the Chapter Idea's intro as the basis for the event
 - make characters speak with the "add_portrait" command for each character and then use the "speak" command for them to speak
 - unless a character enters the scene later, all characters in the event should be added with "add_portrait" before anyone speaks
@@ -97,12 +110,19 @@ Newly Dead This Chapter: ${JSON.stringify(
   const checkerSystemMessage = `You are a Fire Emblem Fangame Intro Event Checker (checker).
 We must ensure:
 1) It does not resurrect or give speaking roles to actually dead characters from previous chapters (those in allDeadCharacters list).
-2) The event only uses "add_portrait", "speak", "narrate" commands from the sourceAsObject schema.
+2) The event uses required commands correctly ("add_portrait", "speak", "narrate", "give_item", "give_money").
 3) The event must not mention or speak for newlyDeadThisChapter.
 4) Characters can be introduced naturally in the narrative, including:
    - Narrative references to historical/lore figures being "thought dead" or returning
    - Characters speaking from "OffscreenLeft" or "OffscreenRight" positions
    - Bosses and antagonists mentioned in the chapter intro
+
+5) SPECIAL ITEM CHECKING - CRITICALLY IMPORTANT:
+   - Read the original intro text in the Chapter Idea carefully
+   - If the intro mentions characters finding, receiving, or obtaining ANY items (weapons, artifacts, etc.)
+     or money, the event MUST include the appropriate "give_item" or "give_money" command
+   - Example: If intro says "...stumbles upon a Silver Blade" but no "give_item;Silver_Blade" command exists,
+     that's an error that MUST be fixed by adding the command
 
 IMPORTANT NOTES:
 - Allow narrative devices like "thought dead" or "has returned" for storytelling
@@ -119,6 +139,8 @@ If the candidate is valid, return { "fixText": "None", "passesCheck": true }. Ot
     return `Candidate:\n${JSON.stringify(candidate, null, 2)}
 Portrait Validation Result: ${JSON.stringify(portraitValidation)}
 
+Chapter Idea: ${JSON.stringify(chapterIdea, null, 2)}
+
 Check the following constraints carefully but leniently:
 1) Must not include or resurrect ACTUAL dead characters from: ${JSON.stringify(
       allDeadCharacters,
@@ -130,7 +152,9 @@ Check the following constraints carefully but leniently:
       2
     )}.
 2) Portrait validation is now handled by the algorithm and the result is shown above.
-3) Must follow the AIEvent schema exactly and only use valid commands ("add_portrait", "speak", "narrate").
+3) Must follow the AIEvent schema exactly and only use valid commands ("add_portrait", "speak", "narrate", "give_item", "give_money").
+4) SPECIAL ITEM CHECK: If the intro text mentions items or money being found (e.g., "stumbles upon a Silver Blade"),
+   there MUST be a corresponding "give_item" or "give_money" command in the sourceObjects.
 
 IMPORTANT:
 - Allow storytelling with references to characters being "thought dead" or returned

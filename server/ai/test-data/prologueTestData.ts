@@ -2265,7 +2265,7 @@ export const testPrologueChapter: Chapter = {
   idea: {
     title: "The Grand Mischief",
     intro:
-      "As the vibrant kingdom of Althoria buzzes with anticipation for the annual Grand Tourney, rumors swirl of hidden treasures and mischievous schemes. Amidst the joviality, Silas the nimble archer, Cassandra the valorous knight, and Alden the eccentric alchemist find themselves drawn together by the promise of glory and a mysterious ancient artifact said to harbor the Mischievous Muse's chaotic magic. However, the discovery of a conspiracy within the Order of the Glorious Blade, led by the hot-tempered and cunning Leona Darksong, threatens to unravel the light-hearted spirit of the festival. Determined to uncover the truth, our heroes must navigate a maze of intrigue and tactical gamesmanship in the Jester's Fields.",
+      "As the vibrant kingdom of Althoria buzzes with anticipation for the annual Grand Tourney, rumors swirl of hidden treasures and mischievous schemes. Amidst the joviality, Silas the nimble archer, Cassandra the valorous knight, and Alden the eccentric alchemist find themselves drawn together by the promise of glory and a mysterious ancient artifact said to harbor the Mischievous Muse's chaotic magic. However, the discovery of a conspiracy within the Order of the Glorious Blade, led by the hot-tempered and cunning Leona Darksong, threatens to unravel the light-hearted spirit of the festival. Determined to uncover the truth, our heroes must navigate a maze of intrigue and tactical gamesmanship in the Jester's Fields. On the way to the battle, the party stumbles upon a Silver Blade.",
     battle:
       "The battlefield is a lively recreation of the Jester's Fields, filled with colorful banners and bustling grandstands. Amidst merchant stalls and carriages, competitors dodge unexpected illusions cast by Leona's schemes, requiring quick thinking and coordination. The map is littered with obstacles, secret passages, and whimsical traps, challenging our heroes to outsmart their foes while peeling back the layers of conspiracy.",
     outro:
@@ -2313,6 +2313,10 @@ export const testPrologueChapter: Chapter = {
       name: "Conspirator",
       desc: "Seek to manipulate the Grand Tourney for personal gain.",
       icon_nid: "KnightEmblem",
+    },
+    endOfChapterChoice: {
+      displayText: "What will you do next?",
+      options: ["Pursue the villain", "Stay at home"],
     },
   },
 };

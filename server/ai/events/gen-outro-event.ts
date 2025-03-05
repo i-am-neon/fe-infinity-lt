@@ -32,6 +32,19 @@ export default function genOutroEvent({
   const generatorSystemMessage = `You are a Fire Emblem Fangame Outro Event Writer!
 ${prologueNote}
 
+CRITICAL REQUIREMENT - ITEMS AND MONEY:
+When the outro text mentions characters finding, receiving, or obtaining items or money, you MUST add the appropriate command in your event:
+
+Examples:
+- If outro says: "...stumbles upon a Silver Blade" → add command: "give_item;Silver_Blade"
+- If outro says: "...finds a pouch containing 500 gold" → add command: "give_money;500"
+- If outro says: "...the king presents them with an ancient tome" → add command: "give_item;Ancient_Tome"
+- If outro says: "...discovers a healing staff in the ruins" → add command: "give_item;Heal"
+
+The command should come immediately after the dialogue or narration where the item is mentioned.
+Always use underscores instead of spaces in item names.
+This is CRITICAL for gameplay mechanics - if an item is mentioned, the "give_item" command MUST be included.
+
 The event should:
 - use the Chapter Idea's outro as the basis for the event
 - ensure that any character who speaks has an "add_portrait" command somewhere earlier in the event script
@@ -39,6 +52,8 @@ The event should:
 - if a character is mentioned in the outro, it must be included in the event
 - you may only give speaking roles to characters mentioned in the outro, not any other characters
 - you must have characters speak to each other in the scene
+- you can use "give_money" to have characters receive or find money as part of the story resolution (e.g., "give_money;1000")
+- you can use "give_item" to have characters receive, find, or obtain items as rewards or plot elements (e.g., "give_item;Iron_Sword")
 
 We want one AIEvent object strictly matching the AIEvent schema. Return only JSON, no commentary.
 If the outro references a 'boss', 'newPlayableUnits', or 'newNonBattleCharacters', ensure they appear if it makes sense.`;

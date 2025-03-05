@@ -58,10 +58,14 @@ CRITICAL REQUIREMENTS:
   * MUST mention EACH CHARACTER BY NAME explicitly in intro, battle, or outro text
 - Must not reuse or resurrect any dead characters
 - Must not reuse a previous boss from earlier chapters
+- Consider including monetary rewards or special items as part of the narrative. Examples:
+  - characters find treasure
+  - thankful townspeople give special weapon/item as thanks after the battle
+  - king gives party money to aid their adventure
 - Must produce a new Chapter Idea that strictly matches the ChapterIdea schema
 - Return only JSON without any commentary
 
-Additionally, the 'intro' must be a thorough single paragraph explaining the reason for the battle, who the boss is, etc. The 'battle' should be brief, focusing primarily on the scenario's setting or map. The 'outro' must be a single paragraph that resolves the chapter's events. For EACH new character, weave in their backstory and motivations for joining the group in a natural way.`
+Additionally, the 'intro' and 'outro' fields must each be a single full paragraph summarizing all the events, dialogue, and interactions that happen in those scenes. Make sure new characters' introductions feel natural and their reasons for joining are compelling and tied to their backstories. Feel free to incorporate monetary rewards, treasure finds, or special items as part of the narrative to add depth and motivation to the storyline.`
     : `You are a Fire Emblem Fangame Chapter Idea Generator (generator).
 
 We have:
