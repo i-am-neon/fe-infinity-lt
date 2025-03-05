@@ -1,11 +1,16 @@
 import pool from "@/vector-db/connection.ts";
 import { VectorType } from "@/vector-db/types/vector-type.ts";
+import createEmbedding from "@/vector-db/create-embedding.ts";
 
-export default async function similaritySearch(
-  embedding: number[],
+export default async function similaritySearch({
+  searchQuery,
   topK = 3,
-  vectorType: VectorType
-): Promise<
+  vectorType,
+}: {
+  searchQuery: string;
+  topK: number;
+  vectorType: VectorType;
+}): Promise<
   Array<{
     id: string;
     score: number;
@@ -26,6 +31,8 @@ export default async function similaritySearch(
     } else {
       tableName = "music_vectors";
     }
+    const embedding = await createEmbedding({ text: searchQuery });
+
     const embeddingLiteral = "[" + embedding.join(",") + "]";
     const query = `
       SELECT
@@ -49,7 +56,11 @@ export default async function similaritySearch(
 
 if (import.meta.main) {
   // Example usage for maps
-  const queryEmbedding = new Array(1536).fill(0).map(() => Math.random());
-  const res = await similaritySearch(queryEmbedding, 100, "music");
+  const res = await similaritySearch({
+    searchQuery: "Magic Necklace",
+    topK: 3,
+    vectorType: "items",
+  });
   console.log("similarity search results:", res);
 }
+

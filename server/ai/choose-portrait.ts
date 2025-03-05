@@ -1,7 +1,6 @@
 import { testCharIdeaAislin } from "@/ai/test-data/character-ideas.ts";
 import { CharacterIdea } from "@/ai/types/character-idea.ts";
 import { getCurrentLogger } from "@/lib/current-logger.ts";
-import createEmbedding from "@/vector-db/create-embedding.ts";
 import similaritySearch from "@/vector-db/similarity-search.ts";
 import { VectorType } from "@/vector-db/types/vector-type.ts";
 import { z } from "zod";
@@ -34,14 +33,15 @@ Given the user's Fire Emblem character idea, provide a brief single-line string 
     model: "fast",
   });
 
-  // 2) Embed and run similarity search on the gender-specific database
-  const embedding = await createEmbedding({ text: searchQuery });
-
   // Determine which vector type to use based on gender
   const vectorType: VectorType =
     characterIdea.gender === "male" ? "portraits-male" : "portraits-female";
 
-  const topResults = await similaritySearch(embedding, 3, vectorType);
+  const topResults = await similaritySearch({
+    searchQuery,
+    topK: 3,
+    vectorType,
+  });
   if (!topResults.length) {
     logger.warn("No portrait results found for search query", { searchQuery });
     throw new Error("No portrait matches found.");
@@ -56,7 +56,11 @@ Given the user's Fire Emblem character idea, provide a brief single-line string 
       "No unused portraits remain for top 5, re-searching with topK=10 ...",
       { searchQuery }
     );
-    const biggerResults = await similaritySearch(embedding, 10, vectorType);
+    const biggerResults = await similaritySearch({
+      searchQuery,
+      topK: 10,
+      vectorType,
+    });
     const biggerFiltered = biggerResults.filter((res) => {
       const md = res.metadata as { originalName?: string };
       return md.originalName && !usedPortraits.includes(md.originalName);

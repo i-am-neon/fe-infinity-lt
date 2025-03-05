@@ -1,12 +1,14 @@
-import createEmbedding from "@/vector-db/create-embedding.ts";
-import similaritySearch from "@/vector-db/similarity-search.ts";
-import { sluggify } from "@/lib/sluggify.ts";
 import { getCurrentLogger } from "@/lib/current-logger.ts";
+import { sluggify } from "@/lib/sluggify.ts";
+import similaritySearch from "@/vector-db/similarity-search.ts";
 
 export default async function chooseMusic(scenario: string): Promise<string> {
   const logger = getCurrentLogger();
-  const embedding = await createEmbedding({ text: scenario });
-  const topResults = await similaritySearch(embedding, 3, "music");
+  const topResults = await similaritySearch({
+    searchQuery: scenario,
+    topK: 3,
+    vectorType: "music",
+  });
   if (!topResults.length) {
     throw new Error("No music results found for this scenario.");
   }

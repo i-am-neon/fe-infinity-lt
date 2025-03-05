@@ -1,9 +1,8 @@
+import { testPrologueChapter } from "@/ai/test-data/prologueTestData.ts";
 import { ChapterIdea } from "@/ai/types/chapter-idea.ts";
-import generateStructuredData from "./lib/generate-structured-data.ts";
-import createEmbedding from "@/vector-db/create-embedding.ts";
 import similaritySearch from "@/vector-db/similarity-search.ts";
 import { z } from "zod";
-import { testPrologueChapter } from "@/ai/test-data/prologueTestData.ts";
+import generateStructuredData from "./lib/generate-structured-data.ts";
 
 interface EphemeralMapOption {
   ephemeralId: "A" | "B" | "C";
@@ -45,9 +44,12 @@ Given the user's Fire Emblem chapter idea, provide a brief single-line string (n
     model: "fast",
   });
 
-  // 2) Embed and run similarity search
-  const embedding = await createEmbedding({ text: searchQuery });
-  const topResults = await similaritySearch(embedding, 5, "maps");
+  // 2) Run similarity search
+  const topResults = await similaritySearch({
+    searchQuery,
+    topK: 5,
+    vectorType: "maps",
+  });
   if (!topResults.length) {
     throw new Error("No map results found for this query.");
   }
