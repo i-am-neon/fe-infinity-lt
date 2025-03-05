@@ -191,6 +191,11 @@ export default async function initializeProject(projectName: string) {
     key: "convoy_on_death",
     newValue: true,
   });
+  await modifyConstant({
+    projectNameEndingInDotLtProj: newProjectNameEndingInDotLtProj,
+    key: "info_menu_blink",
+    newValue: true,
+  });
 
   // Remove music that plays during battle
   await removeWithinLtMaker({
