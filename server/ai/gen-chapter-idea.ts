@@ -7,6 +7,7 @@ import {
 import { ChapterIdea, ChapterIdeaSchema } from "@/ai/types/chapter-idea.ts";
 import { InitialGameIdea } from "@/ai/types/initial-game-idea.ts";
 import { WorldSummary } from "@/ai/types/world-summary.ts";
+import { validateCharacterMentions } from "@/ai/validators/validate-character-mentions.ts";
 import { DeadCharacterRecord } from "@/types/dead-character-record.ts";
 
 export default function genChapterIdea({
@@ -151,10 +152,10 @@ Constraints:
   b) Dramatic language in death quotes (like "I will rise again" or similar) is completely acceptable.
   c) New bosses and characters are always allowed even if they talk about resurrection themes.
 3) Only check that boss characters from previous chapters aren't reused with the same name and role.
-4) If there are newPlayableUnits or newNonBattleCharacters arrays present, ensure each character in these arrays is explicitly mentioned BY NAME (their exact firstName) in the intro, battle, or outro text. The boss character is already a required field and doesn't need this validation.
-5) Verify that if there are dead characters (from allDeadCharacters or newlyDeadThisChapter), the chapter narrative acknowledges these deaths in some meaningful way - either through explicit mentions in dialogue, plot consequences, or character reactions.
+4) Verify that if there are dead characters (from allDeadCharacters or newlyDeadThisChapter), the chapter narrative acknowledges these deaths in some meaningful way - either through explicit mentions in dialogue, plot consequences, or character reactions.
 If all good => fixText="None". Otherwise => fix instructions.`;
     },
+    validators: [validateCharacterMentions],
   });
 }
 if (import.meta.main) {
