@@ -1,11 +1,13 @@
 import { getCurrentLogger } from "@/lib/current-logger.ts";
 import { anthropic } from "@ai-sdk/anthropic";
+import { openai } from "@ai-sdk/openai";
 import { generateObject } from "ai";
 import "jsr:@std/dotenv/load";
 import { z, ZodSchema } from "zod";
-import { openai } from "@ai-sdk/openai";
+
 export type ModelType = "fast" | "strong";
 const LLM_PROVIDER: "anthropic" | "openai" = "openai";
+
 export default async function generateStructuredData<T>({
   fnName,
   schema,
@@ -121,3 +123,4 @@ if (import.meta.main) {
     console.log(res);
   });
 }
+

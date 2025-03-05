@@ -2,8 +2,6 @@ import generateStructuredData, {
   ModelType,
 } from "@/ai/lib/generate-structured-data.ts";
 import { getCurrentLogger } from "@/lib/current-logger.ts";
-import { openai } from "@ai-sdk/openai";
-import { generateObject } from "ai";
 import "jsr:@std/dotenv/load";
 import { z, ZodObject, ZodSchema } from "zod";
 
@@ -335,12 +333,14 @@ No additional commentary or text outside these JSON objects.`;
             });
 
             // Check if that final fix worked
-            const { object: finalCheckResult } = await generateObject({
-              model: openai(checkerModel),
+            const finalCheckResult = await generateStructuredData({
+              fnName: `${fnBaseName}_final_check_additional_${attempt}`,
               schema: rawCheckerSchema,
-              system: checkerSystemMessage,
+              systemMessage: checkerSystemMessage,
               prompt: checkerPrompt(lastChanceFixedCandidate),
               temperature: checkerTemperature,
+              model: checkerModel,
+              logResults: false,
             });
 
             if (
