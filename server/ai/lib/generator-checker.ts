@@ -442,10 +442,6 @@ ${fixCheck.fixText}
 Return only the fixed JSON object with no additional commentary.`;
 
   try {
-    logger.debug(
-      `[fixCandidate: ${fnBaseName}] Calling fixer LLM on attempt ${attemptNumber}`
-    );
-
     const fixedCandidate = await generateStructuredData({
       fnName: `${fnBaseName}_fixer_${attemptNumber}`,
       schema: generatorSchema,
@@ -456,9 +452,6 @@ Return only the fixed JSON object with no additional commentary.`;
       logResults: false,
     });
 
-    logger.debug(
-      `[fixCandidate: ${fnBaseName}] Fixer succeeded on attempt ${attemptNumber}`
-    );
     return fixedCandidate;
   } catch (error) {
     logger.warn(
@@ -475,4 +468,3 @@ Return only the fixed JSON object with no additional commentary.`;
     return candidate;
   }
 }
-
