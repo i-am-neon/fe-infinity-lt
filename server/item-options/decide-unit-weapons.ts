@@ -2,10 +2,30 @@ import {
   classWeaponMap,
   weaponRankExpMap,
 } from "@/ai/create-unit-data/get-weapon-exp.ts";
+import { specialWeaponNids } from "@/item-options/special-weapons.ts";
 import { FE8Class } from "@/types/fe8-class.ts";
 import filterWeapons from "./filter-weapons.ts";
 import getBasicWeapon from "./get-basic-weapon.ts";
-import { specialWeaponNids } from "@/item-options/special-weapons.ts";
+
+// Monster class to weapon mapping
+const monsterWeaponMap: Partial<Record<FE8Class, string[]>> = {
+  Mogall: ["Evil_Eye"],
+  "Arch Mogall": ["Crimson_Eye"],
+  Manakete: ["Dragonstone"],
+};
+
+// Get appropriate claw based on level
+function getClawByLevel(level: number, isPromoted: boolean): string {
+  const effectiveLevel = isPromoted ? level + 20 : level;
+
+  if (effectiveLevel < 10) {
+    return "Rotten_Claw";
+  } else if (effectiveLevel < 20) {
+    return "Fetid_Claw";
+  } else {
+    return "Sharp_Claw";
+  }
+}
 
 export default function decideUnitWeapons({
   fe8Class,
@@ -18,7 +38,26 @@ export default function decideUnitWeapons({
   isPromoted: boolean;
   isBoss?: boolean;
 }): [string, boolean][] {
-  // Determine rank for basic weapon
+  // Initialize weapons array
+  const weapons: [string, boolean][] = [];
+
+  // Handle monster classes
+  if (fe8Class === "Revenant" || fe8Class === "Entombed") {
+    const clawType = getClawByLevel(level, isPromoted);
+    weapons.push([clawType, isBoss]);
+    return weapons;
+  }
+
+  // Check if the class is another type of monster with specific weapons
+  if (monsterWeaponMap[fe8Class]) {
+    const monsterWeapons = monsterWeaponMap[fe8Class]!;
+    const weaponChoice =
+      monsterWeapons[Math.floor(Math.random() * monsterWeapons.length)];
+    weapons.push([weaponChoice, isBoss]);
+    return weapons;
+  }
+
+  // Handle regular classes
   let rank: keyof typeof weaponRankExpMap = "E";
   if (!isPromoted) {
     rank = level < 10 ? "E" : "D";
@@ -35,7 +74,7 @@ export default function decideUnitWeapons({
   const chosenType =
     possibleWeaponTypes[Math.floor(Math.random() * possibleWeaponTypes.length)];
   const [basicNid] = getBasicWeapon(chosenType, rank);
-  const weapons: [string, boolean][] = [[basicNid, false]];
+  weapons.push([basicNid, false]);
 
   // Chance to add another basic weapon if multiple weapon types
   if (possibleWeaponTypes.length > 1) {
@@ -152,5 +191,11 @@ if (import.meta.main) {
     isBoss: true,
   });
   console.log("bossShaman", bossShaman);
+  const entombed = decideUnitWeapons({
+    fe8Class: "Entombed",
+    level: 1,
+    isPromoted: false,
+  });
+  console.log("entombed", entombed);
 }
 
