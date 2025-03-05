@@ -41,7 +41,7 @@ export default async function createUnitData({
       fe8Class: klass,
       level,
       isPromoted,
-      isBoss: characterIdea.firstSeenAs === "boss"
+      isBoss: characterIdea.firstSeenAs === "boss",
     }),
     ...decideStartingNonWeaponItems({
       isBoss: characterIdea.firstSeenAs === "boss",
@@ -52,7 +52,9 @@ export default async function createUnitData({
   ];
 
   // Post-processing to ensure only one item is droppable and player units never have droppable items
-  const isPlayerUnit = characterIdea.firstSeenAs === "ally" || characterIdea.firstSeenAs === "allied NPC";
+  const isPlayerUnit =
+    characterIdea.firstSeenAs === "ally" ||
+    characterIdea.firstSeenAs === "allied NPC";
   let foundDroppable = false;
   for (let i = 0; i < startingItems.length; i++) {
     // If this is a player unit, make sure no items are droppable
@@ -70,7 +72,10 @@ export default async function createUnitData({
   }
 
   // Always give thieves, rogues, and assassins a lockpick if they don't have one
-  if ((klass === "Thief" || klass === "Rogue" || klass === "Assassin") && !hasLockpick(startingItems)) {
+  if (
+    (klass === "Thief" || klass === "Rogue" || klass === "Assassin") &&
+    !hasLockpick(startingItems)
+  ) {
     startingItems.push(["Lockpick", false]);
   }
 
@@ -78,7 +83,7 @@ export default async function createUnitData({
     nid: characterIdea.firstName,
     name: characterIdea.firstName,
     desc: characterIdea.inGameDescription,
-    variant: null,
+    variant: characterIdea.gender === "female" ? "Female" : null,
     level,
     klass: FE8ClassToLTNidMap[klass],
     tags: characterIdea.firstSeenAs === "boss" ? ["Boss"] : [],

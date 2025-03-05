@@ -1,4 +1,3 @@
-import { FE8Class } from "@/types/fe8-class.ts";
 import { Affinity } from "@/types/character/affinity.ts";
 
 export type WeaponExperience = [boolean, number, number]; // [Usable, Starting Exp, Max Exp]. Max Exp is always 251
@@ -24,7 +23,7 @@ export type UnitData = {
   nid: string; // Should exactly match name
   name: string;
   desc: string; // Should exactly match provided description
-  variant: string | null; // Should always be null
+  variant: string | null; // Should be null if the character is male, "Female" if the character is female.
   level: number; // The level the character starts at when first seen in game.
   klass: string; // LTNid from FE8ClassToLTNidMap
   tags: string[]; // Should always be an empty list
