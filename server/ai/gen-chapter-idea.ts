@@ -108,6 +108,8 @@ CRITICAL REQUIREMENTS:
   - When creating the endOfChapterChoice, ensure none of the options include attempting to recruit a certain character
 - Return only JSON without any commentary
 
+THERE MUST BE A NEW PLAYER CHARACTER THAT STARTS ON THE ENEMY TEAM THIS CHAPTER
+
 Additionally, the 'intro' and 'outro' fields must each be a single full paragraph summarizing all the events, dialogue, and interactions that happen in those scenes. Make sure new characters' introductions feel natural and their reasons for joining are compelling and tied to their backstories.`;
 
   const basePrompt = isPrologue

@@ -32,6 +32,7 @@ If valid => fixText=None. Otherwise => fix instructions as fixObject.`;
 
   return genAndCheck<InitialGameIdea>({
     fnBaseName: "genInitialGameIdea",
+    generatorModel: "strong",
     generatorSystemMessage,
     generatorPrompt: userPrompt,
     generatorSchema: initialGameIdeaSchema,

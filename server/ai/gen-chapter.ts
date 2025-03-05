@@ -14,25 +14,20 @@ import { InitialGameIdea } from "@/ai/types/initial-game-idea.ts";
 import { WorldSummary } from "@/ai/types/world-summary.ts";
 import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
 import { getCurrentLogger } from "@/lib/current-logger.ts";
+import cleanGameText from "@/lib/formatting/clean-game-text.ts";
+import getArmoryAndVendorEventsAndRegions from "@/map-region-processing/get-armory-and-vendor-events-and-regions.ts";
+import getBreakableWallEventsAndUnits from "@/map-region-processing/get-breakable-wall-events.ts";
+import getChestEventsAndRegions from "@/map-region-processing/get-chest-events-and-regions.ts";
+import getDoorEventsAndRegions from "@/map-region-processing/get-door-events-and-regions.ts";
+import getHouseAndVillageEventsAndRegions from "@/map-region-processing/get-house-and-village-events-and-regions.ts";
+import getSnagEventsAndUnits from "@/map-region-processing/get-snag-events-and-units.ts";
 import { allPortraitOptions } from "@/portrait-processing/all-portrait-options.ts";
 import { Chapter } from "@/types/chapter.ts";
 import { Character } from "@/types/character/character.ts";
 import { DeadCharacterRecord } from "@/types/dead-character-record.ts";
 import { Event } from "@/types/events/event.ts";
-import { Tilemap } from "@/types/maps/tilemap.ts";
-import {
-  testInitialGameIdea,
-  testTone,
-  testWorldSummary,
-} from "@/ai/test-data/prologueTestData.ts";
-import getChestEventsAndRegions from "@/map-region-processing/get-chest-events-and-regions.ts";
-import getDoorEventsAndRegions from "@/map-region-processing/get-door-events-and-regions.ts";
-import getBreakableWallEventsAndUnits from "@/map-region-processing/get-breakable-wall-events.ts";
 import { LevelRegion } from "@/types/level.ts";
-import getSnagEventsAndUnits from "@/map-region-processing/get-snag-events-and-units.ts";
-import getHouseAndVillageEventsAndRegions from "@/map-region-processing/get-house-and-village-events-and-regions.ts";
-import getArmoryAndVendorEventsAndRegions from "@/map-region-processing/get-armory-and-vendor-events-and-regions.ts";
-import cleanGameText from "@/lib/formatting/clean-game-text.ts";
+import { Tilemap } from "@/types/maps/tilemap.ts";
 
 /**
  * Creates the next chapter based on the given data.
@@ -41,6 +36,7 @@ import cleanGameText from "@/lib/formatting/clean-game-text.ts";
  * Returns { chapter, usedPortraits, music } so the caller can proceed
  * to writing it out (with writeChapter) and do any additional steps (like stub next chapter).
  */
+
 export default async function genChapter({
   worldSummary,
   initialGameIdea,
@@ -98,7 +94,7 @@ export default async function genChapter({
   const usedSoFar = usedPortraitsSoFar ?? [];
   logger.debug("Used portraits so far", { usedSoFar });
 
-  // Run these in parallel for performance
+  // Create the new unit datas
   const [
     portraitMap,
     newCharacterUnitDatas,
@@ -140,6 +136,7 @@ export default async function genChapter({
     chooseMusic(`Reflective conclusion for chapter: ${chapterIdea.outro}`),
   ]);
 
+  // Choose backgrounds for intro/outro
   const [introBackgroundChoice, outroBackgroundChoice] = await Promise.all([
     chooseBackground(introAIEvent),
     chooseBackground(outroAIEvent),
@@ -161,7 +158,7 @@ export default async function genChapter({
     showChapterTitle: false,
   });
 
-  // Also a defeat boss event
+  // Boss defeat event
   const bossNid = chapterIdea.boss.firstName;
   const defeatBossEvent: Event = {
     name: "Defeat Boss",
@@ -198,28 +195,20 @@ export default async function genChapter({
     ...existingCharacters.map((c) => c.characterIdea),
     ...newCharacterIdeas,
   ]
-    // Remove duplicates
     .filter(
       (idea, index, self) =>
         index === self.findIndex((i) => i.firstName === idea.firstName)
     )
-    // Remove dead characters
     .filter(
       (idea) =>
         ![...allDeadCharacters, ...newlyDeadThisChapter].some(
           (dc) => dc.name === idea.firstName
         )
     )
-    // Remove characters who are not playable
     .filter((idea) => idea.firstSeenAs !== "boss");
 
   logger.debug("allLivingPlayerCharacterIdeas", {
     allLivingPlayerCharacterIdeas,
-    existingCharacters,
-    initialGameIdeaCharacterIdeas: initialGameIdea?.characterIdeas,
-    newCharacterIdeas,
-    allDeadCharacters,
-    newlyDeadThisChapter,
   });
 
   // Gather the player's current unit datas
@@ -245,33 +234,29 @@ export default async function genChapter({
     )!,
   });
 
+  // Collect region and event info from environment
   const chestEventsAndRegions = getChestEventsAndRegions({
     mapName: chosenMapName,
     chapterNumber,
   });
-
   const doorEventsAndRegions = getDoorEventsAndRegions({
     mapName: chosenMapName,
     chapterNumber,
   });
-
   const breakableWallEventsAndUnits = getBreakableWallEventsAndUnits({
     mapName: chosenMapName,
     chapterNumber,
   });
-
   const snagEventsAndUnits = getSnagEventsAndUnits({
     mapName: chosenMapName,
     chapterNumber,
   });
-
   const houseAndVillageEventsAndRegions =
     await getHouseAndVillageEventsAndRegions({
       mapName: chosenMapName,
       chapterNumber,
       chapterIdea,
     });
-
   const armoryAndVendorEventsAndRegions = getArmoryAndVendorEventsAndRegions({
     mapName: chosenMapName,
     chapterNumber,
@@ -293,9 +278,8 @@ export default async function genChapter({
     ...armoryAndVendorEventsAndRegions.map(({ event }) => event),
   ];
 
-  // Add breakable wall units to level units
+  // Add breakable wall units and snag units
   const wallUnits = breakableWallEventsAndUnits.flatMap(({ units }) => units);
-  // Add snag units to level units
   const snagUnits = snagEventsAndUnits.map(({ unit }) => unit);
 
   // Construct the level
@@ -309,24 +293,24 @@ export default async function genChapter({
     regions: [...interactableRegions, ...formationRegions],
   });
 
-  // Grab tilemap from local assets
+  // read tilemap from local assets
   const tilemapRaw = Deno.readTextFileSync(
     getPathWithinServer(`assets/maps/${level.tilemap}.json`)
   );
   const tilemap: Tilemap = JSON.parse(tilemapRaw);
 
-  // Set up level vars
+  // Insert level vars for houses
   houseAndVillageEventsAndRegions.forEach(({ region }) => {
     introEvent._source.push(`level_var;${region.nid}_visited;False`);
     introEvent._source.push(`level_var;${region.nid}_destroyed;False`);
   });
-  // Place the player units on the formation tiles
+  // place the player units on formation tiles
   introEvent._source.push("arrange_formation");
-  // Add prep screen if not prologue
+  // if not prologue, add prep screen
   if (chapterNumber > 0) {
     introEvent._source.push("prep;true");
   }
-  // If prologue add market items and give gold
+  // if prologue add some shop items
   if (chapterNumber === 0) {
     introEvent._source.push("add_market_item;Iron_Sword");
     introEvent._source.push("add_market_item;Iron_Axe");
@@ -338,19 +322,80 @@ export default async function genChapter({
     introEvent._source.push("add_market_item;Vulnerary");
     introEvent._source.push("add_market_item;Chest_Key");
     introEvent._source.push("add_market_item;Door_Key");
-
     introEvent._source.push("give_money;1000;no_banner");
   }
-  // Add the choice at the end of the chapter
-  outroEvent._source.push(
-    `choice;${chapterNumber}_choice;${
-      chapterIdea.endOfChapterChoice.displayText
-    };${chapterIdea.endOfChapterChoice.options.map((opt) => `${opt}`)}`
-  );
-  // Add base screen to end of chapter
-  outroEvent._source.push("game_var;_base_market;True");
-  outroEvent._source.push(`base;${outroBackgroundChoice}`);
 
+  // Mid-battle recruitment logic
+  const allPreviousNonBattleChars = new Set<string>();
+  for (const ch of existingChapters) {
+    for (const nb of ch.idea.newNonBattleCharacters ?? []) {
+      allPreviousNonBattleChars.add(nb.firstName);
+    }
+  }
+  for (const nb of chapterIdea.newNonBattleCharacters ?? []) {
+    allPreviousNonBattleChars.add(nb.firstName);
+  }
+  const recruitableIdeas = (chapterIdea.newPlayableUnits ?? []).filter((u) => {
+    const cat = u.firstSeenAs;
+    if (cat !== "enemy non-boss" && cat !== "allied NPC") return false;
+    if (allPreviousNonBattleChars.has(u.firstName)) return false;
+    return true;
+  });
+
+  // gather living recruiters as CharacterIdea
+  const livingRecruiters = allLivingPlayerCharacterIdeas;
+
+  let talkSetupCommands: string[] = [];
+  let recruitmentEvents: Event[] = [];
+  if (recruitableIdeas.length > 0 && livingRecruiters.length > 0) {
+    const { default: genRecruitmentEvents } = await import(
+      "@/ai/level/gen-recruitment-events.ts"
+    );
+    const recResults = await genRecruitmentEvents({
+      recruitables: recruitableIdeas,
+      recruiters: livingRecruiters,
+      chapterNumber,
+      chapterIdea,
+    });
+    talkSetupCommands = recResults.talkSetupCommands;
+    recruitmentEvents = recResults.recruitmentEvents;
+  }
+
+  // Build level events
+  const newChapter: Chapter = {
+    title: chapterIdea.title,
+    number: chapterNumber,
+    level,
+    events: [introEvent, outroEvent, defeatBossEvent, ...interactableEvents],
+    newCharacters,
+    tilemap,
+    enemyFaction: chapterIdea.enemyFaction,
+    idea: chapterIdea,
+  };
+
+  // add mid-battle recruitment events
+  newChapter.events.push(...recruitmentEvents);
+
+  // inject talkSetupCommands into intro
+  const introEvtIndex = newChapter.events.findIndex(
+    (e) => e.trigger === "level_start"
+  );
+  if (introEvtIndex >= 0 && talkSetupCommands.length > 0) {
+    const arrFormIndex = newChapter.events[introEvtIndex]._source.findIndex(
+      (line) => line.startsWith("arrange_formation")
+    );
+    const insertionIndex =
+      arrFormIndex >= 0
+        ? arrFormIndex
+        : newChapter.events[introEvtIndex]._source.length;
+    newChapter.events[introEvtIndex]._source.splice(
+      insertionIndex,
+      0,
+      ...talkSetupCommands
+    );
+  }
+
+  // create death events for new characters
   const newCharacterDeathEvents: Event[] = newCharacters.map((ch) => ({
     name: `Death${ch.unitData.nid}`,
     trigger: "unit_death",
@@ -367,29 +412,11 @@ export default async function genChapter({
     ],
   }));
 
-  // Build final Chapter object
-  const newChapter: Chapter = {
-    title: chapterIdea.title,
-    number: chapterNumber,
-    level,
-    events: [
-      introEvent,
-      outroEvent,
-      defeatBossEvent,
-      ...interactableEvents,
-      ...newCharacterDeathEvents,
-    ],
-    newCharacters,
-    tilemap,
-    enemyFaction: chapterIdea.enemyFaction,
-    idea: chapterIdea,
-  };
+  newChapter.events.push(...newCharacterDeathEvents);
 
-  // Update used portraits
-  const newlyUsedPortraits = Object.values(portraitMap);
-  const updatedUsedPortraits = [...usedSoFar, ...newlyUsedPortraits];
+  const updatedUsedPortraits = [...usedSoFar, ...Object.values(portraitMap)];
 
-  // Collect any new music to copy
+  // music
   const musicToCopy = [
     playerPhaseMusic,
     enemyPhaseMusic,
@@ -405,11 +432,29 @@ export default async function genChapter({
 }
 
 if (import.meta.main) {
-  genChapter({
-    worldSummary: testWorldSummary,
-    initialGameIdea: testInitialGameIdea,
-    chapterNumber: 0,
-    tone: testTone,
-  }).then(console.log);
+  // Example usage
+  (async () => {
+    const mockWorldSummary: WorldSummary = {
+      worldName: "Testland",
+      description: "A test realm",
+      geography: {
+        regions: [],
+      },
+      history: "Lots of testing",
+      mythology: "",
+      factions: [],
+    };
+    const mockInitialGameIdea: InitialGameIdea = {
+      backstory: "We are testing",
+      characterIdeas: [],
+      plotDirections: [],
+    };
+    const result = await genChapter({
+      worldSummary: mockWorldSummary,
+      initialGameIdea: mockInitialGameIdea,
+      tone: "Neutral",
+      chapterNumber: 0,
+    });
+    console.log(JSON.stringify(result, null, 2));
+  })();
 }
-
