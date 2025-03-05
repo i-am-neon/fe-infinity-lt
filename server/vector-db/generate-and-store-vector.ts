@@ -30,8 +30,10 @@ export default async function generateAndStoreVector({
     } else if (type === "portraits-female") {
       return new URL("./seed-vectors/portraits-female.json", import.meta.url)
         .pathname;
+    } else if (type === "items") {
+      return new URL("./seed-vectors/items.json", import.meta.url).pathname;
     } else {
-      return new URL("./seed-vectors/music.json", import.meta.url).pathname;
+      throw new Error("invalid vector type");
     }
   }
   const seedFilePath = getSeedFilePathByType(vectorType);

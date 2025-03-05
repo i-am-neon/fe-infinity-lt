@@ -46,6 +46,25 @@ clean-logs:
 run path:
     source /opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh && conda activate fe-i-lt && cd server && set -a; source .env; set +a; cd .. && deno run --allow-all --config server/deno.json "{{path}}"
 
+###################
+# Vector DB
+###################
+# Initialize PostgreSQL with pgvector extension installed and configured.
+start-vector-db:
+	brew install pgvector || true
+	brew services restart postgresql@14
+	just run server/vector-db/init.ts
+	just run server/vector-db/seed-vectors.ts
+
+stop-vector-db:
+    brew services stop postgresql@14
+
+###################
+# Asset Processing
+###################
+
+# Make sure the vector db is running before processing assets!
+
 process-maps:
     rm -rf server/vector-db/seed-vectors/maps.json
     just run server/map-processing/process-all-maps.ts
@@ -59,12 +78,6 @@ process-music:
     rm -rf server/vector-db/seed-vectors/music.json
     just run server/music-processing/process-all-music.ts
 
-# Initialize PostgreSQL with pgvector extension installed and configured.
-start-vector-db:
-	brew install pgvector || true
-	brew services restart postgresql@14
-	just run server/vector-db/init.ts
-	just run server/vector-db/seed-vectors.ts
-
-stop-vector-db:
-    brew services stop postgresql@14
+process-items:
+    rm -rf server/vector-db/seed-vectors/items.json
+    just run server/item-processing/process-items.ts

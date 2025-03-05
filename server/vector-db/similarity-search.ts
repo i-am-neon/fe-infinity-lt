@@ -17,12 +17,12 @@ export default async function similaritySearch(
     let tableName = "";
     if (vectorType === "maps") {
       tableName = "maps_vectors";
-    } else if (vectorType === "portraits") {
-      tableName = "portraits_vectors";
     } else if (vectorType === "portraits-male") {
       tableName = "portraits_male_vectors";
     } else if (vectorType === "portraits-female") {
       tableName = "portraits_female_vectors";
+    } else if (vectorType === "items") {
+      tableName = "items_vectors";
     } else {
       tableName = "music_vectors";
     }

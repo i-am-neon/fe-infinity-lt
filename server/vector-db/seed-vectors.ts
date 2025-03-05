@@ -26,6 +26,7 @@ export async function seedVectors(): Promise<void> {
     "portraits-female"
   );
   await seedVectorsFromFile("./seed-vectors/music.json", "music");
+  await seedVectorsFromFile("./seed-vectors/items.json", "items");
   console.log("Seeding complete. Vectors have been stored in the database.");
 }
 
@@ -61,4 +62,3 @@ async function seedVectorsFromFile(fileName: string, vectorType: VectorType) {
 if (import.meta.main) {
   await seedVectors();
 }
-

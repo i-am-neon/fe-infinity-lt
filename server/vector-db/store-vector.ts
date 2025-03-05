@@ -29,6 +29,8 @@ export default async function storeVector({
       tableName = "portraits_male_vectors";
     } else if (vectorType === "portraits-female") {
       tableName = "portraits_female_vectors";
+    } else if (vectorType === "items") {
+      tableName = "items_vectors";
     } else {
       tableName = "music_vectors";
     }
