@@ -90,6 +90,7 @@ If the candidate is valid, return { "fixText": "None", "passesCheck": true }. Ot
 
   const event = await genAndCheck<AIEvent>({
     fnBaseName: "genOutroEvent",
+    generatorModel: "strong",
     generatorSystemMessage,
     generatorPrompt,
     generatorSchema: AIEventSchema,

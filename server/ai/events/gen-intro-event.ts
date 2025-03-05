@@ -171,6 +171,7 @@ For portrait validation issues, the algorithm has already checked this for you. 
 
   const event = await genAndCheck<AIEvent>({
     fnBaseName: "genIntroEvent",
+    generatorModel: "strong",
     generatorSystemMessage,
     generatorPrompt,
     generatorSchema: AIEventSchema,
