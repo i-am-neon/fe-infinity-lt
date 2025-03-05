@@ -1,3 +1,4 @@
+import processEventItems from "@/ai/events/process-event-items.ts";
 import { validateAiEventPortraits } from "@/ai/events/validate-ai-event.ts";
 import { genAndCheck } from "@/ai/lib/generator-checker.ts";
 import {
@@ -14,7 +15,7 @@ import { WorldSummary } from "@/ai/types/world-summary.ts";
 /**
  * Generates an AIEvent that serves as the outro scene for the chapter, wrapping up the chapter's story.
  */
-export default function genOutroEvent({
+export default async function genOutroEvent({
   worldSummary,
   initialGameIdea,
   chapterIdea,
@@ -87,7 +88,7 @@ DETAILED CHECK PROCEDURE:
 
 If the candidate is valid, return { "fixText": "None", "passesCheck": true }. Otherwise, provide fix instructions in fixText and the fixed sourceObjects in fixObject if possible.`;
 
-  return genAndCheck<AIEvent>({
+  const event = await genAndCheck<AIEvent>({
     fnBaseName: "genOutroEvent",
     generatorSystemMessage,
     generatorPrompt,
@@ -112,6 +113,9 @@ If there are issues => provide detailed fixText and set passesCheck=false.`;
     },
     validators: [validateAiEventPortraits],
   });
+
+  // Process any item commands to use valid game item NIDs
+  return processEventItems(event);
 }
 
 if (import.meta.main) {
@@ -124,3 +128,4 @@ if (import.meta.main) {
     .then((event) => console.log(JSON.stringify(event, null, 2)))
     .catch(console.error);
 }
+

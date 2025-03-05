@@ -1,3 +1,4 @@
+import processEventItems from "@/ai/events/process-event-items.ts";
 import { validateAiEventPortraits } from "@/ai/events/validate-ai-event.ts";
 import { genAndCheck } from "@/ai/lib/generator-checker.ts";
 import {
@@ -17,7 +18,7 @@ import { DeadCharacterRecord } from "@/types/dead-character-record.ts";
 /**
  * Generates an AIEvent that serves as the intro scene for the chapter, introducing the story.
  */
-export default function genIntroEvent({
+export default async function genIntroEvent({
   worldSummary,
   chapterIdea,
   tone,
@@ -168,7 +169,7 @@ If there are issues => provide detailed fixText and set passesCheck=false.
 For portrait validation issues, the algorithm has already checked this for you. Only raise portrait-related issues if the algorithm detected problems (isValid=false).`;
   };
 
-  return genAndCheck<AIEvent>({
+  const event = await genAndCheck<AIEvent>({
     fnBaseName: "genIntroEvent",
     generatorSystemMessage,
     generatorPrompt,
@@ -177,6 +178,9 @@ For portrait validation issues, the algorithm has already checked this for you. 
     checkerPrompt,
     validators: [validateAiEventPortraits],
   });
+
+  // Process any item commands to use valid game item NIDs
+  return processEventItems(event);
 }
 
 if (import.meta.main) {
@@ -191,3 +195,4 @@ if (import.meta.main) {
     })
     .catch(console.error);
 }
+
