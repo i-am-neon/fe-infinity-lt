@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const UnpromotedFE8Classes = [
   "Citizen",
-  "Dancer",
+  // "Dancer", // Dancer not implemented fully in LT
   "Myrmidon",
   "Mercenary",
   "Thief",
@@ -68,7 +68,7 @@ export type FE8Class = z.infer<typeof FE8ClassSchema>;
 
 export const FE8ClassDescriptionMap: Record<FE8Class, string> = {
   Citizen: "A non-combatant civilian with no combat abilities.",
-  Dancer: "A support unit that can refresh an ally's turn by dancing.",
+  // Dancer: "A support unit that can refresh an ally's turn by dancing.",
   Myrmidon: "A swift swordfighter with high crit potential.",
   Mercenary: "A balanced swordfighter with solid offense and defense.",
   Thief: "A nimble trickster able to pick locks and steal items.",
@@ -120,7 +120,7 @@ export const FE8ClassDescriptionMap: Record<FE8Class, string> = {
 
 export const FE8ClassToLTNidMap: Record<FE8Class, string> = {
   Citizen: "Citizen",
-  Dancer: "Dancer",
+  // Dancer: "Dancer",
   Myrmidon: "Myrmidon",
   Mercenary: "Mercenary",
   Thief: "Thief",
