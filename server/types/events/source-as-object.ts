@@ -33,7 +33,7 @@ Required args: Amount (number)
 ## give_item
 Gives the player an item. The item must be from Fire Emblem 8.
 
-Required args: Item Name (string)
+Required args: 'convoy' (should always be 'convoy'), Item Name (string)
 `);
 
 export type SourceAsObject = z.infer<typeof SourceAsObjectSchema>;

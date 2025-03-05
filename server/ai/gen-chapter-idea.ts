@@ -58,10 +58,12 @@ CRITICAL REQUIREMENTS:
   * MUST mention EACH CHARACTER BY NAME explicitly in intro, battle, or outro text
 - Must not reuse or resurrect any dead characters
 - Must not reuse a previous boss from earlier chapters
-- Consider including monetary rewards or special items as part of the narrative. Examples:
-  - characters find treasure
-  - thankful townspeople give special weapon/item as thanks after the battle
-  - king gives party money to aid their adventure
+- Consider including monetary rewards or special items as part of the narrative.
+  - Examples:
+    - characters find treasure
+    - thankful townspeople give special weapon/item as thanks after the battle
+    - king gives party money to aid their adventure
+  - Note that money should be given sparingly and definitely not every chapter or more than once in a chapter.
 - Must produce a new Chapter Idea that strictly matches the ChapterIdea schema
 - Return only JSON without any commentary
 
