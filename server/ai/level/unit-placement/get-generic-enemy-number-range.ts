@@ -14,15 +14,15 @@ export default function getGenericEnemyCountNumberRange({
 }): EnemyCountRange {
   const { width, height } = mapSize;
   const mapArea = width * height;
-  const base = Math.floor(mapArea / 15);
-  let min = Math.floor(base * 0.9) + 2;
-  let max = Math.floor(base * 1.2) + 5;
-  if (min < 2) min = 2;
+  const base = Math.floor(mapArea / 30); // Doubled the divisor to halve the base
+  let min = Math.floor(base * 0.9) + 1; // Reduced the addition from 2 to 1
+  let max = Math.floor(base * 1.2) + 3; // Reduced the addition from 5 to 3
+  if (min < 1) min = 1; // Lowered the minimum from 2 to 1
   if (max < min) max = min;
 
   if (chapter <= 3) {
-    min -= 2;
-    max -= 3;
+    min -= 1; // Reduced the subtraction from 2 to 1
+    max -= 2; // Reduced the subtraction from 3 to 2
     if (min < 1) min = 1;
     if (max < min) max = min;
   }
@@ -58,4 +58,3 @@ if (import.meta.main) {
   });
   console.log("Chapter 5, large map range:", largeMapRange);
 }
-
