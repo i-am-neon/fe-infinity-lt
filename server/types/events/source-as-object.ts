@@ -7,6 +7,7 @@ export const SourceAsObjectSchema = z.object({
     "narrate",
     "give_money",
     "give_item",
+    "bop_portrait",
   ]),
   args: z.array(z.string()),
 }).describe(`## add_portrait
@@ -34,6 +35,11 @@ Required args: Amount (number)
 Gives the player an item. The item must be from Fire Emblem 8.
 
 Required args: 'convoy' (should always be 'convoy'), Item Name (string)
+
+## bop_portrait
+Causes a portrait to briefly bob up and down. Often used to illustrate a surprised or shocked reaction.
+
+Required args: character firstName (string)
 `);
 
 export type SourceAsObject = z.infer<typeof SourceAsObjectSchema>;
