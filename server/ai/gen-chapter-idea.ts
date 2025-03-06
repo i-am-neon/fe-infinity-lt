@@ -73,6 +73,12 @@ CRITICAL REQUIREMENTS:
 - Must produce a new Chapter Idea that strictly matches the ChapterIdea schema
 - Return only JSON without any commentary
 
+OUTRO AND CHOICE INTEGRATION:
+- The 'outro' MUST directly lead into and set up the endOfChapterChoice
+- End the outro with dialogue or a situation that naturally creates the decision point reflected in endOfChapterChoice
+- Make the final lines of the outro create the context for why this specific choice is being presented
+- Ensure there's a clear narrative connection between the concluding events and the choice options
+
 Additionally, the 'intro' and 'outro' fields must each be a single full paragraph summarizing all the events, dialogue, and interactions that happen in those scenes. Make sure new characters' introductions feel natural and their reasons for joining are compelling and tied to their backstories. Feel free to incorporate monetary rewards, treasure finds, or special items as part of the narrative to add depth and motivation to the storyline.`
     : `You are a Fire Emblem Fangame Chapter Idea Generator (generator).
 
@@ -107,6 +113,12 @@ CRITICAL REQUIREMENTS:
 - Must produce a new Chapter Idea that strictly matches the ChapterIdea schema
   - When creating the endOfChapterChoice, ensure none of the options include attempting to recruit a certain character
 - Return only JSON without any commentary
+
+OUTRO AND CHOICE INTEGRATION:
+- The 'outro' MUST directly lead into and set up the endOfChapterChoice
+- End the outro with dialogue or a situation that naturally creates the decision point reflected in endOfChapterChoice
+- Make the final lines of the outro create the context for why this specific choice is being presented
+- Ensure there's a clear narrative connection between the concluding events and the choice options
 
 Additionally, the 'intro' and 'outro' fields must each be a single full paragraph summarizing all the events, dialogue, and interactions that happen in those scenes. Make sure new characters' introductions feel natural and their reasons for joining are compelling and tied to their backstories.`;
 
