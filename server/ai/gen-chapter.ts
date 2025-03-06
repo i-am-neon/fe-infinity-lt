@@ -6,6 +6,7 @@ import chooseBackground from "@/ai/events/choose-background.ts";
 import convertAIEventToEvent from "@/ai/events/convert-ai-event-to-event.ts";
 import genIntroEvent from "@/ai/events/gen-intro-event.ts";
 import genOutroEvent from "@/ai/events/gen-outro-event.ts";
+import genBossFightEvents from "@/ai/level/gen-boss-fight-events.ts";
 import genChapterIdea from "@/ai/gen-chapter-idea.ts";
 import assembleLevel from "@/ai/level/assemble-level.ts";
 import getLevelUnits from "@/ai/level/get-level-units.ts";
@@ -385,6 +386,22 @@ export default async function genChapter({
   // add mid-battle recruitment events
   newChapter.events.push(...recruitmentEvents);
 
+  // Generate boss fight events for all living player units
+  const bossFightEvents = await genBossFightEvents({
+    boss: chapterIdea.boss,
+    playerUnits: allLivingPlayerCharacterIdeas.filter(
+      idea => idea.firstName !== chapterIdea.boss.firstName
+    ),
+    chapterNumber,
+    chapterIdea,
+    recruitedThisChapter: (chapterIdea.newPlayableUnits || []).filter(
+      unit => unit.firstSeenAs === "enemy non-boss" || unit.firstSeenAs === "allied NPC"
+    ),
+  });
+  
+  // Add boss fight events to chapter
+  newChapter.events.push(...bossFightEvents);
+
   // inject talkSetupCommands into intro
   const introEvtIndex = newChapter.events.findIndex(
     (e) => e.trigger === "level_start"
@@ -467,4 +484,3 @@ if (import.meta.main) {
     console.log(JSON.stringify(result, null, 2));
   })();
 }
-
