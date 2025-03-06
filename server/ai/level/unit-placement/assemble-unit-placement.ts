@@ -2,7 +2,7 @@ import correctUnitPlacement from "@/ai/level/unit-placement/correct-unit-placeme
 import { ChapterIdea } from "@/ai/types/chapter-idea.ts";
 import { MapMetadata } from "@/types/maps/map-metadata.ts";
 import { TerrainGrid } from "@/types/maps/terrain-grid.ts";
-import genBossAndPlayerAndGreenUnitCoords from "./gen-boss-and-player-and-green-unit-coords.ts";
+import genBossAndPlayerAndRecruitableUnitCoords from "./gen-boss-and-player-and-recruitable-unit-coords.ts";
 import getGenericEnemies from "./get-generic-enemies.ts";
 
 export default async function assembleUnitPlacement({
@@ -18,7 +18,7 @@ export default async function assembleUnitPlacement({
 }) {
   const [
     originalGenericEnemies,
-    { bossCoords, playerUnitsCoords, greenUnitsCoords },
+    { bossCoords, playerUnitsCoords, recruitableUnits },
   ] = await Promise.all([
     getGenericEnemies({
       terrainGrid,
@@ -26,17 +26,18 @@ export default async function assembleUnitPlacement({
       mapMetadata,
       chapterNumber,
     }),
-    genBossAndPlayerAndGreenUnitCoords({
+    genBossAndPlayerAndRecruitableUnitCoords({
       terrainGrid,
       chapterIdea,
       mapMetadata,
     }),
   ]);
 
-  // Collect existing positions (boss and player units)
+  // Collect existing positions (boss, player, and recruitable units)
   const existingPositions = [
     { x: bossCoords.x, y: bossCoords.y },
     ...playerUnitsCoords.map((unit) => ({ x: unit.x, y: unit.y })),
+    ...recruitableUnits.map((unit) => ({ x: unit.coords.x, y: unit.coords.y })),
   ];
 
   // Correct enemy positions to avoid overlap with player units and boss
@@ -50,7 +51,7 @@ export default async function assembleUnitPlacement({
     bossCoords,
     playerUnitsCoords,
     genericEnemies,
-    greenUnits: greenUnitsCoords || [],
+    recruitableUnits,
   };
 }
 

@@ -1,6 +1,7 @@
-import { z } from "zod";
-import { FE8ClassSchema } from "@/types/fe8-class.ts";
+import { FirstSeenAsSchema } from "@/ai/types/character-idea.ts";
 import { EnemyAIGroupSchema } from "@/ai/types/enemy-ai-group.ts";
+import { FE8ClassSchema } from "@/types/fe8-class.ts";
+import { z } from "zod";
 
 export const EnemyGenericUnitSchema = z.object({
   x: z.number().int().min(0),
@@ -15,27 +16,20 @@ export type EnemyGenericUnitWithStartingItems = EnemyGenericUnit & {
   startingItems?: [string, boolean][]; // boolean is droppable
 };
 
-export const BossCoordsSchema = z.object({
+export const UnitCoordsSchema = z.object({
   x: z.number().int().min(0),
   y: z.number().int().min(0),
 });
-export type BossCoords = z.infer<typeof BossCoordsSchema>;
 
-export const PlayerUnitStartCoordsSchema = z.array(
-  z.object({
-    x: z.number().int().min(0),
-    y: z.number().int().min(0),
-  })
-);
-export type PlayerUnitStartCoords = z.infer<typeof PlayerUnitStartCoordsSchema>;
+export type UnitCoords = z.infer<typeof UnitCoordsSchema>;
 
-export const GreenUnitSchema = z.object({
-  x: z.number().int().min(0),
-  y: z.number().int().min(0),
-  name: z.string().min(1),
-  desc: z.string().min(1),
-  class: FE8ClassSchema,
+export const RecruitableUnitSchema = z.object({
+  nid: z
+    .string()
+    .describe("should match the character's first name exactly as it appears"),
+  firstSeenAs: FirstSeenAsSchema,
+  coords: UnitCoordsSchema,
 });
 
-export type GreenUnit = z.infer<typeof GreenUnitSchema>;
+export type RecruitableUnit = z.infer<typeof RecruitableUnitSchema>;
 

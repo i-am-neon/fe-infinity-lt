@@ -211,24 +211,33 @@ export default async function genChapter({
     allLivingPlayerCharacterIdeas,
   });
 
-  // Gather the player's current unit datas
-  const playerUnitDatas = [
-    ...newCharacterUnitDatas,
-    ...existingCharacters.map((c) => c.unitData),
-  ].filter((c) =>
-    allLivingPlayerCharacterIdeas.some((idea) => idea.firstName === c.nid)
-  );
-
   // Finally pick map
   const usedMapNames = existingChapters.map((c) => c.tilemap.nid);
   const chosenMapName = await chooseMap(chapterIdea, usedMapNames);
+
+  const existingPlayerUnitDatas = existingCharacters
+    .map((c) => c.unitData)
+    .filter((c) =>
+      allLivingPlayerCharacterIdeas.some((idea) => idea.firstName === c.nid)
+    )
+    .filter((c) => newCharacterIdeas.every((n) => n.firstName !== c.nid));
+  // All characters are new in prologue (but only get the ones that start as allies)
+  if (chapterNumber === 0) {
+    existingPlayerUnitDatas.push(
+      ...newCharacterUnitDatas.filter(
+        (c) =>
+          newCharacterIdeas.find((idea) => idea.firstName === c.nid)
+            ?.firstSeenAs === "ally"
+      )
+    );
+  }
 
   // Place units
   const { units: levelUnits, formationRegions } = await getLevelUnits({
     chosenMapName,
     chapterIdea,
     chapterNumber,
-    playerUnitDatas,
+    existingPlayerUnitDatas,
     bossUnitData: newCharacterUnitDatas.find(
       (c) => c.nid === chapterIdea.boss.firstName
     )!,
@@ -458,3 +467,4 @@ if (import.meta.main) {
     console.log(JSON.stringify(result, null, 2));
   })();
 }
+

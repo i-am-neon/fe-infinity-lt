@@ -1,5 +1,16 @@
-import { z } from "zod";
 import { AffinitySchema } from "@/types/character/affinity.ts";
+import { z } from "zod";
+
+export const FirstSeenAsSchema = z
+  .union([
+    z.literal("ally"),
+    z.literal("allied NPC"),
+    z.literal("enemy non-boss"),
+    z.literal("boss"),
+  ])
+  .describe("the type of unit the character is first seen as");
+
+export type FirstSeenAs = z.infer<typeof FirstSeenAsSchema>;
 
 export const CharacterIdeaSchema = z
   .object({
@@ -30,14 +41,7 @@ export const CharacterIdeaSchema = z
       z.literal("elderly"),
     ]),
     backstory: z.string().min(20, "Must be 4-5 sentences"),
-    firstSeenAs: z
-      .union([
-        z.literal("ally"),
-        z.literal("allied NPC"),
-        z.literal("enemy non-boss"),
-        z.literal("boss"),
-      ])
-      .describe("the type of unit the character is first seen as"),
+    firstSeenAs: FirstSeenAsSchema,
     physicalDescription: z
       .string()
       .describe("A physical description of the character"),

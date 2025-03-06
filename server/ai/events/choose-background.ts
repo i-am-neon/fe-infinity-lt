@@ -18,7 +18,9 @@ export default async function chooseBackground(
 We have a list of possible backgrounds to choose from, enumerated in the set:
 Arena, Bedroom, Black Background, Castle Ruins, Castle Sepia, Clearing, Deep Forest, Forest, Forest Dark, Grado Castle, Hill, House, Inside Castle, Plains, Ruins, Town, Town Sunset, Village, Village Gate.
 Use the AIEvent as context to pick the most suitable background for this scene.
-Output a JSON object { "chosenBackground": "OneOfTheBackgroundOptions" }. No additional commentary.`;
+Output a JSON object { "chosenBackground": "OneOfTheBackgroundOptions" }. No additional commentary.
+
+Ensure the background name matches exactly. You must ONLY choose from the set of options provided. No other backgrounds are allowed.`;
 
   const { chosenBackground } = await generateStructuredData({
     fnName: "chooseBackground",
@@ -26,7 +28,7 @@ Output a JSON object { "chosenBackground": "OneOfTheBackgroundOptions" }. No add
     systemMessage,
     prompt: JSON.stringify(aiEvent),
     model: "fast",
-    temperature: 0.3,
+    temperature: 0,
   });
 
   return chosenBackground;

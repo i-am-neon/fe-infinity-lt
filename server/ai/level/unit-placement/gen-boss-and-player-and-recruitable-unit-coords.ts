@@ -3,17 +3,18 @@ import { testPrologueChapter } from "@/ai/test-data/prologueTestData.ts";
 import { testMapMetadata } from "@/ai/test-data/unit-placement.ts";
 import { ChapterIdea } from "@/ai/types/chapter-idea.ts";
 import {
-  BossCoords,
-  GreenUnit,
-  PlayerUnitStartCoords,
+  RecruitableUnit,
+  RecruitableUnitSchema,
+  UnitCoords,
+  UnitCoordsSchema,
 } from "@/ai/types/unit-placement.ts";
-import generateStructuredData from "../../lib/generate-structured-data.ts";
 import { ch4TerrainGrid } from "@/map-processing/test-data/terrain-grid.ts";
 import { MapMetadata } from "@/types/maps/map-metadata.ts";
 import { TerrainGrid } from "@/types/maps/terrain-grid.ts";
 import { z } from "zod";
+import generateStructuredData from "../../lib/generate-structured-data.ts";
 
-export default async function genBossAndPlayerAndGreenUnitCoords({
+export default async function genBossAndPlayerAndRecruitableUnitCoords({
   terrainGrid,
   chapterIdea,
   mapMetadata,
@@ -22,9 +23,9 @@ export default async function genBossAndPlayerAndGreenUnitCoords({
   chapterIdea: ChapterIdea;
   mapMetadata: MapMetadata;
 }): Promise<{
-  bossCoords: BossCoords;
-  playerUnitsCoords: PlayerUnitStartCoords;
-  greenUnitsCoords: GreenUnit[];
+  bossCoords: UnitCoords;
+  playerUnitsCoords: UnitCoords[];
+  recruitableUnits: RecruitableUnit[];
 }> {
   const systemMessage = `
 You are a Fire Emblem Tactician. Choose exactly one region from mapMetadata.distinctRegions for the boss, and one or more regions for the player units to start. Base your choice on the sceneOverview:
@@ -35,13 +36,19 @@ You are a Fire Emblem Tactician. Choose exactly one region from mapMetadata.dist
 - Player units typically start on the edge or corner of a map.
 - The player and boss regions must be on opposite edge/corner of the map, as far away from each other as possible.
 
-If sceneOverview.greenUnits is present and not empty, also choose one or more regions for them. They are allied but not directly controlled by the player. They typically start in a region that thematically aligns with the story, or near the player's region, but not in the exact same tiles. They might be near or adjacent to the player if the story suggests it, or somewhere else if the story calls for it.
+Recruitable Units (green and red):
+- If chapterIdea.newPlayableUnits is present and not empty, also choose one or more regions for them.
+- Characters with 'firstSeenAs'='allied NPC' are allied but not directly controlled by the player.
+  - They typically start in a region that thematically aligns with the story, or near the player's region, but not in the exact same tiles.
+  - They might be near or adjacent to the player if the story suggests it, or somewhere else if the story calls for it.
+- Characters with 'firstSeenAs'='enemy non-boss' are enemies that can be recruited.
+  - They typically start in a region that thematically aligns with the story, in similar regions as other enemies.
 
 Structure your choice in JSON as:
 {
   "bossRegion": "Exact name from distinctRegions",
   "playerRegions": ["Exact name from distinctRegions"],
-  "greenUnitRegions": ["Exact name from distinctRegions"]  // Omit or empty array if no greenUnits
+  "recruitableUnitRegions": ["Exact name from distinctRegions"]  // Omit or empty array if no recruitable units (from chapterIdea.newPlayableUnits)
 }
 
 Ensure region names match exactly.
@@ -50,7 +57,7 @@ Ensure region names match exactly.
   const regionChoiceSchema = z.object({
     bossRegion: z.string(),
     playerRegions: z.array(z.string()),
-    greenUnitRegions: z.array(z.string()).optional(),
+    recruitableUnitRegions: z.array(z.string()).optional(),
   });
 
   const prompt = `Chapter Idea: ${JSON.stringify(
@@ -62,68 +69,37 @@ Ensure region names match exactly.
   const {
     bossRegion,
     playerRegions,
-    greenUnitRegions = [],
+    recruitableUnitRegions = [],
   } = await generateStructuredData({
-    fnName: "genBossAndPlayerAndGreenUnitCoords call 1",
+    fnName: "genBossAndPlayerAndRecruitableUnitCoords call 1",
     schema: regionChoiceSchema,
     systemMessage,
     prompt,
   });
 
-  // Step 2: generate boss and player coords
+  // Step 2: generate boss, player, and recruitable unit coords
   const systemMessage2 = `
-Now, given the chosen boss region, player regions, and possibly green unit regions (if any), generate coordinates:
-{
-  "boss": {
-    "x": number,
-    "y": number
-  },
-  "playerUnits": [
-    { "x": number, "y": number }
-  ],
-  "greenUnits": [
-    { "x": number, "y": number },
-    ...
-  ]
-}
+Now, given the chosen boss region, player regions, and possibly recruitable unit regions (if any), generate coordinates.
 
-Only include greenUnits if sceneOverview.greenUnits is provided.
+Only include recruitableUnits if chapterIdea.newPlayableUnits is provided.
 Coordinates must lie within their chosen region(s). The sceneOverview might indicate splitting players or green units among multiple spots. Distribute them as appropriate. If you place the boss on a tile that is typically used for a throne, fort, or gate, keep that in mind if relevant.
 `;
 
   const coordsSchema = z.object({
-    boss: z.object({
-      x: z.number().int().min(0),
-      y: z.number().int().min(0),
-    }),
-    playerUnits: z.array(
-      z.object({
-        x: z.number().int().min(0),
-        y: z.number().int().min(0),
-      })
-    ),
-    greenUnits: z
-      .array(
-        z.object({
-          x: z.number().int().min(0),
-          y: z.number().int().min(0),
-        })
-      )
-      .optional(),
+    boss: UnitCoordsSchema,
+    playerUnits: z.array(UnitCoordsSchema),
+    recruitableUnits: z.array(RecruitableUnitSchema),
   });
 
   // For prologue, do this. Figure out how to bring this in
   const playerUnitsNumber = 5;
-  const chIdeaGreenUnits = chapterIdea.newPlayableUnits?.filter(
-    (unit) => unit.firstSeenAs === "allied NPC"
-  );
 
   const prompt2 = `Chosen boss region: ${bossRegion}\nChosen player region(s): ${JSON.stringify(
     playerRegions
   )}\nNumber of Player Units: ${playerUnitsNumber}\nChosen green unit region(s): ${JSON.stringify(
-    greenUnitRegions
-  )}\nGreen Units to Place: ${JSON.stringify(
-    chIdeaGreenUnits
+    recruitableUnitRegions
+  )}\nRecruitable Units to Place: ${JSON.stringify(
+    chapterIdea.newPlayableUnits
   )}\nMap Metadata: ${JSON.stringify(
     mapMetadata
   )}\nTerrain Grid: ${JSON.stringify(terrainGrid)}`;
@@ -131,7 +107,7 @@ Coordinates must lie within their chosen region(s). The sceneOverview might indi
   const {
     boss,
     playerUnits,
-    greenUnits = [],
+    recruitableUnits = [],
   } = await generateStructuredData({
     fnName: "genBossAndPlayerAndGreenUnitCoords call 2",
     schema: coordsSchema,
@@ -147,29 +123,24 @@ Coordinates must lie within their chosen region(s). The sceneOverview might indi
   const correctedPlayers = correctUnitPlacement({
     terrainGrid,
     units: playerUnits,
-    existingPositions: [{ x: correctedBoss.x, y: correctedBoss.y }],
+    existingPositions: [correctedBoss],
   });
 
-  let correctedGreens: GreenUnit[] = [];
-  // TODO: green units
-  // if (chIdeaGreenUnits?.length && greenUnits.length) {
-  //   correctedGreens = correctUnitPlacement({
-  //     terrainGrid,
-  //     units: greenUnits.map((g, idx) => {
-  //       return {
-  //         x: g.x,
-  //         y: g.y,
-  //         class: chapterIdea.greenUnits![idx].class,
-  //         name: chapterIdea.greenUnits![idx].name,
-  //         desc: chapterIdea.greenUnits![idx].description,
-  //       };
-  //     }),
-  //     existingPositions: [
-  //       { x: correctedBoss.x, y: correctedBoss.y },
-  //       ...correctedPlayers.map(p => ({ x: p.x, y: p.y })),
-  //     ],
-  //   });
-  // }
+  let correctedRecruitables: RecruitableUnit[] = [];
+  if (recruitableUnits.length > 0) {
+    recruitableUnits.forEach((ru) => {
+      const correctedRecruitable = correctUnitPlacement({
+        terrainGrid,
+        units: [{ x: ru.coords.x, y: ru.coords.y }],
+        existingPositions: correctedPlayers,
+      })[0];
+      correctedRecruitables.push({
+        nid: ru.nid,
+        firstSeenAs: ru.firstSeenAs,
+        coords: { x: correctedRecruitable.x, y: correctedRecruitable.y },
+      });
+    });
+  }
 
   return {
     bossCoords: {
@@ -177,20 +148,14 @@ Coordinates must lie within their chosen region(s). The sceneOverview might indi
       y: correctedBoss.y,
     },
     playerUnitsCoords: correctedPlayers.map((u) => ({ x: u.x, y: u.y })),
-    greenUnitsCoords: correctedGreens.map((g) => ({
-      x: g.x,
-      y: g.y,
-      class: g.class!,
-      name: g.name!,
-      desc: g.desc!,
-    })),
+    recruitableUnits: correctedRecruitables,
   };
 }
 
 if (import.meta.main) {
   (async () => {
     // ch4 has green units
-    const result = await genBossAndPlayerAndGreenUnitCoords({
+    const result = await genBossAndPlayerAndRecruitableUnitCoords({
       terrainGrid: ch4TerrainGrid,
       chapterIdea: testPrologueChapter.idea,
       mapMetadata: testMapMetadata,

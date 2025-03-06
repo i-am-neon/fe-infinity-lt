@@ -22,7 +22,7 @@ export interface Objective {
 
 export interface Unit {
   nid: string;
-  team: string;
+  team: "player" | "enemy" | "other";
   ai: string;
   roam_ai: string | null;
   ai_group: string | null;

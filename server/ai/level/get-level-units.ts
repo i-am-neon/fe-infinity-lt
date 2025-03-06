@@ -1,5 +1,6 @@
 import decideGenericUnitLevel from "@/ai/level/decide-generic-unit-level.ts";
 import assembleUnitPlacement from "@/ai/level/unit-placement/assemble-unit-placement.ts";
+import { isPromotedClass } from "@/ai/level/unit-placement/get-all-class-options.ts";
 import getTerrainGridFromMapName from "@/ai/level/unit-placement/get-terrain-grid-from-tilemap.ts";
 import { ChapterIdea } from "@/ai/types/chapter-idea.ts";
 import { getCurrentLogger } from "@/lib/current-logger.ts";
@@ -9,26 +10,25 @@ import { UnitData } from "@/types/character/unit-data.ts";
 import { FE8ClassToLTNidMap } from "@/types/fe8-class.ts";
 import { Level } from "@/types/level.ts";
 import decideUnitWeapons from "../../item-options/decide-unit-weapons.ts";
-import { isPromotedClass } from "@/ai/level/unit-placement/get-all-class-options.ts";
 
 export default async function getLevelUnits({
   chosenMapName,
   chapterIdea,
   chapterNumber,
-  playerUnitDatas,
+  existingPlayerUnitDatas,
   bossUnitData,
 }: {
   chosenMapName: string;
   chapterIdea: ChapterIdea;
   chapterNumber: number;
-  playerUnitDatas: UnitData[];
+  existingPlayerUnitDatas: UnitData[];
   bossUnitData: UnitData;
 }): Promise<{ units: Level["units"]; formationRegions: Level["regions"] }> {
   const logger = getCurrentLogger();
   const start = Date.now();
   logger.debug("getLevelUnits", {
     chapterNumber,
-    playerUnitDatas,
+    existingPlayerUnitDatas,
     bossUnitData,
   });
   const mapMetadata = allMapOptions.find(
@@ -37,7 +37,7 @@ export default async function getLevelUnits({
   if (!mapMetadata) {
     throw new Error(`No metadata found for map ${chosenMapName}`);
   }
-  const { bossCoords, genericEnemies, playerUnitsCoords, greenUnits } =
+  const { bossCoords, genericEnemies, playerUnitsCoords, recruitableUnits } =
     await assembleUnitPlacement({
       terrainGrid: getTerrainGridFromMapName(chosenMapName),
       chapterIdea,
@@ -47,7 +47,7 @@ export default async function getLevelUnits({
   const units: Level["units"] = [];
 
   // Add player units
-  playerUnitDatas.forEach((ud) => {
+  existingPlayerUnitDatas.forEach((ud) => {
     units.push({
       nid: ud.nid,
       team: "player",
@@ -70,6 +70,20 @@ export default async function getLevelUnits({
     starting_position: [bossCoords.x, bossCoords.y],
     starting_traveler: null,
     generic: false,
+  });
+
+  // add recruitable units
+  recruitableUnits.forEach((ru) => {
+    units.push({
+      nid: ru.nid,
+      team: ru.firstSeenAs === "allied NPC" ? "other" : "enemy",
+      ai: "Defend",
+      roam_ai: null,
+      ai_group: "",
+      starting_position: [ru.coords.x, ru.coords.y],
+      starting_traveler: null,
+      generic: false,
+    });
   });
 
   // Add generic enemies. Comment this out to skip generics for quick testing

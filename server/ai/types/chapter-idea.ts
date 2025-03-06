@@ -33,7 +33,8 @@ export const ChapterIdeaSchema = z.object({
     ),
   newPlayableUnits: z
     .array(CharacterIdeaSchema)
-    .optional()
+    .min(2) // for testing
+    // .optional()
     .describe(
       "New playable characters introduced in this chapter, if any. Includes units that start as player units, NPCs, or enemies but can be recruited."
     ),
