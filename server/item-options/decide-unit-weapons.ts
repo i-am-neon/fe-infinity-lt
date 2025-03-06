@@ -133,7 +133,7 @@ export default function decideUnitWeapons({
   // If there are special weapons, give them priority for being droppable
   if (specialWeapons.length > 0) {
     // Calculate chance based on whether it's a boss
-    const dropChance = isBoss ? 0.6 : 0.3;
+    const dropChance = isBoss ? 0.6 : 0.05;
     if (Math.random() < dropChance) {
       // Randomly choose one special weapon to be droppable
       const randomIndex = Math.floor(Math.random() * specialWeapons.length);
