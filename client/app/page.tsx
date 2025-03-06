@@ -8,6 +8,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  NonClosableDialog,
+  NonClosableDialogContent,
+  NonClosableDialogHeader,
+  NonClosableDialogTitle,
+} from "@/components/ui/non-closable-dialog";
 import GameIdeaSelector from "@/components/ui/game-idea-selector";
 import GamesGrid from "@/components/ui/games-grid";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
@@ -92,20 +98,22 @@ export default function Home() {
           </DialogContent>
         </Dialog>
 
-        <Dialog
+        <NonClosableDialog
           open={creatingGameModalOpen}
           onOpenChange={setCreatingGameModalOpen}
         >
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Game is being generated</DialogTitle>
-            </DialogHeader>
+          <NonClosableDialogContent allowClosing={false}>
+            <NonClosableDialogHeader>
+              <NonClosableDialogTitle>
+                Game is being generated
+              </NonClosableDialogTitle>
+            </NonClosableDialogHeader>
             <div className="flex items-center gap-2">
               <Loader2 className="mr-2 h-5 w-5 animate-spin" />
               <p>The game is being created. Please wait...</p>
             </div>
-          </DialogContent>
-        </Dialog>
+          </NonClosableDialogContent>
+        </NonClosableDialog>
 
         <GamesGrid />
       </main>

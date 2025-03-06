@@ -390,15 +390,17 @@ export default async function genChapter({
   const bossFightEvents = await genBossFightEvents({
     boss: chapterIdea.boss,
     playerUnits: allLivingPlayerCharacterIdeas.filter(
-      idea => idea.firstName !== chapterIdea.boss.firstName
+      (idea) => idea.firstName !== chapterIdea.boss.firstName
     ),
     chapterNumber,
     chapterIdea,
     recruitedThisChapter: (chapterIdea.newPlayableUnits || []).filter(
-      unit => unit.firstSeenAs === "enemy non-boss" || unit.firstSeenAs === "allied NPC"
+      (unit) =>
+        unit.firstSeenAs === "enemy non-boss" ||
+        unit.firstSeenAs === "allied NPC"
     ),
   });
-  
+
   // Add boss fight events to chapter
   newChapter.events.push(...bossFightEvents);
 
@@ -439,6 +441,18 @@ export default async function genChapter({
   }));
 
   newChapter.events.push(...newCharacterDeathEvents);
+
+  const loseConditionEvent: Event = {
+    name: "Lose Game",
+    trigger: "combat_end",
+    level_nid: chapterNumber.toString(),
+    condition: "len(game.get_player_units()) == 0",
+    commands: [],
+    only_once: false,
+    priority: 20,
+    _source: ["lose_game"],
+  };
+  newChapter.events.push(loseConditionEvent);
 
   const updatedUsedPortraits = [...usedSoFar, ...Object.values(portraitMap)];
 
@@ -484,3 +498,4 @@ if (import.meta.main) {
     console.log(JSON.stringify(result, null, 2));
   })();
 }
+

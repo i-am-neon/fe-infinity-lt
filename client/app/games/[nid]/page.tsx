@@ -15,15 +15,17 @@ import {
   AlertDialogTitle,
   AlertDialogDescription,
   AlertDialogFooter,
+  AlertDialogAction,
+  AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-  DialogDescription,
-} from "@/components/ui/dialog";
+  NonClosableDialog,
+  NonClosableDialogContent,
+  NonClosableDialogHeader,
+  NonClosableDialogTitle,
+  NonClosableDialogFooter,
+  NonClosableDialogDescription,
+} from "@/components/ui/non-closable-dialog";
 
 export default function GameDetailPage() {
   const { nid } = useParams() as { nid: string };
@@ -51,6 +53,12 @@ export default function GameDetailPage() {
     setNewGameModalOpen(searchParams.get("new") === "true");
   }, [searchParams]);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [confirmNextChapterOpen, setConfirmNextChapterOpen] = useState(false);
+  const [generatingChapterModalOpen, setGeneratingChapterModalOpen] =
+    useState(false);
+  const [generationError, setGenerationError] = useState<string | null>(null);
+
+  const [oldChapterCount, setOldChapterCount] = useState<number | null>(null);
 
   // Poll for newly created game if "new" query param is present
   useEffect(() => {
@@ -137,15 +145,28 @@ export default function GameDetailPage() {
     });
   }, [data]);
 
-  const [oldChapterCount, setOldChapterCount] = useState<number | null>(null);
+  const handleConfirmNextChapter = useCallback(() => {
+    setConfirmNextChapterOpen(false);
+    if (!data?.game) return;
+
+    setOldChapterCount(data.game.chapters.length);
+    setGeneratingChapterModalOpen(true);
+    setLoadingAction("generate");
+
+    startTransition(async () => {
+      try {
+        await generateNextChapter(data.game!.directory, data.game!.nid);
+        // We'll rely on the polling to detect completion
+      } catch (err) {
+        setGenerationError(err instanceof Error ? err.message : String(err));
+        setLoadingAction(null);
+      }
+    });
+  }, [data]);
 
   const handleGenerateNextChapter = useCallback(() => {
     if (!data?.game) return;
-    setOldChapterCount(data.game.chapters.length);
-    setLoadingAction("generate");
-    startTransition(async () => {
-      await generateNextChapter(data.game!.directory, data.game!.nid);
-    });
+    setConfirmNextChapterOpen(true);
   }, [data]);
 
   // Poll for generate next chapter completion
@@ -164,11 +185,21 @@ export default function GameDetailPage() {
             if (res.game.chapters.length > oldChapterCount) {
               setLoadingAction(null);
               setOldChapterCount(null);
+              setGeneratingChapterModalOpen(false);
               clearInterval(pollId);
+
+              // Auto-run the game on success
+              openGame(res.game.directory);
             }
           }
         } catch (err) {
           console.error("Error polling after generate next chapter:", err);
+          setGenerationError(
+            "An error occurred while checking chapter generation status."
+          );
+          setLoadingAction(null);
+          setGeneratingChapterModalOpen(false);
+          clearInterval(pollId);
         }
       }, 3000);
 
@@ -192,7 +223,7 @@ export default function GameDetailPage() {
   return (
     <>
       {newGameModalOpen && (
-        <Dialog
+        <NonClosableDialog
           open={newGameModalOpen}
           onOpenChange={(open) => {
             // Only allow closing if there's an error
@@ -201,19 +232,19 @@ export default function GameDetailPage() {
             }
           }}
         >
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>
+          <NonClosableDialogContent allowClosing={!!creationError}>
+            <NonClosableDialogHeader>
+              <NonClosableDialogTitle>
                 {creationError
                   ? "Game Creation Failed"
                   : "Game is being created"}
-              </DialogTitle>
+              </NonClosableDialogTitle>
               {creationError && (
-                <DialogDescription className="text-destructive">
+                <NonClosableDialogDescription className="text-destructive">
                   An error occurred while creating your game
-                </DialogDescription>
+                </NonClosableDialogDescription>
               )}
-            </DialogHeader>
+            </NonClosableDialogHeader>
 
             {creationError ? (
               <div className="flex flex-col gap-4">
@@ -221,7 +252,7 @@ export default function GameDetailPage() {
                   <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
                   <p>{creationError}</p>
                 </div>
-                <DialogFooter>
+                <NonClosableDialogFooter>
                   <Button onClick={() => router.push("/")} variant="secondary">
                     Return to Home
                   </Button>
@@ -233,20 +264,98 @@ export default function GameDetailPage() {
                   >
                     Close
                   </Button>
-                </DialogFooter>
+                </NonClosableDialogFooter>
               </div>
             ) : (
               <div className="flex items-center gap-2">
                 <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                 <p>
                   Your game is being created and will open automatically when
-                  finished.
+                  finished. This will take about five minutes.
                 </p>
               </div>
             )}
-          </DialogContent>
-        </Dialog>
+          </NonClosableDialogContent>
+        </NonClosableDialog>
       )}
+
+      {/* Next Chapter Confirmation Dialog */}
+      <AlertDialog
+        open={confirmNextChapterOpen}
+        onOpenChange={setConfirmNextChapterOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Generate Next Chapter?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Make sure you have completed the current chapter before generating
+              the next one. Your choices and actions in the current chapter will
+              affect the story and characters in the next chapter.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmNextChapter}>
+              Generate Next Chapter
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Next Chapter Generation Loading/Error Dialog */}
+      <NonClosableDialog
+        open={generatingChapterModalOpen}
+        onOpenChange={(open) => {
+          // Only allow closing if there's an error
+          if (generationError || !open) {
+            setGeneratingChapterModalOpen(open);
+          }
+        }}
+      >
+        <NonClosableDialogContent allowClosing={!!generationError}>
+          <NonClosableDialogHeader>
+            <NonClosableDialogTitle>
+              {generationError
+                ? "Chapter Generation Failed"
+                : "Generating Next Chapter"}
+            </NonClosableDialogTitle>
+            {generationError && (
+              <NonClosableDialogDescription className="text-destructive">
+                An error occurred while generating the next chapter
+              </NonClosableDialogDescription>
+            )}
+          </NonClosableDialogHeader>
+
+          {generationError ? (
+            <div className="flex flex-col gap-4">
+              <div className="flex items-start gap-2 p-3 bg-destructive/10 rounded-md text-destructive border border-destructive">
+                <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
+                <p>{generationError}</p>
+              </div>
+              <NonClosableDialogFooter>
+                <Button
+                  onClick={() => {
+                    setGenerationError(null);
+                    setGeneratingChapterModalOpen(false);
+                  }}
+                >
+                  Close
+                </Button>
+              </NonClosableDialogFooter>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+              <p>
+                The next chapter is being generated based on your gameplay
+                choices. This will take about five minutes, and the game will
+                launch automatically when ready.
+              </p>
+            </div>
+          )}
+        </NonClosableDialogContent>
+      </NonClosableDialog>
+
       <div className="p-6 space-y-4">
         {loading ? (
           <div>Loading...</div>
@@ -295,8 +404,8 @@ export default function GameDetailPage() {
                   <AlertDialogHeader>
                     <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This will permanently delete the game’s data and files.
-                      This action cannot be undone.
+                      This will permanently delete the game&apos;s data and
+                      files. This action cannot be undone.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>

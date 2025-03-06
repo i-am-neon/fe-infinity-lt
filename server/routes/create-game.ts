@@ -143,13 +143,12 @@ export async function handleCreateGame(req: Request): Promise<Response> {
         const duration = Date.now() - startTime;
         logger.info("New Game Created", { newGame: updatedGame, duration });
 
-        // optional runGame
         runGame(projectNameEndingInDotLtProj);
       } catch (err) {
         const logger = getCurrentLogger();
         const errorMsg = err instanceof Error ? err.message : String(err);
         logger.error("Error creating game", { error: errorMsg });
-        
+
         // Store error in memory map for retrieval
         gameCreationErrors.set(gameNid, errorMsg);
       }
@@ -164,3 +163,4 @@ export async function handleCreateGame(req: Request): Promise<Response> {
     });
   }
 }
+
