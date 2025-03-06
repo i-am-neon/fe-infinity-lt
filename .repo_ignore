@@ -5,6 +5,9 @@ server/vector-db/seed-vectors/*
 server/ai/test-data/*
 server/ai/map-processing/*
 
+client/out/*
+pnpm-lock.yaml
+
 # Default fallback .repo_ignore content
 **/node_modules/
 **/.npm/

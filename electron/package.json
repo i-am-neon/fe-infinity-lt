@@ -5,24 +5,65 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "dev": "concurrently \"cd ../client && pnpm dev\" \"wait-on http://localhost:3000 && NODE_ENV=development electron .\"",
-    "package": "electron-builder"
+    "dev": "concurrently \"cd ../client && pnpm dev\" \"wait-on http://localhost:3000 && electron . --dev\"",
+    "postinstall": "electron-builder install-app-deps && node download-binaries.js",
+    "package": "electron-builder",
+    "package:mac": "electron-builder --mac",
+    "package:win": "electron-builder --win",
+    "package:linux": "electron-builder --linux"
   },
   "devDependencies": {
+    "axios": "^1.6.7",
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3",
     "electron": "^35.0.0",
     "electron-builder": "^24.9.1",
-    "concurrently": "^8.2.2",
+    "extract-zip": "^2.0.1",
     "wait-on": "^7.2.0"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2",
+    "fs-extra": "^11.2.0"
   },
   "build": {
     "appId": "com.fe-infinity.app",
     "files": [
       "*.js",
+      "*.html",
       "node_modules/**/*",
-      "../client/out/**/*"
+      "../client/out/**/*",
+      "bin/**/*",
+      "../server/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "../server",
+        "to": "server",
+        "filter": [
+          "**/*",
+          "!node_modules/**/*"
+        ]
+      }
     ],
     "directories": {
       "output": "release"
+    },
+    "mac": {
+      "target": [
+        "dmg"
+      ],
+      "category": "public.app-category.games"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "category": "Game"
     }
   }
 }

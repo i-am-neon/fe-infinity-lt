@@ -11,11 +11,24 @@ export default async function readOrCreateJSON<T>(
     return [parsed, false];
   } catch (error) {
     if (error instanceof Deno.errors.NotFound && fallbackWritePath) {
-      await Deno.writeTextFile(
-        fallbackWritePath,
-        JSON.stringify(fallbackData, null, 2)
-      );
-      return [fallbackData, true];
+      console.log(`[JSON] File not found: ${filePath}, creating with fallback data at: ${fallbackWritePath}`);
+      
+      try {
+        // Ensure the directory exists
+        const dirPath = fallbackWritePath.substring(0, fallbackWritePath.lastIndexOf('/'));
+        await Deno.mkdir(dirPath, { recursive: true });
+        
+        // Write the file
+        await Deno.writeTextFile(
+          fallbackWritePath,
+          JSON.stringify(fallbackData, null, 2)
+        );
+        console.log(`[JSON] Successfully created fallback file: ${fallbackWritePath}`);
+        return [fallbackData, true];
+      } catch (writeError) {
+        console.error(`[JSON] Failed to create fallback file:`, writeError);
+        throw writeError;
+      }
     }
     throw error;
   }

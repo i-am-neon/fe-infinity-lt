@@ -1,4 +1,7 @@
-import { getPathWithinLtMaker } from "./get-path-within-lt-maker.ts";
+import {
+  getPathWithinLtMaker,
+  ensureParentDirsExist,
+} from "@/file-io/get-path-within-lt-maker.ts";
 
 export default async function writeFileWithinLtMaker({
   relativePath,
@@ -10,6 +13,18 @@ export default async function writeFileWithinLtMaker({
   append?: boolean;
 }): Promise<void> {
   const path = getPathWithinLtMaker(relativePath);
-  await Deno.writeTextFile(path, text, { append });
+
+  // Ensure parent directories exist
+  ensureParentDirsExist(path);
+
+  console.log(`[FileIO] Writing to file: ${path} (append: ${append})`);
+
+  try {
+    await Deno.writeTextFile(path, text, { append });
+    console.log(`[FileIO] Successfully wrote to: ${path}`);
+  } catch (e) {
+    console.error(`[FileIO] Failed to write to file: ${path}`, e);
+    throw e;
+  }
 }
 

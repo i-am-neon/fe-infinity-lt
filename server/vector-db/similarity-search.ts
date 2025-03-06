@@ -1,8 +1,29 @@
 import pool from "@/vector-db/connection.ts";
 import { VectorType } from "@/vector-db/types/vector-type.ts";
 import createEmbedding from "@/vector-db/create-embedding.ts";
+import { adaptiveSimilaritySearch } from "@/vector-db/adapter.ts";
 
 export default async function similaritySearch({
+  searchQuery,
+  topK = 3,
+  vectorType,
+}: {
+  searchQuery: string;
+  topK: number;
+  vectorType: VectorType;
+}): Promise<
+  Array<{
+    id: string;
+    score: number;
+    metadata: Record<string, unknown> | null;
+  }>
+> {
+  // Use the adapter which will route to the appropriate implementation
+  return adaptiveSimilaritySearch({ searchQuery, topK, vectorType });
+}
+
+// This function is the original PostgreSQL implementation that's used when not in Electron
+export async function pgSimilaritySearch({
   searchQuery,
   topK = 3,
   vectorType,
@@ -61,6 +82,6 @@ if (import.meta.main) {
     topK: 3,
     vectorType: "items",
   });
+
   console.log("similarity search results:", res);
 }
-

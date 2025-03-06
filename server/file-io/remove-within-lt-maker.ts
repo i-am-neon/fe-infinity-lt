@@ -1,4 +1,4 @@
-import { getPathWithinLtMaker } from "./get-path-within-lt-maker.ts";
+import { getPathWithinLtMaker } from "@/file-io/get-path-within-lt-maker.ts";
 
 export default async function removeWithinLtMaker({
   relativePath,
@@ -10,9 +10,21 @@ export default async function removeWithinLtMaker({
   const path = getPathWithinLtMaker(relativePath);
 
   if (preserveDirectory) {
-    const entries = Deno.readDir(path);
-    for await (const entry of entries) {
-      await Deno.remove(`${path}/${entry.name}`, { recursive: true });
+    try {
+      // Ensure directory exists
+      await Deno.mkdir(path, { recursive: true });
+
+      // Then clear its contents
+      const entries = Deno.readDir(path);
+      for await (const entry of entries) {
+        await Deno.remove(`${path}/${entry.name}`, { recursive: true });
+      }
+    } catch (err) {
+      if (!(err instanceof Deno.errors.NotFound)) {
+        throw err;
+      }
+      // If directory doesn't exist, create it
+      await Deno.mkdir(path, { recursive: true });
     }
   } else {
     try {

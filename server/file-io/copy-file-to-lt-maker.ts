@@ -1,4 +1,4 @@
-import { join, basename } from "node:path";
+import { join, basename, dirname } from "node:path";
 import { getPathWithinLtMaker } from "@/file-io/get-path-within-lt-maker.ts";
 import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
 
@@ -22,6 +22,18 @@ export default async function copyFileToLtMaker({
   const destinationPath = getPathWithinLtMaker(
     join(ltMakerSubdirectory, newFileName || fileName)
   );
+
+  // Ensure the destination directory exists
+  const destinationDir = dirname(destinationPath);
+  try {
+    await Deno.mkdir(destinationDir, { recursive: true });
+  } catch (err) {
+    if (!(err instanceof Deno.errors.AlreadyExists)) {
+      console.error(`Failed to create directory: ${destinationDir}`, err);
+      throw err;
+    }
+  }
+
   await Deno.copyFile(absoluteSourcePath, destinationPath);
 }
 
@@ -32,3 +44,4 @@ if (import.meta.main) {
   });
   console.log("File copied successfully.");
 }
+
