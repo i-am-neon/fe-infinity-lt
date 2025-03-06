@@ -109,7 +109,7 @@ Coordinates must lie within their chosen region(s). The sceneOverview might indi
     playerUnits,
     recruitableUnits = [],
   } = await generateStructuredData({
-    fnName: "genBossAndPlayerAndGreenUnitCoords call 2",
+    fnName: "genBossAndPlayerAndRecruitableUnitCoords call 2",
     schema: coordsSchema,
     systemMessage: systemMessage2,
     prompt: prompt2,
@@ -126,9 +126,16 @@ Coordinates must lie within their chosen region(s). The sceneOverview might indi
     existingPositions: [correctedBoss],
   });
 
-  let correctedRecruitables: RecruitableUnit[] = [];
+  const correctedRecruitables: RecruitableUnit[] = [];
   if (recruitableUnits.length > 0) {
     recruitableUnits.forEach((ru) => {
+      if (
+        !chapterIdea.newPlayableUnits?.some((unit) => unit.firstName === ru.nid)
+      ) {
+        throw new Error(
+          `Recruitable unit with NID "${ru.nid}" does not match any unit's firstName in chapterIdea.newPlayableUnits`
+        );
+      }
       const correctedRecruitable = correctUnitPlacement({
         terrainGrid,
         units: [{ x: ru.coords.x, y: ru.coords.y }],
