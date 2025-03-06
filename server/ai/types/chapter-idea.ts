@@ -40,12 +40,16 @@ export const ChapterIdeaSchema = z.object({
   enemyFaction: EnemyFactionSchema,
   endOfChapterChoice: z
     .object({
-      displayText: z.string(),
+      displayText: z
+        .string()
+        .describe(
+          "The text that will be displayed to the player. Must fit on one line going across the small screen, therefore it must be a very simple single sentence."
+        ),
       options: z
         .array(z.string())
         .min(2)
         .describe(
-          "2-5 The options the player can choose from. These should be choices that will affect the story broadly. Options may NOT include attempting to recruit a certain character."
+          "2-5 The options the player can choose from. These should be choices that will affect the story broadly. Options may NOT include attempting to recruit a certain character. Each option should only be a few words long."
         ),
     })
     .describe(
