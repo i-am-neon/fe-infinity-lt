@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useState, useCallback, useTransition } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { AlertCircle, Loader2 } from "lucide-react";
+import { AlertCircle, ChevronLeft, Loader2 } from "lucide-react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 import { Game } from "@/types/game";
 import { openGame, generateNextChapter, deleteGame } from "@/app/actions";
 import apiCall from "@/lib/api-call";
@@ -357,6 +358,10 @@ export default function GameDetailPage() {
       </NonClosableDialog>
 
       <div className="p-6 space-y-4">
+        <Link href="/" className="inline-flex items-center mb-4 text-sm font-medium hover:underline">
+          <ChevronLeft className="w-4 h-4 mr-1" />
+          Back to Home
+        </Link>
         {loading ? (
           <div>Loading...</div>
         ) : !data?.success || !data.game ? (
@@ -436,4 +441,3 @@ export default function GameDetailPage() {
     </>
   );
 }
-
