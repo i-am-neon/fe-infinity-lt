@@ -108,8 +108,6 @@ CRITICAL REQUIREMENTS:
   - When creating the endOfChapterChoice, ensure none of the options include attempting to recruit a certain character
 - Return only JSON without any commentary
 
-ON THIS CHAPTER YOU MUST ADD TWO NEW PLAYABLE UNITS: ONE THAT STARTS AS "allied NPC" ONE THAT STARTS AS "enemy non-boss". THIS IS A REQUIREMENT FOR THIS CHAPTER.
-
 Additionally, the 'intro' and 'outro' fields must each be a single full paragraph summarizing all the events, dialogue, and interactions that happen in those scenes. Make sure new characters' introductions feel natural and their reasons for joining are compelling and tied to their backstories.`;
 
   const basePrompt = isPrologue
@@ -156,9 +154,7 @@ Constraints:
   c) New bosses and characters are always allowed even if they talk about resurrection themes.
 3) Only check that boss characters from previous chapters aren't reused with the same name and role.
 4) Verify that if there are dead characters (from allDeadCharacters or newlyDeadThisChapter), the chapter narrative acknowledges these deaths in some meaningful way - either through explicit mentions in dialogue, plot consequences, or character reactions.
-If all good => fixText="None". Otherwise => fix instructions.
-
-ON THIS CHAPTER YOU MUST ADD TWO NEW PLAYABLE UNITS: ONE THAT STARTS AS "allied NPC" ONE THAT STARTS AS "enemy non-boss". THIS IS A REQUIREMENT FOR THIS CHAPTER.`;
+If all good => fixText="None". Otherwise => fix instructions.`;
     },
     validators: [validateCharacterMentions],
   });
