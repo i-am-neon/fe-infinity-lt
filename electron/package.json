@@ -1,5 +1,28 @@
 {
-	"devDependencies": {
-		"electron": "^35.0.0"
-	}
+  "name": "fe-infinity-electron",
+  "version": "1.0.0",
+  "description": "Electron wrapper for FE Infinity",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "concurrently \"cd ../client && pnpm dev\" \"wait-on http://localhost:3000 && NODE_ENV=development electron .\"",
+    "package": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^35.0.0",
+    "electron-builder": "^24.9.1",
+    "concurrently": "^8.2.2",
+    "wait-on": "^7.2.0"
+  },
+  "build": {
+    "appId": "com.fe-infinity.app",
+    "files": [
+      "*.js",
+      "node_modules/**/*",
+      "../client/out/**/*"
+    ],
+    "directories": {
+      "output": "release"
+    }
+  }
 }
