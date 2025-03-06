@@ -3,12 +3,6 @@ import { CharacterIdea } from "@/ai/types/character-idea.ts";
 import { getCurrentLogger } from "@/lib/current-logger.ts";
 import similaritySearch from "@/vector-db/similarity-search.ts";
 import { VectorType } from "@/vector-db/types/vector-type.ts";
-import { z } from "zod";
-import generateStructuredData from "./lib/generate-structured-data.ts";
-
-const searchQuerySchema = z.object({
-  searchQuery: z.string().describe("A short sentence to search for a portrait"),
-});
 
 export default async function choosePortrait({
   characterIdea,
@@ -20,77 +14,66 @@ export default async function choosePortrait({
   const start = Date.now();
   const logger = getCurrentLogger();
 
-  // 1) Generate search query
-  const systemMessageForQuery = `You are a query generator for an advanced portrait search system.
-Given the user's Fire Emblem character idea, provide a brief single-line string (no more than 70 characters) that captures the essential attributes (gender, age, hair color, vibe, etc.) to help find a matching portrait. Do not wrap the string in quotes. Avoid words that are not relevant.`;
-
-  const { searchQuery } = await generateStructuredData({
-    fnName: "genPortraitSearchQuery",
-    schema: searchQuerySchema,
-    systemMessage: systemMessageForQuery,
-    prompt: JSON.stringify(characterIdea),
-    temperature: 0.3,
-    model: "fast",
-  });
-
   // Determine which vector type to use based on gender
   const vectorType: VectorType =
     characterIdea.gender === "male" ? "portraits-male" : "portraits-female";
 
-  const topResults = await similaritySearch({
-    searchQuery,
-    topK: 3,
-    vectorType,
-  });
-  if (!topResults.length) {
-    logger.warn("No portrait results found for search query", { searchQuery });
-    throw new Error("No portrait matches found.");
-  }
+  // Use physicalDescription directly for the search
+  const searchQuery = characterIdea.physicalDescription;
 
-  const filteredResults = topResults.filter((res) => {
-    const md = res.metadata as { originalName?: string };
-    return md.originalName && !usedPortraits.includes(md.originalName);
-  });
-  if (!filteredResults.length) {
-    logger.warn(
-      "No unused portraits remain for top 5, re-searching with topK=10 ...",
-      { searchQuery }
-    );
-    const biggerResults = await similaritySearch({
+  // Try with initial topK
+  let topK = 5;
+  let chosenPortraitName: string | null = null;
+
+  while (!chosenPortraitName) {
+    const results = await similaritySearch({
       searchQuery,
-      topK: 10,
+      topK,
       vectorType,
     });
-    const biggerFiltered = biggerResults.filter((res) => {
-      const md = res.metadata as { originalName?: string };
-      return md.originalName && !usedPortraits.includes(md.originalName);
-    });
-    if (!biggerFiltered.length) {
-      logger.warn("No unused portraits remain at topK=10", { searchQuery });
-      throw new Error("No unused portrait matches found after second attempt.");
+
+    if (!results.length) {
+      logger.warn("No portrait results found for search query", {
+        searchQuery,
+      });
+      throw new Error("No portrait matches found.");
     }
-    const randomIndex = Math.floor(Math.random() * biggerFiltered.length);
-    const chosen = biggerFiltered[randomIndex];
-    const chosenPortraitName = chosen.metadata!.originalName as string;
 
-    logger.info("Chose portrait for character after second attempt", {
-      characterIdea,
-      chosenPortrait: chosen,
-      elapsedTimeMs: Date.now() - start,
-    });
-    return chosenPortraitName;
+    // Try each result in order of similarity until finding an unused one
+    for (const result of results) {
+      const md = result.metadata as { originalName?: string };
+      if (md.originalName && !usedPortraits.includes(md.originalName)) {
+        chosenPortraitName = md.originalName;
+        break;
+      }
+    }
+
+    // If all portraits in current results are used, increase topK and try again
+    if (!chosenPortraitName) {
+      topK *= 2; // Double the search space
+      if (topK > 50) {
+        // Safety limit to prevent excessive searches
+        logger.warn("Exhausted portrait search after reaching topK=50", {
+          searchQuery,
+        });
+        throw new Error(
+          "No unused portrait matches found after extensive search."
+        );
+      }
+      logger.info(
+        `All portraits in top ${
+          topK / 2
+        } are used, increasing to top ${topK}...`
+      );
+    }
   }
-
-  // 3) Pick a random portrait from the filtered results
-  const randomIndex = Math.floor(Math.random() * filteredResults.length);
-  const chosen = filteredResults[randomIndex];
-  const chosenPortraitName = chosen.metadata!.originalName as string;
 
   logger.info("Chose portrait for character", {
     characterIdea,
-    chosenPortrait: chosen,
+    chosenPortraitName,
     elapsedTimeMs: Date.now() - start,
   });
+
   return chosenPortraitName;
 }
 
@@ -104,4 +87,3 @@ if (import.meta.main) {
       console.error("Error choosing portrait:", err);
     });
 }
-
