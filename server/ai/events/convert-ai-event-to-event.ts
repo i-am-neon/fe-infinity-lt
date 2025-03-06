@@ -43,6 +43,7 @@ export default function convertAIEventToEvent({
       const line = sourceObj.args.join(" ");
       const formatted = cleanGameText(line);
       _source.push(`speak;hint;${formatted}`);
+      _source.push("end_skip");
     } else {
       const rawSource = `${sourceObj.command};${sourceObj.args.join(";")}`;
       _source.push(rawSource);
