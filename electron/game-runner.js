@@ -105,21 +105,34 @@ async function runGameWithWine(projectNameEndingInDotLtProj) {
           return;
         }
         
-        console.log(`Running game with Wine: ${projectNameEndingInDotLtProj}`);
+        // Normalize project path for Wine and ensure it uses forward slashes
+        const normalizedProjectPath = projectNameEndingInDotLtProj.replace(/\\/g, '/');
+        
+        console.log(`Running game with Wine: ${normalizedProjectPath}`);
         console.log(`LT Maker path: ${ltMakerPath}`);
+        
+        // Check if metadata.json exists before running
+        const metadataPath = path.join(ltMakerPath, normalizedProjectPath, 'metadata.json');
+        if (!fs.existsSync(metadataPath)) {
+          console.error(`Error: metadata.json not found at ${metadataPath}`);
+          reject(new Error(`Game cannot run: metadata.json not found for ${normalizedProjectPath}`));
+          return;
+        }
         
         const wineProcess = spawn(
           winePath,
           [
             'python',
             'run_engine_for_project.py',
-            projectNameEndingInDotLtProj
+            normalizedProjectPath
           ],
           {
             cwd: ltMakerPath,
             env: {
               ...process.env,
               WINEDEBUG: '-all', // Reduce Wine debug output
+              WINEDLLOVERRIDES: 'mscoree,mshtml=',  // Prevent Wine from showing error dialogs
+              WINEPREFIX: process.env.WINEPREFIX || `${require('os').homedir()}/.wine`,  // Use consistent Wine prefix
             }
           }
         );

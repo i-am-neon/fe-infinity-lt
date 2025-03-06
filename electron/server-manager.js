@@ -138,7 +138,7 @@ const startDenoServer = () => {
       LT_MAKER_PATH: ltMakerPath,
       SERVER_DIR: serverPath,
       DENO_ENV: process.env.NODE_ENV || 'development',
-      DEBUG: 'true'
+      // DEBUG: 'true'
     };
 
     denoProcess = spawn(

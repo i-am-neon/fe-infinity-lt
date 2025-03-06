@@ -16,16 +16,74 @@ export default async function initializeProject(projectName: string) {
   const initProjectScriptPath = getPathWithinLtMaker("create_new_project.py");
   const newProjectNameEndingInDotLtProj = `_${sluggify(projectName)}.ltproj`;
   const gameNid = "_" + sluggify(projectName);
-  // python initialize_new_project.py <nid> <title> <lt_project_base_path> <new_project_relative_path>
-  await runPythonScript({
+  
+  // Get the lt-maker path and ensure it uses forward slashes for Wine compatibility
+  const ltMakerPath = getLtMakerPath().replace(/\\/g, '/');
+  
+  // Normalize the project path to use forward slashes
+  const normalizedProjectPath = newProjectNameEndingInDotLtProj.replace(/\\/g, '/');
+  
+  console.log(`Initializing project with paths:
+    - Script: ${initProjectScriptPath}
+    - LT Maker Path: ${ltMakerPath}
+    - Project NID: ${sluggify(projectName)}
+    - Project Title: ${projectName}
+    - Project Path: ${normalizedProjectPath}
+  `);
+  
+  // Run the Python script and capture its output for debugging
+  const { output, error } = await runPythonScript({
     pathToPythonScript: initProjectScriptPath,
     args: [
       sluggify(projectName),
       projectName,
-      getLtMakerPath(),
-      newProjectNameEndingInDotLtProj,
+      ltMakerPath,
+      normalizedProjectPath,
     ],
   });
+  
+  console.log(`Python script output: ${output}`);
+  
+  if (error) {
+    console.error(`Python script error: ${error}`);
+    throw new Error(`Project initialization failed: Python script error: ${error}`);
+  }
+  
+  // Check if the project directory was created
+  const projectDirPath = getPathWithinLtMaker(normalizedProjectPath);
+  try {
+    const projectDirInfo = await Deno.stat(projectDirPath);
+    console.log(`Project directory created: ${projectDirPath} (isDirectory: ${projectDirInfo.isDirectory})`);
+    
+    // List files in the project directory for debugging
+    try {
+      const entries = await Array.fromAsync(Deno.readDir(projectDirPath));
+      console.log(`Files in project directory: ${entries.map(e => e.name).join(', ')}`);
+    } catch (err) {
+      console.error(`Failed to read project directory: ${err}`);
+    }
+  } catch (err) {
+    console.error(`Project directory was not created at ${projectDirPath}`, err);
+  }
+  
+  // Verify metadata.json was created
+  const metadataPath = getPathWithinLtMaker(`${normalizedProjectPath}/metadata.json`);
+  try {
+    await Deno.stat(metadataPath);
+    console.log(`Successfully created metadata.json at ${metadataPath}`);
+  } catch (err) {
+    console.error(`Failed to find metadata.json at ${metadataPath}`, err);
+    
+    // Try to inspect the create_new_project.py script to see if it's the issue
+    try {
+      const pythonScriptContent = await Deno.readTextFile(initProjectScriptPath);
+      console.log(`Python script content first 500 chars: ${pythonScriptContent.substring(0, 500)}`);
+    } catch (readErr) {
+      console.error(`Failed to read Python script: ${readErr}`);
+    }
+    
+    throw new Error(`Project initialization failed: metadata.json was not created for ${projectName}`);
+  }
 
   // Empty levels.json and events.json
   await writeFileWithinLtMaker({
@@ -220,4 +278,3 @@ export default async function initializeProject(projectName: string) {
 if (import.meta.main) {
   await initializeProject("My Project");
 }
-
