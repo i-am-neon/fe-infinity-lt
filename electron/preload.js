@@ -1,5 +1,12 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
+// Add global electronAPI for Deno processes
+if (typeof global !== 'undefined') {
+  global.electronAPI = {
+    runGame: (projectPath) => ipcRenderer.invoke('runGame', projectPath)
+  };
+}
+
 contextBridge.exposeInMainWorld('electron', {
   ipcRenderer: {
     send: (channel, data) => {

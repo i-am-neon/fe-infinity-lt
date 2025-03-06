@@ -5,7 +5,8 @@ export function isElectronEnvironment(): boolean {
   return (
     Deno.env.get("ELECTRON_RUN_AS_NODE") === "1" ||
     typeof Deno.env.get("ELECTRON_APP_ROOT") !== "undefined" ||
-    typeof Deno.env.get("SERVER_DIR") !== "undefined"
+    typeof Deno.env.get("SERVER_DIR") !== "undefined" ||
+    typeof Deno.electronAPI !== "undefined"
   );
 }
 

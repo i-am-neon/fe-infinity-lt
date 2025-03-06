@@ -19,8 +19,8 @@ const isLinux = platform === 'linux';
 const arch = process.arch === 'x64' ? 'x86_64' : process.arch;
 
 // Download and extract a file
-async function downloadAndExtract(url, destDir, extractionRoot = '') {
-  const fileName = url.split('/').pop();
+async function downloadAndExtract(url, destDir, extractionRoot = '', customFileName = null) {
+  const fileName = customFileName || url.split('/').pop();
   const downloadPath = path.join(destDir, fileName);
   
   console.log(`Downloading ${url}...`);
@@ -162,6 +162,102 @@ async function installPgVector() {
   }
 }
 
+// Download Wine for macOS
+async function downloadWine() {
+  console.log('Downloading Wine...');
+  
+  // Skip on Windows (not needed)
+  if (process.platform === 'win32') {
+    console.log('Wine not needed on Windows, skipping');
+    return;
+  }
+  
+  const wineDir = path.join(__dirname, 'wine');
+  
+  // Create wine directory if it doesn't exist
+  if (!fs.existsSync(wineDir)) {
+    fs.mkdirSync(wineDir, { recursive: true });
+  }
+  
+  let wineUrl;
+  
+  if (process.platform === 'darwin') {
+    // For macOS, we'll download a portable Wine
+    wineUrl = 'https://github.com/Gcenx/winecx/releases/download/crossover-wine-22.1.1/wine-crossover-22.1.1-osx64.tar.xz';
+  } else if (process.platform === 'linux') {
+    // For Linux, we'll use a portable Wine build
+    wineUrl = 'https://github.com/mmtrt/WINE_AppImage/releases/download/continuous-stable-1-i386/wine-stable-1-i386.AppImage';
+  } else {
+    console.log('Unknown platform for Wine download, skipping');
+    return;
+  }
+  
+  try {
+    if (process.platform === 'darwin') {
+      const tarFile = 'wine-crossover.tar.xz';
+      // Download the tar.xz file
+      await downloadFile(wineUrl, path.join(wineDir, tarFile));
+      
+      // Extract tar.xz file
+      console.log('Extracting Wine...');
+      await execCommand('tar', ['-xf', path.join(wineDir, tarFile), '-C', wineDir]);
+      
+      // Clean up
+      fs.unlinkSync(path.join(wineDir, tarFile));
+    } else if (process.platform === 'linux') {
+      const appImageFile = path.join(wineDir, 'wine.AppImage');
+      
+      // Download the AppImage
+      await downloadFile(wineUrl, appImageFile);
+      
+      // Make it executable
+      fs.chmodSync(appImageFile, 0o755);
+    }
+    
+    console.log('Wine downloaded successfully');
+  } catch (error) {
+    console.error('Failed to download Wine:', error);
+    // Continue anyway
+  }
+}
+
+// Helper to download a file
+async function downloadFile(url, destination) {
+  console.log(`Downloading ${url}...`);
+  
+  const response = await axios({
+    method: 'GET',
+    url: url,
+    responseType: 'stream'
+  });
+  
+  const writer = fs.createWriteStream(destination);
+  
+  response.data.pipe(writer);
+  
+  return new Promise((resolve, reject) => {
+    writer.on('finish', resolve);
+    writer.on('error', reject);
+  });
+}
+
+// Helper to execute commands
+async function execCommand(command, args, options = {}) {
+  return new Promise((resolve, reject) => {
+    const process = spawn(command, args, options);
+    
+    process.on('close', (code) => {
+      if (code === 0) {
+        resolve();
+      } else {
+        reject(new Error(`Command exited with code ${code}`));
+      }
+    });
+    
+    process.on('error', reject);
+  });
+}
+
 // Main function to run all downloads
 async function main() {
   try {
@@ -186,6 +282,11 @@ async function main() {
     
     // Normal download flow
     await downloadDeno();
+    
+    // Download Wine for non-Windows platforms
+    if (process.platform !== 'win32') {
+      await downloadWine();
+    }
     
     if (!isMac) {
       // Skip PostgreSQL download on Mac as it's complex

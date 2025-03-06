@@ -1,6 +1,8 @@
-const { app, BrowserWindow, dialog } = require('electron');
+const { app, BrowserWindow, dialog, ipcMain } = require('electron');
 const path = require('path');
 const { startServer, stopServer, isServerReady } = require('./server-manager');
+const { runGameWithWine } = require('./game-runner');
+const { startGameLauncherServer } = require('./game-launcher');
 
 // Set application name before anything else
 app.setName("FE Infinity");
@@ -51,6 +53,16 @@ function createMainWindow() {
     process.env.NODE_ENV = 'development';
     mainWindow.loadURL('http://localhost:3000');
     mainWindow.webContents.openDevTools();
+    
+    // Start HTTP game launcher server in development mode
+    startGameLauncherServer().then(server => {
+      console.log('Game launcher HTTP server started successfully');
+      app.on('before-quit', () => {
+        server.close();
+      });
+    }).catch(err => {
+      console.error('Failed to start game launcher server:', err);
+    });
   } else {
     mainWindow.loadFile(path.join(__dirname, '../client/out/index.html'));
   }
@@ -109,6 +121,21 @@ app.on('activate', () => {
         'Cannot start application because server components failed to initialize.'
       );
     }
+  }
+});
+
+// Handle IPC request to run a game
+ipcMain.handle('runGame', async (_, projectPath) => {
+  try {
+    await runGameWithWine(projectPath);
+    return { success: true };
+  } catch (error) {
+    console.error('Error running game:', error);
+    dialog.showErrorBox(
+      'Game Launch Failed',
+      `Failed to launch the game: ${error.message}`
+    );
+    return { success: false, error: error.message };
   }
 });
 
