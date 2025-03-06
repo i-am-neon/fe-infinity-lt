@@ -8,6 +8,8 @@ server/ai/map-processing/*
 client/out/*
 pnpm-lock.yaml
 
+electron/icons/*
+
 # Default fallback .repo_ignore content
 **/node_modules/
 **/.npm/

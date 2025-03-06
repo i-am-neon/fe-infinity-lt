@@ -2,6 +2,9 @@ const { app, BrowserWindow, dialog } = require('electron');
 const path = require('path');
 const { startServer, stopServer, isServerReady } = require('./server-manager');
 
+// Set application name before anything else
+app.setName("FE Infinity");
+
 let mainWindow = null;
 let splashWindow = null;
 let serverStarted = false;
@@ -14,6 +17,7 @@ function createSplashWindow() {
     transparent: true,
     frame: false,
     alwaysOnTop: true,
+    icon: path.join(__dirname, '../client/public/fe-infinity-logo.png'),
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false
@@ -30,6 +34,7 @@ function createMainWindow() {
     width: 1200,
     height: 800,
     show: false,
+    icon: path.join(__dirname, '../client/public/fe-infinity-logo.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
@@ -62,6 +67,11 @@ function createMainWindow() {
 
 // Initialize application
 app.whenReady().then(async () => {
+  // Set app icon for macOS dock
+  if (process.platform === 'darwin') {
+    app.dock.setIcon(path.join(__dirname, '../client/public/fe-infinity-logo.png'));
+  }
+  
   createSplashWindow();
   
   try {
