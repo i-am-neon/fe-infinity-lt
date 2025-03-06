@@ -41,7 +41,7 @@ export default async function processEventItems(
       if (commandIndex !== -1) {
         updatedEvent.sourceObjects[commandIndex] = {
           ...command,
-          args: [gameItemNid, ...command.args.slice(1)],
+          args: ["convoy", gameItemNid],
         };
       }
 
@@ -78,3 +78,4 @@ if (import.meta.main) {
     console.log("Processed:", processed);
   });
 }
+
