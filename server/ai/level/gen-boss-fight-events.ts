@@ -39,12 +39,14 @@ export default async function genBossFightEvents({
   recruitedThisChapter?: CharacterIdea[];
 }): Promise<Event[]> {
   const logger = getCurrentLogger();
-  const bossFightEvents: Event[] = [];
 
-  for (const playerUnit of playerUnits) {
-    // Skip if the unit is the boss (shouldn't happen but just in case)
-    if (playerUnit.firstName === boss.firstName) continue;
+  // Filter out boss from player units if they happen to be the same
+  const validPlayerUnits = playerUnits.filter(
+    (unit) => unit.firstName !== boss.firstName
+  );
 
+  // Generate events in parallel
+  const eventPromises = validPlayerUnits.map(async (playerUnit) => {
     // Check if the unit was recruited this chapter
     const wasRecruitedThisChapter = recruitedThisChapter.some(
       (unit) => unit.firstName === playerUnit.firstName
@@ -145,8 +147,11 @@ Use a dramatic, confrontational tone suitable for a boss fight.
     bossFightEvent._source.push(`remove_portrait;${boss.firstName};no_block`);
     bossFightEvent._source.push(`remove_portrait;${playerUnit.firstName}`);
 
-    bossFightEvents.push(bossFightEvent);
-  }
+    return bossFightEvent;
+  });
+
+  // Wait for all event generation to complete
+  const bossFightEvents = await Promise.all(eventPromises);
 
   return bossFightEvents;
 }
@@ -211,4 +216,3 @@ if (import.meta.main) {
     console.log(JSON.stringify(events, null, 2));
   });
 }
-

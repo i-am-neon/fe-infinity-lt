@@ -52,22 +52,39 @@ export default async function genRecruitmentEvents({
   chapterNumber: number;
   chapterIdea: ChapterIdea;
 }): Promise<RecruitmentResult> {
-  const talkSetupCommands: string[] = [];
-  const recruitmentEvents: Event[] = [];
-
+  const logger = getCurrentLogger();
+  
+  // Create a flat array of all valid recruitable/recruiter pairs to process in parallel
+  const recruitmentPairs: Array<{
+    recruitable: CharacterIdea;
+    recruiterName: string;
+    allRecruiterNames: string[];
+  }> = [];
+  
+  // Gather all valid recruitment pairs
   for (const recruitable of recruitables) {
-    // gather the recruiter firstNames
     const recruiterNames = recruiters
       .map((r) => r.firstName)
       .filter((rName) => rName !== recruitable.firstName);
-
+      
     if (recruiterNames.length === 0) continue;
-
+    
     for (const rName of recruiterNames) {
-      talkSetupCommands.push(`add_talk;${rName};${recruitable.firstName}`);
-
+      recruitmentPairs.push({
+        recruitable,
+        recruiterName: rName,
+        allRecruiterNames: recruiterNames
+      });
+    }
+  }
+  
+  // Process all pairs in parallel
+  const pairResults = await Promise.all(
+    recruitmentPairs.map(async ({ recruitable, recruiterName, allRecruiterNames }) => {
+      const talkSetupCommand = `add_talk;${recruiterName};${recruitable.firstName}`;
+      
       const systemMessage = `
-You are writing a short Fire Emblem conversation script for a talk event where a character named ${rName} recruits an ${
+You are writing a short Fire Emblem conversation script for a talk event where a character named ${recruiterName} recruits an ${
         recruitable.firstSeenAs
       } named ${recruitable.firstName}.
 They discuss reasons for joining, referencing the chapter idea context.
@@ -84,7 +101,7 @@ Use a friendly, concise tone.
           schema: conversationLinesSchema,
           systemMessage,
           prompt: JSON.stringify({
-            recruiter: rName,
+            recruiter: recruiterName,
             recruitee: recruitable.firstName,
             classDirection: recruitable.classDirection,
             personality: recruitable.personality,
@@ -94,13 +111,12 @@ Use a friendly, concise tone.
         });
       } catch {
         // fallback
-        const logger = getCurrentLogger();
         logger.error(
-          `Failed to generate recruitment conversation for ${rName} recruiting ${recruitable.firstName}`
+          `Failed to generate recruitment conversation for ${recruiterName} recruiting ${recruitable.firstName}`
         );
         conv.conversationLines = [
           {
-            name: rName,
+            name: recruiterName,
             text: "Listen, we share a common cause. Fight with us!",
           },
           {
@@ -110,12 +126,12 @@ Use a friendly, concise tone.
         ];
       }
 
-      const talkEventName = `Recruit_${recruitable.firstName}_By_${rName}`;
+      const talkEventName = `Recruit_${recruitable.firstName}_By_${recruiterName}`;
       const talkEvent: Event = {
         name: talkEventName,
         trigger: "on_talk",
         level_nid: chapterNumber.toString(),
-        condition: `unit.nid == '${rName}' and unit2.nid == '${recruitable.firstName}'`,
+        condition: `unit.nid == '${recruiterName}' and unit2.nid == '${recruitable.firstName}'`,
         commands: [],
         only_once: true,
         priority: 20,
@@ -123,7 +139,7 @@ Use a friendly, concise tone.
       };
 
       // Start conversation
-      talkEvent._source.push(`add_portrait;${rName};Left`);
+      talkEvent._source.push(`add_portrait;${recruiterName};Left`);
       talkEvent._source.push(`add_portrait;${recruitable.firstName};Right`);
 
       // Add each line of conversation
@@ -138,19 +154,26 @@ Use a friendly, concise tone.
         `speak;${recruitable.firstName};I'm in! Let's fight together.`
       );
       talkEvent._source.push(`change_team;${recruitable.firstName};player`);
-      talkEvent._source.push(`remove_portrait;${rName};no_block`);
+      talkEvent._source.push(`remove_portrait;${recruiterName};no_block`);
       talkEvent._source.push(`remove_portrait;${recruitable.firstName}`);
 
       // remove_talk for all recruiters
-      for (const otherRec of recruiterNames) {
+      for (const otherRec of allRecruiterNames) {
         talkEvent._source.push(
           `remove_talk;${otherRec};${recruitable.firstName}`
         );
       }
 
-      recruitmentEvents.push(talkEvent);
-    }
-  }
+      return {
+        talkSetupCommand,
+        talkEvent
+      };
+    })
+  );
+  
+  // Combine all results
+  const talkSetupCommands: string[] = pairResults.map(result => result.talkSetupCommand);
+  const recruitmentEvents: Event[] = pairResults.map(result => result.talkEvent);
 
   return { talkSetupCommands, recruitmentEvents };
 }
@@ -190,4 +213,3 @@ if (import.meta.main) {
     );
   })();
 }
-
