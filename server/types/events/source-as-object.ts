@@ -8,6 +8,7 @@ export const SourceAsObjectSchema = z.object({
     "give_money",
     "give_item",
     "bop_portrait",
+    "choice",
   ]),
   args: z.array(z.string()),
 }).describe(`## add_portrait
@@ -40,6 +41,9 @@ Required args: 'convoy' (should always be 'convoy'), Item Name (string)
 Causes a portrait to briefly bob up and down. Often used to illustrate a surprised or shocked reaction.
 
 Required args: character firstName (string)
+
+## choice
+Should never be used. The choice is added in after the event is written.
 `);
 
 export type SourceAsObject = z.infer<typeof SourceAsObjectSchema>;

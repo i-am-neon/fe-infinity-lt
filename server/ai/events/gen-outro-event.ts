@@ -11,6 +11,7 @@ import { AIEvent, AIEventSchema } from "@/ai/types/ai-event.ts";
 import { ChapterIdea } from "@/ai/types/chapter-idea.ts";
 import { InitialGameIdea } from "@/ai/types/initial-game-idea.ts";
 import { WorldSummary } from "@/ai/types/world-summary.ts";
+import { sluggify } from "@/lib/sluggify.ts";
 
 /**
  * Generates an AIEvent that serves as the outro scene for the chapter, wrapping up the chapter's story.
@@ -116,7 +117,17 @@ If there are issues => provide detailed fixText and set passesCheck=false.`;
   });
 
   // Process any item commands to use valid game item NIDs
-  return processEventItems(event);
+  const eventWithProcessedItems: AIEvent = await processEventItems(event);
+  // Add the choice event at the end. Example: `"choice;fates;Who do you side with?;Hoshido,Nohr,Smash",`
+  eventWithProcessedItems.sourceObjects.push({
+    command: "choice",
+    args: [
+      sluggify(chapterIdea.endOfChapterChoice.displayText),
+      chapterIdea.endOfChapterChoice.displayText,
+      chapterIdea.endOfChapterChoice.options.join(","),
+    ],
+  });
+  return eventWithProcessedItems;
 }
 
 if (import.meta.main) {
