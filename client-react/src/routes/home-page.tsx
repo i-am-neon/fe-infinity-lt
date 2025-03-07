@@ -1,7 +1,7 @@
-import { useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,17 +9,17 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 import {
   NonClosableDialog,
   NonClosableDialogContent,
   NonClosableDialogHeader,
   NonClosableDialogTitle,
-} from '@/components/ui/non-closable-dialog';
-import GameIdeaSelector from '@/components/ui/game-idea-selector';
-import GamesGrid from '@/components/ui/games-grid';
-import { ModeToggle } from '@/components/ui/theme-toggle';
-import apiCall from '@/lib/api-call';
+} from "@/components/ui/non-closable-dialog";
+import GameIdeaSelector from "@/components/ui/game-idea-selector";
+import GamesGrid from "@/components/ui/games-grid";
+import { ModeToggle } from "@/components/ui/theme-toggle";
+import apiCall from "@/lib/api-call";
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -34,17 +34,19 @@ export default function HomePage() {
       setError("No game idea selected.");
       return;
     }
-    
+
     const parts = gameIdea.split(" - ");
     const title = parts[0] ? parts[0].trim() : "";
     const description = parts[1] ? parts[1].trim() : "";
     const tone = parts[2] ? parts[2].trim() : "";
-    
+
     if (!title || !description || !tone) {
-      setError("Invalid game idea format. Expected 'Title - Description - Tone'.");
+      setError(
+        "Invalid game idea format. Expected 'Title - Description - Tone'."
+      );
       return;
     }
-    
+
     setDialogOpen(false);
     setCreatingGameModalOpen(true);
     setIsCreating(true);
@@ -59,7 +61,7 @@ export default function HomePage() {
         method: "POST",
         body: { title, description, tone },
       });
-      
+
       if (res.success && res.gameNid) {
         navigate(`/games/${res.gameNid}?new=true`);
       } else if (res.error) {
@@ -67,7 +69,8 @@ export default function HomePage() {
         setCreatingGameModalOpen(false);
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
+      const errorMessage =
+        err instanceof Error ? err.message : "Unknown error occurred";
       setError(errorMessage);
       setCreatingGameModalOpen(false);
     } finally {
@@ -79,7 +82,6 @@ export default function HomePage() {
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
         <div className="flex justify-between w-full">
-          <h1 className="text-3xl font-bold">FE Infinity</h1>
           <ModeToggle />
         </div>
 
