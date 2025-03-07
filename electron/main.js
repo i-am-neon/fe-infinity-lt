@@ -160,54 +160,58 @@ function createMainWindow() {
       let indexPath = appEntryPath || validBuildPath;
 
       if (indexPath) {
-        logger.log('info', `Attempting to load Next.js from: ${indexPath}`);
+        logger.log('info', `Attempting to load React app from: ${indexPath}`);
         
         try {
           // Check if indexPath is a directory or file
           const stats = fs.statSync(indexPath);
           
           if (stats.isDirectory()) {
-            // If it's a directory, we need to serve it with a custom protocol
-            logger.log('info', `Found build directory, setting up file protocol`);
-            
-            // Check for different HTML files in various locations
-            let htmlFile = null;
-            const possibleHtmlFiles = [
-              'index.html',
-              'static/index.html'
-            ];
-            
-            for (const file of possibleHtmlFiles) {
-              const fullPath = path.join(indexPath, file);
-              if (fs.existsSync(fullPath)) {
-                htmlFile = file;
-                logger.log('info', `Found HTML file at: ${fullPath}`);
-                break;
-              }
+            // If it's a directory, we need to load index.html from it
+            const indexHtmlPath = path.join(indexPath, 'index.html');
+            if (fs.existsSync(indexHtmlPath)) {
+              // Create file:// URL with proper formatting for loadURL
+              const fileUrl = `file://${indexHtmlPath.replace(/\\/g, '/')}`;
+              logger.log('info', `Loading from URL (directory): ${fileUrl}`);
+              mainWindow.loadURL(fileUrl);
+            } else {
+              logger.log('error', `index.html not found in directory: ${indexPath}`);
+              throw new Error(`index.html not found in directory: ${indexPath}`);
             }
-            
-            // For Next.js static export, we need to load from the file protocol
-            const fileUrl = htmlFile
-              ? `file://${indexPath}/${htmlFile}`
-              : `file://${indexPath}/`;
-              
-            logger.log('info', `Loading from URL: ${fileUrl}`);
-            mainWindow.loadURL(fileUrl);
           } else {
-            // If it's a file, load it directly
-            logger.log('info', `Loading file directly: ${indexPath}`);
-            mainWindow.loadFile(indexPath);
+            // It's a direct file (likely index.html) - use proper URL format
+            const fileUrl = `file://${indexPath.replace(/\\/g, '/')}`;
+            logger.log('info', `Loading from URL (file): ${fileUrl}`);
+            mainWindow.loadURL(fileUrl);
           }
           
-          // Set up protocol handling for Next.js routes
+          // Set up error handling
+          mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
+            logger.log('error', `Page failed to load: ${errorDescription} (${errorCode})`);
+            
+            // Show error in window
+            mainWindow.loadURL(`data:text/html;charset=utf-8,
+              <html>
+                <head><title>FE Infinity - Error</title></head>
+                <body style="font-family: Arial; padding: 2rem; color: #333;">
+                  <h2>Failed to load application</h2>
+                  <p>Error: ${errorDescription} (${errorCode})</p>
+                  <p>Please check the application logs for more details.</p>
+                </body>
+              </html>
+            `);
+          });
+          
+          // Enable DevTools in packaged app for debugging
+          mainWindow.webContents.on('did-finish-load', () => {
+            logger.log('info', 'React app loaded successfully');
+            // Uncomment to open DevTools in production for debugging
+            // mainWindow.webContents.openDevTools();
+          });
+          
+          // Set up protocol handling
           mainWindow.webContents.on('will-navigate', (event, url) => {
             const parsedUrl = new URL(url);
-            
-            // Only handle same-origin navigation
-            if (parsedUrl.protocol === 'file:') {
-              // Let it navigate normally
-              return;
-            }
             
             // For external links, open in browser
             if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
@@ -216,7 +220,7 @@ function createMainWindow() {
             }
           });
         } catch (err) {
-          logger.log('error', `Failed to load Next.js build: ${err.message}`);
+          logger.log('error', `Failed to load React app: ${err.message}`, { error: err.stack });
           
           // Fallback to a basic HTML message
           mainWindow.loadURL(`data:text/html;charset=utf-8,
@@ -525,6 +529,43 @@ ipcMain.handle('runGame', async (_, projectPath) => {
       `Failed to launch the game: ${error.message}`
     );
     return { success: false, error: error.message };
+  }
+});
+
+// IPC handler for API calls
+ipcMain.handle('api-call', async (_, args) => {
+  const { endpoint, method, body } = args;
+  
+  try {
+    // Connect to the local server
+    const url = `http://localhost:8000/${endpoint}`;
+    
+    const options = {
+      method,
+      headers: body ? { 'Content-Type': 'application/json' } : undefined,
+      body: body ? JSON.stringify(body) : undefined
+    };
+    
+    const response = await fetch(url, options);
+    const data = await response.json();
+    
+    if (!response.ok) {
+      return {
+        success: false,
+        error: data.error || `API call failed with status ${response.status}`
+      };
+    }
+    
+    return {
+      success: true,
+      data
+    };
+  } catch (error) {
+    console.error('Error in API call:', error);
+    return {
+      success: false,
+      error: error.message
+    };
   }
 });
 
