@@ -64,6 +64,13 @@
         "filter": [
           "**/*"
         ]
+      },
+      {
+        "from": "../client/public",
+        "to": "client/public",
+        "filter": [
+          "**/*"
+        ]
       }
     ],
     "directories": {

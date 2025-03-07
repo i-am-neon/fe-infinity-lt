@@ -48,14 +48,14 @@ function createMainWindow() {
 
   // Check if running in development mode
   const isDev = process.argv.includes('--dev');
-  
+
   // Load from Next.js dev server in development
   if (isDev) {
     console.log('Running in development mode');
     process.env.NODE_ENV = 'development';
     mainWindow.loadURL('http://localhost:3000');
     mainWindow.webContents.openDevTools();
-    
+
     // Start HTTP game launcher server in development mode
     startGameLauncherServer().then(server => {
       console.log('Game launcher HTTP server started successfully');
@@ -74,39 +74,40 @@ function createMainWindow() {
         path.join(__dirname, 'client/out/index.html'),                // Packaged relative
         path.join(app.getAppPath(), 'client/out/index.html'),         // From app root
         path.join(process.resourcesPath, 'client/out/index.html'),    // From resources
-        path.join(process.resourcesPath, 'app/client/out/index.html') // Nested in resources/app
+        path.join(process.resourcesPath, 'app/client/out/index.html'), // Nested in resources/app
+        path.join(process.resourcesPath, '../Resources/client/out/index.html') // macOS specific path
       ];
-      
+
       let indexPath = null;
-      
+
       // Log all path attempts for debugging
       logger.log('info', 'Searching for Next.js build output...');
       for (const possiblePath of possiblePaths) {
         const exists = fs.existsSync(possiblePath);
         logger.log('info', `Checking path: ${possiblePath}, exists: ${exists}`);
-        
+
         if (exists) {
           indexPath = possiblePath;
           logger.log('info', `Using Next.js build at: ${indexPath}`);
           break;
         }
       }
-      
+
       if (indexPath) {
         // For Next.js apps in Electron, we need to load the index.html first
         // and let the Next.js router handle the rest
         mainWindow.loadFile(indexPath);
-        
+
         // Set up protocol handling for Next.js routes
         mainWindow.webContents.on('will-navigate', (event, url) => {
           const parsedUrl = new URL(url);
-          
+
           // Only handle same-origin navigation
           if (parsedUrl.origin === 'file://') {
             // Let it navigate normally
             return;
           }
-          
+
           // For external links, open in browser
           if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
             event.preventDefault();
@@ -117,7 +118,7 @@ function createMainWindow() {
         // If we can't find the client build, show an error page
         logger.log('error', 'Could not find Next.js build output in any expected location');
         mainWindow.loadFile(path.join(__dirname, 'splash.html')); // Fallback to splash screen
-        
+
         // Show error dialog after window opens
         mainWindow.webContents.on('did-finish-load', () => {
           dialog.showErrorBox(
@@ -158,46 +159,63 @@ app.whenReady().then(async () => {
     resourcesPath: process.resourcesPath || 'not available',
     userDataPath: app.getPath('userData')
   });
-  
+
   // Set app icon for macOS dock
   if (process.platform === 'darwin') {
     try {
-      const iconPath = path.join(__dirname, '../client/public/fe-infinity-logo.png');
-      const iconPathExists = require('fs').existsSync(iconPath);
-      
-      if (iconPathExists) {
-        app.dock.setIcon(iconPath);
-        logger.log('info', 'Set macOS dock icon');
+      // Try local logo first (for packaged app)
+      const localIconPath = path.join(__dirname, 'logo.png');
+      const localIconExists = require('fs').existsSync(localIconPath);
+
+      if (localIconExists) {
+        app.dock.setIcon(localIconPath);
+        logger.log('info', 'Set macOS dock icon from local path');
       } else {
-        // Try alternative icon paths in packaged app
-        const alternativePaths = [
-          path.join(app.getAppPath(), 'client/public/fe-infinity-logo.png'),
-          path.join(process.resourcesPath, 'client/public/fe-infinity-logo.png'),
-          path.join(process.resourcesPath, 'app/client/public/fe-infinity-logo.png')
-        ];
-        
-        let foundIcon = false;
-        for (const altPath of alternativePaths) {
-          if (require('fs').existsSync(altPath)) {
-            app.dock.setIcon(altPath);
-            logger.log('info', `Set macOS dock icon from alternative path: ${altPath}`);
-            foundIcon = true;
-            break;
+        // Fall back to client public path (for development)
+        const iconPath = path.join(__dirname, '../client/public/fe-infinity-logo.png');
+        const iconPathExists = require('fs').existsSync(iconPath);
+
+        if (iconPathExists) {
+          app.dock.setIcon(iconPath);
+          logger.log('info', 'Set macOS dock icon');
+
+          // Copy icon for future use
+          try {
+            fs.copyFileSync(iconPath, localIconPath);
+            logger.log('info', 'Copied icon to local directory for future use');
+          } catch (copyErr) {
+            logger.log('warn', `Failed to copy icon: ${copyErr.message}`);
           }
-        }
-        
-        if (!foundIcon) {
-          logger.log('warn', 'Could not find app icon');
+        } else {
+          // Try alternative icon paths in packaged app
+          const alternativePaths = [
+            path.join(app.getAppPath(), 'client/public/fe-infinity-logo.png'),
+            path.join(process.resourcesPath, 'client/public/fe-infinity-logo.png'),
+            path.join(process.resourcesPath, 'app/client/public/fe-infinity-logo.png')
+          ];
+
+          let foundIcon = false;
+          for (const altPath of alternativePaths) {
+            if (require('fs').existsSync(altPath)) {
+              app.dock.setIcon(altPath);
+              logger.log('info', `Set macOS dock icon from alternative path: ${altPath}`);
+              foundIcon = true;
+              break;
+            }
+          }
+
+          if (!foundIcon) {
+            logger.log('warn', 'Could not find app icon');
+          }
         }
       }
     } catch (iconError) {
       logger.log('error', 'Error setting dock icon', { error: iconError.message });
     }
   }
-  
   createSplashWindow();
   logger.log('info', 'Splash window created');
-  
+
   try {
     // Add env variable for server logs
     process.env.ELECTRON_LOG_DIR = logDir;
@@ -210,23 +228,23 @@ app.whenReady().then(async () => {
       RESOURCES_PATH: process.resourcesPath,
       USER_DATA_PATH: app.getPath('userData')
     });
-    
+
     // Log system information to help diagnose issues
     try {
       if (process.platform === 'darwin') {
         const { execSync } = require('child_process');
-        
+
         try {
           const osVersion = execSync('sw_vers -productVersion', { encoding: 'utf8' }).trim();
           logger.log('info', `macOS version: ${osVersion}`);
         } catch (e) {
           logger.log('error', 'Failed to get macOS version');
         }
-        
+
         try {
           const homebrewInstalled = execSync('which brew || echo "Not found"', { encoding: 'utf8' }).trim();
           logger.log('info', `Homebrew path: ${homebrewInstalled}`);
-          
+
           if (homebrewInstalled !== 'Not found') {
             try {
               const denoInstalled = execSync('brew list | grep deno || echo "Not installed"', { encoding: 'utf8' }).trim();
@@ -238,7 +256,7 @@ app.whenReady().then(async () => {
         } catch (e) {
           logger.log('error', 'Failed to check Homebrew installation');
         }
-        
+
         try {
           const denoInPath = execSync('which deno || echo "Not found"', { encoding: 'utf8' }).trim();
           logger.log('info', `Deno in PATH: ${denoInPath}`);
@@ -249,15 +267,15 @@ app.whenReady().then(async () => {
     } catch (diagError) {
       logger.log('error', 'Failed to gather system diagnostics', { error: diagError.message });
     }
-    
+
     // Check for important directories
     const fs = require('fs');
-    
+
     // Check server directory
     const serverDir = path.join(app.getAppPath(), '..', 'server');
     const serverDirExists = fs.existsSync(serverDir);
     logger.log('info', `Server directory exists: ${serverDirExists}`, { path: serverDir });
-    
+
     if (!serverDirExists) {
       // Check alternative locations
       const altServerPaths = [
@@ -265,18 +283,18 @@ app.whenReady().then(async () => {
         path.join(process.resourcesPath, 'server'),
         path.join(process.resourcesPath, 'app', 'server')
       ];
-      
+
       for (const altPath of altServerPaths) {
         const exists = fs.existsSync(altPath);
         logger.log('info', `Alternative server path exists: ${exists}`, { path: altPath });
       }
     }
-    
+
     // Check LT Maker directory
     const ltMakerDir = path.join(app.getAppPath(), '..', 'lt-maker-fork');
     const ltMakerDirExists = fs.existsSync(ltMakerDir);
     logger.log('info', `LT Maker directory exists: ${ltMakerDirExists}`, { path: ltMakerDir });
-    
+
     if (!ltMakerDirExists) {
       // Check alternative locations
       const altLtMakerPaths = [
@@ -284,30 +302,30 @@ app.whenReady().then(async () => {
         path.join(process.resourcesPath, 'lt-maker-fork'),
         path.join(process.resourcesPath, 'app', 'lt-maker-fork')
       ];
-      
+
       for (const altPath of altLtMakerPaths) {
         const exists = fs.existsSync(altPath);
         logger.log('info', `Alternative LT Maker path exists: ${exists}`, { path: altPath });
       }
     }
-    
+
     // Start server components with retries
     logger.log('info', 'Starting server components...');
-    
+
     let retryCount = 0;
     const maxRetries = 3;
-    
+
     while (retryCount < maxRetries) {
       try {
         serverStarted = await startServer();
-        
+
         if (serverStarted) {
           logger.log('info', 'Server components started successfully');
           break;
         } else {
           retryCount++;
           logger.log('warn', `Server startup attempt ${retryCount} failed, ${maxRetries - retryCount} retries left`);
-          
+
           if (retryCount < maxRetries) {
             // Wait a bit before retrying
             await new Promise(resolve => setTimeout(resolve, 2000));
@@ -320,17 +338,17 @@ app.whenReady().then(async () => {
           stack: serverError.stack,
           retriesLeft: maxRetries - retryCount
         });
-        
+
         if (retryCount < maxRetries) {
           // Wait a bit before retrying
           await new Promise(resolve => setTimeout(resolve, 2000));
         }
       }
     }
-    
+
     if (!serverStarted) {
       logger.log('error', 'Server startup failed after all retry attempts');
-      
+
       if (process.platform === 'darwin') {
         dialog.showErrorBox(
           'Server Startup Failed',
@@ -348,7 +366,7 @@ app.whenReady().then(async () => {
         );
       }
     }
-    
+
     // Create main window after server starts (or fails)
     createMainWindow();
     logger.log('info', 'Main window created');
