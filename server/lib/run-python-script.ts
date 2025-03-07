@@ -1,5 +1,6 @@
 import { getPathWithinLtMaker } from "@/file-io/get-path-within-lt-maker.ts";
 import { getCurrentLogger } from "@/lib/current-logger.ts";
+import { isElectronEnvironment } from "@/lib/env-detector.ts";
 
 export default async function runPythonScript({
   pathToPythonScript,
@@ -14,7 +15,19 @@ export default async function runPythonScript({
   const logger = getCurrentLogger();
   logger.debug("Running Python script", { path: fullPath, args });
 
-  const command = new Deno.Command("python3", {
+  // Determine if we're in Electron environment
+  const isElectron = isElectronEnvironment();
+
+  // Get the appropriate Python command based on environment
+  const pythonCommand = isElectron
+    ? Deno.build.os === "windows"
+      ? "..\\bin\\python\\python.exe"
+      : "../electron/python/prefix/drive_c/users/crossover/Application Data/Python/Python311/python.exe"
+    : "python3";
+
+  logger.debug("Using Python command", { pythonCommand, isElectron });
+
+  const command = new Deno.Command(pythonCommand, {
     args: [fullPath, ...args],
     stdout: "piped",
     stderr: "piped",
@@ -46,4 +59,3 @@ if (import.meta.main) {
 
   await runPythonScript({ pathToPythonScript: scriptPath, args: scriptArgs });
 }
-

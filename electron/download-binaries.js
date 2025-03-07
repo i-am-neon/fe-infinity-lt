@@ -162,6 +162,206 @@ async function installPgVector() {
   }
 }
 
+// Download and setup Python
+async function downloadPython() {
+  console.log('Downloading Python...');
+  
+  const pythonDir = path.join(__dirname, 'python');
+  
+  // Create python directory if it doesn't exist
+  if (!fs.existsSync(pythonDir)) {
+    fs.mkdirSync(pythonDir, { recursive: true });
+  }
+  
+  let pythonUrl;
+  let pythonFileName;
+  
+  if (isWindows) {
+    // For Windows, use the embeddable package
+    pythonUrl = 'https://www.python.org/ftp/python/3.11.7/python-3.11.7-embed-amd64.zip';
+    pythonFileName = 'python-3.11.7-embed-amd64.zip';
+  } else if (isMac) {
+    // For macOS, we'll use a portable Python build (it will be executed through Wine)
+    pythonUrl = 'https://www.python.org/ftp/python/3.11.7/python-3.11.7-amd64.exe';
+    pythonFileName = 'python-3.11.7-amd64.exe';
+  } else if (isLinux) {
+    // For Linux, we'll use a portable Python build
+    pythonUrl = 'https://www.python.org/ftp/python/3.11.7/python-3.11.7-amd64.exe';
+    pythonFileName = 'python-3.11.7-amd64.exe';
+  } else {
+    console.log('Unknown platform for Python download, skipping');
+    return;
+  }
+  
+  try {
+    const downloadPath = path.join(pythonDir, pythonFileName);
+    
+    // Download Python installer/package
+    await downloadFile(pythonUrl, downloadPath);
+    console.log(`Downloaded Python to ${downloadPath}`);
+    
+    // For Windows, extract the embeddable package
+    if (isWindows) {
+      console.log('Extracting Python embeddable package...');
+      await extract(downloadPath, { dir: pythonDir });
+      
+      // Download and install pip for Windows embeddable package
+      const getPipUrl = 'https://bootstrap.pypa.io/get-pip.py';
+      const getPipPath = path.join(pythonDir, 'get-pip.py');
+      await downloadFile(getPipUrl, getPipPath);
+      
+      // Run get-pip.py
+      console.log('Installing pip...');
+      await execCommand(path.join(pythonDir, 'python.exe'), [getPipPath], { cwd: pythonDir });
+      
+      // Install required packages
+      await installPythonRequirements(path.join(pythonDir, 'python.exe'));
+    }
+    
+    // For Mac/Linux, we'll use Wine to install Python later
+    // The installation will be handled by setupPythonWithWine function
+    // which is called in the main function
+    
+    console.log('Python download completed successfully');
+  } catch (error) {
+    console.error('Failed to download or setup Python:', error);
+    // Continue anyway
+  }
+}
+
+// Install Python requirements with pip
+async function installPythonRequirements(pythonExecutable) {
+  console.log('Installing Python requirements...');
+  
+  const ltMakerPath = path.join(app.getAppPath(), isWindows ? 'lt-maker-fork' : '..', 'lt-maker-fork');
+  
+  try {
+    // Install editor requirements
+    const editorRequirementsPath = path.join(ltMakerPath, 'requirements_editor.txt');
+    console.log(`Installing editor requirements from ${editorRequirementsPath}`);
+    await execCommand(pythonExecutable, ['-m', 'pip', 'install', '-r', editorRequirementsPath]);
+    
+    // Install engine requirements
+    const engineRequirementsPath = path.join(ltMakerPath, 'requirements_engine.txt');
+    console.log(`Installing engine requirements from ${engineRequirementsPath}`);
+    await execCommand(pythonExecutable, ['-m', 'pip', 'install', '-r', engineRequirementsPath]);
+    
+    console.log('Python requirements installed successfully');
+  } catch (error) {
+    console.error('Failed to install Python requirements:', error);
+    // Continue anyway
+  }
+}
+
+// Setup Python with Wine (for macOS and Linux)
+async function setupPythonWithWine() {
+  if (isWindows) {
+    return; // Not needed on Windows
+  }
+  
+  console.log('Setting up Python with Wine...');
+  const pythonDir = path.join(__dirname, 'python');
+  const pythonInstallerPath = path.join(pythonDir, 'python-3.11.7-amd64.exe');
+  const winePath = getWinePath();
+  
+  if (!winePath || !fs.existsSync(pythonInstallerPath)) {
+    console.error('Wine not found or Python installer not downloaded');
+    return;
+  }
+  
+  try {
+    // Create a custom Wine prefix for Python
+    const pythonWinePrefix = path.join(pythonDir, 'prefix');
+    
+    if (!fs.existsSync(pythonWinePrefix)) {
+      fs.mkdirSync(pythonWinePrefix, { recursive: true });
+    }
+    
+    // Set environment variables for Wine
+    const wineEnv = {
+      ...process.env,
+      WINEDEBUG: '-all',
+      WINEPREFIX: pythonWinePrefix
+    };
+    
+    // Run Python installer silently
+    console.log('Running Python installer with Wine...');
+    await execCommand(winePath, [pythonInstallerPath, '/quiet', 'InstallAllUsers=0', 'PrependPath=1', 'Include_test=0'], {
+      env: wineEnv,
+      timeout: 120000 // 2 minutes timeout
+    });
+    
+    // Create a script to install pip and requirements
+    const pipScriptPath = path.join(pythonDir, 'install_requirements.py');
+    const pipScriptContent = `
+import subprocess
+import sys
+
+def install_package(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
+# Install pip
+print("Installing pip...")
+try:
+    import ensurepip
+    ensurepip._bootstrap()
+except ImportError:
+    print("ensurepip not available, trying get-pip.py...")
+    import urllib.request
+    urllib.request.urlretrieve("https://bootstrap.pypa.io/get-pip.py", "get-pip.py")
+    subprocess.check_call([sys.executable, "get-pip.py"])
+
+# Install requirements
+print("Installing requirements...")
+subprocess.check_call([sys.executable, "-m", "pip", "install", "pygame-ce==2.3.2", "pyinstaller==6.2.0", "typing-extensions==4.8.0", "PyQt5==5.15.10"])
+
+print("Installation complete!")
+`;
+    
+    fs.writeFileSync(pipScriptPath, pipScriptContent);
+    
+    // Run the script with Wine Python
+    console.log('Installing pip and requirements with Wine Python...');
+    await execCommand(winePath, ['python', pipScriptPath], {
+      env: wineEnv,
+      timeout: 300000 // 5 minutes timeout
+    });
+    
+    console.log('Python setup with Wine completed successfully');
+  } catch (error) {
+    console.error('Failed to setup Python with Wine:', error);
+    // Continue anyway
+  }
+}
+
+// Function to get Wine path (used by setupPythonWithWine)
+function getWinePath() {
+  if (isWindows) {
+    return null;
+  }
+  
+  // Check common locations
+  const commonPaths = [
+    '/usr/bin/wine',
+    '/usr/local/bin/wine',
+    '/opt/homebrew/bin/wine',
+    path.join(__dirname, 'wine', 'bin', 'wine')
+  ];
+  
+  for (const winePath of commonPaths) {
+    try {
+      if (fs.existsSync(winePath)) {
+        return winePath;
+      }
+    } catch (e) {
+      // Ignore errors
+    }
+  }
+  
+  // Fallback to assuming it's in PATH
+  return 'wine';
+}
+
 // Download Wine for macOS
 async function downloadWine() {
   console.log('Downloading Wine...');
@@ -261,9 +461,11 @@ async function execCommand(command, args, options = {}) {
 // Main function to run all downloads
 async function main() {
   try {
-    // Check if running on macOS in development mode
+    // Platform checks
     const isDev = process.argv.includes('--dev') || process.env.NODE_ENV === 'development';
     const isMac = process.platform === 'darwin';
+    const isWindows = process.platform === 'win32';
+    const isLinux = process.platform === 'linux';
     
     if (isMac && isDev) {
       console.log('Running on macOS in development mode');
@@ -283,9 +485,14 @@ async function main() {
     // Normal download flow
     await downloadDeno();
     
+    // Download Python for all platforms
+    await downloadPython();
+    
     // Download Wine for non-Windows platforms
-    if (process.platform !== 'win32') {
+    if (!isWindows) {
       await downloadWine();
+      // Setup Python with Wine after Wine is downloaded
+      await setupPythonWithWine();
     }
     
     if (!isMac) {

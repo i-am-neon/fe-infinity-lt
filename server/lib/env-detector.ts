@@ -1,3 +1,11 @@
+// Add type declaration to extend Deno namespace
+declare global {
+  namespace Deno {
+    // deno-lint-ignore no-explicit-any
+    var electronAPI: any;
+  }
+}
+
 /**
  * Returns true if running in an Electron environment.
  */
@@ -41,8 +49,10 @@ export function getEnvironmentDescription(): string {
     environment.push("Standalone");
   }
 
-  if (Deno.env.get("NODE_ENV") === "production" ||
-      Deno.env.get("DENO_ENV") === "production") {
+  if (
+    Deno.env.get("NODE_ENV") === "production" ||
+    Deno.env.get("DENO_ENV") === "production"
+  ) {
     environment.push("Production");
   } else {
     environment.push("Development");
@@ -55,7 +65,7 @@ export function getEnvironmentDescription(): string {
 
 if (import.meta.main) {
   console.log(`Environment: ${getEnvironmentDescription()}`);
-  isPostgresAvailable().then(available => {
+  isPostgresAvailable().then((available) => {
     console.log(`PostgreSQL available: ${available}`);
   });
 }

@@ -76,6 +76,34 @@ function getLtMakerPath() {
   return path.join(app.getAppPath(), 'lt-maker-fork');
 }
 
+// Get path to bundled Python
+function getBundledPythonPath() {
+  if (process.platform === 'win32') {
+    // Windows uses the embedded Python directly
+    return path.join(app.getAppPath(), 'bin', 'python', 'python.exe');
+  } else {
+    // macOS and Linux use Wine
+    // Return the Wine Python path (this is the path within the Wine environment)
+    return 'python';
+  }
+}
+
+// Get Wine Python environment variables
+function getWinePythonEnv() {
+  if (process.platform === 'win32') {
+    return process.env;
+  }
+  
+  // For macOS and Linux, set up Wine environment variables
+  const pythonWinePrefix = path.join(app.getAppPath(), 'bin', 'python', 'prefix');
+  return {
+    ...process.env,
+    WINEDEBUG: '-all',
+    WINEDLLOVERRIDES: 'mscoree,mshtml=',
+    WINEPREFIX: pythonWinePrefix || `${require('os').homedir()}/.wine`
+  };
+}
+
 // Run a game using Wine and Python
 async function runGameWithWine(projectNameEndingInDotLtProj) {
   return new Promise((resolve, reject) => {
@@ -119,21 +147,21 @@ async function runGameWithWine(projectNameEndingInDotLtProj) {
           return;
         }
         
+        // Get the bundled Python environment
+        const pythonEnv = getWinePythonEnv();
+        
+        console.log('Using bundled Python with Wine');
+        
         const wineProcess = spawn(
           winePath,
           [
-            'python',
+            getBundledPythonPath(),
             'run_engine_for_project.py',
             normalizedProjectPath
           ],
           {
             cwd: ltMakerPath,
-            env: {
-              ...process.env,
-              WINEDEBUG: '-all', // Reduce Wine debug output
-              WINEDLLOVERRIDES: 'mscoree,mshtml=',  // Prevent Wine from showing error dialogs
-              WINEPREFIX: process.env.WINEPREFIX || `${require('os').homedir()}/.wine`,  // Use consistent Wine prefix
-            }
+            env: pythonEnv
           }
         );
         
@@ -179,9 +207,12 @@ from your terminal.`;
           }
         });
       } else {
-        // On Windows, we run Python directly
+        // On Windows, we run our bundled Python directly
+        const pythonPath = getBundledPythonPath();
+        console.log(`Using bundled Python: ${pythonPath}`);
+        
         const pythonProcess = spawn(
-          'python',
+          pythonPath,
           [
             'run_engine_for_project.py',
             projectNameEndingInDotLtProj
