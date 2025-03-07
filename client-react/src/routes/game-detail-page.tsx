@@ -247,7 +247,7 @@ export default function GameDetailPage() {
 
   return (
     <>
-      {/* {newGameModalOpen && (
+      {newGameModalOpen && (
         <NonClosableDialog
           open={newGameModalOpen}
           onOpenChange={(open) => {
@@ -302,7 +302,7 @@ export default function GameDetailPage() {
             )}
           </NonClosableDialogContent>
         </NonClosableDialog>
-      )} */}
+      )}
 
       {/* Next Chapter Confirmation Dialog */}
       <AlertDialog
