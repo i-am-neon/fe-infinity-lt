@@ -12,18 +12,18 @@ let serverReady = false;
 const getDataDir = () => {
   const userDataPath = app.getPath('userData');
   const dataDir = path.join(userDataPath, 'data');
-  
+
   if (!fs.existsSync(dataDir)) {
     fs.mkdirSync(dataDir, { recursive: true });
   }
-  
+
   return dataDir;
 };
 
 // Set up environment variables for the server
 const getServerEnv = () => {
   const dataDir = getDataDir();
-  
+
   return {
     ...process.env,
     // PostgreSQL connection details (for embedded PostgreSQL)
@@ -42,25 +42,25 @@ const startPostgres = () => {
   return new Promise((resolve, reject) => {
     const dataDir = getDataDir();
     const pgDataDir = path.join(dataDir, 'pgdata');
-    
+
     // Create PostgreSQL data directory if it doesn't exist
     if (!fs.existsSync(pgDataDir)) {
       fs.mkdirSync(pgDataDir, { recursive: true });
-      
+
       // Initialize PostgreSQL database
       const pgInitProcess = spawn(
         path.join(__dirname, 'bin', process.platform === 'win32' ? 'initdb.exe' : 'initdb'),
         ['-D', pgDataDir, '-U', 'postgres', '--auth=trust'],
         { env: process.env }
       );
-      
+
       pgInitProcess.on('close', (code) => {
         if (code !== 0) {
           console.error('Failed to initialize PostgreSQL database');
           reject(new Error('PostgreSQL initialization failed'));
           return;
         }
-        
+
         startPostgresServer(pgDataDir, resolve, reject);
       });
     } else {
@@ -76,7 +76,7 @@ const startPostgresServer = (pgDataDir, resolve, reject) => {
     ['-D', pgDataDir],
     { env: process.env }
   );
-  
+
   pgProcess.stdout.on('data', (data) => {
     console.log(`PostgreSQL: ${data}`);
     if (data.toString().includes('database system is ready to accept connections')) {
@@ -84,17 +84,17 @@ const startPostgresServer = (pgDataDir, resolve, reject) => {
       resolve();
     }
   });
-  
+
   pgProcess.stderr.on('data', (data) => {
     console.error(`PostgreSQL error: ${data}`);
     // Still continue even with some errors as PostgreSQL might output warnings
   });
-  
+
   pgProcess.on('error', (err) => {
     console.error('Failed to start PostgreSQL server:', err);
     reject(err);
   });
-  
+
   // Set timeout in case PostgreSQL doesn't start properly
   setTimeout(() => {
     if (pgProcess) {
@@ -107,12 +107,12 @@ const startPostgresServer = (pgDataDir, resolve, reject) => {
 const startDenoServer = () => {
   return new Promise((resolve, reject) => {
     const serverPath = path.join(__dirname, '..', 'server');
-    
+
     // Check if server path exists in packaged app
     if (!fs.existsSync(serverPath)) {
       logger.log('error', 'Server directory does not exist', { path: serverPath });
       console.error('Server directory does not exist at:', serverPath);
-      
+
       // Try alternative paths in packaged app
       const alternativePaths = [
         path.join(app.getAppPath(), 'server'),
@@ -120,12 +120,12 @@ const startDenoServer = () => {
         path.join(process.resourcesPath, 'server'),
         path.join(process.resourcesPath, 'app', 'server')
       ];
-      
+
       let foundPath = null;
       for (const altPath of alternativePaths) {
         logger.log('info', `Checking alternative server path: ${altPath}`);
         console.log(`Checking alternative server path: ${altPath}`);
-        
+
         if (fs.existsSync(altPath)) {
           logger.log('info', `Found server at alternative path: ${altPath}`);
           console.log(`Found server at alternative path: ${altPath}`);
@@ -133,7 +133,7 @@ const startDenoServer = () => {
           break;
         }
       }
-      
+
       if (foundPath) {
         logger.log('info', `Using alternative server path: ${foundPath}`);
         console.log(`Using alternative server path: ${foundPath}`);
@@ -143,11 +143,11 @@ const startDenoServer = () => {
         return reject(new Error('Cannot find server directory in any expected location'));
       }
     }
-    
+
     // For development, use system Deno instead of bundled one
     const isDev = process.argv.includes('--dev') || process.env.NODE_ENV === 'development';
     const isMac = process.platform === 'darwin';
-    
+
     // On macOS, prefer system Deno for both dev and production
     let denoCommand;
     if (isMac) {
@@ -165,7 +165,7 @@ const startDenoServer = () => {
           '/usr/bin/deno',
           path.join(app.getPath('home'), '.deno/bin/deno')
         ];
-        
+
         for (const loc of commonLocations) {
           if (fs.existsSync(loc)) {
             denoCommand = loc;
@@ -174,7 +174,7 @@ const startDenoServer = () => {
             break;
           }
         }
-        
+
         // If still not found, fall back to bundled version or 'deno' command
         if (!denoCommand) {
           const bundledDeno = path.join(__dirname, 'bin', 'deno');
@@ -190,24 +190,24 @@ const startDenoServer = () => {
     } else {
       // For Windows/Linux, use bundled or system Deno based on dev mode
       denoCommand = isDev ? 'deno' : path.join(__dirname, 'bin', process.platform === 'win32' ? 'deno.exe' : 'deno');
-      
+
       // Verify bundled Deno exists in production mode
       if (!isDev && !fs.existsSync(denoCommand)) {
         logger.log('error', `Bundled Deno not found at: ${denoCommand}, falling back to system Deno`);
         denoCommand = 'deno'; // Fallback to system Deno
       }
     }
-    
+
     logger.log('info', `Starting Deno server with command: ${denoCommand}`);
     console.log(`Starting Deno server with command: ${denoCommand}`);
-    
+
     // Add additional environment variables to help with path resolution
     const appRoot = app.getAppPath();
     const resourcesPath = process.resourcesPath || appRoot;
-    
+
     // Try to find lt-maker-fork in various locations
     let ltMakerPath = path.resolve(appRoot, 'lt-maker-fork');
-    
+
     if (!fs.existsSync(ltMakerPath)) {
       const possibleLtMakerPaths = [
         path.join(appRoot, '..', 'lt-maker-fork'),
@@ -215,7 +215,7 @@ const startDenoServer = () => {
         path.join(resourcesPath, 'app', 'lt-maker-fork'),
         path.join(app.getPath('userData'), 'lt-maker-fork')
       ];
-      
+
       for (const possiblePath of possibleLtMakerPaths) {
         if (fs.existsSync(possiblePath)) {
           ltMakerPath = possiblePath;
@@ -223,7 +223,7 @@ const startDenoServer = () => {
         }
       }
     }
-    
+
     logger.log('info', 'Path information', {
       electronAppRoot: appRoot,
       resourcesPath: resourcesPath,
@@ -234,7 +234,7 @@ const startDenoServer = () => {
     console.log('Resources path:', resourcesPath);
     console.log('LT Maker path:', ltMakerPath);
     console.log('Server path:', serverPath);
-    
+
     // Check if lt-maker directory exists
     try {
       if (fs.existsSync(ltMakerPath)) {
@@ -248,10 +248,10 @@ const startDenoServer = () => {
       logger.log('error', 'Error checking LT Maker directory', { error: error.message });
       console.error('Error checking LT Maker directory:', error);
     }
-    
+
     // Get log directory from environment or use default
     const logDir = process.env.ELECTRON_LOG_DIR || path.join(serverPath, '_logs');
-    
+
     // Ensure log directory exists
     try {
       if (!fs.existsSync(logDir)) {
@@ -261,9 +261,9 @@ const startDenoServer = () => {
     } catch (logDirError) {
       logger.log('error', `Failed to create log directory: ${logDirError.message}`);
     }
-    
+
     logger.log('info', `Using log directory for Deno server: ${logDir}`);
-    
+
     const serverEnv = {
       ...getServerEnv(),
       ELECTRON_APP_ROOT: appRoot,
@@ -292,13 +292,13 @@ const startDenoServer = () => {
     denoProcess = spawn(
       denoCommand,
       ['run', '--allow-all', 'server.ts'],
-      { 
+      {
         cwd: serverPath,
         env: serverEnv,
         shell: isMac // Use shell on macOS
       }
     );
-    
+
     denoProcess.stdout.on('data', (data) => {
       const output = data.toString();
       logger.log('info', `Deno server output: ${output}`);
@@ -306,14 +306,14 @@ const startDenoServer = () => {
       serverReady = true;
       resolve();
     });
-    
+
     denoProcess.stderr.on('data', (data) => {
       const error = data.toString();
       logger.log('error', `Deno server error: ${error}`);
       console.error(`Deno server error: ${error}`);
       // Don't reject on stderr, as Deno might output warnings here
     });
-    
+
     denoProcess.on('error', (err) => {
       logger.log('error', 'Failed to start Deno server', {
         error: err.message,
@@ -321,18 +321,13 @@ const startDenoServer = () => {
         stack: err.stack
       });
       console.error('Failed to start Deno server:', err);
-      
-      // Try fallback for both dev and production on macOS
-      if (isMac) {
-        logger.log('info', 'Attempting to use global Deno installation...');
-        console.log('Attempting to use global Deno installation...');
-        // Try using deno from PATH as fallback
-        startDenoServerFallback(serverPath, resolve, reject);
-      } else {
-        reject(err);
-      }
+
+      // We don't want to use system binaries as fallback anymore
+      logger.log('error', 'Failed to start Deno server - not attempting fallback');
+      console.error('Failed to start Deno server - not attempting fallback');
+      reject(err);
     });
-    
+
     // Resolve after timeout to not block app startup
     setTimeout(() => {
       if (!serverReady) {
@@ -345,11 +340,14 @@ const startDenoServer = () => {
   });
 };
 
-// Fallback method for starting Deno (works in both dev and production)
+// Fallback method for starting Deno (only for bundled binaries)
 const startDenoServerFallback = (serverPath, resolve, reject) => {
+  logger.log('error', 'Deno server failed to start with primary method - attempting bundled binary only fallback');
+  console.error('Deno server failed to start with primary method - attempting bundled binary only fallback');
+
   // Get log directory from environment or use default
   const logDir = process.env.ELECTRON_LOG_DIR || path.join(serverPath, '_logs');
-  
+
   // Ensure log directory exists
   try {
     if (!fs.existsSync(logDir)) {
@@ -358,13 +356,13 @@ const startDenoServerFallback = (serverPath, resolve, reject) => {
   } catch (e) {
     logger.log('error', `Failed to create log directory: ${e.message}`);
   }
-  
+
   logger.log('info', `Using log directory for Deno server fallback: ${logDir}`);
-  
+
   // Try to find LT Maker path
   const appRoot = app.getAppPath();
   const resourcesPath = process.resourcesPath || appRoot;
-  
+
   let ltMakerPath = path.resolve(appRoot, 'lt-maker-fork');
   if (!fs.existsSync(ltMakerPath)) {
     const possibleLtMakerPaths = [
@@ -373,7 +371,7 @@ const startDenoServerFallback = (serverPath, resolve, reject) => {
       path.join(resourcesPath, 'app', 'lt-maker-fork'),
       path.join(app.getPath('userData'), 'lt-maker-fork')
     ];
-    
+
     for (const possiblePath of possibleLtMakerPaths) {
       if (fs.existsSync(possiblePath)) {
         ltMakerPath = possiblePath;
@@ -382,7 +380,7 @@ const startDenoServerFallback = (serverPath, resolve, reject) => {
       }
     }
   }
-  
+
   // Add additional environment variables to help with path resolution
   const serverEnv = {
     ...getServerEnv(),
@@ -395,92 +393,26 @@ const startDenoServerFallback = (serverPath, resolve, reject) => {
     NODE_ENV: process.env.NODE_ENV || 'production'
   };
 
-  // Try different approaches to start Deno
-  const isMac = process.platform === 'darwin';
-  let denoCommand, args;
-  
-  if (isMac) {
-    // For macOS, try to find Deno in the system
-    try {
-      const { execSync } = require('child_process');
-      
-      // Check if Deno is installed with Homebrew
-      try {
-        execSync('which brew', { stdio: 'ignore' });
-        logger.log('info', 'Homebrew is installed, checking for Deno');
-        
-        try {
-          const denoPath = execSync('brew --prefix deno 2>/dev/null || echo ""', { encoding: 'utf8' }).trim();
-          if (denoPath && fs.existsSync(path.join(denoPath, 'bin/deno'))) {
-            denoCommand = path.join(denoPath, 'bin/deno');
-            logger.log('info', `Found Deno installed via Homebrew at: ${denoCommand}`);
-          }
-        } catch (e) {
-          logger.log('info', 'Deno not found via Homebrew');
-        }
-      } catch (e) {
-        logger.log('info', 'Homebrew not installed or not in PATH');
-      }
-      
-      // If not found through Homebrew, try which
-      if (!denoCommand) {
-        try {
-          denoCommand = execSync('which deno', { encoding: 'utf8' }).trim();
-          logger.log('info', `Found Deno in PATH at: ${denoCommand}`);
-        } catch (e) {
-          logger.log('info', 'Deno not found in PATH');
-        }
-      }
-      
-      // If still not found, check common locations
-      if (!denoCommand) {
-        const commonLocations = [
-          '/usr/local/bin/deno',
-          '/opt/homebrew/bin/deno',
-          '/usr/bin/deno',
-          path.join(app.getPath('home'), '.deno/bin/deno')
-        ];
-        
-        for (const loc of commonLocations) {
-          if (fs.existsSync(loc)) {
-            denoCommand = loc;
-            logger.log('info', `Found Deno at common location: ${denoCommand}`);
-            break;
-          }
-        }
-      }
-      
-      // If still not found, last resort is to try /usr/bin/env
-      if (!denoCommand) {
-        denoCommand = '/usr/bin/env';
-        args = ['deno', 'run', '--allow-all', 'server.ts'];
-        logger.log('info', 'Using /usr/bin/env as last resort to find Deno');
-      } else {
-        args = ['run', '--allow-all', 'server.ts'];
-      }
-    } catch (e) {
-      logger.log('error', `Error finding Deno: ${e.message}`);
-      denoCommand = '/usr/bin/env';
-      args = ['deno', 'run', '--allow-all', 'server.ts'];
-    }
-  } else {
-    // For Windows/Linux, try system deno as fallback
-    denoCommand = 'deno';
-    args = ['run', '--allow-all', 'server.ts'];
+  // Try ONLY using bundled Deno
+  const bundledDenoPath = path.join(__dirname, 'bin', process.platform === 'win32' ? 'deno.exe' : 'deno');
+
+  if (!fs.existsSync(bundledDenoPath)) {
+    const errorMessage = `Bundled Deno not found at ${bundledDenoPath}`;
+    logger.log('error', errorMessage);
+    console.error(errorMessage);
+    reject(new Error(errorMessage));
+    return;
   }
 
-  logger.log('info', 'Starting Deno with fallback method', {
-    command: denoCommand,
-    args: args,
-    cwd: serverPath
-  });
-  
+  logger.log('info', `Using bundled Deno at: ${bundledDenoPath}`);
+  console.log(`Using bundled Deno at: ${bundledDenoPath}`);
+
   // Log current working directory and file existence
   try {
     const serverTsPath = path.join(serverPath, 'server.ts');
     const serverTsExists = fs.existsSync(serverTsPath);
     logger.log('info', `server.ts exists: ${serverTsExists}`, { path: serverTsPath });
-    
+
     if (!serverTsExists) {
       // Check other potential locations
       const otherPotentialPaths = [
@@ -488,11 +420,11 @@ const startDenoServerFallback = (serverPath, resolve, reject) => {
         path.join(resourcesPath, 'server', 'server.ts'),
         path.join(resourcesPath, 'app', 'server', 'server.ts')
       ];
-      
+
       for (const potentialPath of otherPotentialPaths) {
         const exists = fs.existsSync(potentialPath);
         logger.log('info', `Alternative server.ts path exists: ${exists}`, { path: potentialPath });
-        
+
         if (exists) {
           serverPath = path.dirname(potentialPath);
           logger.log('info', `Using alternative server path: ${serverPath}`);
@@ -505,57 +437,37 @@ const startDenoServerFallback = (serverPath, resolve, reject) => {
   }
 
   denoProcess = spawn(
-    denoCommand,
-    args,
-    { 
+    bundledDenoPath,
+    ['run', '--allow-all', 'server.ts'],
+    {
       cwd: serverPath,
-      env: serverEnv,
-      shell: true
+      env: serverEnv
     }
   );
-  
+
   denoProcess.stdout.on('data', (data) => {
     const output = data.toString();
-    logger.log('info', `Deno server (fallback) output: ${output}`);
-    console.log(`Deno server (fallback): ${output}`);
+    logger.log('info', `Deno server (bundled fallback) output: ${output}`);
+    console.log(`Deno server (bundled fallback): ${output}`);
     serverReady = true;
     resolve();
   });
-  
+
   denoProcess.stderr.on('data', (data) => {
     const error = data.toString();
-    logger.log('error', `Deno server error (fallback): ${error}`);
-    console.error(`Deno server error (fallback): ${error}`);
+    logger.log('error', `Deno server error (bundled fallback): ${error}`);
+    console.error(`Deno server error (bundled fallback): ${error}`);
   });
-  
+
   denoProcess.on('error', (err) => {
-    logger.log('error', 'Failed to start Deno server with fallback', {
+    logger.log('error', 'Failed to start Deno server with bundled fallback', {
       error: err.message,
       code: err.code,
       stack: err.stack
     });
-    console.error('Failed to start Deno server with fallback:', err);
-    
-    // As a last resort, set serverReady = true after a delay
-    // This will allow the app to start, but functionality that depends on the server won't work
-    logger.log('warn', 'Setting serverReady = true despite failure to allow app to start');
-    console.warn('Setting serverReady = true despite failure to allow app to start');
-    
-    setTimeout(() => {
-      serverReady = true;
-      resolve();
-    }, 1000);
+    console.error('Failed to start Deno server with bundled fallback:', err);
+    reject(err);
   });
-  
-  // Set a timeout to resolve anyway, as last resort
-  setTimeout(() => {
-    if (!serverReady) {
-      logger.log('warn', 'Fallback timeout reached, forcing serverReady = true');
-      console.warn('Fallback timeout reached, forcing serverReady = true');
-      serverReady = true;
-      resolve();
-    }
-  }, 10000);
 };
 
 // Initialize the vector database
@@ -563,16 +475,16 @@ const initVectorDb = async () => {
   // Use Deno to run the initialization script
   const denoExecutable = path.join(__dirname, 'bin', process.platform === 'win32' ? 'deno.exe' : 'deno');
   const serverPath = path.join(__dirname, '..', 'server');
-  
+
   const vectorDbInitProcess = spawn(
     denoExecutable,
     ['run', '--allow-all', 'vector-db/init.ts'],
-    { 
+    {
       cwd: serverPath,
       env: getServerEnv()
     }
   );
-  
+
   return new Promise((resolve) => {
     vectorDbInitProcess.on('close', (code) => {
       if (code !== 0) {
@@ -589,16 +501,16 @@ const initVectorDb = async () => {
 const seedVectorDb = async () => {
   const denoExecutable = path.join(__dirname, 'bin', process.platform === 'win32' ? 'deno.exe' : 'deno');
   const serverPath = path.join(__dirname, '..', 'server');
-  
+
   const vectorDbSeedProcess = spawn(
     denoExecutable,
     ['run', '--allow-all', 'vector-db/seed-vectors.ts'],
-    { 
+    {
       cwd: serverPath,
       env: getServerEnv()
     }
   );
-  
+
   return new Promise((resolve) => {
     vectorDbSeedProcess.on('close', (code) => {
       if (code !== 0) {
@@ -611,17 +523,124 @@ const seedVectorDb = async () => {
   });
 };
 
+// Function to get Wine path (used by setupPythonWithWine)
+function getWinePath() {
+  if (isWindows) {
+    return null;
+  }
+
+  // Always use bundled Wine
+  const bundledWinePath = path.join(__dirname, 'bin', 'wine', 'bin', 'wine');
+
+  if (!fs.existsSync(bundledWinePath)) {
+    const errorMessage = `ERROR: Bundled Wine not found at ${bundledWinePath}`;
+    logger.log('error', errorMessage);
+    console.error(errorMessage);
+    throw new Error(errorMessage);
+  }
+
+  logger.log('info', `Using bundled Wine at: ${bundledWinePath}`);
+  return bundledWinePath;
+}
+
+// Setup Python with Wine (for macOS and Linux)
+async function setupPythonWithWine() {
+  if (isWindows) {
+    return; // Not needed on Windows
+  }
+
+  console.log('Setting up Python with Wine...');
+  const pythonDir = path.join(__dirname, 'bin', 'python');
+  const pythonInstallerPath = path.join(pythonDir, 'python-3.11.7-amd64.exe');
+  const winePath = getWinePath();
+
+  if (!fs.existsSync(pythonInstallerPath)) {
+    console.error('Python installer not downloaded');
+    return;
+  }
+
+  if (!winePath) {
+    console.error('Bundled Wine not found - cannot set up Python with Wine');
+    throw new Error('Bundled Wine not found - cannot set up Python with Wine');
+  }
+
+  try {
+    // Create a custom Wine prefix for Python
+    const pythonWinePrefix = path.join(pythonDir, 'prefix');
+
+    if (!fs.existsSync(pythonWinePrefix)) {
+      fs.mkdirSync(pythonWinePrefix, { recursive: true });
+    }
+
+    // Set environment variables for Wine
+    const wineEnv = {
+      ...process.env,
+      WINEDEBUG: '-all',
+      WINEPREFIX: pythonWinePrefix
+    };
+
+    // Run Python installer silently
+    console.log('Running Python installer with Wine...');
+    await execCommand(winePath, [pythonInstallerPath, '/quiet', 'InstallAllUsers=0', 'PrependPath=1', 'Include_test=0'], {
+      env: wineEnv,
+      timeout: 120000 // 2 minutes timeout
+    });
+
+    // Create a script to install pip and requirements
+    const pipScriptPath = path.join(pythonDir, 'install_requirements.py');
+    const pipScriptContent = `
+import subprocess
+import sys
+
+def install_package(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
+# Install pip
+print("Installing pip...")
+try:
+    import ensurepip
+    ensurepip._bootstrap()
+except ImportError:
+    print("ensurepip not available, trying get-pip.py...")
+    import urllib.request
+    urllib.request.urlretrieve("https://bootstrap.pypa.io/get-pip.py", "get-pip.py")
+    subprocess.check_call([sys.executable, "get-pip.py"])
+
+# Install requirements
+print("Installing requirements...")
+subprocess.check_call([sys.executable, "-m", "pip", "install", "pygame-ce==2.3.2", "pyinstaller==6.2.0", "typing-extensions==4.8.0", "PyQt5==5.15.10"])
+
+print("Installation complete!")
+`;
+
+    fs.writeFileSync(pipScriptPath, pipScriptContent);
+
+    // Run the script with Wine Python
+    console.log('Installing pip and requirements with Wine Python...');
+    await execCommand(winePath, ['python', pipScriptPath], {
+      env: wineEnv,
+      timeout: 300000 // 5 minutes timeout
+    });
+
+    console.log('Python setup with Wine completed successfully');
+  } catch (error) {
+    console.error('Failed to setup Python with Wine:', error);
+    // Continue anyway
+  }
+}
+
 // Start all required services
 const startServer = async () => {
   try {
     const isDev = process.argv.includes('--dev');
     const isMac = process.platform === 'darwin';
+    const isWindows = process.platform === 'win32';
     logger.log('info', 'Starting server components', { isDev: isDev, platform: process.platform });
-    
+
     // Skip PostgreSQL on macOS (both in dev and production)
     if (isMac) {
-      logger.log('info', 'On macOS, skipping PostgreSQL startup (assuming it\'s running or using SQLite fallback)');
-      console.log('On macOS, skipping PostgreSQL startup (assuming it\'s running or using SQLite fallback)');
+      logger.log('info', 'On macOS, skipping PostgreSQL startup (using SQLite fallback)');
+      console.log('On macOS, skipping PostgreSQL startup (using SQLite fallback)');
     } else {
       // Start PostgreSQL on other platforms
       try {
@@ -634,10 +653,10 @@ const startServer = async () => {
         // Continue even if PostgreSQL fails - our adapter can handle it
       }
     }
-    
+
     // Start Deno server, which will initialize everything else
     logger.log('info', 'Starting Deno server...');
-    
+
     try {
       await startDenoServer();
     } catch (denoError) {
@@ -646,100 +665,16 @@ const startServer = async () => {
         stack: denoError.stack
       });
       console.error('Primary Deno server startup failed, trying fallback method:', denoError);
-      
-      // Always try fallback on macOS, not just in dev mode
-      if (isMac) {
-        try {
-          // Find system-installed Deno on macOS
-          const { execSync } = require('child_process');
-          let denoPath;
-          
-          try {
-            denoPath = execSync('which deno', { encoding: 'utf8' }).trim();
-            logger.log('info', `Found system Deno at: ${denoPath}`);
-            console.log(`Found system Deno at: ${denoPath}`);
-          } catch (whichErr) {
-            // If 'which' fails, try common locations
-            const commonPaths = [
-              '/usr/local/bin/deno',
-              '/opt/homebrew/bin/deno',
-              '/usr/bin/deno'
-            ];
-            
-            for (const path of commonPaths) {
-              try {
-                if (require('fs').existsSync(path)) {
-                  denoPath = path;
-                  logger.log('info', `Found system Deno at common path: ${denoPath}`);
-                  console.log(`Found system Deno at common path: ${denoPath}`);
-                  break;
-                }
-              } catch (e) {
-                // Ignore and keep trying
-              }
-            }
-          }
-          
-          if (denoPath) {
-            // Use system Deno as fallback
-            const serverPath = path.join(__dirname, '..', 'server');
-            
-            logger.log('info', 'Starting Deno with system installation');
-            console.log('Starting Deno with system installation');
-            
-            const logDir = process.env.ELECTRON_LOG_DIR || path.join(serverPath, '_logs');
-            
-            const serverEnv = {
-              ...getServerEnv(),
-              ELECTRON_APP_ROOT: path.resolve(__dirname, '..'),
-              LT_MAKER_PATH: path.join(path.resolve(__dirname, '..'), 'lt-maker-fork'),
-              SERVER_DIR: serverPath,
-              DENO_ENV: process.env.NODE_ENV || 'production',
-              ELECTRON_LOG_DIR: logDir
-            };
-            
-            denoProcess = spawn(
-              denoPath,
-              ['run', '--allow-all', 'server.ts'],
-              {
-                cwd: serverPath,
-                env: serverEnv,
-                shell: true
-              }
-            );
-            
-            denoProcess.stdout.on('data', (data) => {
-              const output = data.toString();
-              logger.log('info', `Deno server (system fallback) output: ${output}`);
-              console.log(`Deno server (system fallback): ${output}`);
-              serverReady = true;
-            });
-            
-            denoProcess.stderr.on('data', (data) => {
-              const error = data.toString();
-              logger.log('error', `Deno server error (system fallback): ${error}`);
-              console.error(`Deno server error (system fallback): ${error}`);
-            });
-            
-            // Resolve after timeout to not block app startup
-            await new Promise(resolve => setTimeout(resolve, 3000));
-            serverReady = true;
-          } else {
-            throw new Error('Could not find system Deno installation');
-          }
-        } catch (fallbackErr) {
-          logger.log('error', 'Fallback Deno server startup also failed', {
-            error: fallbackErr.message,
-            stack: fallbackErr.stack
-          });
-          console.error('Fallback Deno server startup also failed:', fallbackErr);
-          throw fallbackErr; // Re-throw to the outer catch
-        }
-      } else {
-        throw denoError; // Re-throw for non-macOS platforms
-      }
+
+      // We don't want to use system binaries as fallback
+      logger.log('error', 'Deno server startup failed - not attempting fallback to system binaries', {
+        error: denoError.message,
+        stack: denoError.stack
+      });
+      console.error('Deno server startup failed - not attempting fallback to system binaries:', denoError);
+      throw denoError; // Re-throw the error for all platforms
     }
-    
+
     logger.log('info', 'All server components started successfully');
     console.log('All server components started successfully');
     return true;
@@ -749,35 +684,35 @@ const startServer = async () => {
       stack: error.stack
     });
     console.error('Server startup failed:', error);
-    
+
     // Log system information to help diagnose the issue
     try {
       const { execSync } = require('child_process');
       let systemInfo = {};
-      
+
       if (process.platform === 'darwin') {
         systemInfo.osVersion = execSync('sw_vers -productVersion', { encoding: 'utf8' }).trim();
         systemInfo.architecture = execSync('uname -m', { encoding: 'utf8' }).trim();
-        
+
         try {
           systemInfo.denoVersion = execSync('deno --version', { encoding: 'utf8' }).trim();
         } catch (e) {
           systemInfo.denoVersion = 'Not found or not in PATH';
         }
-        
+
         try {
           systemInfo.homebrewInstalled = execSync('which brew', { encoding: 'utf8' }).trim();
         } catch (e) {
           systemInfo.homebrewInstalled = 'Not found';
         }
       }
-      
+
       logger.log('info', 'System diagnostic information', systemInfo);
       console.log('System diagnostic information:', systemInfo);
     } catch (diagError) {
       logger.log('error', 'Failed to gather system diagnostics', { error: diagError.message });
     }
-    
+
     return false;
   }
 };
@@ -790,14 +725,14 @@ const stopServer = () => {
     denoProcess.kill();
     denoProcess = null;
   }
-  
+
   if (pgProcess) {
     logger.log('info', 'Stopping PostgreSQL server...');
     console.log('Stopping PostgreSQL server...');
     pgProcess.kill();
     pgProcess = null;
   }
-  
+
   serverReady = false;
   logger.log('info', 'All server components stopped');
 };

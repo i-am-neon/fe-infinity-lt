@@ -3,72 +3,25 @@ const path = require('path');
 const fs = require('fs');
 const { app } = require('electron');
 
-// Get path to bundled Wine or use system Wine
+// Get path to bundled Wine only, never use system Wine
 function getWinePath() {
-  // In production, use bundled Wine
-  if (process.env.NODE_ENV === 'production') {
-    if (process.platform === 'darwin') {
-      return path.join(app.getAppPath(), 'bin', 'wine', 'bin', 'wine');
-    } else if (process.platform === 'linux') {
-      return path.join(app.getAppPath(), 'bin', 'wine', 'bin', 'wine');
-    } else {
-      // On Windows, we don't need Wine
-      return null;
-    }
+  if (process.platform === 'windows') {
+    // On Windows, we don't need Wine
+    return null;
   }
   
-  // In development, try to find Wine in common locations
-  if (process.platform === 'darwin') {
-    // Try using 'which' to find wine
-    try {
-      const { execSync } = require('child_process');
-      const winePath = execSync('which wine', { encoding: 'utf8' }).trim();
-      
-      // Verify wine actually works
-      try {
-        execSync(`${winePath} --version`, { stdio: 'ignore' });
-        console.log(`Verified working Wine at: ${winePath}`);
-        return winePath;
-      } catch (e) {
-        console.warn(`Found Wine at ${winePath} but it appears non-functional`);
-      }
-    } catch (e) {
-      // which command failed, continue to path checking
-    }
-    
-    // Check common macOS Wine installation paths
-    const commonPaths = [
-      '/usr/local/bin/wine',
-      '/opt/homebrew/bin/wine',
-      '/Applications/Wine Stable.app/Contents/Resources/wine/bin/wine',
-      '/usr/bin/wine',
-      path.join(require('os').homedir(), '.wine/bin/wine')
-    ];
-    
-    // Check if any of these paths exist and are executable
-    for (const winePath of commonPaths) {
-      try {
-        if (fs.existsSync(winePath) && fs.accessSync(winePath, fs.constants.X_OK) === undefined) {
-          // Try to verify it works
-          try {
-            const { execSync } = require('child_process');
-            execSync(`${winePath} --version`, { stdio: 'ignore' });
-            console.log(`Verified working Wine at: ${winePath}`);
-            return winePath;
-          } catch (e) {
-            console.warn(`Found Wine at ${winePath} but it appears non-functional`);
-          }
-        }
-      } catch (e) {
-        // Ignore errors, just continue checking
-      }
-    }
-    
-    console.warn('Wine not found in common locations or not functional. Trying default "wine" command');
+  // Both in production and development, always use bundled Wine
+  const bundledWinePath = path.join(app.getAppPath(), 'bin', 'wine', 'bin', 'wine');
+  
+  // Check if bundled Wine exists
+  if (!fs.existsSync(bundledWinePath)) {
+    const errorMessage = `ERROR: Bundled Wine not found at ${bundledWinePath}. Cannot run game.`;
+    console.error(errorMessage);
+    throw new Error(errorMessage);
   }
   
-  // Fallback to assuming it's in PATH
-  return 'wine';
+  console.log(`Using bundled Wine at: ${bundledWinePath}`);
+  return bundledWinePath;
 }
 
 // Get the LT maker path
@@ -166,10 +119,19 @@ async function runGameWithWine(projectNameEndingInDotLtProj) {
       
       // On macOS, we use Wine
       if (process.platform === 'darwin' || process.platform === 'linux') {
-        const winePath = getWinePath();
+        let winePath;
+        try {
+          winePath = getWinePath();
+        } catch (wineError) {
+          console.error('Fatal Wine error:', wineError.message);
+          reject(wineError);
+          return;
+        }
         
         if (!winePath) {
-          reject(new Error('Wine is not available'));
+          const error = new Error('Wine is not available');
+          console.error('Fatal Wine error:', error.message);
+          reject(error);
           return;
         }
         
@@ -226,23 +188,17 @@ async function runGameWithWine(projectNameEndingInDotLtProj) {
         wineProcess.on('error', (err) => {
           console.error('Failed to start game process:', err);
           
-          // Provide more helpful error message if Wine is not installed
+          // Provide more helpful error message about bundled Wine
           if (err.code === 'ENOENT') {
-            const errorMessage = `Wine is not installed or not found in PATH.
-Please install Wine on your Mac using:
-brew install --cask wine-stable
-or
-brew install --cask --no-quarantine wine-stable
+            const errorMessage = `Bundled Wine executable failed to run.
+This is likely due to a missing or corrupted Wine installation in the application bundle.
+Please contact support or reinstall the application.
 
-After installation, you may need to run:
-brew link --overwrite wine-stable
-
-Make sure Wine is working by running:
-wine --version
-from your terminal.`;
+Error details: ${err.message}`;
             console.error(errorMessage);
             reject(new Error(errorMessage));
           } else {
+            console.error('Wine execution error:', err.message);
             reject(err);
           }
         });

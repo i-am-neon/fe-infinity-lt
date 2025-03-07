@@ -53,14 +53,24 @@ export default async function runGame(
       pythonCommand = "..\\bin\\python\\python.exe";
       pythonArgs = ["run_engine_for_project.py", normalizedProjectPath];
     } else {
-      // macOS/Linux - use Wine
-      pythonCommand = "wine";
+      // macOS/Linux - look for bundled Wine in electron/bin
+      const { resolve } = await import("@std/path");
+      const bundledWinePath = resolve(ltMakerPath, "../electron/bin/wine/bin/wine");
       
-      // Simplified approach for development - just use 'python' command in Wine
+      try {
+        // Check if bundled Wine exists
+        await Deno.stat(bundledWinePath);
+        console.log(`Using bundled Wine at: ${bundledWinePath}`);
+        pythonCommand = bundledWinePath;
+      } catch (error) {
+        // Bundled Wine not found - throw error
+        console.error(`Bundled Wine not found at ${bundledWinePath}`);
+        throw new Error(`Cannot run game: Bundled Wine not found at ${bundledWinePath}`);
+      }
+      
       pythonArgs = ["python", "run_engine_for_project.py", normalizedProjectPath];
       
       // Get absolute path for WINEPREFIX if it exists
-      const { resolve } = await import("@std/path");
       try {
         const winePrefixPath = "../electron/python/prefix";
         const winePrefixAbsolute = resolve(ltMakerPath, winePrefixPath);
@@ -71,7 +81,7 @@ export default async function runGame(
           console.log(`Using Wine prefix: ${winePrefix}`);
         }
       } catch (error) {
-        console.log("Wine prefix not found, using system default");
+        console.log("Wine prefix not found, using default");
       }
     }
 
