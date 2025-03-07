@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   // We need Electron to serve dynamic routes
-  // Removed output: "export" setting
+  output: "export",
   distDir: "out",
   // Required for Electron static file serving
   images: {
