@@ -10,11 +10,11 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "dev": "concurrently \"cd ../client && pnpm dev\" \"wait-on http://localhost:3000 && electron . --dev\"",
+    "dev": "concurrently \"cd ../client-react && pnpm dev\" \"wait-on http://localhost:5173 && electron . --dev\"",
     "postinstall": "electron-builder install-app-deps && node download-binaries.js",
-    "generate-icons": "electron-icon-builder --input=../client/public/fe-infinity-logo.png --output=icons",
-    "build:client": "cd ../client && pnpm build",
-    "verify-client-build": "node -e \"const fs=require('fs');const path=require('path');const outDir=path.join(__dirname,'../client/out');const manifestFile=path.join(outDir,'app-build-manifest.json');if(!fs.existsSync(outDir)||!fs.existsSync(manifestFile)){console.error('Next.js build not found. Run build:client first.');process.exit(1);}console.log('Next.js build verified.')\"",
+    "generate-icons": "electron-icon-builder --input=../client-react/public/vite.svg --output=icons",
+    "build:client": "cd ../client-react && pnpm build",
+    "verify-client-build": "node -e \"const fs=require('fs');const path=require('path');const distDir=path.join(__dirname,'../client-react/dist');const indexFile=path.join(distDir,'index.html');if(!fs.existsSync(distDir)||!fs.existsSync(indexFile)){console.error('React build not found. Run build:client first.');process.exit(1);}console.log('React build verified.')\"",
     "package": "npm run build:client && npm run verify-client-build && electron-builder",
     "package:mac": "npm run build:client && npm run verify-client-build && electron-builder --mac",
     "package:win": "npm run build:client && npm run verify-client-build && electron-builder --win",
@@ -61,15 +61,15 @@
         ]
       },
       {
-        "from": "../client/out",
-        "to": "client/out",
+        "from": "../client-react/dist",
+        "to": "client-react/dist",
         "filter": [
           "**/*"
         ]
       },
       {
-        "from": "../client/public",
-        "to": "client/public",
+        "from": "../client-react/public",
+        "to": "client-react/public",
         "filter": [
           "**/*"
         ]

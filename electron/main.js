@@ -49,11 +49,11 @@ function createMainWindow() {
   // Check if running in development mode
   const isDev = process.argv.includes('--dev');
 
-  // Load from Next.js dev server in development
+  // Load from Vite dev server in development
   if (isDev) {
     console.log('Running in development mode');
     process.env.NODE_ENV = 'development';
-    mainWindow.loadURL('http://localhost:3000');
+    mainWindow.loadURL('http://localhost:5173');
     mainWindow.webContents.openDevTools();
 
     // Start HTTP game launcher server in development mode
@@ -82,21 +82,21 @@ function createMainWindow() {
         // macOS-specific paths (in order of priority)
         basePaths = [
           // Inside .app bundle
-          path.join(process.resourcesPath, 'client/out'),
-          path.join(process.resourcesPath, 'app/client/out'),
-          path.join(process.resourcesPath, 'extraResources/client/out'),
-          path.join(app.getAppPath(), 'Resources/client/out'),
-          path.join(app.getAppPath(), 'Resources/app/client/out'),
-          path.join(app.getPath('exe'), '../../Resources/client/out')
+          path.join(process.resourcesPath, 'client-react/dist'),
+          path.join(process.resourcesPath, 'app/client-react/dist'),
+          path.join(process.resourcesPath, 'extraResources/client-react/dist'),
+          path.join(app.getAppPath(), 'Resources/client-react/dist'),
+          path.join(app.getAppPath(), 'Resources/app/client-react/dist'),
+          path.join(app.getPath('exe'), '../../Resources/client-react/dist')
         ];
       } else {
         // Windows/Linux paths
         basePaths = [
-          path.join(__dirname, '../client/out'),
-          path.join(__dirname, 'client/out'),
-          path.join(app.getAppPath(), 'client/out'),
-          path.join(process.resourcesPath, 'client/out'),
-          path.join(process.resourcesPath, 'app/client/out')
+          path.join(__dirname, '../client-react/dist'),
+          path.join(__dirname, 'client-react/dist'),
+          path.join(app.getAppPath(), 'client-react/dist'),
+          path.join(process.resourcesPath, 'client-react/dist'),
+          path.join(process.resourcesPath, 'app/client-react/dist')
         ];
       }
   
@@ -182,9 +182,8 @@ function createMainWindow() {
             // Check for different HTML files in various locations
             let htmlFile = null;
             const possibleHtmlFiles = [
-              'static/index.html',
-              'server/app/index.html',
-              'index.html'
+              'index.html',
+              'static/index.html'
             ];
             
             for (const file of possibleHtmlFiles) {
