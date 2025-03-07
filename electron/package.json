@@ -38,10 +38,7 @@
       "*.js",
       "*.html",
       "node_modules/**/*",
-      "../client/out/**/*",
-      "bin/**/*",
-      "../server/**/*",
-      "wine/**/*"
+      "bin/**/*"
     ],
     "extraResources": [
       {
@@ -50,6 +47,21 @@
         "filter": [
           "**/*",
           "!node_modules/**/*"
+        ]
+      },
+      {
+        "from": "../lt-maker-fork",
+        "to": "lt-maker-fork",
+        "filter": [
+          "**/*",
+          "!__pycache__/**/*"
+        ]
+      },
+      {
+        "from": "../client/out",
+        "to": "client/out",
+        "filter": [
+          "**/*"
         ]
       }
     ],

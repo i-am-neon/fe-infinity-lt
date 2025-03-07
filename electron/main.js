@@ -65,7 +65,54 @@ function createMainWindow() {
       console.error('Failed to start game launcher server:', err);
     });
   } else {
-    mainWindow.loadFile(path.join(__dirname, '../client/out/index.html'));
+    // In production, we need to handle path resolution differently
+    try {
+      // First, try to find the Next.js output in different potential locations
+      const possiblePaths = [
+        path.join(__dirname, '../client/out/index.html'),             // Dev structure
+        path.join(__dirname, 'client/out/index.html'),                // Packaged relative
+        path.join(app.getAppPath(), 'client/out/index.html'),         // From app root
+        path.join(process.resourcesPath, 'client/out/index.html'),    // From resources
+        path.join(process.resourcesPath, 'app/client/out/index.html') // Nested in resources/app
+      ];
+      
+      let indexPath = null;
+      
+      // Log all path attempts for debugging
+      logger.log('info', 'Searching for Next.js build output...');
+      for (const possiblePath of possiblePaths) {
+        const exists = fs.existsSync(possiblePath);
+        logger.log('info', `Checking path: ${possiblePath}, exists: ${exists}`);
+        
+        if (exists) {
+          indexPath = possiblePath;
+          logger.log('info', `Using Next.js build at: ${indexPath}`);
+          break;
+        }
+      }
+      
+      if (indexPath) {
+        mainWindow.loadFile(indexPath);
+      } else {
+        // If we can't find the client build, show an error page
+        logger.log('error', 'Could not find Next.js build output in any expected location');
+        mainWindow.loadFile(path.join(__dirname, 'splash.html')); // Fallback to splash screen
+        
+        // Show error dialog after window opens
+        mainWindow.webContents.on('did-finish-load', () => {
+          dialog.showErrorBox(
+            'Application Error',
+            'Could not find the application interface files. The application may not have been packaged correctly.'
+          );
+        });
+      }
+    } catch (error) {
+      logger.log('error', 'Error loading main window content', { error: error.message, stack: error.stack });
+      dialog.showErrorBox(
+        'Application Error',
+        `Failed to load application interface: ${error.message}`
+      );
+    }
   }
 
   mainWindow.on('closed', () => {
@@ -82,12 +129,50 @@ function createMainWindow() {
 app.whenReady().then(async () => {
   // Initialize logger early
   const logDir = logger.initLogger();
-  logger.log('info', 'Application starting', { version: app.getVersion(), environment: process.env.NODE_ENV });
+  logger.log('info', 'Application starting', {
+    version: app.getVersion(),
+    environment: process.env.NODE_ENV,
+    platform: process.platform,
+    arch: process.arch,
+    appPath: app.getAppPath(),
+    resourcesPath: process.resourcesPath || 'not available',
+    userDataPath: app.getPath('userData')
+  });
   
   // Set app icon for macOS dock
   if (process.platform === 'darwin') {
-    app.dock.setIcon(path.join(__dirname, '../client/public/fe-infinity-logo.png'));
-    logger.log('info', 'Set macOS dock icon');
+    try {
+      const iconPath = path.join(__dirname, '../client/public/fe-infinity-logo.png');
+      const iconPathExists = require('fs').existsSync(iconPath);
+      
+      if (iconPathExists) {
+        app.dock.setIcon(iconPath);
+        logger.log('info', 'Set macOS dock icon');
+      } else {
+        // Try alternative icon paths in packaged app
+        const alternativePaths = [
+          path.join(app.getAppPath(), 'client/public/fe-infinity-logo.png'),
+          path.join(process.resourcesPath, 'client/public/fe-infinity-logo.png'),
+          path.join(process.resourcesPath, 'app/client/public/fe-infinity-logo.png')
+        ];
+        
+        let foundIcon = false;
+        for (const altPath of alternativePaths) {
+          if (require('fs').existsSync(altPath)) {
+            app.dock.setIcon(altPath);
+            logger.log('info', `Set macOS dock icon from alternative path: ${altPath}`);
+            foundIcon = true;
+            break;
+          }
+        }
+        
+        if (!foundIcon) {
+          logger.log('warn', 'Could not find app icon');
+        }
+      }
+    } catch (iconError) {
+      logger.log('error', 'Error setting dock icon', { error: iconError.message });
+    }
   }
   
   createSplashWindow();
@@ -96,20 +181,152 @@ app.whenReady().then(async () => {
   try {
     // Add env variable for server logs
     process.env.ELECTRON_LOG_DIR = logDir;
-    logger.log('info', 'Set log directory for server', { logDir });
+    process.env.APP_PATH = app.getAppPath();
+    process.env.RESOURCES_PATH = process.resourcesPath;
+    process.env.USER_DATA_PATH = app.getPath('userData');
+    logger.log('info', 'Set environment variables', {
+      ELECTRON_LOG_DIR: logDir,
+      APP_PATH: app.getAppPath(),
+      RESOURCES_PATH: process.resourcesPath,
+      USER_DATA_PATH: app.getPath('userData')
+    });
     
-    // Start server components
+    // Log system information to help diagnose issues
+    try {
+      if (process.platform === 'darwin') {
+        const { execSync } = require('child_process');
+        
+        try {
+          const osVersion = execSync('sw_vers -productVersion', { encoding: 'utf8' }).trim();
+          logger.log('info', `macOS version: ${osVersion}`);
+        } catch (e) {
+          logger.log('error', 'Failed to get macOS version');
+        }
+        
+        try {
+          const homebrewInstalled = execSync('which brew || echo "Not found"', { encoding: 'utf8' }).trim();
+          logger.log('info', `Homebrew path: ${homebrewInstalled}`);
+          
+          if (homebrewInstalled !== 'Not found') {
+            try {
+              const denoInstalled = execSync('brew list | grep deno || echo "Not installed"', { encoding: 'utf8' }).trim();
+              logger.log('info', `Deno via Homebrew: ${denoInstalled}`);
+            } catch (e) {
+              logger.log('error', 'Failed to check Deno via Homebrew');
+            }
+          }
+        } catch (e) {
+          logger.log('error', 'Failed to check Homebrew installation');
+        }
+        
+        try {
+          const denoInPath = execSync('which deno || echo "Not found"', { encoding: 'utf8' }).trim();
+          logger.log('info', `Deno in PATH: ${denoInPath}`);
+        } catch (e) {
+          logger.log('error', 'Failed to check Deno in PATH');
+        }
+      }
+    } catch (diagError) {
+      logger.log('error', 'Failed to gather system diagnostics', { error: diagError.message });
+    }
+    
+    // Check for important directories
+    const fs = require('fs');
+    
+    // Check server directory
+    const serverDir = path.join(app.getAppPath(), '..', 'server');
+    const serverDirExists = fs.existsSync(serverDir);
+    logger.log('info', `Server directory exists: ${serverDirExists}`, { path: serverDir });
+    
+    if (!serverDirExists) {
+      // Check alternative locations
+      const altServerPaths = [
+        path.join(app.getAppPath(), 'server'),
+        path.join(process.resourcesPath, 'server'),
+        path.join(process.resourcesPath, 'app', 'server')
+      ];
+      
+      for (const altPath of altServerPaths) {
+        const exists = fs.existsSync(altPath);
+        logger.log('info', `Alternative server path exists: ${exists}`, { path: altPath });
+      }
+    }
+    
+    // Check LT Maker directory
+    const ltMakerDir = path.join(app.getAppPath(), '..', 'lt-maker-fork');
+    const ltMakerDirExists = fs.existsSync(ltMakerDir);
+    logger.log('info', `LT Maker directory exists: ${ltMakerDirExists}`, { path: ltMakerDir });
+    
+    if (!ltMakerDirExists) {
+      // Check alternative locations
+      const altLtMakerPaths = [
+        path.join(app.getAppPath(), 'lt-maker-fork'),
+        path.join(process.resourcesPath, 'lt-maker-fork'),
+        path.join(process.resourcesPath, 'app', 'lt-maker-fork')
+      ];
+      
+      for (const altPath of altLtMakerPaths) {
+        const exists = fs.existsSync(altPath);
+        logger.log('info', `Alternative LT Maker path exists: ${exists}`, { path: altPath });
+      }
+    }
+    
+    // Start server components with retries
     logger.log('info', 'Starting server components...');
-    serverStarted = await startServer();
+    
+    let retryCount = 0;
+    const maxRetries = 3;
+    
+    while (retryCount < maxRetries) {
+      try {
+        serverStarted = await startServer();
+        
+        if (serverStarted) {
+          logger.log('info', 'Server components started successfully');
+          break;
+        } else {
+          retryCount++;
+          logger.log('warn', `Server startup attempt ${retryCount} failed, ${maxRetries - retryCount} retries left`);
+          
+          if (retryCount < maxRetries) {
+            // Wait a bit before retrying
+            await new Promise(resolve => setTimeout(resolve, 2000));
+          }
+        }
+      } catch (serverError) {
+        retryCount++;
+        logger.log('error', `Server startup attempt ${retryCount} threw error`, {
+          error: serverError.message,
+          stack: serverError.stack,
+          retriesLeft: maxRetries - retryCount
+        });
+        
+        if (retryCount < maxRetries) {
+          // Wait a bit before retrying
+          await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+      }
+    }
     
     if (!serverStarted) {
-      logger.log('error', 'Server startup failed');
-      dialog.showErrorBox(
-        'Server Startup Failed',
-        'Failed to start server components. The application may not function correctly.'
-      );
-    } else {
-      logger.log('info', 'Server components started successfully');
+      logger.log('error', 'Server startup failed after all retry attempts');
+      
+      if (process.platform === 'darwin') {
+        dialog.showErrorBox(
+          'Server Startup Failed',
+          'Failed to start server components. This might be due to missing dependencies.\n\n' +
+          'Please make sure you have installed:\n' +
+          '1. Homebrew (https://brew.sh)\n' +
+          '2. Deno: brew install deno\n' +
+          '3. Wine: brew install --cask --no-quarantine wine-stable\n\n' +
+          'The application may not function correctly.'
+        );
+      } else {
+        dialog.showErrorBox(
+          'Server Startup Failed',
+          'Failed to start server components. The application may not function correctly.'
+        );
+      }
     }
     
     // Create main window after server starts (or fails)
