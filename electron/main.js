@@ -1,5 +1,6 @@
 const { app, BrowserWindow, dialog, ipcMain } = require('electron');
 const path = require('path');
+const fs = require('fs');
 const { startServer, stopServer, isServerReady } = require('./server-manager');
 const { runGameWithWine } = require('./game-runner');
 const { startGameLauncherServer } = require('./game-launcher');
