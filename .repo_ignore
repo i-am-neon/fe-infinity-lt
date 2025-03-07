@@ -4,12 +4,18 @@ webpack/*
 server/vector-db/seed-vectors/*
 server/ai/test-data/*
 server/ai/map-processing/*
+server/assets/*
 
 client/out/*
+client/.next/*
+client/**.mjs
 pnpm-lock.yaml
 
 electron/icons/*
 electron/release/*
+electron/python/*
+electron/wine/*
+electron/bin/*
 
 # Default fallback .repo_ignore content
 **/node_modules/
