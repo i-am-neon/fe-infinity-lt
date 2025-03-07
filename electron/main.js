@@ -74,60 +74,60 @@ function createMainWindow() {
       logger.log('info', `__dirname: ${__dirname}`);
       logger.log('info', `app.getAppPath(): ${app.getAppPath()}`);
       logger.log('info', `process.resourcesPath: ${process.resourcesPath}`);
-      
+
       // Define base paths based on platform
       let basePaths = [];
-      
+
       if (isMac) {
         // macOS-specific paths (in order of priority)
         basePaths = [
           // Inside .app bundle
-          path.join(process.resourcesPath, 'client-react/dist'),
-          path.join(process.resourcesPath, 'app/client-react/dist'),
-          path.join(process.resourcesPath, 'extraResources/client-react/dist'),
-          path.join(app.getAppPath(), 'Resources/client-react/dist'),
-          path.join(app.getAppPath(), 'Resources/app/client-react/dist'),
-          path.join(app.getPath('exe'), '../../Resources/client-react/dist')
+          path.join(process.resourcesPath, 'client/dist'),
+          path.join(process.resourcesPath, 'app/client/dist'),
+          path.join(process.resourcesPath, 'extraResources/client/dist'),
+          path.join(app.getAppPath(), 'Resources/client/dist'),
+          path.join(app.getAppPath(), 'Resources/app/client/dist'),
+          path.join(app.getPath('exe'), '../../Resources/client/dist')
         ];
       } else {
         // Windows/Linux paths
         basePaths = [
-          path.join(__dirname, '../client-react/dist'),
-          path.join(__dirname, 'client-react/dist'),
-          path.join(app.getAppPath(), 'client-react/dist'),
-          path.join(process.resourcesPath, 'client-react/dist'),
-          path.join(process.resourcesPath, 'app/client-react/dist')
+          path.join(__dirname, '../client/dist'),
+          path.join(__dirname, 'client/dist'),
+          path.join(app.getAppPath(), 'client/dist'),
+          path.join(process.resourcesPath, 'client/dist'),
+          path.join(process.resourcesPath, 'app/client/dist')
         ];
       }
-  
+
       // Add development paths
       if (app.isPackaged === false) {
         basePaths.unshift(path.join(__dirname, '../client/out'));
       }
-  
+
       // Markers to identify a valid Vite build directory
       const buildMarkers = ['index.html', 'assets'];
-      
+
       let validBuildPath = null;
       let appEntryPath = null;
-  
+
       // Log all path attempts for debugging
       logger.log('info', 'Searching for Vite build output...');
-      
+
       // First, find a valid build directory
       for (const basePath of basePaths) {
         let isValid = false;
-        
+
         for (const marker of buildMarkers) {
           const markerPath = path.join(basePath, marker);
           const exists = fs.existsSync(markerPath);
           logger.log('info', `Checking marker: ${markerPath}, exists: ${exists}`);
-          
+
           if (exists) {
             isValid = true;
             validBuildPath = basePath;
             logger.log('info', `Found valid Vite build at: ${validBuildPath}`);
-            
+
             // If we found the index.html, set it as the entry path
             if (marker === 'index.html') {
               appEntryPath = markerPath;
@@ -136,16 +136,16 @@ function createMainWindow() {
             break;
           }
         }
-        
+
         if (isValid) break;
       }
-      
+
       // If we found a valid build path but not an entry path yet, look for index.html
       if (validBuildPath && !appEntryPath) {
         const indexPath = path.join(validBuildPath, 'index.html');
         const exists = fs.existsSync(indexPath);
         logger.log('info', `Checking for index.html: ${indexPath}, exists: ${exists}`);
-        
+
         if (exists) {
           appEntryPath = indexPath;
           logger.log('info', `Found Vite entry file at: ${appEntryPath}`);
@@ -155,17 +155,17 @@ function createMainWindow() {
           appEntryPath = validBuildPath;
         }
       }
-      
+
       // Use validBuildPath as our indexPath
       let indexPath = appEntryPath || validBuildPath;
 
       if (indexPath) {
         logger.log('info', `Attempting to load React app from: ${indexPath}`);
-        
+
         try {
           // Check if indexPath is a directory or file
           const stats = fs.statSync(indexPath);
-          
+
           if (stats.isDirectory()) {
             // If it's a directory, we need to load index.html from it
             const indexHtmlPath = path.join(indexPath, 'index.html');
@@ -184,11 +184,11 @@ function createMainWindow() {
             logger.log('info', `Loading from URL (file): ${fileUrl}`);
             mainWindow.loadURL(fileUrl);
           }
-          
+
           // Set up error handling
           mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
             logger.log('error', `Page failed to load: ${errorDescription} (${errorCode})`);
-            
+
             // Show error in window
             mainWindow.loadURL(`data:text/html;charset=utf-8,
               <html>
@@ -201,18 +201,18 @@ function createMainWindow() {
               </html>
             `);
           });
-          
+
           // Enable DevTools in packaged app for debugging
           mainWindow.webContents.on('did-finish-load', () => {
             logger.log('info', 'React app loaded successfully');
             // Uncomment to open DevTools in production for debugging
             // mainWindow.webContents.openDevTools();
           });
-          
+
           // Set up protocol handling
           mainWindow.webContents.on('will-navigate', (event, url) => {
             const parsedUrl = new URL(url);
-            
+
             // For external links, open in browser
             if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
               event.preventDefault();
@@ -221,7 +221,7 @@ function createMainWindow() {
           });
         } catch (err) {
           logger.log('error', `Failed to load React app: ${err.message}`, { error: err.stack });
-          
+
           // Fallback to a basic HTML message
           mainWindow.loadURL(`data:text/html;charset=utf-8,
             <html>
@@ -235,8 +235,8 @@ function createMainWindow() {
           `);
         }
       } else {
-      // If we can't find the client build, show an error page
-      logger.log('error', 'Could not find Vite build output in any expected location');
+        // If we can't find the client build, show an error page
+        logger.log('error', 'Could not find Vite build output in any expected location');
         mainWindow.loadFile(path.join(__dirname, 'splash.html')); // Fallback to splash screen
 
         // Show error dialog after window opens
@@ -535,27 +535,27 @@ ipcMain.handle('runGame', async (_, projectPath) => {
 // IPC handler for API calls
 ipcMain.handle('api-call', async (_, args) => {
   const { endpoint, method, body } = args;
-  
+
   try {
     // Connect to the local server
     const url = `http://localhost:8000/${endpoint}`;
-    
+
     const options = {
       method,
       headers: body ? { 'Content-Type': 'application/json' } : undefined,
       body: body ? JSON.stringify(body) : undefined
     };
-    
+
     const response = await fetch(url, options);
     const data = await response.json();
-    
+
     if (!response.ok) {
       return {
         success: false,
         error: data.error || `API call failed with status ${response.status}`
       };
     }
-    
+
     return {
       success: true,
       data
