@@ -14,10 +14,11 @@
     "postinstall": "electron-builder install-app-deps && node download-binaries.js",
     "generate-icons": "electron-icon-builder --input=../client/public/fe-infinity-logo.png --output=icons",
     "build:client": "cd ../client && pnpm build",
-    "package": "npm run build:client && electron-builder",
-    "package:mac": "npm run build:client && electron-builder --mac",
-    "package:win": "npm run build:client && electron-builder --win",
-    "package:linux": "npm run build:client && electron-builder --linux"
+    "verify-client-build": "node -e \"const fs=require('fs');const path=require('path');const outDir=path.join(__dirname,'../client/out');const manifestFile=path.join(outDir,'app-build-manifest.json');if(!fs.existsSync(outDir)||!fs.existsSync(manifestFile)){console.error('Next.js build not found. Run build:client first.');process.exit(1);}console.log('Next.js build verified.')\"",
+    "package": "npm run build:client && npm run verify-client-build && electron-builder",
+    "package:mac": "npm run build:client && npm run verify-client-build && electron-builder --mac",
+    "package:win": "npm run build:client && npm run verify-client-build && electron-builder --win",
+    "package:linux": "npm run build:client && npm run verify-client-build && electron-builder --linux"
   },
   "devDependencies": {
     "axios": "^1.6.7",

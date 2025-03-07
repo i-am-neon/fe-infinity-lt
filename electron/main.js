@@ -68,52 +68,157 @@ function createMainWindow() {
   } else {
     // In production, we need to handle path resolution differently
     try {
-      // First, try to find the Next.js output in different potential locations
-      const possiblePaths = [
-        path.join(__dirname, '../client/out/index.html'),             // Dev structure
-        path.join(__dirname, 'client/out/index.html'),                // Packaged relative
-        path.join(app.getAppPath(), 'client/out/index.html'),         // From app root
-        path.join(process.resourcesPath, 'client/out/index.html'),    // From resources
-        path.join(process.resourcesPath, 'app/client/out/index.html'), // Nested in resources/app
-        path.join(process.resourcesPath, '../Resources/client/out/index.html') // macOS specific path
-      ];
-
-      let indexPath = null;
-
+      // Get platform-specific information
+      const isMac = process.platform === 'darwin';
+      logger.log('info', `Platform: ${process.platform}, is macOS: ${isMac}`);
+      logger.log('info', `__dirname: ${__dirname}`);
+      logger.log('info', `app.getAppPath(): ${app.getAppPath()}`);
+      logger.log('info', `process.resourcesPath: ${process.resourcesPath}`);
+      
+      // Define base paths based on platform
+      let basePaths = [];
+      
+      if (isMac) {
+        // macOS-specific paths (in order of priority)
+        basePaths = [
+          // Inside .app bundle
+          path.join(process.resourcesPath, 'client/out'),
+          path.join(process.resourcesPath, 'app/client/out'),
+          path.join(process.resourcesPath, 'extraResources/client/out'),
+          path.join(app.getAppPath(), 'Resources/client/out'),
+          path.join(app.getAppPath(), 'Resources/app/client/out'),
+          path.join(app.getPath('exe'), '../../Resources/client/out')
+        ];
+      } else {
+        // Windows/Linux paths
+        basePaths = [
+          path.join(__dirname, '../client/out'),
+          path.join(__dirname, 'client/out'),
+          path.join(app.getAppPath(), 'client/out'),
+          path.join(process.resourcesPath, 'client/out'),
+          path.join(process.resourcesPath, 'app/client/out')
+        ];
+      }
+  
+      // Add development paths
+      if (app.isPackaged === false) {
+        basePaths.unshift(path.join(__dirname, '../client/out'));
+      }
+  
+      // Markers to identify a valid Next.js build directory
+      const buildMarkers = ['app-build-manifest.json', 'build-manifest.json'];
+      
+      let validBuildPath = null;
+      let appEntryPath = null;
+  
       // Log all path attempts for debugging
       logger.log('info', 'Searching for Next.js build output...');
-      for (const possiblePath of possiblePaths) {
-        const exists = fs.existsSync(possiblePath);
-        logger.log('info', `Checking path: ${possiblePath}, exists: ${exists}`);
-
-        if (exists) {
-          indexPath = possiblePath;
-          logger.log('info', `Using Next.js build at: ${indexPath}`);
-          break;
+      
+      // First, find a valid build directory
+      for (const basePath of basePaths) {
+        let isValid = false;
+        
+        for (const marker of buildMarkers) {
+          const markerPath = path.join(basePath, marker);
+          const exists = fs.existsSync(markerPath);
+          logger.log('info', `Checking marker: ${markerPath}, exists: ${exists}`);
+          
+          if (exists) {
+            isValid = true;
+            validBuildPath = basePath;
+            logger.log('info', `Found valid Next.js build at: ${validBuildPath}`);
+            break;
+          }
+        }
+        
+        if (isValid) break;
+      }
+      
+      // If we found a valid build path, look for the entry files
+      if (validBuildPath) {
+        const possibleEntryPaths = [
+          // For Next.js App Router, we serve static/index.html as the default route
+          path.join(validBuildPath, 'static/index.html'),
+          // For pages router, might be index.html directly
+          path.join(validBuildPath, 'index.html'),
+          // Next.js 15 with app router might have this structure
+          path.join(validBuildPath, 'server/app/page.html'),
+          path.join(validBuildPath, 'server/pages/index.html')
+        ];
+        
+        for (const entryPath of possibleEntryPaths) {
+          const exists = fs.existsSync(entryPath);
+          logger.log('info', `Checking entry file: ${entryPath}, exists: ${exists}`);
+          
+          if (exists) {
+            appEntryPath = entryPath;
+            logger.log('info', `Found Next.js entry file at: ${appEntryPath}`);
+            break;
+          }
+        }
+        
+        // If we couldn't find an HTML entry file, try to load the app directory itself
+        if (!appEntryPath) {
+          logger.log('info', `No specific HTML entry file found, using build directory: ${validBuildPath}`);
+          appEntryPath = validBuildPath;
         }
       }
+      
+      // Use validBuildPath as our indexPath
+      let indexPath = appEntryPath || validBuildPath;
 
       if (indexPath) {
-        // For Next.js apps in Electron, we need to load the index.html first
-        // and let the Next.js router handle the rest
-        mainWindow.loadFile(indexPath);
-
-        // Set up protocol handling for Next.js routes
-        mainWindow.webContents.on('will-navigate', (event, url) => {
-          const parsedUrl = new URL(url);
-
-          // Only handle same-origin navigation
-          if (parsedUrl.origin === 'file://') {
-            // Let it navigate normally
-            return;
+        logger.log('info', `Attempting to load Next.js from: ${indexPath}`);
+        
+        try {
+          // Check if indexPath is a directory or file
+          const stats = fs.statSync(indexPath);
+          
+          if (stats.isDirectory()) {
+            // If it's a directory, we need to serve it with a custom protocol
+            logger.log('info', `Found build directory, setting up file protocol`);
+            
+            // For Next.js static export, we need to load from the file protocol
+            const fileUrl = `file://${indexPath}/static/index.html`;
+            logger.log('info', `Loading from URL: ${fileUrl}`);
+            mainWindow.loadURL(fileUrl);
+          } else {
+            // If it's a file, load it directly
+            logger.log('info', `Loading file directly: ${indexPath}`);
+            mainWindow.loadFile(indexPath);
           }
-
-          // For external links, open in browser
-          if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
-            event.preventDefault();
-            require('electron').shell.openExternal(url);
-          }
-        });
+          
+          // Set up protocol handling for Next.js routes
+          mainWindow.webContents.on('will-navigate', (event, url) => {
+            const parsedUrl = new URL(url);
+            
+            // Only handle same-origin navigation
+            if (parsedUrl.protocol === 'file:') {
+              // Let it navigate normally
+              return;
+            }
+            
+            // For external links, open in browser
+            if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
+              event.preventDefault();
+              require('electron').shell.openExternal(url);
+            }
+          });
+        } catch (err) {
+          logger.log('error', `Failed to load Next.js build: ${err.message}`);
+          
+          // Fallback to a basic HTML message
+          mainWindow.loadURL(`data:text/html;charset=utf-8,
+            <html>
+              <head><title>FE Infinity - Error</title></head>
+              <body style="font-family: Arial; padding: 2rem; color: #333;">
+                <h2>Failed to load application</h2>
+                <p>There was an error loading the application: ${err.message}</p>
+                <p>Please check the application logs for more details.</p>
+              </body>
+            </html>
+          `);
+        }
       } else {
         // If we can't find the client build, show an error page
         logger.log('error', 'Could not find Next.js build output in any expected location');
