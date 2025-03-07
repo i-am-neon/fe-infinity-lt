@@ -77,6 +77,12 @@ async function downloadAndExtract(url, destDir, extractionRoot = '', customFileN
 async function downloadDeno() {
   console.log('Downloading Deno...');
 
+  // Check if Deno is already installed
+  if (fs.existsSync(path.join(binariesDir, isWindows ? 'deno.exe' : 'deno'))) {
+    console.log('Deno already installed, skipping...');
+    return;
+  }
+
   let denoUrl;
   let extractionRoot = '';
 
@@ -107,6 +113,12 @@ async function downloadDeno() {
 // Download PostgreSQL
 async function downloadPostgres() {
   console.log('Downloading PostgreSQL...');
+
+  // Check if PostgreSQL is already installed
+  if (isWindows && fs.existsSync(path.join(binariesDir, 'postgres.exe'))) {
+    console.log('PostgreSQL already installed, skipping...');
+    return;
+  }
 
   let pgUrl;
   let pgExtractDir;
@@ -166,7 +178,13 @@ async function installPgVector() {
 async function downloadPython() {
   console.log('Downloading Python...');
 
-  const pythonDir = path.join(__dirname, 'python');
+  const pythonDir = path.join(__dirname, 'bin', 'python');
+
+  // Check if Python is already installed
+  if (fs.existsSync(pythonDir)) {
+    console.log('Python already installed, skipping...');
+    return;
+  }
 
   // Create python directory if it doesn't exist
   if (!fs.existsSync(pythonDir)) {
@@ -260,7 +278,7 @@ async function setupPythonWithWine() {
   }
 
   console.log('Setting up Python with Wine...');
-  const pythonDir = path.join(__dirname, 'python');
+  const pythonDir = path.join(__dirname, 'bin', 'python');
   const pythonInstallerPath = path.join(pythonDir, 'python-3.11.7-amd64.exe');
   const winePath = getWinePath();
 
@@ -372,7 +390,13 @@ async function downloadWine() {
     return;
   }
 
-  const wineDir = path.join(__dirname, 'wine');
+  const wineDir = path.join(__dirname, 'bin', 'wine');
+
+  // Check if Wine is already installed
+  if (fs.existsSync(wineDir)) {
+    console.log('Wine already installed, skipping...');
+    return;
+  }
 
   // Create wine directory if it doesn't exist
   if (!fs.existsSync(wineDir)) {
