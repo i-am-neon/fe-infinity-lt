@@ -142,6 +142,7 @@ function createMainWindow() {
           // For pages router, might be index.html directly
           path.join(validBuildPath, 'index.html'),
           // Next.js 15 with app router might have this structure
+          path.join(validBuildPath, 'server/app/index.html'),
           path.join(validBuildPath, 'server/app/page.html'),
           path.join(validBuildPath, 'server/pages/index.html')
         ];
@@ -178,8 +179,28 @@ function createMainWindow() {
             // If it's a directory, we need to serve it with a custom protocol
             logger.log('info', `Found build directory, setting up file protocol`);
             
+            // Check for different HTML files in various locations
+            let htmlFile = null;
+            const possibleHtmlFiles = [
+              'static/index.html',
+              'server/app/index.html',
+              'index.html'
+            ];
+            
+            for (const file of possibleHtmlFiles) {
+              const fullPath = path.join(indexPath, file);
+              if (fs.existsSync(fullPath)) {
+                htmlFile = file;
+                logger.log('info', `Found HTML file at: ${fullPath}`);
+                break;
+              }
+            }
+            
             // For Next.js static export, we need to load from the file protocol
-            const fileUrl = `file://${indexPath}/static/index.html`;
+            const fileUrl = htmlFile
+              ? `file://${indexPath}/${htmlFile}`
+              : `file://${indexPath}/`;
+              
             logger.log('info', `Loading from URL: ${fileUrl}`);
             mainWindow.loadURL(fileUrl);
           } else {
