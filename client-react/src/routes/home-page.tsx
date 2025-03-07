@@ -2,7 +2,7 @@ import { useState } from 'react';
 import apiCall from '../lib/api-call';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { ThemeToggle } from '../components/ui/theme-toggle';
+import { ModeToggle } from '../components/ui/theme-toggle';
 
 export default function HomePage() {
   const [pingResult, setPingResult] = useState<string | null>(null);
@@ -27,7 +27,7 @@ export default function HomePage() {
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
         <div className="flex justify-between w-full">
           <h1 className="text-3xl font-bold">FE Infinity</h1>
-          <ThemeToggle />
+          <ModeToggle />
         </div>
 
         <Card className="w-full">
