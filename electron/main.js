@@ -105,14 +105,14 @@ function createMainWindow() {
         basePaths.unshift(path.join(__dirname, '../client/out'));
       }
   
-      // Markers to identify a valid Next.js build directory
-      const buildMarkers = ['app-build-manifest.json', 'build-manifest.json'];
+      // Markers to identify a valid Vite build directory
+      const buildMarkers = ['index.html', 'assets'];
       
       let validBuildPath = null;
       let appEntryPath = null;
   
       // Log all path attempts for debugging
-      logger.log('info', 'Searching for Next.js build output...');
+      logger.log('info', 'Searching for Vite build output...');
       
       // First, find a valid build directory
       for (const basePath of basePaths) {
@@ -126,7 +126,13 @@ function createMainWindow() {
           if (exists) {
             isValid = true;
             validBuildPath = basePath;
-            logger.log('info', `Found valid Next.js build at: ${validBuildPath}`);
+            logger.log('info', `Found valid Vite build at: ${validBuildPath}`);
+            
+            // If we found the index.html, set it as the entry path
+            if (marker === 'index.html') {
+              appEntryPath = markerPath;
+              logger.log('info', `Found entry file at: ${appEntryPath}`);
+            }
             break;
           }
         }
@@ -134,33 +140,18 @@ function createMainWindow() {
         if (isValid) break;
       }
       
-      // If we found a valid build path, look for the entry files
-      if (validBuildPath) {
-        const possibleEntryPaths = [
-          // For Next.js App Router, we serve static/index.html as the default route
-          path.join(validBuildPath, 'static/index.html'),
-          // For pages router, might be index.html directly
-          path.join(validBuildPath, 'index.html'),
-          // Next.js 15 with app router might have this structure
-          path.join(validBuildPath, 'server/app/index.html'),
-          path.join(validBuildPath, 'server/app/page.html'),
-          path.join(validBuildPath, 'server/pages/index.html')
-        ];
+      // If we found a valid build path but not an entry path yet, look for index.html
+      if (validBuildPath && !appEntryPath) {
+        const indexPath = path.join(validBuildPath, 'index.html');
+        const exists = fs.existsSync(indexPath);
+        logger.log('info', `Checking for index.html: ${indexPath}, exists: ${exists}`);
         
-        for (const entryPath of possibleEntryPaths) {
-          const exists = fs.existsSync(entryPath);
-          logger.log('info', `Checking entry file: ${entryPath}, exists: ${exists}`);
-          
-          if (exists) {
-            appEntryPath = entryPath;
-            logger.log('info', `Found Next.js entry file at: ${appEntryPath}`);
-            break;
-          }
-        }
-        
-        // If we couldn't find an HTML entry file, try to load the app directory itself
-        if (!appEntryPath) {
-          logger.log('info', `No specific HTML entry file found, using build directory: ${validBuildPath}`);
+        if (exists) {
+          appEntryPath = indexPath;
+          logger.log('info', `Found Vite entry file at: ${appEntryPath}`);
+        } else {
+          // If we couldn't find an HTML entry file, try to load the app directory itself
+          logger.log('info', `No index.html found, using build directory: ${validBuildPath}`);
           appEntryPath = validBuildPath;
         }
       }
@@ -240,8 +231,8 @@ function createMainWindow() {
           `);
         }
       } else {
-        // If we can't find the client build, show an error page
-        logger.log('error', 'Could not find Next.js build output in any expected location');
+      // If we can't find the client build, show an error page
+      logger.log('error', 'Could not find Vite build output in any expected location');
         mainWindow.loadFile(path.join(__dirname, 'splash.html')); // Fallback to splash screen
 
         // Show error dialog after window opens

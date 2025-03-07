@@ -14,8 +14,8 @@
     "postinstall": "electron-builder install-app-deps && node download-binaries.js",
     "generate-icons": "electron-icon-builder --input=../client-react/public/vite.svg --output=icons",
     "build:client": "cd ../client-react && pnpm build",
-    "verify-client-build": "node -e \"const fs=require('fs');const path=require('path');const distDir=path.join(__dirname,'../client-react/dist');const indexFile=path.join(distDir,'index.html');if(!fs.existsSync(distDir)||!fs.existsSync(indexFile)){console.error('React build not found. Run build:client first.');process.exit(1);}console.log('React build verified.')\"",
-    "package": "npm run build:client && npm run verify-client-build && electron-builder",
+    "verify-client-build": "node -e \"const fs=require('fs');const path=require('path');const distDir=path.join(__dirname,'../client-react/dist');const indexFile=path.join(distDir,'index.html');const assetsDir=path.join(distDir,'assets');if(!fs.existsSync(distDir)||!fs.existsSync(indexFile)||!fs.existsSync(assetsDir)){console.error('React build not found or incomplete. Run build:client first.');process.exit(1);}console.log('React build verified:');console.log('- dist directory:', fs.existsSync(distDir));console.log('- index.html:', fs.existsSync(indexFile));console.log('- assets directory:', fs.existsSync(assetsDir));\"",
+    "package": "npm run build:client && npm run verify-client-build && electron-builder --dir && node -e \"const fs=require('fs');const path=require('path');console.log('Output directory contents:');const outputDir=path.join(__dirname,'release/mac-arm64/FE Infinity.app/Contents/Resources/client-react/dist');if(fs.existsSync(outputDir)){console.log(fs.readdirSync(outputDir));}else{console.log('Output directory not found:',outputDir);}\" && electron-builder",
     "package:mac": "npm run build:client && npm run verify-client-build && electron-builder --mac",
     "package:win": "npm run build:client && npm run verify-client-build && electron-builder --win",
     "package:linux": "npm run build:client && npm run verify-client-build && electron-builder --linux"
@@ -42,6 +42,10 @@
       "*.png",
       "node_modules/**/*",
       "bin/**/*"
+    ],
+    "asar": true,
+    "asarUnpack": [
+      "**/*.node"
     ],
     "extraResources": [
       {
