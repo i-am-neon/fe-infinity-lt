@@ -93,7 +93,26 @@ function createMainWindow() {
       }
       
       if (indexPath) {
+        // For Next.js apps in Electron, we need to load the index.html first
+        // and let the Next.js router handle the rest
         mainWindow.loadFile(indexPath);
+        
+        // Set up protocol handling for Next.js routes
+        mainWindow.webContents.on('will-navigate', (event, url) => {
+          const parsedUrl = new URL(url);
+          
+          // Only handle same-origin navigation
+          if (parsedUrl.origin === 'file://') {
+            // Let it navigate normally
+            return;
+          }
+          
+          // For external links, open in browser
+          if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
+            event.preventDefault();
+            require('electron').shell.openExternal(url);
+          }
+        });
       } else {
         // If we can't find the client build, show an error page
         logger.log('error', 'Could not find Next.js build output in any expected location');
