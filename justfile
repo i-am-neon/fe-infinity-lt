@@ -15,7 +15,7 @@ start-server:
 editor:
     cd lt-maker-fork && source /opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh && conda activate fe-i-lt && wine python run_editor.py
 
-# Start the Next.js client
+# Start the Vite React client
 start-client:
     cd client && pnpm dev
 
@@ -27,7 +27,7 @@ reset:
 stop:
 	-pkill -f "deno"
 	-pkill -f "pnpm dev"
-	-pkill -f "next dev"
+	-pkill -f "vite"
 	just stop-vector-db
 
 clean:

@@ -49,11 +49,11 @@ function createMainWindow() {
   // Check if running in development mode
   const isDev = process.argv.includes('--dev');
 
-  // Load from Next.js dev server in development
+  // Load from Vite dev server in development
   if (isDev) {
     console.log('Running in development mode');
     process.env.NODE_ENV = 'development';
-    mainWindow.loadURL('http://localhost:3000');
+    mainWindow.loadURL('http://localhost:5173');
     mainWindow.webContents.openDevTools();
 
     // Start HTTP game launcher server in development mode
@@ -74,151 +74,145 @@ function createMainWindow() {
       logger.log('info', `__dirname: ${__dirname}`);
       logger.log('info', `app.getAppPath(): ${app.getAppPath()}`);
       logger.log('info', `process.resourcesPath: ${process.resourcesPath}`);
-      
+
       // Define base paths based on platform
       let basePaths = [];
-      
+
       if (isMac) {
         // macOS-specific paths (in order of priority)
         basePaths = [
           // Inside .app bundle
-          path.join(process.resourcesPath, 'client/out'),
-          path.join(process.resourcesPath, 'app/client/out'),
-          path.join(process.resourcesPath, 'extraResources/client/out'),
-          path.join(app.getAppPath(), 'Resources/client/out'),
-          path.join(app.getAppPath(), 'Resources/app/client/out'),
-          path.join(app.getPath('exe'), '../../Resources/client/out')
+          path.join(process.resourcesPath, 'client/dist'),
+          path.join(process.resourcesPath, 'app/client/dist'),
+          path.join(process.resourcesPath, 'extraResources/client/dist'),
+          path.join(app.getAppPath(), 'Resources/client/dist'),
+          path.join(app.getAppPath(), 'Resources/app/client/dist'),
+          path.join(app.getPath('exe'), '../../Resources/client/dist')
         ];
       } else {
         // Windows/Linux paths
         basePaths = [
-          path.join(__dirname, '../client/out'),
-          path.join(__dirname, 'client/out'),
-          path.join(app.getAppPath(), 'client/out'),
-          path.join(process.resourcesPath, 'client/out'),
-          path.join(process.resourcesPath, 'app/client/out')
+          path.join(__dirname, '../client/dist'),
+          path.join(__dirname, 'client/dist'),
+          path.join(app.getAppPath(), 'client/dist'),
+          path.join(process.resourcesPath, 'client/dist'),
+          path.join(process.resourcesPath, 'app/client/dist')
         ];
       }
-  
+
       // Add development paths
       if (app.isPackaged === false) {
         basePaths.unshift(path.join(__dirname, '../client/out'));
       }
-  
-      // Markers to identify a valid Next.js build directory
-      const buildMarkers = ['app-build-manifest.json', 'build-manifest.json'];
-      
+
+      // Markers to identify a valid Vite build directory
+      const buildMarkers = ['index.html', 'assets'];
+
       let validBuildPath = null;
       let appEntryPath = null;
-  
+
       // Log all path attempts for debugging
-      logger.log('info', 'Searching for Next.js build output...');
-      
+      logger.log('info', 'Searching for Vite build output...');
+
       // First, find a valid build directory
       for (const basePath of basePaths) {
         let isValid = false;
-        
+
         for (const marker of buildMarkers) {
           const markerPath = path.join(basePath, marker);
           const exists = fs.existsSync(markerPath);
           logger.log('info', `Checking marker: ${markerPath}, exists: ${exists}`);
-          
+
           if (exists) {
             isValid = true;
             validBuildPath = basePath;
-            logger.log('info', `Found valid Next.js build at: ${validBuildPath}`);
+            logger.log('info', `Found valid Vite build at: ${validBuildPath}`);
+
+            // If we found the index.html, set it as the entry path
+            if (marker === 'index.html') {
+              appEntryPath = markerPath;
+              logger.log('info', `Found entry file at: ${appEntryPath}`);
+            }
             break;
           }
         }
-        
+
         if (isValid) break;
       }
-      
-      // If we found a valid build path, look for the entry files
-      if (validBuildPath) {
-        const possibleEntryPaths = [
-          // For Next.js App Router, we serve static/index.html as the default route
-          path.join(validBuildPath, 'static/index.html'),
-          // For pages router, might be index.html directly
-          path.join(validBuildPath, 'index.html'),
-          // Next.js 15 with app router might have this structure
-          path.join(validBuildPath, 'server/app/index.html'),
-          path.join(validBuildPath, 'server/app/page.html'),
-          path.join(validBuildPath, 'server/pages/index.html')
-        ];
-        
-        for (const entryPath of possibleEntryPaths) {
-          const exists = fs.existsSync(entryPath);
-          logger.log('info', `Checking entry file: ${entryPath}, exists: ${exists}`);
-          
-          if (exists) {
-            appEntryPath = entryPath;
-            logger.log('info', `Found Next.js entry file at: ${appEntryPath}`);
-            break;
-          }
-        }
-        
-        // If we couldn't find an HTML entry file, try to load the app directory itself
-        if (!appEntryPath) {
-          logger.log('info', `No specific HTML entry file found, using build directory: ${validBuildPath}`);
+
+      // If we found a valid build path but not an entry path yet, look for index.html
+      if (validBuildPath && !appEntryPath) {
+        const indexPath = path.join(validBuildPath, 'index.html');
+        const exists = fs.existsSync(indexPath);
+        logger.log('info', `Checking for index.html: ${indexPath}, exists: ${exists}`);
+
+        if (exists) {
+          appEntryPath = indexPath;
+          logger.log('info', `Found Vite entry file at: ${appEntryPath}`);
+        } else {
+          // If we couldn't find an HTML entry file, try to load the app directory itself
+          logger.log('info', `No index.html found, using build directory: ${validBuildPath}`);
           appEntryPath = validBuildPath;
         }
       }
-      
+
       // Use validBuildPath as our indexPath
       let indexPath = appEntryPath || validBuildPath;
 
       if (indexPath) {
-        logger.log('info', `Attempting to load Next.js from: ${indexPath}`);
-        
+        logger.log('info', `Attempting to load React app from: ${indexPath}`);
+
         try {
           // Check if indexPath is a directory or file
           const stats = fs.statSync(indexPath);
-          
+
           if (stats.isDirectory()) {
-            // If it's a directory, we need to serve it with a custom protocol
-            logger.log('info', `Found build directory, setting up file protocol`);
-            
-            // Check for different HTML files in various locations
-            let htmlFile = null;
-            const possibleHtmlFiles = [
-              'static/index.html',
-              'server/app/index.html',
-              'index.html'
-            ];
-            
-            for (const file of possibleHtmlFiles) {
-              const fullPath = path.join(indexPath, file);
-              if (fs.existsSync(fullPath)) {
-                htmlFile = file;
-                logger.log('info', `Found HTML file at: ${fullPath}`);
-                break;
-              }
+            // If it's a directory, we need to load index.html from it
+            const indexHtmlPath = path.join(indexPath, 'index.html');
+            if (fs.existsSync(indexHtmlPath)) {
+              // Create file:// URL with proper formatting for loadURL
+              const fileUrl = `file://${indexHtmlPath.replace(/\\/g, '/')}`;
+              logger.log('info', `Loading from URL (directory): ${fileUrl}`);
+              mainWindow.loadURL(fileUrl);
+            } else {
+              logger.log('error', `index.html not found in directory: ${indexPath}`);
+              throw new Error(`index.html not found in directory: ${indexPath}`);
             }
-            
-            // For Next.js static export, we need to load from the file protocol
-            const fileUrl = htmlFile
-              ? `file://${indexPath}/${htmlFile}`
-              : `file://${indexPath}/`;
-              
-            logger.log('info', `Loading from URL: ${fileUrl}`);
-            mainWindow.loadURL(fileUrl);
           } else {
-            // If it's a file, load it directly
-            logger.log('info', `Loading file directly: ${indexPath}`);
-            mainWindow.loadFile(indexPath);
+            // It's a direct file (likely index.html) - use proper URL format
+            const fileUrl = `file://${indexPath.replace(/\\/g, '/')}`;
+            logger.log('info', `Loading from URL (file): ${fileUrl}`);
+            mainWindow.loadURL(fileUrl);
           }
-          
-          // Set up protocol handling for Next.js routes
+
+          // Set up error handling
+          mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
+            logger.log('error', `Page failed to load: ${errorDescription} (${errorCode})`);
+
+            // Show error in window
+            mainWindow.loadURL(`data:text/html;charset=utf-8,
+              <html>
+                <head><title>FE Infinity - Error</title></head>
+                <body style="font-family: Arial; padding: 2rem; color: #333;">
+                  <h2>Failed to load application</h2>
+                  <p>Error: ${errorDescription} (${errorCode})</p>
+                  <p>Please check the application logs for more details.</p>
+                </body>
+              </html>
+            `);
+          });
+
+          // Enable DevTools in packaged app for debugging
+          mainWindow.webContents.on('did-finish-load', () => {
+            logger.log('info', 'React app loaded successfully');
+            // Uncomment to open DevTools in production for debugging
+            // mainWindow.webContents.openDevTools();
+          });
+
+          // Set up protocol handling
           mainWindow.webContents.on('will-navigate', (event, url) => {
             const parsedUrl = new URL(url);
-            
-            // Only handle same-origin navigation
-            if (parsedUrl.protocol === 'file:') {
-              // Let it navigate normally
-              return;
-            }
-            
+
             // For external links, open in browser
             if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
               event.preventDefault();
@@ -226,8 +220,8 @@ function createMainWindow() {
             }
           });
         } catch (err) {
-          logger.log('error', `Failed to load Next.js build: ${err.message}`);
-          
+          logger.log('error', `Failed to load React app: ${err.message}`, { error: err.stack });
+
           // Fallback to a basic HTML message
           mainWindow.loadURL(`data:text/html;charset=utf-8,
             <html>
@@ -242,7 +236,7 @@ function createMainWindow() {
         }
       } else {
         // If we can't find the client build, show an error page
-        logger.log('error', 'Could not find Next.js build output in any expected location');
+        logger.log('error', 'Could not find Vite build output in any expected location');
         mainWindow.loadFile(path.join(__dirname, 'splash.html')); // Fallback to splash screen
 
         // Show error dialog after window opens
@@ -535,6 +529,43 @@ ipcMain.handle('runGame', async (_, projectPath) => {
       `Failed to launch the game: ${error.message}`
     );
     return { success: false, error: error.message };
+  }
+});
+
+// IPC handler for API calls
+ipcMain.handle('api-call', async (_, args) => {
+  const { endpoint, method, body } = args;
+
+  try {
+    // Connect to the local server
+    const url = `http://localhost:8000/${endpoint}`;
+
+    const options = {
+      method,
+      headers: body ? { 'Content-Type': 'application/json' } : undefined,
+      body: body ? JSON.stringify(body) : undefined
+    };
+
+    const response = await fetch(url, options);
+    const data = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: data.error || `API call failed with status ${response.status}`
+      };
+    }
+
+    return {
+      success: true,
+      data
+    };
+  } catch (error) {
+    console.error('Error in API call:', error);
+    return {
+      success: false,
+      error: error.message
+    };
   }
 });
 

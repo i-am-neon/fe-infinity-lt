@@ -7,6 +7,9 @@ if (typeof global !== 'undefined') {
   };
 }
 
+// Log preload script execution to help with debugging
+console.log('Preload script executing');
+
 contextBridge.exposeInMainWorld('electron', {
   ipcRenderer: {
     send: (channel, data) => {
@@ -18,11 +21,14 @@ contextBridge.exposeInMainWorld('electron', {
     on: (channel, func) => {
       const validChannels = ['fromMain', 'serverStatus', 'gameRunStatus'];
       if (validChannels.includes(channel)) {
+        // Remove the previous listener if there is one
+        ipcRenderer.removeAllListeners(channel);
+        // Add the new listener
         ipcRenderer.on(channel, (event, ...args) => func(...args));
       }
     },
     invoke: (channel, data) => {
-      const validChannels = ['isServerReady', 'runGame'];
+      const validChannels = ['isServerReady', 'runGame', 'api-call'];
       if (validChannels.includes(channel)) {
         return ipcRenderer.invoke(channel, data);
       }
@@ -33,5 +39,12 @@ contextBridge.exposeInMainWorld('electron', {
     getVersion: () => ipcRenderer.invoke('getAppVersion'),
     getServerStatus: () => ipcRenderer.invoke('getServerStatus'),
     quit: () => ipcRenderer.send('quitApp')
+  },
+  // Add a simple test method to verify IPC is working
+  test: {
+    ping: () => 'pong'
   }
 });
+
+// Log that preload script is complete
+console.log('Preload script completed');
