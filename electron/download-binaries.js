@@ -1,4 +1,4 @@
-const fs = require('fs-extra');
+const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 const extract = require('extract-zip');
@@ -22,9 +22,9 @@ const arch = process.arch === 'x64' ? 'x86_64' : process.arch;
 async function downloadAndExtract(url, destDir, extractionRoot = '', customFileName = null) {
   const fileName = customFileName || url.split('/').pop();
   const downloadPath = path.join(destDir, fileName);
-  
+
   console.log(`Downloading ${url}...`);
-  
+
   try {
     // Download the file
     const response = await axios({
@@ -32,23 +32,23 @@ async function downloadAndExtract(url, destDir, extractionRoot = '', customFileN
       url: url,
       responseType: 'stream'
     });
-    
+
     const writer = fs.createWriteStream(downloadPath);
-    
+
     response.data.pipe(writer);
-    
+
     await new Promise((resolve, reject) => {
       writer.on('finish', resolve);
       writer.on('error', reject);
     });
-    
+
     console.log(`Downloaded ${fileName}`);
-    
+
     // Extract if it's a zip file
     if (fileName.endsWith('.zip')) {
       console.log(`Extracting ${fileName}...`);
       await extract(downloadPath, { dir: destDir });
-      
+
       // Move files from extraction root if specified
       if (extractionRoot) {
         const extractionPath = path.join(destDir, extractionRoot);
@@ -62,7 +62,7 @@ async function downloadAndExtract(url, destDir, extractionRoot = '', customFileN
           fs.removeSync(extractionPath);
         }
       }
-      
+
       // Clean up the zip file
       fs.unlinkSync(downloadPath);
       console.log(`Extracted ${fileName}`);
@@ -76,10 +76,10 @@ async function downloadAndExtract(url, destDir, extractionRoot = '', customFileN
 // Download Deno
 async function downloadDeno() {
   console.log('Downloading Deno...');
-  
+
   let denoUrl;
   let extractionRoot = '';
-  
+
   if (isWindows) {
     denoUrl = `https://github.com/denoland/deno/releases/latest/download/deno-x86_64-pc-windows-msvc.zip`;
   } else if (isMac) {
@@ -93,24 +93,24 @@ async function downloadDeno() {
   } else {
     throw new Error(`Unsupported platform: ${platform}`);
   }
-  
+
   await downloadAndExtract(denoUrl, binariesDir);
-  
+
   // Make deno executable on Unix systems
   if (!isWindows) {
     fs.chmodSync(path.join(binariesDir, 'deno'), 0o755);
   }
-  
+
   console.log('Deno downloaded successfully');
 }
 
 // Download PostgreSQL
 async function downloadPostgres() {
   console.log('Downloading PostgreSQL...');
-  
+
   let pgUrl;
   let pgExtractDir;
-  
+
   if (isWindows) {
     pgUrl = 'https://get.enterprisedb.com/postgresql/postgresql-14.10-1-windows-x64-binaries.zip';
     pgExtractDir = 'pgsql';
@@ -127,10 +127,10 @@ async function downloadPostgres() {
   } else {
     throw new Error(`Unsupported platform: ${platform}`);
   }
-  
+
   if (isWindows) {
     await downloadAndExtract(pgUrl, binariesDir, pgExtractDir);
-    
+
     // Copy the key binaries we need to the bin folder
     const pgBinDir = path.join(binariesDir, 'pgsql', 'bin');
     if (fs.existsSync(pgBinDir)) {
@@ -146,7 +146,7 @@ async function downloadPostgres() {
       fs.copySync(path.join(binariesDir, 'pgsql', 'lib'), path.join(binariesDir, 'lib'));
       fs.copySync(path.join(binariesDir, 'pgsql', 'share'), path.join(binariesDir, 'share'));
     }
-    
+
     console.log('PostgreSQL downloaded successfully');
   }
 }
@@ -165,17 +165,17 @@ async function installPgVector() {
 // Download and setup Python
 async function downloadPython() {
   console.log('Downloading Python...');
-  
+
   const pythonDir = path.join(__dirname, 'python');
-  
+
   // Create python directory if it doesn't exist
   if (!fs.existsSync(pythonDir)) {
     fs.mkdirSync(pythonDir, { recursive: true });
   }
-  
+
   let pythonUrl;
   let pythonFileName;
-  
+
   if (isWindows) {
     // For Windows, use the embeddable package
     pythonUrl = 'https://www.python.org/ftp/python/3.11.7/python-3.11.7-embed-amd64.zip';
@@ -192,36 +192,36 @@ async function downloadPython() {
     console.log('Unknown platform for Python download, skipping');
     return;
   }
-  
+
   try {
     const downloadPath = path.join(pythonDir, pythonFileName);
-    
+
     // Download Python installer/package
     await downloadFile(pythonUrl, downloadPath);
     console.log(`Downloaded Python to ${downloadPath}`);
-    
+
     // For Windows, extract the embeddable package
     if (isWindows) {
       console.log('Extracting Python embeddable package...');
       await extract(downloadPath, { dir: pythonDir });
-      
+
       // Download and install pip for Windows embeddable package
       const getPipUrl = 'https://bootstrap.pypa.io/get-pip.py';
       const getPipPath = path.join(pythonDir, 'get-pip.py');
       await downloadFile(getPipUrl, getPipPath);
-      
+
       // Run get-pip.py
       console.log('Installing pip...');
       await execCommand(path.join(pythonDir, 'python.exe'), [getPipPath], { cwd: pythonDir });
-      
+
       // Install required packages
       await installPythonRequirements(path.join(pythonDir, 'python.exe'));
     }
-    
+
     // For Mac/Linux, we'll use Wine to install Python later
     // The installation will be handled by setupPythonWithWine function
     // which is called in the main function
-    
+
     console.log('Python download completed successfully');
   } catch (error) {
     console.error('Failed to download or setup Python:', error);
@@ -232,20 +232,20 @@ async function downloadPython() {
 // Install Python requirements with pip
 async function installPythonRequirements(pythonExecutable) {
   console.log('Installing Python requirements...');
-  
+
   const ltMakerPath = path.join(app.getAppPath(), isWindows ? 'lt-maker-fork' : '..', 'lt-maker-fork');
-  
+
   try {
     // Install editor requirements
     const editorRequirementsPath = path.join(ltMakerPath, 'requirements_editor.txt');
     console.log(`Installing editor requirements from ${editorRequirementsPath}`);
     await execCommand(pythonExecutable, ['-m', 'pip', 'install', '-r', editorRequirementsPath]);
-    
+
     // Install engine requirements
     const engineRequirementsPath = path.join(ltMakerPath, 'requirements_engine.txt');
     console.log(`Installing engine requirements from ${engineRequirementsPath}`);
     await execCommand(pythonExecutable, ['-m', 'pip', 'install', '-r', engineRequirementsPath]);
-    
+
     console.log('Python requirements installed successfully');
   } catch (error) {
     console.error('Failed to install Python requirements:', error);
@@ -258,39 +258,39 @@ async function setupPythonWithWine() {
   if (isWindows) {
     return; // Not needed on Windows
   }
-  
+
   console.log('Setting up Python with Wine...');
   const pythonDir = path.join(__dirname, 'python');
   const pythonInstallerPath = path.join(pythonDir, 'python-3.11.7-amd64.exe');
   const winePath = getWinePath();
-  
+
   if (!winePath || !fs.existsSync(pythonInstallerPath)) {
     console.error('Wine not found or Python installer not downloaded');
     return;
   }
-  
+
   try {
     // Create a custom Wine prefix for Python
     const pythonWinePrefix = path.join(pythonDir, 'prefix');
-    
+
     if (!fs.existsSync(pythonWinePrefix)) {
       fs.mkdirSync(pythonWinePrefix, { recursive: true });
     }
-    
+
     // Set environment variables for Wine
     const wineEnv = {
       ...process.env,
       WINEDEBUG: '-all',
       WINEPREFIX: pythonWinePrefix
     };
-    
+
     // Run Python installer silently
     console.log('Running Python installer with Wine...');
     await execCommand(winePath, [pythonInstallerPath, '/quiet', 'InstallAllUsers=0', 'PrependPath=1', 'Include_test=0'], {
       env: wineEnv,
       timeout: 120000 // 2 minutes timeout
     });
-    
+
     // Create a script to install pip and requirements
     const pipScriptPath = path.join(pythonDir, 'install_requirements.py');
     const pipScriptContent = `
@@ -317,16 +317,16 @@ subprocess.check_call([sys.executable, "-m", "pip", "install", "pygame-ce==2.3.2
 
 print("Installation complete!")
 `;
-    
+
     fs.writeFileSync(pipScriptPath, pipScriptContent);
-    
+
     // Run the script with Wine Python
     console.log('Installing pip and requirements with Wine Python...');
     await execCommand(winePath, ['python', pipScriptPath], {
       env: wineEnv,
       timeout: 300000 // 5 minutes timeout
     });
-    
+
     console.log('Python setup with Wine completed successfully');
   } catch (error) {
     console.error('Failed to setup Python with Wine:', error);
@@ -339,7 +339,7 @@ function getWinePath() {
   if (isWindows) {
     return null;
   }
-  
+
   // Check common locations
   const commonPaths = [
     '/usr/bin/wine',
@@ -347,7 +347,7 @@ function getWinePath() {
     '/opt/homebrew/bin/wine',
     path.join(__dirname, 'wine', 'bin', 'wine')
   ];
-  
+
   for (const winePath of commonPaths) {
     try {
       if (fs.existsSync(winePath)) {
@@ -357,7 +357,7 @@ function getWinePath() {
       // Ignore errors
     }
   }
-  
+
   // Fallback to assuming it's in PATH
   return 'wine';
 }
@@ -365,22 +365,22 @@ function getWinePath() {
 // Download Wine for macOS
 async function downloadWine() {
   console.log('Downloading Wine...');
-  
+
   // Skip on Windows (not needed)
   if (process.platform === 'win32') {
     console.log('Wine not needed on Windows, skipping');
     return;
   }
-  
+
   const wineDir = path.join(__dirname, 'wine');
-  
+
   // Create wine directory if it doesn't exist
   if (!fs.existsSync(wineDir)) {
     fs.mkdirSync(wineDir, { recursive: true });
   }
-  
+
   let wineUrl;
-  
+
   if (process.platform === 'darwin') {
     // For macOS, we'll download a portable Wine
     wineUrl = 'https://github.com/Gcenx/winecx/releases/download/crossover-wine-22.1.1/wine-crossover-22.1.1-osx64.tar.xz';
@@ -391,29 +391,29 @@ async function downloadWine() {
     console.log('Unknown platform for Wine download, skipping');
     return;
   }
-  
+
   try {
     if (process.platform === 'darwin') {
       const tarFile = 'wine-crossover.tar.xz';
       // Download the tar.xz file
       await downloadFile(wineUrl, path.join(wineDir, tarFile));
-      
+
       // Extract tar.xz file
       console.log('Extracting Wine...');
       await execCommand('tar', ['-xf', path.join(wineDir, tarFile), '-C', wineDir]);
-      
+
       // Clean up
       fs.unlinkSync(path.join(wineDir, tarFile));
     } else if (process.platform === 'linux') {
       const appImageFile = path.join(wineDir, 'wine.AppImage');
-      
+
       // Download the AppImage
       await downloadFile(wineUrl, appImageFile);
-      
+
       // Make it executable
       fs.chmodSync(appImageFile, 0o755);
     }
-    
+
     console.log('Wine downloaded successfully');
   } catch (error) {
     console.error('Failed to download Wine:', error);
@@ -424,17 +424,17 @@ async function downloadWine() {
 // Helper to download a file
 async function downloadFile(url, destination) {
   console.log(`Downloading ${url}...`);
-  
+
   const response = await axios({
     method: 'GET',
     url: url,
     responseType: 'stream'
   });
-  
+
   const writer = fs.createWriteStream(destination);
-  
+
   response.data.pipe(writer);
-  
+
   return new Promise((resolve, reject) => {
     writer.on('finish', resolve);
     writer.on('error', reject);
@@ -445,7 +445,7 @@ async function downloadFile(url, destination) {
 async function execCommand(command, args, options = {}) {
   return new Promise((resolve, reject) => {
     const process = spawn(command, args, options);
-    
+
     process.on('close', (code) => {
       if (code === 0) {
         resolve();
@@ -453,7 +453,7 @@ async function execCommand(command, args, options = {}) {
         reject(new Error(`Command exited with code ${code}`));
       }
     });
-    
+
     process.on('error', reject);
   });
 }
@@ -466,35 +466,35 @@ async function main() {
     const isMac = process.platform === 'darwin';
     const isWindows = process.platform === 'win32';
     const isLinux = process.platform === 'linux';
-    
+
     if (isMac && isDev) {
       console.log('Running on macOS in development mode');
       console.log('Skipping binary downloads - using system-installed versions');
-      
+
       // Create placeholder files so the app knows we ran
       fs.writeFileSync(path.join(binariesDir, '.dev-mode'), 'Development mode - using system binaries');
-      
+
       // Create a dummy script to redirect to system Deno
       const denoDummyPath = path.join(binariesDir, 'deno');
       fs.writeFileSync(denoDummyPath, '#!/bin/sh\ndeno "$@"');
       fs.chmodSync(denoDummyPath, 0o755);
-      
+
       return;
     }
-    
+
     // Normal download flow
     await downloadDeno();
-    
+
     // Download Python for all platforms
     await downloadPython();
-    
+
     // Download Wine for non-Windows platforms
     if (!isWindows) {
       await downloadWine();
       // Setup Python with Wine after Wine is downloaded
       await setupPythonWithWine();
     }
-    
+
     if (!isMac) {
       // Skip PostgreSQL download on Mac as it's complex
       await downloadPostgres();
@@ -502,7 +502,7 @@ async function main() {
     } else {
       console.log('Skipping PostgreSQL download on macOS - please install manually if needed');
     }
-    
+
     console.log('All binaries downloaded successfully');
   } catch (error) {
     console.error('Failed to download binaries:', error);

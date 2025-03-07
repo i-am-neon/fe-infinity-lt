@@ -1,6 +1,6 @@
-import { join } from "jsr:@std/path";
-import { ensureDirSync } from "jsr:@std/fs";
 import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
+import { ensureDirSync } from "jsr:@std/fs";
+import { join } from "jsr:@std/path";
 
 type LogLevel = "debug" | "info" | "warn" | "error";
 
@@ -18,7 +18,17 @@ export class Logger {
 
   constructor(projectName: string) {
     this.projectName = projectName || "-";
-    this.baseLogDir = getPathWithinServer("_logs");
+
+    // Use Electron log directory if available, otherwise use server path
+    const electronLogDir = Deno.env.get("ELECTRON_LOG_DIR");
+    this.baseLogDir = electronLogDir
+      ? join(electronLogDir, "game_logs")
+      : getPathWithinServer("_logs");
+
+    console.log(
+      `Logger initialized for project '${projectName}' using base log directory: ${this.baseLogDir}`
+    );
+
     this.openLogFile();
   }
 
@@ -27,19 +37,30 @@ export class Logger {
       this.stream.close();
       this.stream = null;
     }
-    ensureDirSync(this.baseLogDir);
-    const projectDir = join(this.baseLogDir, this.projectName);
-    ensureDirSync(projectDir);
 
-    const fileName =
-      this.chapterNumber !== null ? `${this.chapterNumber}.log` : `-.log`;
-    const logFilePath = join(projectDir, fileName);
+    try {
+      // Ensure base log directory exists
+      ensureDirSync(this.baseLogDir);
 
-    this.stream = Deno.openSync(logFilePath, {
-      write: true,
-      create: true,
-      append: true,
-    });
+      // Ensure project-specific directory exists
+      const projectDir = join(this.baseLogDir, this.projectName);
+      ensureDirSync(projectDir);
+
+      const fileName =
+        this.chapterNumber !== null ? `${this.chapterNumber}.log` : `-.log`;
+      const logFilePath = join(projectDir, fileName);
+
+      console.log(`Opening log file: ${logFilePath}`);
+
+      this.stream = Deno.openSync(logFilePath, {
+        write: true,
+        create: true,
+        append: true,
+      });
+    } catch (error) {
+      console.error(`Failed to open log file for ${this.projectName}:`, error);
+      // Don't throw, just continue without logging to file
+    }
   }
 
   public setChapterNumber(chapter: number | null) {
@@ -48,19 +69,42 @@ export class Logger {
   }
 
   private writeLog({ level, message, metadata }: LogOptions) {
-    if (!this.stream) return;
-    const logEntry = {
-      timestamp: new Date().toISOString(),
-      level,
-      message,
-      metadata: {
-        ...metadata,
-        chapter: this.chapterNumber !== null ? this.chapterNumber : "-",
-      },
-    };
-    this.stream.writeSync(
-      new TextEncoder().encode(JSON.stringify(logEntry, null, 2) + "\n")
-    );
+    if (!this.stream) {
+      // If stream isn't available, at least log to console
+      console.log(
+        `[${level.toUpperCase()}] ${message} ${
+          metadata ? JSON.stringify(metadata) : ""
+        }`
+      );
+      return;
+    }
+
+    try {
+      const logEntry = {
+        timestamp: new Date().toISOString(),
+        level,
+        message,
+        metadata: {
+          ...metadata,
+          chapter: this.chapterNumber !== null ? this.chapterNumber : "-",
+        },
+      };
+
+      this.stream.writeSync(
+        new TextEncoder().encode(JSON.stringify(logEntry, null, 2) + "\n")
+      );
+    } catch (error) {
+      console.error(`Failed to write to log file: ${(error as Error).message}`);
+
+      // Try to reopen the log file
+      try {
+        this.openLogFile();
+      } catch (reopenError) {
+        console.error(
+          `Failed to reopen log file: ${(reopenError as Error).message}`
+        );
+      }
+    }
   }
 
   debug(message: string, metadata?: Record<string, unknown>) {

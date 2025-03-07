@@ -29,9 +29,7 @@
     "wait-on": "^7.2.0"
   },
   "dependencies": {
-    "fs-extra": "^11.2.0",
-    "node-fetch": "^3.3.2",
-    "wine-stable": "^1.0.0"
+    "node-fetch": "^3.3.2"
   },
   "build": {
     "appId": "com.fe-infinity.app",
