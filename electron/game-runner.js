@@ -95,13 +95,53 @@ function getWinePythonEnv() {
   }
   
   // For macOS and Linux, set up Wine environment variables
-  const pythonWinePrefix = path.join(app.getAppPath(), 'bin', 'python', 'prefix');
-  return {
+  let winePrefix;
+  
+  // Try user's default Wine prefix first
+  const userWinePrefix = path.join(require('os').homedir(), '.wine');
+  if (fs.existsSync(userWinePrefix)) {
+    winePrefix = userWinePrefix;
+    console.log(`Using existing Wine prefix: ${winePrefix}`);
+  } else {
+    // Fall back to app directory but ensure it exists
+    const appWinePrefix = path.join(app.getAppPath(), 'wine_prefix');
+    try {
+      // Create directory if it doesn't exist
+      if (!fs.existsSync(appWinePrefix)) {
+        fs.mkdirSync(appWinePrefix, { recursive: true });
+        console.log(`Created Wine prefix directory: ${appWinePrefix}`);
+      }
+      winePrefix = appWinePrefix;
+    } catch (error) {
+      // Use temp directory as last resort
+      const tempWinePrefix = path.join(require('os').tmpdir(), 'fe_infinity_wine');
+      try {
+        if (!fs.existsSync(tempWinePrefix)) {
+          fs.mkdirSync(tempWinePrefix, { recursive: true });
+        }
+        winePrefix = tempWinePrefix;
+        console.log(`Using temporary Wine prefix: ${winePrefix}`);
+      } catch (tempError) {
+        // If all else fails, use null and let Wine choose its default
+        winePrefix = null;
+        console.warn('Could not create Wine prefix directory, using default');
+      }
+    }
+  }
+  
+  // Build Wine environment
+  const wineEnv = {
     ...process.env,
-    WINEDEBUG: '-all',
-    WINEDLLOVERRIDES: 'mscoree,mshtml=',
-    WINEPREFIX: pythonWinePrefix || `${require('os').homedir()}/.wine`
+    WINEDEBUG: '-all', // Suppress Wine debug messages
+    WINEDLLOVERRIDES: 'mscoree,mshtml=', // Avoid Wine trying to use Internet Explorer
   };
+  
+  // Only set WINEPREFIX if we have a valid path
+  if (winePrefix) {
+    wineEnv.WINEPREFIX = winePrefix;
+  }
+  
+  return wineEnv;
 }
 
 // Run a game using Wine and Python
