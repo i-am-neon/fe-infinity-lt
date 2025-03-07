@@ -10,12 +10,12 @@ import {
 } from "@/components/ui/dialog";
 import GameIdeaSelector from "@/components/ui/game-idea-selector";
 import GamesGrid from "@/components/ui/games-grid";
-// import {
-//   NonClosableDialog,
-//   NonClosableDialogContent,
-//   NonClosableDialogHeader,
-//   NonClosableDialogTitle,
-// } from "@/components/ui/non-closable-dialog";
+import {
+  NonClosableDialog,
+  NonClosableDialogContent,
+  NonClosableDialogHeader,
+  NonClosableDialogTitle,
+} from "@/components/ui/non-closable-dialog";
 import apiCall from "@/lib/api-call";
 import { Loader2 } from "lucide-react";
 import { useCallback, useState } from "react";
@@ -124,7 +124,7 @@ export default function HomePage() {
           </DialogContent>
         </Dialog>
 
-        {/* <NonClosableDialog
+        <NonClosableDialog
           open={creatingGameModalOpen}
           onOpenChange={setCreatingGameModalOpen}
         >
@@ -139,7 +139,7 @@ export default function HomePage() {
               <p>The game is being created. Please wait...</p>
             </div>
           </NonClosableDialogContent>
-        </NonClosableDialog> */}
+        </NonClosableDialog>
 
         <GamesGrid />
       </main>

@@ -1,4 +1,5 @@
-import { ChevronLeft, Loader2 } from "lucide-react";
+import apiCall from "@/lib/api-call";
+import { AlertCircle, ChevronLeft, Loader2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
@@ -13,15 +14,14 @@ import {
   AlertDialogTrigger,
 } from "../components/ui/alert-dialog";
 import { Button } from "../components/ui/button";
-// import {
-//   NonClosableDialog,
-//   NonClosableDialogContent,
-//   NonClosableDialogDescription,
-//   NonClosableDialogFooter,
-//   NonClosableDialogHeader,
-//   NonClosableDialogTitle,
-// } from "../components/ui/non-closable-dialog";
-import apiCall from "@/lib/api-call";
+import {
+  NonClosableDialog,
+  NonClosableDialogContent,
+  NonClosableDialogDescription,
+  NonClosableDialogFooter,
+  NonClosableDialogHeader,
+  NonClosableDialogTitle,
+} from "../components/ui/non-closable-dialog";
 import { Game } from "../types/game";
 
 export default function GameDetailPage() {
@@ -328,7 +328,7 @@ export default function GameDetailPage() {
       </AlertDialog>
 
       {/* Next Chapter Generation Loading/Error Dialog */}
-      {/* <NonClosableDialog
+      <NonClosableDialog
         open={generatingChapterModalOpen}
         onOpenChange={(open) => {
           // Only allow closing if there's an error
@@ -379,7 +379,7 @@ export default function GameDetailPage() {
             </div>
           )}
         </NonClosableDialogContent>
-      </NonClosableDialog> */}
+      </NonClosableDialog>
 
       <div className="p-6 space-y-4">
         <a
