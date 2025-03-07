@@ -5,23 +5,71 @@ const { app } = require('electron');
 
 // Get path to bundled Wine only, never use system Wine
 function getWinePath() {
-  if (process.platform === 'windows') {
+  if (process.platform === 'win32') {
     // On Windows, we don't need Wine
     return null;
   }
 
-  // Both in production and development, always use bundled Wine
-  const bundledWinePath = path.join(app.getAppPath(), 'bin', 'wine');
+  const baseWineDir = path.join(app.getAppPath(), 'bin', 'wine');
+  console.log(`Looking for Wine in: ${baseWineDir}`);
 
-  // Check if bundled Wine exists
-  if (!fs.existsSync(bundledWinePath)) {
-    const errorMessage = `ERROR: Bundled Wine not found at ${bundledWinePath}. Cannot run game.`;
-    console.error(errorMessage);
-    throw new Error(errorMessage);
+  // Try to find wine binary using find
+  try {
+    const { execSync } = require('child_process');
+    const result = execSync(`find "${baseWineDir}" -name wine -type f`, { encoding: 'utf8' });
+
+    if (result.trim()) {
+      const foundPaths = result.trim().split('\n');
+
+      // Get the first found path that exists
+      for (const winePath of foundPaths) {
+        if (fs.existsSync(winePath)) {
+          console.log(`Found Wine binary at: ${winePath}`);
+          // Make sure it's executable
+          try {
+            fs.chmodSync(winePath, 0o755);
+            console.log(`Ensured executable permission on ${winePath}`);
+          } catch (err) {
+            console.error(`Failed to set executable permission on ${winePath}:`, err);
+          }
+          return winePath;
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error searching for Wine binary:', error.message);
   }
 
-  console.log(`Using bundled Wine at: ${bundledWinePath}`);
-  return bundledWinePath;
+  // If find command failed, check for Wine in bundled locations
+  const possiblePaths = [
+    // Standard Wine binary paths
+    path.join(baseWineDir, 'bin', 'wine'),
+    // Wine stable paths
+    path.join(baseWineDir, 'wine-stable/bin/wine'),
+    // Wine within app bundles
+    path.join(baseWineDir, 'Wine.app', 'Contents', 'MacOS', 'wine'),
+    path.join(baseWineDir, 'wine-stable.app', 'Contents', 'MacOS', 'wine')
+  ];
+
+  // Find the first existing Wine binary
+  for (const winePath of possiblePaths) {
+    console.log(`Checking for Wine at: ${winePath}`);
+    if (fs.existsSync(winePath)) {
+      console.log(`Found Wine at: ${winePath}`);
+      // Make sure it's executable
+      try {
+        fs.chmodSync(winePath, 0o755);
+        console.log(`Ensured executable permission on ${winePath}`);
+      } catch (err) {
+        console.error(`Failed to set executable permission on ${winePath}:`, err);
+      }
+      return winePath;
+    }
+  }
+
+  // If we get here, we couldn't find Wine
+  console.error(`ERROR: Wine binary not found in ${baseWineDir}. Cannot run game.`);
+  throw new Error(`Wine binary not found in ${baseWineDir}`);
 }
 
 // Get the LT maker path

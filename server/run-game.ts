@@ -53,35 +53,79 @@ export default async function runGame(
       pythonCommand = "..\\bin\\python\\python.exe";
       pythonArgs = ["run_engine_for_project.py", normalizedProjectPath];
     } else {
-      // macOS/Linux - look for bundled Wine in electron/bin
+      // macOS/Linux - look for bundled Wine
       const { resolve } = await import("@std/path");
-      const bundledWinePath = resolve(ltMakerPath, "../electron/bin/wine/bin/wine");
-      
-      try {
-        // Check if bundled Wine exists
-        await Deno.stat(bundledWinePath);
-        console.log(`Using bundled Wine at: ${bundledWinePath}`);
-        pythonCommand = bundledWinePath;
-      } catch (error) {
-        // Bundled Wine not found - throw error
-        console.error(`Bundled Wine not found at ${bundledWinePath}`);
-        throw new Error(`Cannot run game: Bundled Wine not found at ${bundledWinePath}`);
+
+      // Try multiple possible Wine locations
+      const possibleWinePaths = [
+        resolve(ltMakerPath, "../electron/bin/wine/bin/wine"),
+        resolve(
+          ltMakerPath,
+          "../electron/bin/wine/Wine Stable.app/Contents/MacOS/wine"
+        ),
+        resolve(
+          ltMakerPath,
+          "../electron/bin/wine/Wine Stable.app/Contents/Resources/wine/bin/wine"
+        ),
+      ];
+
+      console.log("Checking for Wine in the following locations:");
+      possibleWinePaths.forEach((path) => console.log(` - ${path}`));
+
+      let bundledWinePath = null;
+
+      // Try each path in order
+      for (const winePath of possibleWinePaths) {
+        try {
+          await Deno.stat(winePath);
+          console.log(`Found Wine at: ${winePath}`);
+          bundledWinePath = winePath;
+          break;
+        } catch (e) {
+          console.log(`Wine not found at: ${winePath}`);
+        }
       }
-      
-      pythonArgs = ["python", "run_engine_for_project.py", normalizedProjectPath];
-      
-      // Get absolute path for WINEPREFIX if it exists
+
+      if (!bundledWinePath) {
+        // Bundled Wine not found - throw error
+        console.error(
+          `Bundled Wine not found in any of the expected locations`
+        );
+        throw new Error(`Cannot run game: Bundled Wine not found`);
+      }
+
+      pythonCommand = bundledWinePath;
+      pythonArgs = [
+        "python",
+        "run_engine_for_project.py",
+        normalizedProjectPath,
+      ];
+
+      // Set up Wine prefix - prefer custom prefix, fall back to default
+      const customWinePrefixPath = resolve(
+        ltMakerPath,
+        "../electron/bin/wine/prefix"
+      );
       try {
-        const winePrefixPath = "../electron/python/prefix";
-        const winePrefixAbsolute = resolve(ltMakerPath, winePrefixPath);
-        
         // Only set WINEPREFIX if the directory exists
-        if (await Deno.stat(winePrefixAbsolute).catch(() => null)) {
-          winePrefix = winePrefixAbsolute;
-          console.log(`Using Wine prefix: ${winePrefix}`);
+        if (await Deno.stat(customWinePrefixPath).catch(() => null)) {
+          winePrefix = customWinePrefixPath;
+          console.log(`Using custom Wine prefix: ${winePrefix}`);
+        } else {
+          // Try Python wine prefix as fallback
+          const pythonWinePrefixPath = resolve(
+            ltMakerPath,
+            "../electron/bin/python/prefix"
+          );
+          if (await Deno.stat(pythonWinePrefixPath).catch(() => null)) {
+            winePrefix = pythonWinePrefixPath;
+            console.log(`Using Python Wine prefix: ${winePrefix}`);
+          } else {
+            console.log("Custom Wine prefix not found, using default");
+          }
         }
       } catch (error) {
-        console.log("Wine prefix not found, using default");
+        console.log(`Error checking Wine prefix: ${(error as Error).message}`);
       }
     }
 
@@ -92,7 +136,7 @@ export default async function runGame(
     const env = {
       ...Deno.env.toObject(),
     };
-    
+
     // Only add WINEPREFIX to env if it's defined
     if (winePrefix) {
       env.WINEPREFIX = winePrefix;

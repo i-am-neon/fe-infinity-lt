@@ -18,7 +18,8 @@
     "package": "npm run build:client && npm run verify-client-build && electron-builder --dir && node -e \"const fs=require('fs');const path=require('path');console.log('Output directory contents:');const outputDir=path.join(__dirname,'release/mac-arm64/FE Infinity.app/Contents/Resources/client/dist');if(fs.existsSync(outputDir)){console.log(fs.readdirSync(outputDir));}else{console.log('Output directory not found:',outputDir);}\" && electron-builder",
     "package:mac": "npm run build:client && npm run verify-client-build && electron-builder --mac",
     "package:win": "npm run build:client && npm run verify-client-build && electron-builder --win",
-    "package:linux": "npm run build:client && npm run verify-client-build && electron-builder --linux"
+    "package:linux": "npm run build:client && npm run verify-client-build && electron-builder --linux",
+    "clean": "rm -rf bin"
   },
   "devDependencies": {
     "axios": "^1.6.7",
@@ -104,3 +105,4 @@
     }
   }
 }
+

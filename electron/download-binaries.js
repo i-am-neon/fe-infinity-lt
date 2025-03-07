@@ -407,7 +407,7 @@ async function downloadWine() {
 
   if (process.platform === 'darwin') {
     // For macOS, we'll download a portable Wine
-    wineUrl = 'https://github.com/Gcenx/winecx/releases/download/crossover-wine-22.1.1/wine-crossover-22.1.1-osx64.tar.xz';
+    wineUrl = 'https://github.com/Gcenx/macOS_Wine_builds/releases/download/10.0/wine-stable-10.0-osx64.tar.xz';
   } else if (process.platform === 'linux') {
     // For Linux, we'll use a portable Wine build
     wineUrl = 'https://github.com/mmtrt/WINE_AppImage/releases/download/continuous-stable-1-i386/wine-stable-1-i386.AppImage';
@@ -418,7 +418,7 @@ async function downloadWine() {
 
   try {
     if (process.platform === 'darwin') {
-      const tarFile = 'wine-crossover.tar.xz';
+      const tarFile = 'wine-stable-10.0-osx64.tar.xz';
       // Download the tar.xz file
       await downloadFile(wineUrl, path.join(wineDir, tarFile));
 
@@ -426,15 +426,41 @@ async function downloadWine() {
       console.log('Extracting Wine...');
       await execCommand('tar', ['-xf', path.join(wineDir, tarFile), '-C', wineDir]);
 
+      // Make all Wine binaries executable
+      console.log('Making all Wine binaries executable...');
+      try {
+        // Make all binaries executable recursively
+        await execCommand('chmod', ['-R', '+x', wineDir]);
+
+        // Find the wine binary
+        console.log('Finding Wine binary...');
+        const findCommand = await execCommand('find', [wineDir, '-name', 'wine', '-type', 'f'], {
+          capture: true
+        });
+
+        if (findCommand && findCommand.stdout) {
+          const winePaths = findCommand.stdout.split('\n').filter(Boolean);
+          if (winePaths.length > 0) {
+            console.log(`Found Wine binaries at: ${winePaths.join(', ')}`);
+            // Make each found binary executable
+            for (const winePath of winePaths) {
+              fs.chmodSync(winePath, 0o755);
+              console.log(`Made executable: ${winePath}`);
+            }
+          } else {
+            console.warn('No Wine binary found in extracted directory');
+          }
+        }
+      } catch (error) {
+        console.error('Error setting executable permissions:', error);
+      }
+
       // Clean up
       fs.unlinkSync(path.join(wineDir, tarFile));
     } else if (process.platform === 'linux') {
+      // Linux handling (unchanged)
       const appImageFile = path.join(wineDir, 'wine.AppImage');
-
-      // Download the AppImage
       await downloadFile(wineUrl, appImageFile);
-
-      // Make it executable
       fs.chmodSync(appImageFile, 0o755);
     }
 
@@ -465,20 +491,37 @@ async function downloadFile(url, destination) {
   });
 }
 
-// Helper to execute commands
+// Helper to execute commands with output capture option
 async function execCommand(command, args, options = {}) {
   return new Promise((resolve, reject) => {
-    const process = spawn(command, args, options);
+    const captureOutput = options.capture === true;
+    const childProcess = spawn(command, args, {
+      ...options,
+      stdio: captureOutput ? ['ignore', 'pipe', 'pipe'] : undefined
+    });
 
-    process.on('close', (code) => {
+    let stdout = '';
+    let stderr = '';
+
+    if (captureOutput) {
+      childProcess.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+
+      childProcess.stderr.on('data', (data) => {
+        stderr += data.toString();
+      });
+    }
+
+    childProcess.on('close', (code) => {
       if (code === 0) {
-        resolve();
+        resolve(captureOutput ? { stdout, stderr } : undefined);
       } else {
         reject(new Error(`Command exited with code ${code}`));
       }
     });
 
-    process.on('error', reject);
+    childProcess.on('error', reject);
   });
 }
 
