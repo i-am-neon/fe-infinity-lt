@@ -4,10 +4,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import apiCall from "@/lib/api-call";
+import { Game } from "@/types/game";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import apiCall from "../../lib/api-call";
-import { Game } from "../../types/game";
 
 export default function GamesGrid() {
   const [games, setGames] = useState<Game[]>([]);
@@ -76,3 +76,4 @@ export default function GamesGrid() {
     </div>
   );
 }
+

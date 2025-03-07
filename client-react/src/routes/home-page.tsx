@@ -1,6 +1,4 @@
-import { useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
-import { Loader2 } from "lucide-react";
+import { ModeToggle } from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,16 +8,18 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  NonClosableDialog,
-  NonClosableDialogContent,
-  NonClosableDialogHeader,
-  NonClosableDialogTitle,
-} from "@/components/ui/non-closable-dialog";
 import GameIdeaSelector from "@/components/ui/game-idea-selector";
 import GamesGrid from "@/components/ui/games-grid";
-import { ModeToggle } from "@/components/ui/theme-toggle";
+// import {
+//   NonClosableDialog,
+//   NonClosableDialogContent,
+//   NonClosableDialogHeader,
+//   NonClosableDialogTitle,
+// } from "@/components/ui/non-closable-dialog";
 import apiCall from "@/lib/api-call";
+import { Loader2 } from "lucide-react";
+import { useCallback, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -124,7 +124,7 @@ export default function HomePage() {
           </DialogContent>
         </Dialog>
 
-        <NonClosableDialog
+        {/* <NonClosableDialog
           open={creatingGameModalOpen}
           onOpenChange={setCreatingGameModalOpen}
         >
@@ -139,10 +139,11 @@ export default function HomePage() {
               <p>The game is being created. Please wait...</p>
             </div>
           </NonClosableDialogContent>
-        </NonClosableDialog>
+        </NonClosableDialog> */}
 
         <GamesGrid />
       </main>
     </div>
   );
 }
+
