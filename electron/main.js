@@ -280,6 +280,51 @@ app.whenReady().then(async () => {
     userDataPath: app.getPath('userData')
   });
 
+  // Check for Wine on macOS/Linux
+  if (process.platform !== 'win32') {
+    try {
+      const { execSync } = require('child_process');
+      let wineInstalled = false;
+      
+      try {
+        execSync('which wine', { encoding: 'utf8' });
+        wineInstalled = true;
+        logger.log('info', 'Wine is installed and available in PATH');
+      } catch (e) {
+        logger.log('warn', 'Wine not found in PATH. Checking common locations...');
+        
+        // Check common locations based on platform
+        const commonPaths = process.platform === 'darwin'
+          ? ['/usr/local/bin/wine', '/opt/homebrew/bin/wine', '/Applications/Wine Stable.app/Contents/Resources/wine/bin/wine']
+          : ['/usr/bin/wine', '/usr/local/bin/wine'];
+        
+        for (const winePath of commonPaths) {
+          if (require('fs').existsSync(winePath)) {
+            wineInstalled = true;
+            logger.log('info', `Wine found at: ${winePath}`);
+            break;
+          }
+        }
+      }
+      
+      if (!wineInstalled) {
+        logger.log('error', 'Wine is not installed. Showing error dialog...');
+        dialog.showErrorBox(
+          'Wine Required',
+          'Wine is required to run this application but was not found on your system.\n\n' +
+          'Please install Wine before running FE Infinity:\n' +
+          '- macOS: brew install --cask --no-quarantine wine-stable\n' +
+          '- Linux: Use your distribution\'s package manager to install wine\n\n' +
+          'The application will now exit.'
+        );
+        app.quit();
+        return;
+      }
+    } catch (error) {
+      logger.log('error', 'Error checking for Wine installation', { error: error.message });
+    }
+  }
+
   // Set app icon for macOS dock
   if (process.platform === 'darwin') {
     try {

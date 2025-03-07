@@ -380,96 +380,7 @@ function getWinePath() {
   return 'wine';
 }
 
-// Download Wine for macOS
-async function downloadWine() {
-  console.log('Downloading Wine...');
-
-  // Skip on Windows (not needed)
-  if (process.platform === 'win32') {
-    console.log('Wine not needed on Windows, skipping');
-    return;
-  }
-
-  const wineDir = path.join(__dirname, 'bin', 'wine');
-
-  // Check if Wine is already installed
-  if (fs.existsSync(wineDir)) {
-    console.log('Wine already installed, skipping...');
-    return;
-  }
-
-  // Create wine directory if it doesn't exist
-  if (!fs.existsSync(wineDir)) {
-    fs.mkdirSync(wineDir, { recursive: true });
-  }
-
-  let wineUrl;
-
-  if (process.platform === 'darwin') {
-    // For macOS, we'll download a portable Wine
-    wineUrl = 'https://github.com/Gcenx/macOS_Wine_builds/releases/download/10.0/wine-stable-10.0-osx64.tar.xz';
-  } else if (process.platform === 'linux') {
-    // For Linux, we'll use a portable Wine build
-    wineUrl = 'https://github.com/mmtrt/WINE_AppImage/releases/download/continuous-stable-1-i386/wine-stable-1-i386.AppImage';
-  } else {
-    console.log('Unknown platform for Wine download, skipping');
-    return;
-  }
-
-  try {
-    if (process.platform === 'darwin') {
-      const tarFile = 'wine-stable-10.0-osx64.tar.xz';
-      // Download the tar.xz file
-      await downloadFile(wineUrl, path.join(wineDir, tarFile));
-
-      // Extract tar.xz file
-      console.log('Extracting Wine...');
-      await execCommand('tar', ['-xf', path.join(wineDir, tarFile), '-C', wineDir]);
-
-      // Make all Wine binaries executable
-      console.log('Making all Wine binaries executable...');
-      try {
-        // Make all binaries executable recursively
-        await execCommand('chmod', ['-R', '+x', wineDir]);
-
-        // Find the wine binary
-        console.log('Finding Wine binary...');
-        const findCommand = await execCommand('find', [wineDir, '-name', 'wine', '-type', 'f'], {
-          capture: true
-        });
-
-        if (findCommand && findCommand.stdout) {
-          const winePaths = findCommand.stdout.split('\n').filter(Boolean);
-          if (winePaths.length > 0) {
-            console.log(`Found Wine binaries at: ${winePaths.join(', ')}`);
-            // Make each found binary executable
-            for (const winePath of winePaths) {
-              fs.chmodSync(winePath, 0o755);
-              console.log(`Made executable: ${winePath}`);
-            }
-          } else {
-            console.warn('No Wine binary found in extracted directory');
-          }
-        }
-      } catch (error) {
-        console.error('Error setting executable permissions:', error);
-      }
-
-      // Clean up
-      fs.unlinkSync(path.join(wineDir, tarFile));
-    } else if (process.platform === 'linux') {
-      // Linux handling (unchanged)
-      const appImageFile = path.join(wineDir, 'wine.AppImage');
-      await downloadFile(wineUrl, appImageFile);
-      fs.chmodSync(appImageFile, 0o755);
-    }
-
-    console.log('Wine downloaded successfully');
-  } catch (error) {
-    console.error('Failed to download Wine:', error);
-    // Continue anyway
-  }
-}
+// No Wine download function - users must install Wine on their system
 
 // Helper to download a file
 async function downloadFile(url, destination) {
@@ -555,11 +466,13 @@ async function main() {
     // Download Python for all platforms
     await downloadPython();
 
-    // Download Wine for non-Windows platforms
+    // No Wine download for non-Windows platforms - users must install themselves
     if (!isWindows) {
-      await downloadWine();
-      // Setup Python with Wine after Wine is downloaded
-      await setupPythonWithWine();
+      console.log('Wine is required for non-Windows platforms. Please ensure Wine is installed on your system.');
+      // We still need to setup Python with Wine but using system Wine
+      if (process.env.NODE_ENV !== 'development') {
+        await setupPythonWithWine();
+      }
     }
 
     if (!isMac) {

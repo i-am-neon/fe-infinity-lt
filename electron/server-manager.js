@@ -523,24 +523,63 @@ const seedVectorDb = async () => {
   });
 };
 
-// Function to get Wine path (used by setupPythonWithWine)
+// Function to get Wine path from local system
 function getWinePath() {
   if (isWindows) {
     return null;
   }
 
-  // Always use bundled Wine
-  const bundledWinePath = path.join(__dirname, 'bin', 'wine', 'bin', 'wine');
-
-  if (!fs.existsSync(bundledWinePath)) {
-    const errorMessage = `ERROR: Bundled Wine not found at ${bundledWinePath}`;
-    logger.log('error', errorMessage);
-    console.error(errorMessage);
-    throw new Error(errorMessage);
+  try {
+    // Check if wine is installed and in PATH
+    const { execSync } = require('child_process');
+    
+    try {
+      const winePath = execSync('which wine', { encoding: 'utf8' }).trim();
+      logger.log('info', `Found Wine in PATH: ${winePath}`);
+      return winePath;
+    } catch (error) {
+      logger.log('error', 'Wine not found in PATH', { error: error.message });
+      
+      // Check common locations on macOS
+      if (process.platform === 'darwin') {
+        const commonMacPaths = [
+          '/usr/local/bin/wine',
+          '/opt/homebrew/bin/wine',
+          '/Applications/Wine Stable.app/Contents/Resources/wine/bin/wine',
+          '/Applications/Wine Stable.app/Contents/MacOS/wine'
+        ];
+        
+        for (const macPath of commonMacPaths) {
+          if (fs.existsSync(macPath)) {
+            logger.log('info', `Found Wine at: ${macPath}`);
+            return macPath;
+          }
+        }
+      }
+      
+      // Check common locations on Linux
+      if (process.platform === 'linux') {
+        const commonLinuxPaths = [
+          '/usr/bin/wine',
+          '/usr/local/bin/wine'
+        ];
+        
+        for (const linuxPath of commonLinuxPaths) {
+          if (fs.existsSync(linuxPath)) {
+            logger.log('info', `Found Wine at: ${linuxPath}`);
+            return linuxPath;
+          }
+        }
+      }
+      
+      const errorMessage = 'Wine is not installed or not found in PATH. Please install Wine to run the server.';
+      logger.log('error', errorMessage);
+      throw new Error(errorMessage);
+    }
+  } catch (error) {
+    logger.log('error', 'Error checking for Wine', { error: error.message });
+    throw new Error(`Wine is required but not found: ${error.message}`);
   }
-
-  logger.log('info', `Using bundled Wine at: ${bundledWinePath}`);
-  return bundledWinePath;
 }
 
 // Setup Python with Wine (for macOS and Linux)
