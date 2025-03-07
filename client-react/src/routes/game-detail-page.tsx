@@ -1,34 +1,34 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { AlertCircle, ChevronLeft, Loader2 } from 'lucide-react';
-import { Game } from '../types/game';
-import apiCall from '../lib/api-call';
-import { Button } from '../components/ui/button';
+import { AlertCircle, ChevronLeft, Loader2 } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
   AlertDialog,
-  AlertDialogTrigger,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogFooter,
   AlertDialogAction,
   AlertDialogCancel,
-} from '../components/ui/alert-dialog';
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "../components/ui/alert-dialog";
+import { Button } from "../components/ui/button";
 import {
   NonClosableDialog,
   NonClosableDialogContent,
+  NonClosableDialogDescription,
+  NonClosableDialogFooter,
   NonClosableDialogHeader,
   NonClosableDialogTitle,
-  NonClosableDialogFooter,
-  NonClosableDialogDescription,
-} from '../components/ui/non-closable-dialog';
+} from "../components/ui/non-closable-dialog";
+import apiCall from "../lib/api-call";
+import { Game } from "../types/game";
 
 export default function GameDetailPage() {
   const { nid } = useParams<{ nid: string }>();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  
+
   const [data, setData] = useState<{
     success: boolean;
     game?: Game;
@@ -39,15 +39,16 @@ export default function GameDetailPage() {
   const [loading, setLoading] = useState(true);
   const [creationError, setCreationError] = useState<string | null>(null);
 
-  const [loadingAction, setLoadingAction] = useState
-    'play' | 'generate' | 'delete' | null
+  const [loadingAction, setLoadingAction] = useState<
+    "play" | "generate" | "delete" | null
   >(null);
 
-  const isNew = searchParams.get('new') === 'true';
+  const isNew = searchParams.get("new") === "true";
   const [newGameModalOpen, setNewGameModalOpen] = useState(isNew);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [confirmNextChapterOpen, setConfirmNextChapterOpen] = useState(false);
-  const [generatingChapterModalOpen, setGeneratingChapterModalOpen] = useState(false);
+  const [generatingChapterModalOpen, setGeneratingChapterModalOpen] =
+    useState(false);
   const [generationError, setGenerationError] = useState<string | null>(null);
   const [oldChapterCount, setOldChapterCount] = useState<number | null>(null);
 
@@ -113,7 +114,7 @@ export default function GameDetailPage() {
   useEffect(() => {
     let canceled = false;
     if (!nid) return;
-    
+
     (async () => {
       try {
         const res = await apiCall<{
@@ -128,7 +129,7 @@ export default function GameDetailPage() {
       } catch (error) {
         if (!canceled) {
           setLoading(false);
-          console.error('Error fetching game:', error);
+          console.error("Error fetching game:", error);
         }
       }
     })();
@@ -139,15 +140,15 @@ export default function GameDetailPage() {
 
   const handlePlay = useCallback(async () => {
     if (!data?.game) return;
-    
-    setLoadingAction('play');
+
+    setLoadingAction("play");
     try {
-      await apiCall('run-game', {
-        method: 'POST',
+      await apiCall("run-game", {
+        method: "POST",
         body: { directory: data.game.directory },
       });
     } catch (error) {
-      console.error('Error running game:', error);
+      console.error("Error running game:", error);
     } finally {
       setLoadingAction(null);
     }
@@ -159,11 +160,11 @@ export default function GameDetailPage() {
 
     setOldChapterCount(data.game.chapters.length);
     setGeneratingChapterModalOpen(true);
-    setLoadingAction('generate');
+    setLoadingAction("generate");
 
     try {
-      await apiCall('generate-next-chapter', {
-        method: 'POST',
+      await apiCall("generate-next-chapter", {
+        method: "POST",
         body: { directory: data.game.directory, gameNid: data.game.nid },
       });
       // We'll rely on the polling to detect completion
@@ -180,7 +181,7 @@ export default function GameDetailPage() {
 
   // Poll for generate next chapter completion
   useEffect(() => {
-    if (loadingAction === 'generate' && oldChapterCount !== null && nid) {
+    if (loadingAction === "generate" && oldChapterCount !== null && nid) {
       const pollId = setInterval(async () => {
         try {
           const res = await apiCall<{
@@ -188,7 +189,7 @@ export default function GameDetailPage() {
             game?: Game;
             error?: string;
           }>(`games/${nid}`);
-          
+
           if (res.success && res.game) {
             setData(res);
             // Compare new chapters count to old
@@ -200,12 +201,12 @@ export default function GameDetailPage() {
 
               // Auto-run the game on success
               try {
-                await apiCall('run-game', {
-                  method: 'POST',
+                await apiCall("run-game", {
+                  method: "POST",
                   body: { directory: res.game.directory },
                 });
               } catch (error) {
-                console.error('Error auto-running game:', error);
+                console.error("Error auto-running game:", error);
               }
             }
           }
@@ -226,18 +227,18 @@ export default function GameDetailPage() {
 
   const handleConfirmDelete = useCallback(async () => {
     if (!data?.game) return;
-    
+
     setDialogOpen(false);
-    setLoadingAction('delete');
-    
+    setLoadingAction("delete");
+
     try {
-      await apiCall('delete-game', {
-        method: 'POST',
+      await apiCall("delete-game", {
+        method: "POST",
         body: { nid: data.game.nid, directory: data.game.directory },
       });
-      navigate('/', { replace: true });
+      navigate("/", { replace: true });
     } catch (error) {
-      console.error('Error deleting game:', error);
+      console.error("Error deleting game:", error);
       setLoadingAction(null);
     }
   }, [data, navigate]);
@@ -381,7 +382,10 @@ export default function GameDetailPage() {
       </NonClosableDialog>
 
       <div className="p-6 space-y-4">
-        <a href="/" className="inline-flex items-center mb-4 text-sm font-medium hover:underline">
+        <a
+          href="/"
+          className="inline-flex items-center mb-4 text-sm font-medium hover:underline"
+        >
           <ChevronLeft className="w-4 h-4 mr-1" />
           Back to Home
         </a>
