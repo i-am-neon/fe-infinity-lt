@@ -3,6 +3,18 @@ import { handleCreateGame } from "@/routes/create-game.ts";
 
 export async function handleRequest(req: Request): Promise<Response> {
   const url = new URL(req.url);
+  
+  // Handle CORS preflight requests
+  if (req.method === "OPTIONS") {
+    return new Response(null, {
+      status: 204,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
+      },
+    });
+  }
 
   if (req.method === "GET" && url.pathname === "/ping") {
     // "Ping" route
@@ -43,7 +55,14 @@ export async function handleRequest(req: Request): Promise<Response> {
   }
 
   // Default route
-  return new Response("Not Found", { status: 404 });
+  return new Response("Not Found", {
+    status: 404,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    }
+  });
 }
 
 if (import.meta.main) {
@@ -53,4 +72,3 @@ if (import.meta.main) {
     console.log("Test route responded with:", await res.text());
   });
 }
-
