@@ -1,6 +1,10 @@
 {
   "name": "fe-infinity",
   "productName": "FE Infinity",
+  "author": {
+    "name": "neon",
+    "url": "https://www.neon.engineer/"
+  },
   "version": "1.0.0",
   "description": "Electron wrapper for FE Infinity",
   "main": "main.js",
@@ -59,20 +63,20 @@
         "dmg"
       ],
       "category": "public.app-category.games",
-      "icon": "icons/icon.icns"
+      "icon": "icons/icons/mac/icon.icns"
     },
     "win": {
       "target": [
         "nsis"
       ],
-      "icon": "icons/icon.ico"
+      "icon": "icons/icons/win/icon.ico"
     },
     "linux": {
       "target": [
         "AppImage"
       ],
       "category": "Game",
-      "icon": "icons/512x512.png"
+      "icon": "icons/icons/png/512x512.png"
     }
   }
 }
