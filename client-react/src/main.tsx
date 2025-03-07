@@ -5,6 +5,7 @@ import "./App.css";
 import "./index.css";
 
 import HomePage from "./routes/home-page";
+import GameDetailPage from "./routes/game-detail-page";
 import Root from "./routes/root";
 
 const router = createBrowserRouter([
@@ -15,6 +16,10 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <HomePage />,
+      },
+      {
+        path: "games/:nid",
+        element: <GameDetailPage />,
       },
     ],
   },

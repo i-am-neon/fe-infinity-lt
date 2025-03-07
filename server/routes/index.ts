@@ -16,52 +16,51 @@ export async function handleRequest(req: Request): Promise<Response> {
     });
   }
 
+  // Process the request and get the response
+  let response: Response;
+
   if (req.method === "GET" && url.pathname === "/ping") {
     // "Ping" route
-    return handlePing();
-  }
-
-  if (req.method === "GET" && url.pathname === "/games") {
+    response = await handlePing();
+  } else if (req.method === "GET" && url.pathname === "/games") {
     const { handleListGames } = await import("./list-games.ts");
-    return handleListGames(req);
-  }
-
-  // GET /games/<nid> for a single game
-  if (req.method === "GET" && /^\/games\/[^/]+$/.test(url.pathname)) {
+    response = await handleListGames(req);
+  } else if (req.method === "GET" && /^\/games\/[^/]+$/.test(url.pathname)) {
+    // GET /games/<nid> for a single game
     const { handleGetGame } = await import("./get-game.ts");
-    return handleGetGame(req);
-  }
-
-  if (req.method === "POST" && url.pathname === "/create-game") {
+    response = await handleGetGame(req);
+  } else if (req.method === "POST" && url.pathname === "/create-game") {
     // "Create Game" route
-    return await handleCreateGame(req);
-  }
-
-  if (req.method === "POST" && url.pathname === "/run-game") {
+    response = await handleCreateGame(req);
+  } else if (req.method === "POST" && url.pathname === "/run-game") {
     const { handleRunGame } = await import("./run-game.ts");
-    return await handleRunGame(req);
-  }
-
-  if (req.method === "POST" && url.pathname === "/generate-next-chapter") {
+    response = await handleRunGame(req);
+  } else if (req.method === "POST" && url.pathname === "/generate-next-chapter") {
     const { handleGenerateNextChapter } = await import(
       "./generate-next-chapter.ts"
     );
-    return await handleGenerateNextChapter(req);
-  }
-
-  if (req.method === "POST" && url.pathname === "/delete-game") {
+    response = await handleGenerateNextChapter(req);
+  } else if (req.method === "POST" && url.pathname === "/delete-game") {
     const { handleDeleteGame } = await import("./delete-game.ts");
-    return await handleDeleteGame(req);
+    response = await handleDeleteGame(req);
+  } else {
+    // Default route
+    response = new Response("Not Found", { status: 404 });
   }
 
-  // Default route
-  return new Response("Not Found", {
-    status: 404,
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization",
-    }
+  // Get the existing headers from the response
+  const headers = new Headers(response.headers);
+  
+  // Add CORS headers to the response
+  headers.set("Access-Control-Allow-Origin", "*");
+  headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  
+  // Return a new response with the same body, status, and updated headers
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers
   });
 }
 
