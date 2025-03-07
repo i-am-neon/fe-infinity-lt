@@ -122,8 +122,9 @@ We must ensure:
    - Read the original intro text in the Chapter Idea carefully
    - If the intro mentions characters finding, receiving, or obtaining ANY items (weapons, artifacts, etc.)
      or money, the event MUST include the appropriate "give_item" or "give_money" command
-   - Example: If intro says "...stumbles upon a Silver Blade" but no "give_item;Silver_Blade" command exists,
+   - Example: If intro says "...stumbles upon a Silver Blade" but no command with "give_item" and the item name exists,
      that's an error that MUST be fixed by adding the command
+   - The format can be either "give_item;item_name" or "give_item;convoy;item_name" - both are valid
 
 IMPORTANT NOTES:
 - Allow narrative devices like "thought dead" or "has returned" for storytelling
@@ -196,4 +197,3 @@ if (import.meta.main) {
     })
     .catch(console.error);
 }
-

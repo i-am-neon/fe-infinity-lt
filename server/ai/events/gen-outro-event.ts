@@ -78,6 +78,14 @@ We have an AIEvent candidate. We must ensure:
 2) The event must only use valid commands ("add_portrait", "speak", "narrate").
 3) If the chapter idea's outro references a 'boss', 'newPlayableUnits', or 'newNonBattleCharacters', ensure they appear in the event.
 
+SPECIAL ITEM CHECKING - CRITICALLY IMPORTANT:
+- Read the original outro text in the Chapter Idea carefully
+- If the outro mentions characters finding, receiving, or obtaining ANY items (weapons, artifacts, etc.)
+  or money, the event MUST include the appropriate "give_item" or "give_money" command
+- Example: If outro says "...stumbles upon a Silver Blade" but no command with "give_item" and the item name exists,
+  that's an error that MUST be fixed by adding the command
+- The format can be either "give_item;item_name" or "give_item;convoy;item_name" - both are valid
+
 IMPORTANT NOTES:
 - Allow narrative devices like "thought dead" or "has returned" for storytelling
 - Allow characters to speak from offscreen positions
@@ -140,4 +148,3 @@ if (import.meta.main) {
     .then((event) => console.log(JSON.stringify(event, null, 2)))
     .catch(console.error);
 }
-
