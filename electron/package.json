@@ -39,6 +39,7 @@
     "files": [
       "*.js",
       "*.html",
+      "*.png",
       "node_modules/**/*",
       "bin/**/*"
     ],
