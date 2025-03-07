@@ -40,32 +40,59 @@ export default async function runGame(
   // Outside of Electron, use direct approach with Wine
   const originalDir = Deno.cwd();
   try {
-    Deno.chdir(getLtMakerPath());
+    const ltMakerPath = getLtMakerPath();
+    Deno.chdir(ltMakerPath);
 
-    // Determine the appropriate Python path based on platform
-    const pythonCommand =
-      Deno.build.os === "windows" ? "..\\bin\\python\\python.exe" : "wine";
-    const pythonArgs =
-      Deno.build.os === "windows"
-        ? ["run_engine_for_project.py", normalizedProjectPath]
-        : [
-            "../electron/python/prefix/drive_c/users/crossover/Application Data/Python/Python311/python.exe",
-            "run_engine_for_project.py",
-            normalizedProjectPath,
-          ];
+    // Determine the appropriate Python command and args based on platform and environment
+    let pythonCommand: string;
+    let pythonArgs: string[];
+    let winePrefix: string | undefined;
+
+    if (Deno.build.os === "windows") {
+      // Windows - use native Python directly
+      pythonCommand = "..\\bin\\python\\python.exe";
+      pythonArgs = ["run_engine_for_project.py", normalizedProjectPath];
+    } else {
+      // macOS/Linux - use Wine
+      pythonCommand = "wine";
+      
+      // Simplified approach for development - just use 'python' command in Wine
+      pythonArgs = ["python", "run_engine_for_project.py", normalizedProjectPath];
+      
+      // Get absolute path for WINEPREFIX if it exists
+      const { resolve } = await import("@std/path");
+      try {
+        const winePrefixPath = "../electron/python/prefix";
+        const winePrefixAbsolute = resolve(ltMakerPath, winePrefixPath);
+        
+        // Only set WINEPREFIX if the directory exists
+        if (await Deno.stat(winePrefixAbsolute).catch(() => null)) {
+          winePrefix = winePrefixAbsolute;
+          console.log(`Using Wine prefix: ${winePrefix}`);
+        }
+      } catch (error) {
+        console.log("Wine prefix not found, using system default");
+      }
+    }
 
     console.log(
       `Running game with command: ${pythonCommand} ${pythonArgs.join(" ")}`
     );
 
+    const env = {
+      ...Deno.env.toObject(),
+    };
+    
+    // Only add WINEPREFIX to env if it's defined
+    if (winePrefix) {
+      env.WINEPREFIX = winePrefix;
+    }
+
     const runCommand = new Deno.Command(pythonCommand, {
       args: pythonArgs,
       stdout: "inherit",
       stderr: "inherit",
-      env: {
-        ...Deno.env.toObject(),
-        WINEPREFIX: "../bin/python/prefix",
-      },
+      env,
     });
     await runCommand.output();
   } finally {
