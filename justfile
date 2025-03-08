@@ -49,16 +49,9 @@ run path:
 ###################
 # Vector DB
 ###################
-# Initialize PostgreSQL with pgvector extension installed and configured.
 start-vector-db:
-	brew install pgvector || true
-	brew services restart postgresql@14
-	sleep 3  # Give PostgreSQL time to start up before attempting to connect
-	just run server/vector-db/init.ts
-	just run server/vector-db/seed-vectors.ts
-
-stop-vector-db:
-    brew services stop postgresql@14
+	just run server/vector-db-js/init.ts
+	just run server/vector-db-js/seed-vectors.ts
 
 ###################
 # Asset Processing

@@ -1,4 +1,3 @@
-import shortUuid from "@/lib/short-uuid.ts";
 import { PortraitMetadata } from "@/types/portraits/portrait-metadata.ts";
 import generateAndStoreVector from "@/vector-db-js/generate-and-store-vector.ts";
 import { VectorType } from "@/vector-db-js/types/vector-type.ts";
@@ -20,23 +19,20 @@ Facial Hair: ${portraitMetadata.facialHair || "None"}
 Accessories: ${portraitMetadata.accessories || "None"}`;
 
     // Determine which gender-specific table to use
-    const genderSpecificVectorType: VectorType =
-      portraitMetadata.gender === "male"
-        ? "portraits-male"
-        : "portraits-female";
+    const vectorType: VectorType = portraitMetadata.gender === "male"
+      ? "portraits-male"
+      : "portraits-female";
 
-    // Save to gender-specific table
     await generateAndStoreVector({
-      id: shortUuid(),
       text,
       metadata: portraitMetadata,
-      vectorType: genderSpecificVectorType,
+      vectorType,
     });
   }
 }
 
 if (import.meta.main) {
-  await saveVectorsForAllPortraits([
+  const samplePortraits: PortraitMetadata[] = [
     {
       gender: "male",
       age: "mature adult",
@@ -44,7 +40,7 @@ if (import.meta.main) {
       eyeColor: "red",
       vibe: "mysterious, regal, enigmatic",
       clothing: "dark robe with gold accents",
-      originalName: "2",
+      originalName: "portrait-1",
       blinkingOffset: [32, 24],
       smilingOffset: [32, 40],
     },
@@ -56,34 +52,13 @@ if (import.meta.main) {
       vibe: "confident, bold, adventurous",
       clothing: "red and gold outfit",
       accessories: "earrings, headband",
-      originalName: "3",
+      originalName: "portrait-2",
       blinkingOffset: [24, 24],
       smilingOffset: [24, 40],
-    },
-    {
-      gender: "male",
-      age: "young adult",
-      hairColor: "red",
-      eyeColor: "yellow",
-      vibe: "mysterious, confident, regal",
-      clothing: "fur-lined cloak",
-      accessories: "earrings",
-      originalName: "1",
-      blinkingOffset: [24, 24],
-      smilingOffset: [24, 40],
-    },
-    {
-      gender: "female",
-      age: "young adult",
-      hairColor: "teal",
-      eyeColor: "purple",
-      vibe: "mystical,elegant,calm",
-      clothing: "white and gold outfit",
-      accessories: "headband, earrings",
-      originalName: "0",
-      blinkingOffset: [24, 32],
-      smilingOffset: [24, 48],
-    },
-  ]);
+    }
+  ];
+  
+  saveVectorsForAllPortraits(samplePortraits)
+    .then(() => console.log("Saved vectors for portraits"))
+    .catch(console.error);
 }
-
