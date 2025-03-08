@@ -1,16 +1,16 @@
 import shortUuid from "@/lib/short-uuid.ts";
 import { PortraitMetadata } from "@/types/portraits/portrait-metadata.ts";
-import generateAndStoreVector from "@/vector-db-js/generate-and-store-vector.ts";
-import { VectorType } from "@/vector-db-js/types/vector-type.ts";
+import generateAndStoreVector from "../vector-db/generate-and-store-vector.ts";
+import { VectorType } from "../vector-db/types/vector-type.ts";
 
 export default async function saveVectorsForAllPortraits(
   portraitMetadatas: PortraitMetadata[]
 ): Promise<void> {
   let maleCount = 0;
   let femaleCount = 0;
-  
+
   console.log(`Processing ${portraitMetadatas.length} portraits...`);
-  
+
   for (const portraitMetadata of portraitMetadatas) {
     const text = `Portrait Details:
 Original Name: ${portraitMetadata.originalName}
@@ -29,7 +29,7 @@ Accessories: ${portraitMetadata.accessories || "None"}`;
       portraitMetadata.gender === "male"
         ? "portraits-male"
         : "portraits-female";
-        
+
     // Update count
     if (portraitMetadata.gender === "male") {
       maleCount++;
@@ -45,8 +45,10 @@ Accessories: ${portraitMetadata.accessories || "None"}`;
       vectorType: genderSpecificVectorType,
     });
   }
-  
-  console.log(`Finished processing portraits: ${maleCount} male, ${femaleCount} female`);
+
+  console.log(
+    `Finished processing portraits: ${maleCount} male, ${femaleCount} female`
+  );
 }
 
 if (import.meta.main) {
@@ -100,3 +102,4 @@ if (import.meta.main) {
     },
   ]);
 }
+

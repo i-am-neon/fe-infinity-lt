@@ -4,3 +4,15 @@ export type VectorType =
   | "portraits-female"
   | "music"
   | "items";
+
+export interface Vector {
+  id: string;
+  embedding: number[];
+  metadata: Record<string, unknown>;
+}
+
+export interface SimilarityResult {
+  id: string;
+  score: number;
+  metadata: Record<string, unknown> | null;
+}

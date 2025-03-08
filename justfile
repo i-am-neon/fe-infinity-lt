@@ -50,8 +50,8 @@ run path:
 # Vector DB
 ###################
 start-vector-db:
-	just run server/vector-db-js/init.ts
-	just run server/vector-db-js/seed-vectors.ts
+	just run server/vector-db/init.ts
+	just run server/vector-db/seed-vectors.ts
 
 ###################
 # Asset Processing
