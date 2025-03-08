@@ -1,7 +1,7 @@
 import createNextChapter from "@/create-next-chapter.ts";
-import { getGameByNid, insertGame } from "@/db-sqlite/games.ts";
 import { getCurrentLogger } from "@/lib/current-logger.ts";
 import runGame from "@/run-game.ts";
+import { getGameByNid, insertGame } from "../db/games.ts";
 
 export async function handleGenerateNextChapter(
   req: Request

@@ -1,5 +1,5 @@
-import { DB } from "https://deno.land/x/sqlite@v3.9.1/mod.ts";
 import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
+import { DB } from "https://deno.land/x/sqlite@v3.9.1/mod.ts";
 
 let dbPath: string;
 
@@ -10,10 +10,10 @@ const isElectron =
 
 if (isElectron) {
   // Use the path provided by Electron
-  dbPath = Deno.env.get("DB_PATH") || "./local.db";
+  dbPath = Deno.env.get("DB_PATH") || "./sqlite.db";
 } else {
   // Use the normal server path
-  dbPath = getPathWithinServer("/db/local.db");
+  dbPath = getPathWithinServer("/db/sqlite.db");
 }
 
 console.log(`Using database at: ${dbPath}`);
@@ -25,4 +25,3 @@ if (import.meta.main) {
   console.log(`Database initialized at ${dbPath}`);
   db.close();
 }
-

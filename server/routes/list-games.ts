@@ -1,4 +1,4 @@
-import { getAllGames } from "@/db-sqlite/games.ts";
+import { getAllGames } from "@/db/games.ts";
 
 export async function handleListGames(_req: Request): Promise<Response> {
   try {

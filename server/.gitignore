@@ -1,4 +1,4 @@
-db/local.db
+db/sqlite.db
 .env
 _logs/*
 assets/music/mp3/*

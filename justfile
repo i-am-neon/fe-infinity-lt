@@ -33,7 +33,7 @@ stop:
 clean:
     just stop
     find lt-maker-fork -maxdepth 1 -type d -name "*.ltproj" ! -name "default.ltproj" ! -name "testing_proj.ltproj" -exec rm -rf {} +
-    rm -f server/db/local.db
+    rm -f server/db/sqlite.db
     just clean-logs
     just clean-saves
 

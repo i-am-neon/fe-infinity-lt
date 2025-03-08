@@ -1,5 +1,5 @@
-import { removeGameByNid } from "@/db-sqlite/games.ts";
 import removeWithinLtMaker from "@/file-io/remove-within-lt-maker.ts";
+import { removeGameByNid } from "../db/games.ts";
 
 export async function handleDeleteGame(req: Request): Promise<Response> {
   try {
@@ -25,15 +25,21 @@ export async function handleDeleteGame(req: Request): Promise<Response> {
     });
   } catch (error: unknown) {
     if (error instanceof Error) {
-      return new Response(JSON.stringify({ success: false, error: error.message }), {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      });
+      return new Response(
+        JSON.stringify({ success: false, error: error.message }),
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
     } else {
-      return new Response(JSON.stringify({ success: false, error: "Unknown error" }), {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      });
+      return new Response(
+        JSON.stringify({ success: false, error: "Unknown error" }),
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
     }
   }
 }
