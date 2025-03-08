@@ -1,6 +1,6 @@
 import genChapter from "./ai/gen-chapter.ts";
 
-import { getGameByNid, insertGame } from "@/db/games.ts";
+import { getGameByNid } from "@/db/games.ts";
 import { deleteSuspendSave } from "@/game-engine-io/delete-suspend-save.ts";
 import getChapterResults from "@/game-engine-io/get-chapter-results.ts";
 import { removeStubEvent } from "@/game-engine-io/write-chapter/remove-stub-event.ts";
@@ -114,9 +114,6 @@ export default async function createNextChapter({
     chapterNumber: nextChapterNumber + 1,
     previousTilemapNid: chapter.tilemap.nid,
   });
-
-  // Update the DB with the newly appended chapters
-  insertGame(existingGame);
 }
 
 if (import.meta.main) {
