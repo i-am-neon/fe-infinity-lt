@@ -43,21 +43,42 @@ const startPostgres = () => {
     const dataDir = getDataDir();
     const pgDataDir = path.join(dataDir, 'pgdata');
 
+    // Check if bundled binaries exist
+    const initdbPath = path.join(__dirname, 'bin', process.platform === 'win32' ? 'initdb.exe' : 'initdb');
+    if (!fs.existsSync(initdbPath)) {
+      const errorMsg = `Bundled PostgreSQL binaries not found at: ${initdbPath}. Please run download-binaries.js first.`;
+      logger.log('error', errorMsg);
+      console.error(errorMsg);
+      reject(new Error(errorMsg));
+      return;
+    }
+
     // Create PostgreSQL data directory if it doesn't exist
     if (!fs.existsSync(pgDataDir)) {
       fs.mkdirSync(pgDataDir, { recursive: true });
 
-      // Initialize PostgreSQL database
+      // Initialize PostgreSQL database using bundled initdb
+      logger.log('info', `Initializing PostgreSQL database using bundled binary: ${initdbPath}`);
       const pgInitProcess = spawn(
-        path.join(__dirname, 'bin', process.platform === 'win32' ? 'initdb.exe' : 'initdb'),
+        initdbPath,
         ['-D', pgDataDir, '-U', 'postgres', '--auth=trust'],
         { env: process.env }
       );
 
+      pgInitProcess.stdout.on('data', (data) => {
+        logger.log('info', `PostgreSQL initdb: ${data}`);
+      });
+
+      pgInitProcess.stderr.on('data', (data) => {
+        logger.log('warn', `PostgreSQL initdb warning: ${data}`);
+      });
+
       pgInitProcess.on('close', (code) => {
         if (code !== 0) {
-          console.error('Failed to initialize PostgreSQL database');
-          reject(new Error('PostgreSQL initialization failed'));
+          const errorMsg = 'Failed to initialize PostgreSQL database with bundled binary';
+          logger.log('error', errorMsg);
+          console.error(errorMsg);
+          reject(new Error(errorMsg));
           return;
         }
 
@@ -71,33 +92,54 @@ const startPostgres = () => {
 
 // Start the PostgreSQL server process
 const startPostgresServer = (pgDataDir, resolve, reject) => {
+  // Always use bundled postgres binary
+  const postgresBinPath = path.join(__dirname, 'bin', process.platform === 'win32' ? 'postgres.exe' : 'postgres');
+
+  // Check if bundled postgres binary exists
+  if (!fs.existsSync(postgresBinPath)) {
+    const errorMsg = `Bundled PostgreSQL server binary not found at: ${postgresBinPath}. Please run download-binaries.js first.`;
+    logger.log('error', errorMsg);
+    console.error(errorMsg);
+    reject(new Error(errorMsg));
+    return;
+  }
+
+  logger.log('info', `Starting PostgreSQL server using bundled binary: ${postgresBinPath}`);
   pgProcess = spawn(
-    path.join(__dirname, 'bin', process.platform === 'win32' ? 'postgres.exe' : 'postgres'),
+    postgresBinPath,
     ['-D', pgDataDir],
     { env: process.env }
   );
 
   pgProcess.stdout.on('data', (data) => {
-    console.log(`PostgreSQL: ${data}`);
-    if (data.toString().includes('database system is ready to accept connections')) {
+    const output = data.toString();
+    logger.log('info', `PostgreSQL: ${output}`);
+    console.log(`PostgreSQL: ${output}`);
+    if (output.includes('database system is ready to accept connections')) {
+      logger.log('info', 'PostgreSQL server is ready');
       console.log('PostgreSQL server is ready');
       resolve();
     }
   });
 
   pgProcess.stderr.on('data', (data) => {
-    console.error(`PostgreSQL error: ${data}`);
+    const error = data.toString();
+    logger.log('warn', `PostgreSQL error: ${error}`);
+    console.error(`PostgreSQL error: ${error}`);
     // Still continue even with some errors as PostgreSQL might output warnings
   });
 
   pgProcess.on('error', (err) => {
-    console.error('Failed to start PostgreSQL server:', err);
+    const errorMsg = `Failed to start PostgreSQL server with bundled binary: ${err.message}`;
+    logger.log('error', errorMsg, { error: err });
+    console.error(errorMsg);
     reject(err);
   });
 
   // Set timeout in case PostgreSQL doesn't start properly
   setTimeout(() => {
     if (pgProcess) {
+      logger.log('info', 'PostgreSQL server startup timeout reached, assuming it is running');
       resolve(); // Assume it's running after timeout
     }
   }, 5000);
@@ -150,7 +192,7 @@ const startDenoServer = () => {
 
     // Use bundled Deno for all platforms
     const denoCommand = path.join(__dirname, 'bin', process.platform === 'win32' ? 'deno.exe' : 'deno');
-    
+
     // Verify bundled Deno exists
     if (!fs.existsSync(denoCommand)) {
       const errorMsg = `Bundled Deno not found at: ${denoCommand}. Please ensure binaries are downloaded correctly.`;
@@ -158,7 +200,7 @@ const startDenoServer = () => {
       console.error(errorMsg);
       throw new Error(errorMsg);
     }
-    
+
     logger.log('info', `Using bundled Deno: ${denoCommand}`);
     console.log(`Using bundled Deno: ${denoCommand}`);
 
@@ -496,14 +538,14 @@ function getWinePath() {
   try {
     // Check if wine is installed and in PATH
     const { execSync } = require('child_process');
-    
+
     try {
       const winePath = execSync('which wine', { encoding: 'utf8' }).trim();
       logger.log('info', `Found Wine in PATH: ${winePath}`);
       return winePath;
     } catch (error) {
       logger.log('error', 'Wine not found in PATH', { error: error.message });
-      
+
       // Check common locations on macOS
       if (process.platform === 'darwin') {
         const commonMacPaths = [
@@ -512,7 +554,7 @@ function getWinePath() {
           '/Applications/Wine Stable.app/Contents/Resources/wine/bin/wine',
           '/Applications/Wine Stable.app/Contents/MacOS/wine'
         ];
-        
+
         for (const macPath of commonMacPaths) {
           if (fs.existsSync(macPath)) {
             logger.log('info', `Found Wine at: ${macPath}`);
@@ -520,14 +562,14 @@ function getWinePath() {
           }
         }
       }
-      
+
       // Check common locations on Linux
       if (process.platform === 'linux') {
         const commonLinuxPaths = [
           '/usr/bin/wine',
           '/usr/local/bin/wine'
         ];
-        
+
         for (const linuxPath of commonLinuxPaths) {
           if (fs.existsSync(linuxPath)) {
             logger.log('info', `Found Wine at: ${linuxPath}`);
@@ -535,7 +577,7 @@ function getWinePath() {
           }
         }
       }
-      
+
       const errorMessage = 'Wine is not installed or not found in PATH. Please install Wine to run the server.';
       logger.log('error', errorMessage);
       throw new Error(errorMessage);
@@ -639,7 +681,7 @@ const startServer = async () => {
     const isMac = process.platform === 'darwin';
     const isWindows = process.platform === 'win32';
     logger.log('info', 'Starting server components', { isDev: isDev, platform: process.platform });
-    
+
     // Check for bundled binaries first
     const bundledDenoPath = path.join(__dirname, 'bin', process.platform === 'win32' ? 'deno.exe' : 'deno');
     if (!fs.existsSync(bundledDenoPath)) {
@@ -649,21 +691,22 @@ const startServer = async () => {
       throw new Error(errorMsg);
     }
 
-    // Skip PostgreSQL on macOS (both in dev and production)
-    if (isMac) {
-      logger.log('info', 'On macOS, skipping PostgreSQL startup (using SQLite fallback)');
-      console.log('On macOS, skipping PostgreSQL startup (using SQLite fallback)');
-    } else {
-      // Start PostgreSQL on other platforms
-      try {
-        logger.log('info', 'Starting PostgreSQL...');
+    // Start PostgreSQL using bundled binaries only
+    try {
+      // Check for bundled PostgreSQL binary before attempting to start
+      const postgresBinPath = path.join(__dirname, 'bin', process.platform === 'win32' ? 'postgres.exe' : 'postgres');
+      if (!fs.existsSync(postgresBinPath)) {
+        logger.log('warn', `Bundled PostgreSQL binary not found at: ${postgresBinPath}, skipping PostgreSQL startup`);
+        console.warn(`Bundled PostgreSQL binary not found at: ${postgresBinPath}, skipping PostgreSQL startup`);
+      } else {
+        logger.log('info', 'Starting PostgreSQL using bundled binary...');
         await startPostgres();
-        logger.log('info', 'PostgreSQL started successfully');
-      } catch (err) {
-        logger.log('warn', 'PostgreSQL startup failed, continuing anyway', { error: err.message });
-        console.warn('PostgreSQL startup failed, continuing anyway:', err);
-        // Continue even if PostgreSQL fails - our adapter can handle it
+        logger.log('info', 'PostgreSQL started successfully with bundled binary');
       }
+    } catch (err) {
+      logger.log('warn', 'PostgreSQL startup failed using bundled binary, continuing anyway', { error: err.message });
+      console.warn('PostgreSQL startup failed using bundled binary, continuing anyway:', err);
+      // Continue even if PostgreSQL fails - our adapter can handle it
     }
 
     // Start Deno server, which will initialize everything else
@@ -699,16 +742,16 @@ const startServer = async () => {
         systemInfo.osVersion = execSync('sw_vers -productVersion', { encoding: 'utf8' }).trim();
         systemInfo.architecture = execSync('uname -m', { encoding: 'utf8' }).trim();
 
+        // Use bundled Deno to check version
         try {
-          systemInfo.denoVersion = execSync('deno --version', { encoding: 'utf8' }).trim();
+          const bundledDenoPath = path.join(__dirname, 'bin', 'deno');
+          if (fs.existsSync(bundledDenoPath)) {
+            systemInfo.bundledDenoVersion = `Available at ${bundledDenoPath}`;
+          } else {
+            systemInfo.bundledDenoVersion = 'Not found';
+          }
         } catch (e) {
-          systemInfo.denoVersion = 'Not found or not in PATH';
-        }
-
-        try {
-          systemInfo.homebrewInstalled = execSync('which brew', { encoding: 'utf8' }).trim();
-        } catch (e) {
-          systemInfo.homebrewInstalled = 'Not found';
+          systemInfo.bundledDenoVersion = `Error checking: ${e.message}`;
         }
       }
 

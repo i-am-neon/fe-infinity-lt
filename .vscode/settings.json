@@ -3,13 +3,9 @@
     "editor.formatOnSave": false
   },
   "search.exclude": {
-    "**/electron/wine": true,
-    "**/electron/python": true,
     "**/electron/bin": true
   },
   "files.watcherExclude": {
-    "**/electron/wine": true,
-    "**/electron/python": true,
     "**/electron/bin": true
   }
 }

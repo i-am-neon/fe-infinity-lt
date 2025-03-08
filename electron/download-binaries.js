@@ -1,4 +1,5 @@
 const fs = require('fs');
+const fsExtra = require('fs-extra');
 const path = require('path');
 const axios = require('axios');
 const extract = require('extract-zip');
@@ -57,9 +58,9 @@ async function downloadAndExtract(url, destDir, extractionRoot = '', customFileN
           for (const file of files) {
             const src = path.join(extractionPath, file);
             const dest = path.join(destDir, file);
-            fs.moveSync(src, dest, { overwrite: true });
+            fsExtra.moveSync(src, dest, { overwrite: true });
           }
-          fs.removeSync(extractionPath);
+          fsExtra.removeSync(extractionPath);
         }
       }
 
@@ -114,9 +115,17 @@ async function downloadDeno() {
 async function downloadPostgres() {
   console.log('Downloading PostgreSQL...');
 
-  // Check if PostgreSQL is already installed
-  if (isWindows && fs.existsSync(path.join(binariesDir, 'postgres.exe'))) {
-    console.log('PostgreSQL already installed, skipping...');
+  // Create a dedicated PostgreSQL directory
+  const pgDir = path.join(binariesDir, 'postgresql');
+  fs.mkdirSync(pgDir, { recursive: true });
+
+  // Check if PostgreSQL is already installed by checking key binaries
+  const pgBinaryName = isWindows ? 'postgres.exe' : 'postgres';
+  const initdbBinaryName = isWindows ? 'initdb.exe' : 'initdb';
+
+  if (fs.existsSync(path.join(binariesDir, pgBinaryName)) &&
+    fs.existsSync(path.join(binariesDir, initdbBinaryName))) {
+    console.log('PostgreSQL binaries already installed, skipping...');
     return;
   }
 
@@ -124,42 +133,108 @@ async function downloadPostgres() {
   let pgExtractDir;
 
   if (isWindows) {
-    pgUrl = 'https://get.enterprisedb.com/postgresql/postgresql-14.10-1-windows-x64-binaries.zip';
+    // For Windows, use the official binaries ZIP
+    pgUrl = 'https://get.enterprisedb.com/postgresql/postgresql-17.4-1-windows-x64-binaries.zip';
     pgExtractDir = 'pgsql';
   } else if (isMac) {
-    // For Mac, we'll use a portable PostgreSQL build
-    pgUrl = 'https://github.com/PostgresApp/PostgresApp/releases/download/v2.6.5/Postgres-2.6.5-14.dmg';
-    // This is complex - we might need to extract from DMG which requires additional tools
-    console.log('For macOS, please install PostgreSQL manually using Postgres.app or Homebrew');
-    return;
+    // For macOS, use EnterpriseDB's official binaries
+    pgUrl = 'https://get.enterprisedb.com/postgresql/postgresql-17.4-1-osx-binaries.zip';
+    pgExtractDir = 'pgsql';
+
+    // Alternative approach - provide clear instructions if download fails
+    console.log('Downloading PostgreSQL official binaries for macOS. If this fails, the app will use SQLite instead.');
   } else if (isLinux) {
-    // For Linux, it's better to use package managers or compile from source
-    console.log('For Linux, please install PostgreSQL using your distribution package manager');
-    return;
+    // For Linux, try to download a portable Linux binary
+    pgUrl = 'https://github.com/postgres-appliance/postgres-appliance/releases/download/14.7-1/pg_14.7_linux_amd64.zip';
+    pgExtractDir = 'pg_14.7_linux_amd64';
+
+    console.log('Downloading PostgreSQL portable build for Linux.');
   } else {
     throw new Error(`Unsupported platform: ${platform}`);
   }
 
-  if (isWindows) {
-    await downloadAndExtract(pgUrl, binariesDir, pgExtractDir);
+  try {
+    console.log(`Downloading PostgreSQL from ${pgUrl}`);
+    await downloadAndExtract(pgUrl, pgDir, pgExtractDir);
 
-    // Copy the key binaries we need to the bin folder
-    const pgBinDir = path.join(binariesDir, 'pgsql', 'bin');
-    if (fs.existsSync(pgBinDir)) {
-      const pgBinaries = ['postgres.exe', 'initdb.exe', 'pg_ctl.exe', 'psql.exe'];
-      for (const binary of pgBinaries) {
-        const src = path.join(pgBinDir, binary);
-        const dest = path.join(binariesDir, binary);
-        if (fs.existsSync(src)) {
-          fs.copyFileSync(src, dest);
+    // Find the bin directory which might differ by platform
+    let pgBinDir;
+    if (isWindows) {
+      pgBinDir = path.join(pgDir, 'pgsql', 'bin');
+    } else if (isMac || isLinux) {
+      pgBinDir = path.join(pgDir, pgExtractDir, 'bin');
+      // Alternative paths if the first one doesn't exist
+      if (!fs.existsSync(pgBinDir)) {
+        const possibleBinDirs = [
+          path.join(pgDir, 'bin'),
+          path.join(pgDir, pgExtractDir),
+          path.join(pgDir)
+        ];
+
+        for (const dir of possibleBinDirs) {
+          if (fs.existsSync(dir)) {
+            pgBinDir = dir;
+            break;
+          }
         }
       }
-      // Copy lib directory for PostgreSQL
-      fs.copySync(path.join(binariesDir, 'pgsql', 'lib'), path.join(binariesDir, 'lib'));
-      fs.copySync(path.join(binariesDir, 'pgsql', 'share'), path.join(binariesDir, 'share'));
     }
 
-    console.log('PostgreSQL downloaded successfully');
+    if (!pgBinDir || !fs.existsSync(pgBinDir)) {
+      throw new Error(`Could not find PostgreSQL bin directory after extraction`);
+    }
+
+    console.log(`PostgreSQL bin directory found at: ${pgBinDir}`);
+
+    // Copy the key binaries we need to the bin folder
+    const pgBinaries = isWindows
+      ? ['postgres.exe', 'initdb.exe', 'pg_ctl.exe', 'psql.exe']
+      : ['postgres', 'initdb', 'pg_ctl', 'psql'];
+
+    for (const binary of pgBinaries) {
+      const src = path.join(pgBinDir, binary);
+      const dest = path.join(binariesDir, binary);
+
+      if (fs.existsSync(src)) {
+        console.log(`Copying ${binary} from ${src} to ${dest}`);
+        fs.copyFileSync(src, dest);
+
+        // Make binary executable on Unix-like systems
+        if (!isWindows && binary) {
+          try {
+            fs.chmodSync(dest, 0o755);
+            console.log(`Made ${binary} executable`);
+          } catch (err) {
+            console.error(`Error making ${binary} executable:`, err);
+          }
+        }
+      } else {
+        console.warn(`Binary ${binary} not found in ${pgBinDir}`);
+      }
+    }
+
+    // Copy necessary support directories (lib, share)
+    const pgRootDir = isWindows ? path.join(pgDir, 'pgsql') : path.join(pgDir, pgExtractDir);
+
+    if (fs.existsSync(path.join(pgRootDir, 'lib'))) {
+      console.log('Copying PostgreSQL lib directory');
+      fsExtra.copySync(path.join(pgRootDir, 'lib'), path.join(binariesDir, 'lib'));
+    }
+
+    if (fs.existsSync(path.join(pgRootDir, 'share'))) {
+      console.log('Copying PostgreSQL share directory');
+      fsExtra.copySync(path.join(pgRootDir, 'share'), path.join(binariesDir, 'share'));
+    }
+
+    console.log('PostgreSQL downloaded and set up successfully');
+  } catch (error) {
+    console.error('Failed to download and set up PostgreSQL:', error);
+    console.log('The application will fall back to SQLite if available.');
+
+    // For macOS specifically, provide advice about falling back to SQLite
+    if (isMac) {
+      console.log('On macOS, the application will use SQLite instead.');
+    }
   }
 }
 
@@ -464,12 +539,12 @@ async function main() {
       }
     }
 
+    await downloadPostgres();
     if (!isMac) {
       // Skip PostgreSQL download on Mac as it's complex
-      await downloadPostgres();
       await installPgVector();
     } else {
-      console.log('Skipping PostgreSQL download on macOS - please install manually if needed');
+      console.log('Skipping pgvector download on macOS - please install manually if needed');
     }
 
     console.log('All binaries downloaded successfully');
