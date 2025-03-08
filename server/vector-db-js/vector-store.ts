@@ -60,10 +60,37 @@ async function loadVectorsFromFile(vectorType: VectorType): Promise<void> {
 async function saveVectorsToFile(vectorType: VectorType): Promise<void> {
   const filePath = VECTOR_FILE_MAP[vectorType];
   try {
+    // Save to data directory
     await Deno.writeTextFile(
       filePath,
       JSON.stringify(vectorStore[vectorType], null, 2)
     );
+    
+    // Also save to seed-data directory for persistence
+    const seedFilePath = getPathWithinServer(
+      `/vector-db-js/seed-data/${
+        vectorType === "maps"
+          ? "maps"
+          : vectorType === "portraits-male"
+          ? "portraits-male"
+          : vectorType === "portraits-female"
+          ? "portraits-female"
+          : vectorType === "items"
+          ? "items"
+          : "music"
+      }.json`
+    );
+    
+    // Ensure seed-data directory exists
+    await ensureDir(getPathWithinServer("vector-db-js/seed-data"));
+    
+    // Write to seed file
+    await Deno.writeTextFile(
+      seedFilePath,
+      JSON.stringify(vectorStore[vectorType], null, 2)
+    );
+    
+    console.log(`Saved ${vectorStore[vectorType].length} vectors for ${vectorType} to data and seed files`);
   } catch (error) {
     console.error(`Error saving vectors for ${vectorType}:`, error);
   }
@@ -92,9 +119,11 @@ export async function storeVector({
     vectorStore[vectorType].push({ id, embedding, metadata });
   }
   
-  // Save to file
+  // Save to both data and seed files
   await saveVectorsToFile(vectorType);
 }
+
+
 
 // Calculate cosine similarity
 function cosineSimilarity(vecA: number[], vecB: number[]): number {

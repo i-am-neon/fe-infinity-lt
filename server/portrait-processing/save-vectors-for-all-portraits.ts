@@ -6,6 +6,11 @@ import { VectorType } from "@/vector-db-js/types/vector-type.ts";
 export default async function saveVectorsForAllPortraits(
   portraitMetadatas: PortraitMetadata[]
 ): Promise<void> {
+  let maleCount = 0;
+  let femaleCount = 0;
+  
+  console.log(`Processing ${portraitMetadatas.length} portraits...`);
+  
   for (const portraitMetadata of portraitMetadatas) {
     const text = `Portrait Details:
 Original Name: ${portraitMetadata.originalName}
@@ -24,6 +29,13 @@ Accessories: ${portraitMetadata.accessories || "None"}`;
       portraitMetadata.gender === "male"
         ? "portraits-male"
         : "portraits-female";
+        
+    // Update count
+    if (portraitMetadata.gender === "male") {
+      maleCount++;
+    } else {
+      femaleCount++;
+    }
 
     // Save to gender-specific table
     await generateAndStoreVector({
@@ -33,6 +45,8 @@ Accessories: ${portraitMetadata.accessories || "None"}`;
       vectorType: genderSpecificVectorType,
     });
   }
+  
+  console.log(`Finished processing portraits: ${maleCount} male, ${femaleCount} female`);
 }
 
 if (import.meta.main) {
@@ -86,4 +100,3 @@ if (import.meta.main) {
     },
   ]);
 }
-

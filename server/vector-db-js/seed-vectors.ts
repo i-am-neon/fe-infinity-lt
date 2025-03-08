@@ -1,6 +1,7 @@
 import { VectorType, Vector } from "@/vector-db-js/types/vector-type.ts";
 import { storeVector, clearVectors } from "@/vector-db-js/vector-store.ts";
 import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
+import { ensureDir } from "@std/fs";
 
 export async function seedVectors(seedFiles?: Record<VectorType, string>): Promise<void> {
   // Default seed files paths if not provided
@@ -29,8 +30,80 @@ async function seedVectorsFromFile(vectorType: VectorType, filePath: string): Pr
     await clearVectors(vectorType);
     
     // Read seed file
-    const fileContent = await Deno.readTextFile(filePath).catch(() => "[]");
-    const vectors = JSON.parse(fileContent) as Vector[];
+    let vectors: Vector[] = [];
+    try {
+      const fileContent = await Deno.readTextFile(filePath);
+      vectors = JSON.parse(fileContent) as Vector[];
+    } catch (err) {
+      if (err instanceof Deno.errors.NotFound) {
+        console.log(`No seed file found at ${filePath}, creating empty file`);
+        // Extract directory path from filePath
+        const lastSlashIndex = filePath.lastIndexOf("/");
+        const dirPath = lastSlashIndex !== -1 ? filePath.substring(0, lastSlashIndex) : ".";
+        await ensureDir(dirPath);
+        await Deno.writeTextFile(filePath, "[]");
+      } else {
+        throw err;
+      }
+    }
+    
+    // If we have data files but no seed files, copy them
+    if (vectors.length === 0) {
+      const dataFilePath = getPathWithinServer(
+        `/vector-db-js/data/${
+          vectorType === "maps"
+            ? "maps"
+            : vectorType === "portraits-male"
+            ? "portraits-male"
+            : vectorType === "portraits-female"
+            ? "portraits-female"
+            : vectorType === "items"
+            ? "items"
+            : "music"
+        }.json`
+      );
+      
+      try {
+        const dataContent = await Deno.readTextFile(dataFilePath);
+        const dataVectors = JSON.parse(dataContent) as Vector[];
+        if (dataVectors.length > 0) {
+          console.log(`Found ${dataVectors.length} vectors in data file, copying to seed file`);
+          vectors = dataVectors;
+          await Deno.writeTextFile(filePath, JSON.stringify(vectors, null, 2));
+        }
+      } catch (dataErr) {
+        // Ignore if data file doesn't exist either
+      }
+    }
+    
+    // If we have data files but no seed files, copy them
+    if (vectors.length === 0) {
+      const dataFilePath = getPathWithinServer(
+        `/vector-db-js/data/${
+          vectorType === "maps"
+            ? "maps"
+            : vectorType === "portraits-male"
+            ? "portraits-male"
+            : vectorType === "portraits-female"
+            ? "portraits-female"
+            : vectorType === "items"
+            ? "items"
+            : "music"
+        }.json`
+      );
+      
+      try {
+        const dataContent = await Deno.readTextFile(dataFilePath);
+        const dataVectors = JSON.parse(dataContent) as Vector[];
+        if (dataVectors.length > 0) {
+          console.log(`Found ${dataVectors.length} vectors in data file, copying to seed file`);
+          vectors = dataVectors;
+          await Deno.writeTextFile(filePath, JSON.stringify(vectors, null, 2));
+        }
+      } catch (dataErr) {
+        // Ignore if data file doesn't exist either
+      }
+    }
     
     // Store each vector
     for (const vector of vectors) {

@@ -3,7 +3,7 @@ import {
   SimilarityResult,
   VectorType,
 } from "@/vector-db-js/types/vector-type.ts";
-import { similaritySearch as performSimilaritySearch } from "@/vector-db-js/vector-store.ts";
+import { similaritySearch as performSimilaritySearch, initVectorStore } from "@/vector-db-js/vector-store.ts";
 
 export default async function similaritySearch({
   searchQuery,
@@ -14,6 +14,9 @@ export default async function similaritySearch({
   topK: number;
   vectorType: VectorType;
 }): Promise<SimilarityResult[]> {
+  // Reload vectors to ensure we have the latest data
+  await initVectorStore();
+  
   // Generate embedding for the search query
   const queryEmbedding = await createEmbedding({ text: searchQuery });
 
