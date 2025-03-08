@@ -1,4 +1,4 @@
-import { getGameByNid } from "@/db/games.ts";
+import { getGameByNid } from "@/db-sqlite/games.ts";
 import { getGameCreationError } from "./create-game.ts";
 
 export async function handleGetGame(req: Request): Promise<Response> {

@@ -32,7 +32,7 @@ export default async function processEventItems(
   for (const command of giveItemCommands) {
     if (command.args.length === 0) continue;
 
-    const originalItemName = command.args[0];
+    const originalItemName = command.args[1];
     try {
       const gameItemNid = await chooseItem(originalItemName);
 
@@ -68,8 +68,8 @@ if (import.meta.main) {
     trigger: "level_start",
     condition: "True",
     sourceObjects: [
-      { command: "give_item", args: ["Iron Sword"] },
-      { command: "give_item", args: ["Magic Necklace"] },
+      { command: "give_item", args: ["convoy", "Iron Sword"] },
+      { command: "give_item", args: ["convoy", "Magic Necklace"] },
     ],
   };
 

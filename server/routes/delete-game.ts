@@ -1,4 +1,4 @@
-import { removeGameByNid } from "@/db/games.ts";
+import { removeGameByNid } from "@/db-sqlite/games.ts";
 import removeWithinLtMaker from "@/file-io/remove-within-lt-maker.ts";
 
 export async function handleDeleteGame(req: Request): Promise<Response> {

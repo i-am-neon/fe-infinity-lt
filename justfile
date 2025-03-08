@@ -53,6 +53,7 @@ run path:
 start-vector-db:
 	brew install pgvector || true
 	brew services restart postgresql@14
+	sleep 3  # Give PostgreSQL time to start up before attempting to connect
 	just run server/vector-db/init.ts
 	just run server/vector-db/seed-vectors.ts
 

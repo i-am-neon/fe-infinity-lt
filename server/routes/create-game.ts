@@ -1,7 +1,7 @@
 import chooseTopLevelMusic from "@/ai/choose-top-level-music.ts";
 import genInitialGameIdea from "@/ai/gen-initial-game-idea.ts";
 import genWorldSummary from "@/ai/gen-world-summary.ts";
-import { insertGame } from "@/db/games.ts";
+import { insertGame } from "@/db-sqlite/games.ts";
 import initializeProject from "@/game-engine-io/initialize-project.ts";
 import writeChapter from "@/game-engine-io/write-chapter/write-chapter.ts";
 import writeStubChapter from "@/game-engine-io/write-chapter/write-stub-chapter.ts";
@@ -163,4 +163,3 @@ export async function handleCreateGame(req: Request): Promise<Response> {
     });
   }
 }
-

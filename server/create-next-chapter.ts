@@ -1,6 +1,6 @@
 import genChapter from "./ai/gen-chapter.ts";
 
-import { getGameByNid } from "@/db/games.ts";
+import { getGameByNid } from "@/db-sqlite/games.ts";
 import { deleteSuspendSave } from "@/game-engine-io/delete-suspend-save.ts";
 import getChapterResults from "@/game-engine-io/get-chapter-results.ts";
 import { removeStubEvent } from "@/game-engine-io/write-chapter/remove-stub-event.ts";
@@ -122,4 +122,3 @@ if (import.meta.main) {
     gameNid: "new",
   });
 }
-

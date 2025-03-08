@@ -53,7 +53,7 @@ export function insertGame(game: Game): void {
  * Retrieve a Game by its nid.
  */
 export function getGameByNid(nid: string): Game | null {
-  const query = db.query
+  const query = db.query<
     [
       string,
       string,
@@ -152,7 +152,7 @@ export function getGameByNid(nid: string): Game | null {
  * Retrieve all Games.
  */
 export function getAllGames(): Game[] {
-  const query = db.query
+  const query = db.query<
     [
       string,
       string,
