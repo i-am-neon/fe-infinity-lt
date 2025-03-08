@@ -144,59 +144,23 @@ const startDenoServer = () => {
       }
     }
 
-    // For development, use system Deno instead of bundled one
+    // Always use bundled Deno regardless of dev or prod mode
     const isDev = process.argv.includes('--dev') || process.env.NODE_ENV === 'development';
     const isMac = process.platform === 'darwin';
 
-    // On macOS, prefer system Deno for both dev and production
-    let denoCommand;
-    if (isMac) {
-      // Try to find Deno in PATH first
-      try {
-        const { execSync } = require('child_process');
-        denoCommand = execSync('which deno', { encoding: 'utf8' }).trim();
-        logger.log('info', `Using system Deno from PATH: ${denoCommand}`);
-        console.log(`Using system Deno from PATH: ${denoCommand}`);
-      } catch (e) {
-        // Look in common locations
-        const commonLocations = [
-          '/usr/local/bin/deno',
-          '/opt/homebrew/bin/deno',
-          '/usr/bin/deno',
-          path.join(app.getPath('home'), '.deno/bin/deno')
-        ];
-
-        for (const loc of commonLocations) {
-          if (fs.existsSync(loc)) {
-            denoCommand = loc;
-            logger.log('info', `Found Deno at common location: ${denoCommand}`);
-            console.log(`Found Deno at common location: ${denoCommand}`);
-            break;
-          }
-        }
-
-        // If still not found, fall back to bundled version or 'deno' command
-        if (!denoCommand) {
-          const bundledDeno = path.join(__dirname, 'bin', 'deno');
-          if (fs.existsSync(bundledDeno)) {
-            denoCommand = bundledDeno;
-            logger.log('info', `Using bundled Deno: ${denoCommand}`);
-          } else {
-            denoCommand = 'deno'; // Last resort, hope it's in PATH
-            logger.log('info', 'Falling back to "deno" command, hoping it exists in PATH');
-          }
-        }
-      }
-    } else {
-      // For Windows/Linux, use bundled or system Deno based on dev mode
-      denoCommand = isDev ? 'deno' : path.join(__dirname, 'bin', process.platform === 'win32' ? 'deno.exe' : 'deno');
-
-      // Verify bundled Deno exists in production mode
-      if (!isDev && !fs.existsSync(denoCommand)) {
-        logger.log('error', `Bundled Deno not found at: ${denoCommand}, falling back to system Deno`);
-        denoCommand = 'deno'; // Fallback to system Deno
-      }
+    // Use bundled Deno for all platforms
+    const denoCommand = path.join(__dirname, 'bin', process.platform === 'win32' ? 'deno.exe' : 'deno');
+    
+    // Verify bundled Deno exists
+    if (!fs.existsSync(denoCommand)) {
+      const errorMsg = `Bundled Deno not found at: ${denoCommand}. Please ensure binaries are downloaded correctly.`;
+      logger.log('error', errorMsg);
+      console.error(errorMsg);
+      throw new Error(errorMsg);
     }
+    
+    logger.log('info', `Using bundled Deno: ${denoCommand}`);
+    console.log(`Using bundled Deno: ${denoCommand}`);
 
     logger.log('info', `Starting Deno server with command: ${denoCommand}`);
     console.log(`Starting Deno server with command: ${denoCommand}`);
@@ -393,11 +357,11 @@ const startDenoServerFallback = (serverPath, resolve, reject) => {
     NODE_ENV: process.env.NODE_ENV || 'production'
   };
 
-  // Try ONLY using bundled Deno
+  // Always use bundled Deno
   const bundledDenoPath = path.join(__dirname, 'bin', process.platform === 'win32' ? 'deno.exe' : 'deno');
 
   if (!fs.existsSync(bundledDenoPath)) {
-    const errorMessage = `Bundled Deno not found at ${bundledDenoPath}`;
+    const errorMessage = `Bundled Deno not found at ${bundledDenoPath}. Cannot start server without bundled binaries.`;
     logger.log('error', errorMessage);
     console.error(errorMessage);
     reject(new Error(errorMessage));
@@ -675,6 +639,15 @@ const startServer = async () => {
     const isMac = process.platform === 'darwin';
     const isWindows = process.platform === 'win32';
     logger.log('info', 'Starting server components', { isDev: isDev, platform: process.platform });
+    
+    // Check for bundled binaries first
+    const bundledDenoPath = path.join(__dirname, 'bin', process.platform === 'win32' ? 'deno.exe' : 'deno');
+    if (!fs.existsSync(bundledDenoPath)) {
+      const errorMsg = `Bundled Deno not found at: ${bundledDenoPath}. Please run the download-binaries script first.`;
+      logger.log('error', errorMsg);
+      console.error(errorMsg);
+      throw new Error(errorMsg);
+    }
 
     // Skip PostgreSQL on macOS (both in dev and production)
     if (isMac) {
@@ -704,14 +677,7 @@ const startServer = async () => {
         stack: denoError.stack
       });
       console.error('Primary Deno server startup failed, trying fallback method:', denoError);
-
-      // We don't want to use system binaries as fallback
-      logger.log('error', 'Deno server startup failed - not attempting fallback to system binaries', {
-        error: denoError.message,
-        stack: denoError.stack
-      });
-      console.error('Deno server startup failed - not attempting fallback to system binaries:', denoError);
-      throw denoError; // Re-throw the error for all platforms
+      throw denoError; // Re-throw the error
     }
 
     logger.log('info', 'All server components started successfully');

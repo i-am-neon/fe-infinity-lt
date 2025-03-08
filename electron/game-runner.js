@@ -3,7 +3,8 @@ const path = require('path');
 const fs = require('fs');
 const { app } = require('electron');
 
-// Get path to Wine from the local system, never use bundled Wine
+// Function to get Wine path from the local system
+// NOTE: Wine is the exception - we use system Wine instead of bundled
 function getWinePath() {
   if (process.platform === 'win32') {
     // On Windows, we don't need Wine
@@ -81,9 +82,13 @@ function getLtMakerPath() {
 function getBundledPythonPath() {
   if (process.platform === 'win32') {
     // Windows uses the embedded Python directly
-    return path.join(app.getAppPath(), 'bin', 'python', 'python.exe');
+    const pythonPath = path.join(app.getAppPath(), 'bin', 'python', 'python.exe');
+    if (!fs.existsSync(pythonPath)) {
+      throw new Error(`Bundled Python not found at: ${pythonPath}. Please ensure binaries are downloaded correctly.`);
+    }
+    return pythonPath;
   } else {
-    // macOS and Linux use Wine
+    // macOS and Linux use Wine with bundled Python
     // Return the Wine Python path (this is the path within the Wine environment)
     return 'python';
   }

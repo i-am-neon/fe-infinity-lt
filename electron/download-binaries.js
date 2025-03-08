@@ -445,20 +445,9 @@ async function main() {
     const isWindows = process.platform === 'win32';
     const isLinux = process.platform === 'linux';
 
-    if (isMac && isDev) {
-      console.log('Running on macOS in development mode');
-      console.log('Skipping binary downloads - using system-installed versions');
-
-      // Create placeholder files so the app knows we ran
-      fs.writeFileSync(path.join(binariesDir, '.dev-mode'), 'Development mode - using system binaries');
-
-      // Create a dummy script to redirect to system Deno
-      const denoDummyPath = path.join(binariesDir, 'deno');
-      fs.writeFileSync(denoDummyPath, '#!/bin/sh\ndeno "$@"');
-      fs.chmodSync(denoDummyPath, 0o755);
-
-      return;
-    }
+    // Always download binaries regardless of dev or prod mode
+    // Wine is the only exception that can use system installation
+    console.log('Downloading required binaries for bin directory');
 
     // Normal download flow
     await downloadDeno();
