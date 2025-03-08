@@ -1,4 +1,5 @@
 import { ModeToggle } from "@/components/mode-toggle";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -18,7 +19,7 @@ import {
 } from "@/components/ui/non-closable-dialog";
 import apiCall from "@/lib/api-call";
 import { Loader2 } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function HomePage() {
@@ -28,6 +29,17 @@ export default function HomePage() {
   const [creatingGameModalOpen, setCreatingGameModalOpen] = useState(false);
   const [gameIdea, setGameIdea] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [isMac, setIsMac] = useState(false);
+
+  useEffect(() => {
+    // Check if the user is on a Mac
+    const platform = navigator.platform || "";
+    const userAgent = navigator.userAgent || "";
+    const macDetected =
+      platform.toLowerCase().includes("mac") ||
+      userAgent.toLowerCase().includes("macintosh");
+    setIsMac(macDetected);
+  }, []);
 
   const handleCreateGame = useCallback(async () => {
     if (!gameIdea) {
@@ -84,6 +96,40 @@ export default function HomePage() {
         <div className="flex justify-between w-full">
           <ModeToggle />
         </div>
+
+        {isMac && (
+          <Alert variant="destructive" className="w-full max-w-[600px] mb-4">
+            <div>
+              <AlertTitle>
+                Wine is required for the best experience on macOS
+              </AlertTitle>
+              <AlertDescription>
+                <p className="mb-2">
+                  The game will still run without Wine, but graphics may be
+                  distorted.
+                </p>
+                <p>
+                  To install Wine, run the following command in your terminal:
+                </p>
+                <div className="bg-black/10 dark:bg-white/10 p-2 rounded my-2 font-mono text-xs">
+                  brew install --cask --no-quarantine wine-stable
+                </div>
+                <p>
+                  This requires{" "}
+                  <a
+                    href="https://brew.sh"
+                    className="text-blue-500 hover:underline"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Homebrew
+                  </a>{" "}
+                  to be installed.
+                </p>
+              </AlertDescription>
+            </div>
+          </Alert>
+        )}
 
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
@@ -146,4 +192,3 @@ export default function HomePage() {
     </div>
   );
 }
-
