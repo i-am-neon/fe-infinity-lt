@@ -1,0 +1,66 @@
+import { isElectronEnvironment } from "@/lib/env-detector.ts";
+import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
+import { db } from "@/db/connection.ts";
+import { getVectorStore } from "@/vector-db/init.ts";
+
+async function checkEnvironment() {
+  console.log("=== Environment Verification ===");
+  console.log(`Running in Electron: ${isElectronEnvironment()}`);
+
+  // Check environment variables
+  console.log("\n=== Environment Variables ===");
+  const envVars = [
+    "ELECTRON_RUN_AS_NODE",
+    "ELECTRON_APP_ROOT",
+    "DB_PATH",
+    "SERVER_DIR",
+    "USER_DATA_PATH",
+    "APP_PATH",
+    "RESOURCES_PATH",
+    "OPENAI_API_KEY"
+  ];
+  
+  for (const varName of envVars) {
+    const value = Deno.env.get(varName);
+    console.log(`${varName}: ${value || "not set"}`);
+  }
+
+  // Check SQLite connection
+  console.log("\n=== SQLite Connection ===");
+  try {
+    const result = db.query("SELECT 1 AS test");
+    console.log("SQLite connection test:", result);
+    console.log("SQLite connection successful");
+  } catch (error) {
+    console.error("SQLite connection failed:", error);
+  }
+
+  // Check vector store
+  console.log("\n=== Vector Store ===");
+  try {
+    const vectorStore = await getVectorStore();
+    const counts = {
+      maps: vectorStore.getVectors("maps").length,
+      portraits_male: vectorStore.getVectors("portraits-male").length,
+      portraits_female: vectorStore.getVectors("portraits-female").length,
+      music: vectorStore.getVectors("music").length,
+      items: vectorStore.getVectors("items").length,
+    };
+    console.log("Vector counts:", counts);
+    console.log("Vector store initialization successful");
+  } catch (error) {
+    console.error("Vector store initialization failed:", error);
+  }
+
+  console.log("\n=== Path Resolution ===");
+  try {
+    const serverPath = getPathWithinServer("");
+    console.log("Server path:", serverPath);
+  } catch (error) {
+    console.error("Path resolution failed:", error);
+  }
+}
+
+if (import.meta.main) {
+  checkEnvironment();
+}

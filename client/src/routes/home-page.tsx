@@ -31,6 +31,12 @@ export default function HomePage() {
   const [error, setError] = useState<string | null>(null);
   const [isMac, setIsMac] = useState(false);
 
+  // Test function states
+  const [testingMockGame, setTestingMockGame] = useState(false);
+  const [testingSimilarity, setTestingSimilarity] = useState(false);
+  const [testResults, setTestResults] = useState<any>(null);
+  const [showTestResults, setShowTestResults] = useState(false);
+
   useEffect(() => {
     // Check if the user is on a Mac
     const platform = navigator.platform || "";
@@ -89,6 +95,57 @@ export default function HomePage() {
       setIsCreating(false);
     }
   }, [navigate, gameIdea]);
+
+  // Handler for adding a mock game
+  const handleAddMockGame = useCallback(async () => {
+    setTestingMockGame(true);
+    setTestResults(null);
+    setError(null);
+
+    try {
+      const res = await apiCall<{
+        success: boolean;
+        game?: any;
+        error?: string;
+        message?: string;
+      }>("add-mock-game", {
+        method: "POST",
+      });
+
+      setTestResults(res);
+      setShowTestResults(true);
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Unknown error occurred";
+      setError(errorMessage);
+    } finally {
+      setTestingMockGame(false);
+    }
+  }, []);
+
+  // Handler for testing similarity search
+  const handleTestSimilaritySearch = useCallback(async () => {
+    setTestingSimilarity(true);
+    setTestResults(null);
+    setError(null);
+
+    try {
+      const res = await apiCall<{
+        success: boolean;
+        results?: any[];
+        error?: string;
+      }>("test-similarity-search");
+
+      setTestResults(res);
+      setShowTestResults(true);
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Unknown error occurred";
+      setError(errorMessage);
+    } finally {
+      setTestingSimilarity(false);
+    }
+  }, []);
 
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
@@ -186,6 +243,49 @@ export default function HomePage() {
             </div>
           </NonClosableDialogContent>
         </NonClosableDialog>
+
+        {/* Test Buttons */}
+        <div className="flex flex-col sm:flex-row gap-2 w-full max-w-[600px] mb-4">
+          <Button
+            onClick={handleAddMockGame}
+            disabled={testingMockGame}
+            variant="outline"
+          >
+            {testingMockGame && (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            )}
+            Add Mock Game
+          </Button>
+          <Button
+            onClick={handleTestSimilaritySearch}
+            disabled={testingSimilarity}
+            variant="outline"
+          >
+            {testingSimilarity && (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            )}
+            Test Similarity Search
+          </Button>
+        </div>
+
+        {/* Test Results */}
+        {showTestResults && testResults && (
+          <div className="w-full max-w-[600px] mb-4 p-4 bg-secondary/50 rounded-md overflow-auto">
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="font-semibold">Test Results</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowTestResults(false)}
+              >
+                Close
+              </Button>
+            </div>
+            <pre className="text-xs whitespace-pre-wrap">
+              {JSON.stringify(testResults, null, 2)}
+            </pre>
+          </div>
+        )}
 
         <GamesGrid />
       </main>

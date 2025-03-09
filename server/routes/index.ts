@@ -29,9 +29,17 @@ export async function handleRequest(req: Request): Promise<Response> {
     // GET /games/<nid> for a single game
     const { handleGetGame } = await import("./get-game.ts");
     response = await handleGetGame(req);
+  } else if (req.method === "GET" && url.pathname === "/test-similarity-search") {
+    // Test similarity search route
+    const { handleTestSimilaritySearch } = await import("./test-similarity-search.ts");
+    response = await handleTestSimilaritySearch(req);
   } else if (req.method === "POST" && url.pathname === "/create-game") {
     // "Create Game" route
     response = await handleCreateGame(req);
+  } else if (req.method === "POST" && url.pathname === "/add-mock-game") {
+    // Add mock game route
+    const { handleAddMockGame } = await import("./add-mock-game.ts");
+    response = await handleAddMockGame(req);
   } else if (req.method === "POST" && url.pathname === "/run-game") {
     const { handleRunGame } = await import("./run-game.ts");
     response = await handleRunGame(req);
