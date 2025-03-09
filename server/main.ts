@@ -2,10 +2,22 @@ import { isElectronEnvironment } from "@/lib/env-detector.ts";
 import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
 import { db } from "@/db/connection.ts";
 import { getVectorStore } from "@/vector-db/init.ts";
+import { initVectorDbForElectron } from "@/vector-db/init-electron.ts";
 
 async function checkEnvironment() {
   console.log("=== Environment Verification ===");
   console.log(`Running in Electron: ${isElectronEnvironment()}`);
+
+  // Initialize vector database for Electron if needed
+  if (isElectronEnvironment()) {
+    console.log("Initializing vector database for Electron environment...");
+    try {
+      await initVectorDbForElectron();
+      console.log("Vector database initialization for Electron complete");
+    } catch (error) {
+      console.error("Failed to initialize vector database for Electron:", error);
+    }
+  }
 
   // Check environment variables
   console.log("\n=== Environment Variables ===");
