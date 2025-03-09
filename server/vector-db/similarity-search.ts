@@ -1,3 +1,4 @@
+import { getCurrentLogger } from "@/lib/current-logger.ts";
 import { getVectorStore } from "./init.ts";
 import { VectorType } from "./types/vector-type.ts";
 import { Vector } from "./vector-store.ts";
@@ -19,16 +20,28 @@ export default async function similaritySearch<T = Record<string, unknown>>({
   limit?: number;
   transform?: (vector: Vector) => T;
 }): Promise<TypedSimilarityResult<T>[]> {
+  const startTime = performance.now();
+
   const vectorStore = await getVectorStore();
   const results = await vectorStore.findSimilar(vectorType, query, limit);
 
-  return results.map((result) => ({
+  const mappedResults = results.map((result) => ({
     id: result.vector.id,
     score: result.similarity,
     metadata: transform
       ? transform(result.vector)
       : (result.vector.metadata as T),
   }));
+
+  const endTime = performance.now();
+  const logger = getCurrentLogger();
+  logger.info(
+    `[Similarity Search] "${query}" (${vectorType}): ${(
+      endTime - startTime
+    ).toFixed(2)}ms`
+  );
+
+  return mappedResults;
 }
 
 if (import.meta.main) {
