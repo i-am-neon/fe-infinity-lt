@@ -1,12 +1,13 @@
 import { getCurrentLogger } from "@/lib/current-logger.ts";
 import { sluggify } from "@/lib/sluggify.ts";
+import { SongMetadata } from "@/music-processing/types/song-list-with-links.ts";
 import similaritySearch from "@/vector-db/similarity-search.ts";
 
 export default async function chooseMusic(scenario: string): Promise<string> {
   const logger = getCurrentLogger();
-  const topResults = await similaritySearch({
-    searchQuery: scenario,
-    topK: 3,
+  const topResults = await similaritySearch<SongMetadata>({
+    query: scenario,
+    limit: 3,
     vectorType: "music",
   });
   if (!topResults.length) {

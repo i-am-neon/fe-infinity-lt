@@ -1,9 +1,10 @@
+import { GameItem } from "@/vector-db/save-vectors-for-items.ts";
 import similaritySearch from "@/vector-db/similarity-search.ts";
 
 export default async function chooseItem(itemIdea: string): Promise<string> {
-  const results = await similaritySearch({
-    searchQuery: itemIdea,
-    topK: 1,
+  const results = await similaritySearch<GameItem>({
+    query: itemIdea,
+    limit: 1,
     vectorType: "items",
   });
 
@@ -17,3 +18,4 @@ export default async function chooseItem(itemIdea: string): Promise<string> {
 if (import.meta.main) {
   chooseItem("Throwing Lance").then((nid) => console.log(nid));
 }
+

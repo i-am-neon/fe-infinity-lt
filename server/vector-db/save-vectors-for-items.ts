@@ -1,6 +1,6 @@
 import generateAndStoreVector from "@/vector-db/generate-and-store-vector.ts";
 
-interface Item {
+export interface GameItem {
   nid: string;
   name: string;
   desc: string;
@@ -9,7 +9,7 @@ interface Item {
 }
 
 export default async function saveVectorsForItems(
-  items: Item[]
+  items: GameItem[]
 ): Promise<void> {
   for (const item of items) {
     // Create the text for embedding
@@ -51,7 +51,7 @@ export default async function saveVectorsForItems(
 }
 
 if (import.meta.main) {
-  const sampleItems: Item[] = [
+  const sampleItems: GameItem[] = [
     {
       nid: "iron_sword",
       name: "Iron Sword",
@@ -76,3 +76,4 @@ if (import.meta.main) {
     .then(() => console.log("Saved vectors for items"))
     .catch(console.error);
 }
+

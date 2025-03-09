@@ -5,11 +5,14 @@ interface SongMetadata {
   feel: string;
   instrumentsUsed: string;
   situationUsedInGame: string;
-  youTubeLink?: string;
   [key: string]: unknown;
 }
 
-export type SongListWithLinks = SongMetadata[];
+interface SongWithLink extends SongMetadata {
+  youTubeLink: string;
+}
+
+export type SongListWithLinks = SongWithLink[];
 
 export default async function saveVectorsForSongs(
   songs: SongListWithLinks
@@ -37,12 +40,14 @@ if (import.meta.main) {
       feel: "intense, exciting, dramatic",
       instrumentsUsed: "orchestra, drums, brass",
       situationUsedInGame: "regular combat",
+      youTubeLink: "youtube...",
     },
     {
       songName: "Peaceful Village",
       feel: "calm, serene, gentle",
       instrumentsUsed: "strings, flute, harp",
       situationUsedInGame: "town exploration",
+      youTubeLink: "youtube...",
     },
   ];
 
@@ -50,3 +55,4 @@ if (import.meta.main) {
     .then(() => console.log("Saved vectors for songs"))
     .catch(console.error);
 }
+
