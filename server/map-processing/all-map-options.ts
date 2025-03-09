@@ -4,13 +4,12 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
   {
     "distinctRegions": [
       {
-        "name": "Fortress Interior",
-        "description": "The inner area of the fortress containing the throne room and stairs, heavily fortified and ideal for defense.",
+        "name": "Central Castle Keep",
+        "description": "The heart of the fortress, containing the throne room and stairs leading to strategic positions.",
         "terrainTypes": [
           "Floor",
           "Throne",
-          "Stairs",
-          "Wall"
+          "Stairs"
         ],
         "fromX": 2,
         "fromY": 0,
@@ -18,125 +17,103 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "toY": 4
       },
       {
-        "name": "Northern Plains",
-        "description": "Open plains north of the fortress, providing clear movement but limited cover.",
-        "terrainTypes": [
-          "Plain",
-          "Road"
-        ],
-        "fromX": 8,
-        "fromY": 2,
-        "toX": 15,
-        "toY": 6
-      },
-      {
-        "name": "Central Roadway",
-        "description": "A major road connecting various strategic points, facilitating rapid troop movement.",
+        "name": "Northern Treasure Alcove",
+        "description": "A small, isolated area with valuable chests, accessible via stairs and protected by walls.",
         "terrainTypes": [
           "Road",
-          "Plain"
+          "Chest",
+          "Stairs"
         ],
-        "fromX": 0,
-        "fromY": 5,
+        "fromX": 17,
+        "fromY": 0,
         "toX": 20,
-        "toY": 8
+        "toY": 4
       },
       {
-        "name": "Merchant's Row",
-        "description": "A commercial area with vendors and armories, crucial for resupply and trade.",
-        "terrainTypes": [
-          "Vendor",
-          "Armory",
-          "Road",
-          "Plain"
-        ],
-        "fromX": 0,
-        "fromY": 10,
-        "toX": 20,
-        "toY": 12
-      },
-      {
-        "name": "Village Square",
-        "description": "Central village area with multiple houses, providing cover and strategic positioning.",
+        "name": "Eastern Village Square",
+        "description": "A cluster of villages and armories providing resources and strategic points for defense and resupply.",
         "terrainTypes": [
           "Village",
+          "Armory",
           "Road",
           "Wall"
         ],
-        "fromX": 12,
-        "fromY": 14,
+        "fromX": 13,
+        "fromY": 10,
         "toX": 20,
         "toY": 18
       },
       {
-        "name": "Training Grounds",
-        "description": "An open area with an arena, ideal for training and skirmishes.",
+        "name": "Western Coliseum Grounds",
+        "description": "An open area featuring an arena, surrounded by forests and walls, ideal for training and combat.",
         "terrainTypes": [
           "Arena",
-          "Road",
-          "Forest"
-        ],
-        "fromX": 5,
-        "fromY": 16,
-        "toX": 16,
-        "toY": 19
-      },
-      {
-        "name": "Forest Path",
-        "description": "A narrow path through dense trees, offering concealment and ambush potential.",
-        "terrainTypes": [
           "Forest",
-          "Road",
-          "Plain"
-        ],
-        "fromX": 0,
-        "fromY": 19,
-        "toX": 11,
-        "toY": 22
-      },
-      {
-        "name": "Southern Village",
-        "description": "A small village area at the southern edge, providing additional strategic points.",
-        "terrainTypes": [
-          "Village",
           "Road",
           "Wall"
         ],
         "fromX": 0,
-        "fromY": 23,
-        "toX": 15,
-        "toY": 25
+        "fromY": 15,
+        "toX": 8,
+        "toY": 21
+      },
+      {
+        "name": "Southern Pathway",
+        "description": "A winding road through forests and plains, connecting the southern entrance to the central areas.",
+        "terrainTypes": [
+          "Road",
+          "Forest",
+          "Plain"
+        ],
+        "fromX": 0,
+        "fromY": 22,
+        "toX": 20,
+        "toY": 27
+      },
+      {
+        "name": "Central Courtyard",
+        "description": "A large open area with roads and plains, providing mobility and access to various strategic points.",
+        "terrainTypes": [
+          "Road",
+          "Plain",
+          "Forest"
+        ],
+        "fromX": 0,
+        "fromY": 5,
+        "toX": 20,
+        "toY": 14
       }
     ],
     "keyPointsOfInterest": [
       "Throne at (5,1)",
+      "Treasure Chests at (18,1) and (20,1)",
       "Armories at (14,10) and (19,11)",
-      "Vendors at (2,12)",
       "Arena at (6,16)",
       "Villages at (15,15), (19,15), (13,18), (1,18), (13,24), (1,24), (15,21), (19,21)"
     ],
     "chokePoints": [
-      "Fortress Gate at (4,8) and (5,8)",
+      "Castle Gate at (4,8) and (5,8)",
       "Door at (17,3)",
-      "Narrow roads near Merchant's Row and Village Square"
+      "Narrow roads near villages and armories"
     ],
     "strategicConsiderations": [
-      "Fortress Interior is highly defensible; controlling it is crucial for victory.",
-      "Central Roadway allows rapid troop movement but is vulnerable to ambushes.",
-      "Merchant's Row provides essential resources; securing it early can offer significant advantages.",
-      "Village Square and Southern Village offer cover and strategic positioning for both offense and defense.",
-      "Forest Path is ideal for ambushes and guerrilla tactics, especially for units with high mobility."
+      "Control of the Central Castle Keep is crucial for defense and command.",
+      "Securing the Northern Treasure Alcove early can provide valuable resources.",
+      "Eastern Village Square offers critical resupply points and should be defended or captured strategically.",
+      "Western Coliseum Grounds provide an excellent training area and defensive position.",
+      "Southern Pathway is vital for mobility and reinforcement, making it a key area to control or disrupt enemy movements.",
+      "Central Courtyard allows rapid movement across the map, making it essential for both offensive and defensive maneuvers."
     ],
     "givenName": "Fortress Approach",
     "originalName": "Chapter7OstiasRebellion_Diff_Tileset__by_Shin19",
-    "description": "A strategic outdoor map featuring a fortress entrance, surrounded by a village and open fields. The map is designed for tactical maneuvers with various terrains and structures.",
+    "description": "A fortified area with a central castle, surrounded by villages and a coliseum, featuring strategic pathways and defensive structures.",
     "setting": "outdoor"
   },
   {
     "distinctRegions": [
       {
         "name": "Treasure Chamber",
-        "description": "A secluded room containing a valuable chest, accessible through a door at the north.",
+        "description": "A secluded room in the northwest corner containing a valuable chest, accessible through a door.",
         "terrainTypes": [
           "Floor",
           "Chest"
@@ -153,25 +130,37 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
           "Floor",
           "Pillar"
         ],
-        "fromX": 0,
+        "fromX": 5,
         "fromY": 4,
-        "toX": 17,
+        "toX": 15,
         "toY": 6
       },
       {
         "name": "Eastern Corridor",
-        "description": "A narrow corridor on the eastern side, providing limited mobility and strategic chokepoints.",
+        "description": "A narrow corridor on the eastern side, connecting the central hall to the Guardian Statues area.",
         "terrainTypes": [
           "Floor"
         ],
         "fromX": 13,
         "fromY": 0,
         "toX": 15,
-        "toY": 7
+        "toY": 4
       },
       {
-        "name": "Southern Staircase",
-        "description": "A staircase area in the southwest, potentially allowing reinforcements to enter.",
+        "name": "Guardian Statues",
+        "description": "A defensive area with statues providing cover, located in the southeastern part of the map.",
+        "terrainTypes": [
+          "Floor",
+          "Pillar"
+        ],
+        "fromX": 10,
+        "fromY": 11,
+        "toX": 17,
+        "toY": 13
+      },
+      {
+        "name": "Mossy Entrance",
+        "description": "The main entrance adorned with moss-covered stones, located at the southern edge of the map.",
         "terrainTypes": [
           "Floor",
           "Stairs"
@@ -182,34 +171,30 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "toY": 13
       },
       {
-        "name": "Entrance Archway",
-        "description": "The main entrance area with a large arch, providing initial deployment and entry point.",
+        "name": "Overgrown Hallway",
+        "description": "A corridor with dense vegetation creeping through the stone tiles, connecting the central hall to the Mossy Entrance.",
         "terrainTypes": [
-          "Floor",
-          "Pillar"
+          "Floor"
         ],
-        "fromX": 5,
-        "fromY": 11,
-        "toX": 17,
-        "toY": 13
+        "fromX": 0,
+        "fromY": 5,
+        "toX": 4,
+        "toY": 10
       }
     ],
     "keyPointsOfInterest": [
-      "Chest at (2,2)",
-      "Door at (2,0)",
-      "Stairs at (2,11)-(4,11)"
+      "Chest at (2,2) in the Treasure Chamber",
+      "Stairs at (2,11)-(4,11) in the Mossy Entrance"
     ],
     "chokePoints": [
-      "Door at (2,0)",
-      "Narrow Eastern Corridor (13,0)-(15,7)",
-      "Central Pillar Hall (pillars at (7,5) and (13,5))"
+      "Door at (2,0) leading into the Treasure Chamber",
+      "Narrow corridors connecting the Central Pillar Hall to other regions"
     ],
     "strategicConsiderations": [
+      "The Central Pillar Hall is ideal for defensive positioning due to pillars providing cover.",
       "The Treasure Chamber is isolated and can be easily defended or trapped.",
-      "Central Pillar Hall provides cover and is ideal for defensive positioning.",
-      "Eastern Corridor is narrow and can be used to funnel enemy units.",
-      "Southern Staircase may introduce reinforcements, requiring vigilance.",
-      "Entrance Archway serves as the main entry point, crucial for initial positioning and control."
+      "The Mossy Entrance serves as a critical entry point and should be secured early.",
+      "Guardian Statues area provides excellent defensive cover and should be approached cautiously."
     ],
     "givenName": "Ancient Ruins",
     "originalName": "Nobles_Evil_Doers_9_(5F_00_60_61)__by_Aura_Wolf",
@@ -220,7 +205,7 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
     "distinctRegions": [
       {
         "name": "Central Chamber",
-        "description": "A large, open room with multiple entrances, pillars for cover, and stairs for vertical mobility. Acts as the main hub of the map.",
+        "description": "A large, open room with multiple entrances, pillars for cover, and stairs providing vertical mobility.",
         "terrainTypes": [
           "Floor",
           "Pillar",
@@ -232,12 +217,13 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "toY": 7
       },
       {
-        "name": "Left Wing Corridors",
-        "description": "Narrow corridors and small rooms with walls and pillars providing strategic cover and limited movement options.",
+        "name": "Left Wing",
+        "description": "Interconnected rooms and corridors on the left side, featuring pillars and stairs for strategic positioning.",
         "terrainTypes": [
           "Floor",
-          "Wall",
-          "Pillar"
+          "Pillar",
+          "Stairs",
+          "Plain"
         ],
         "fromX": 0,
         "fromY": 0,
@@ -245,12 +231,13 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "toY": 9
       },
       {
-        "name": "Right Wing Corridors",
-        "description": "Mirrored layout of the Left Wing, featuring narrow corridors, small rooms, and strategic cover.",
+        "name": "Right Wing",
+        "description": "Mirrored layout of the Left Wing, with similar strategic opportunities, pillars, and stairs.",
         "terrainTypes": [
           "Floor",
-          "Wall",
-          "Pillar"
+          "Pillar",
+          "Stairs",
+          "Plain"
         ],
         "fromX": 20,
         "fromY": 0,
@@ -258,11 +245,11 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "toY": 9
       },
       {
-        "name": "Lower Hall",
-        "description": "A long corridor connecting the central chamber to the bottom of the map, with limited access points and stairs for vertical movement.",
+        "name": "Lower Passage",
+        "description": "A narrow corridor at the bottom, connecting smaller rooms and providing tactical approaches.",
         "terrainTypes": [
           "Floor",
-          "Wall",
+          "Pillar",
           "Stairs"
         ],
         "fromX": 0,
@@ -271,44 +258,42 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "toY": 11
       },
       {
-        "name": "Upper Staircase Area",
-        "description": "An elevated area with multiple staircases providing vertical mobility and strategic positioning.",
+        "name": "Upper Balcony",
+        "description": "Elevated area offering a vantage point over the central chamber, accessible via stairs.",
         "terrainTypes": [
           "Floor",
           "Stairs"
         ],
         "fromX": 9,
         "fromY": 2,
-        "toX": 25,
+        "toX": 18,
         "toY": 4
       }
     ],
     "keyPointsOfInterest": [
-      "Multiple staircases for vertical mobility",
-      "Pillars providing strategic cover",
-      "Central Chamber as a main hub"
+      "Stairs at (10,3), (16,6), (19,2), (25,2), (25,3), (25,4), (16,9), (16,10)",
+      "Pillars scattered throughout the Central Chamber and Wings for cover"
     ],
     "chokePoints": [
-      "Narrow corridors in Left and Right Wings",
-      "Limited access points to Lower Hall",
-      "Staircase entrances and exits"
+      "Narrow corridors at (8,4)-(11,4), (8,5)-(11,5), (8,6)-(11,6)",
+      "Doorways and narrow passages between rooms"
     ],
     "strategicConsiderations": [
-      "Control of the Central Chamber is crucial for map dominance.",
-      "Utilize pillars and narrow corridors for defensive positioning.",
-      "Vertical mobility via staircases can provide tactical advantages and surprise attacks.",
-      "Careful management of choke points can restrict enemy movement and control engagements."
+      "Control of the Central Chamber is crucial for mobility and positioning.",
+      "Use pillars and stairs effectively for cover and vertical advantage.",
+      "Secure choke points to control enemy movement and protect vulnerable units.",
+      "Flanking maneuvers through the Left and Right Wings can disrupt enemy formations."
     ],
     "givenName": "Ancient Ruins",
     "originalName": "Nobles_Evil_Doers_6_(6C_00_A3_6E)__by_Aura_Wolf",
-    "description": "A complex indoor map featuring multiple enclosed rooms and narrow corridors, surrounded by impassable terrain and water.",
+    "description": "A complex indoor map featuring multiple rooms and corridors, with a mix of open spaces and narrow pathways.",
     "setting": "indoor"
   },
   {
     "distinctRegions": [
       {
-        "name": "Western Village Area",
-        "description": "A village area with houses, an armory, and a vendor, providing resources and shelter. Important for resupply and defense.",
+        "name": "Western Village",
+        "description": "A small village with several buildings including a vendor, armory, and house, providing resources and shelter.",
         "terrainTypes": [
           "Plain",
           "Forest",
@@ -323,24 +308,22 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "toY": 11
       },
       {
-        "name": "Eastern Castle Grounds",
-        "description": "A fortified castle area with walls and a gate, providing a strong defensive position and strategic control.",
+        "name": "Eastern Castle Courtyard",
+        "description": "A fortified area with walls and a gate, serving as a strategic stronghold.",
         "terrainTypes": [
           "Plain",
           "Forest",
           "Wall",
-          "Gate",
-          "House",
-          "Fort"
+          "Gate"
         ],
-        "fromX": 14,
+        "fromX": 15,
         "fromY": 4,
-        "toX": 18,
-        "toY": 11
+        "toX": 17,
+        "toY": 6
       },
       {
         "name": "Central Mountain Range",
-        "description": "A large impassable mountain range dividing the map, creating strategic choke points and limiting mobility.",
+        "description": "A large, impassable mountain range dominating the center of the map, creating a natural barrier.",
         "terrainTypes": [
           "Mountain",
           "Hill"
@@ -351,8 +334,8 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "toY": 9
       },
       {
-        "name": "Northern Fort Area",
-        "description": "A small fort providing a defensive position and control over the northern approach, surrounded by plains and forests.",
+        "name": "Northern Outpost",
+        "description": "A small outpost with a fort located near the top of the map, offering a vantage point and defensive advantage.",
         "terrainTypes": [
           "Plain",
           "Forest",
@@ -361,64 +344,65 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "fromX": 0,
         "fromY": 0,
         "toX": 6,
-        "toY": 4
+        "toY": 3
       },
       {
-        "name": "Southern Road",
-        "description": "A winding road through the southern part of the map, connecting the western village and eastern castle, important for troop movement.",
+        "name": "Southern Pathway",
+        "description": "A winding path leading through the southern part of the map, connecting key areas and providing mobility.",
         "terrainTypes": [
           "Plain",
           "Forest",
           "Hill"
         ],
         "fromX": 6,
-        "fromY": 9,
-        "toX": 13,
+        "fromY": 10,
+        "toX": 18,
         "toY": 11
       },
       {
-        "name": "Western Fort Area",
-        "description": "A fort located near the western village, offering additional defense and strategic positioning.",
+        "name": "Eastern Settlement",
+        "description": "A small settlement with houses and a fort, providing strategic positions and resources.",
         "terrainTypes": [
           "Plain",
           "Forest",
+          "House",
           "Fort"
         ],
-        "fromX": 5,
-        "fromY": 1,
-        "toX": 6,
-        "toY": 2
+        "fromX": 14,
+        "fromY": 9,
+        "toX": 18,
+        "toY": 11
       }
     ],
     "keyPointsOfInterest": [
       "Western Village at (2,7)",
       "Eastern Castle Gate at (16,6)",
       "Northern Fort at (5,1)",
-      "Western Fort at (5,1)",
+      "Eastern Settlement Houses at (16,9) and (5,11)",
       "Vendor at (4,9)",
-      "Armory at (1,10)",
-      "Houses at (5,11), (16,9), (5,11), (14,11)"
+      "Armory at (1,10)"
     ],
     "chokePoints": [
       "Eastern Castle Gate at (16,6)",
       "Mountain passes around central mountain range"
     ],
     "strategicConsiderations": [
-      "Control of the central mountain range is crucial for limiting enemy movement and creating choke points.",
-      "Securing the western village and eastern castle provides essential resources and defensive positions.",
-      "The southern road is vital for rapid troop deployment and reinforcement between key locations.",
-      "Utilize forts for defensive bonuses and to control key approaches."
+      "The central mountain range significantly restricts movement, making control of the few available passes crucial.",
+      "The Western Village and Eastern Castle Courtyard provide essential resources and defensive positions, making them key objectives.",
+      "The Northern Outpost offers a vantage point for ranged units, ideal for controlling the northern approaches.",
+      "The Southern Pathway is vital for mobility and flanking maneuvers, but its openness makes it vulnerable to ambushes.",
+      "Securing the Eastern Settlement can provide additional resources and a staging area for attacks on the Eastern Castle."
     ],
-    "givenName": "Mountain Pass Siege",
+    "givenName": "Mountain Pass Clash",
     "originalName": "Knights_Villagers_Bandits_4_(01_00_38_03)__by_Aura_Wolf",
-    "description": "A strategic outdoor map featuring a central mountain range dividing the battlefield, with villages and a castle on either side.",
+    "description": "A rugged outdoor map featuring a central mountain range dividing the battlefield, with villages and a castle on either side.",
     "setting": "outdoor"
   },
   {
     "distinctRegions": [
       {
         "name": "Throne Room",
-        "description": "A grand room with a throne, indicating the seat of power. Highly defensible and strategically important.",
+        "description": "A grand room with a throne, serving as the main objective area. Highly defensible with limited entry points.",
         "terrainTypes": [
           "Floor",
           "Throne",
@@ -430,20 +414,8 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "toY": 6
       },
       {
-        "name": "Dining Hall",
-        "description": "A spacious room with pillars, suitable for gatherings or strategic positioning.",
-        "terrainTypes": [
-          "Floor",
-          "Pillar"
-        ],
-        "fromX": 16,
-        "fromY": 1,
-        "toX": 24,
-        "toY": 6
-      },
-      {
-        "name": "Treasure Vault",
-        "description": "A secure area with multiple treasure chests, valuable for acquiring resources.",
+        "name": "Upper Treasure Vault",
+        "description": "A secure area containing multiple treasure chests, accessible through a locked door.",
         "terrainTypes": [
           "Floor",
           "Chest"
@@ -454,33 +426,33 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "toY": 8
       },
       {
-        "name": "Maze Corridors",
-        "description": "Complex network of corridors connecting various rooms, ideal for ambushes and defensive maneuvers.",
+        "name": "Central Maze Corridors",
+        "description": "Complex network of winding corridors connecting various rooms, providing strategic mobility and chokepoints.",
         "terrainTypes": [
           "Floor",
-          "Door"
+          "Door",
+          "Wall"
         ],
         "fromX": 7,
         "fromY": 7,
         "toX": 24,
-        "toY": 14
+        "toY": 16
       },
       {
-        "name": "Left Treasure Room",
-        "description": "A small, isolated room containing a treasure chest, accessible through a locked door.",
+        "name": "Lower Treasure Room",
+        "description": "A small, isolated room with treasure chests, accessible from the maze corridors.",
         "terrainTypes": [
           "Floor",
-          "Chest",
-          "Door"
+          "Chest"
         ],
         "fromX": 4,
-        "fromY": 19,
-        "toX": 9,
+        "fromY": 20,
+        "toX": 6,
         "toY": 23
       },
       {
         "name": "Entrance Hall",
-        "description": "The main entrance to the fortress, flanked by towers and stairs, crucial for controlling access.",
+        "description": "The main entrance to the fortress, leading directly into the maze corridors. Critical for controlling access.",
         "terrainTypes": [
           "Floor",
           "Stairs"
@@ -491,11 +463,11 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "toY": 25
       },
       {
-        "name": "Southern Defensive Perimeter",
-        "description": "A heavily fortified area with cliffs and walls, providing strong defensive positions.",
+        "name": "Southern Cliffside",
+        "description": "A rugged area with cliffs and limited accessibility, providing natural defensive advantages.",
         "terrainTypes": [
-          "Wall",
-          "Cliff"
+          "Cliff",
+          "Wall"
         ],
         "fromX": 0,
         "fromY": 25,
@@ -505,35 +477,33 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
     ],
     "keyPointsOfInterest": [
       "Throne at (9,1)",
-      "Multiple treasure chests at (5,20), (5,23), (26,4), (26,6), (27,8), (26,12)",
-      "Main entrance stairs at (11,25), (12,25), (18,0), (19,0)",
-      "Locked doors at (7,20), (24,5), (26,10), (27,14)"
+      "Upper Treasure Vault chests at (27,4), (26,6), (27,8)",
+      "Lower Treasure Room chests at (5,20), (5,23)",
+      "Entrance Hall stairs at (11,25), (12,25), (18,0), (19,0), (26,20)"
     ],
     "chokePoints": [
-      "Doors at (7,20), (24,5), (26,10), (27,14)",
-      "Corridors in Maze Corridors region"
+      "Doors at (24,5), (26,10), (27,14), (7,20), (8,7), (9,7)"
     ],
     "strategicConsiderations": [
-      "Control of the Throne Room is crucial for victory.",
-      "Treasure Vault and Left Treasure Room contain valuable resources; securing them early can provide significant advantages.",
-      "Maze Corridors offer opportunities for ambushes and defensive setups; controlling these corridors can restrict enemy movement.",
-      "Entrance Hall is vital for controlling reinforcements and retreat paths; maintaining control here is essential for both offense and defense.",
-      "Southern Defensive Perimeter provides strong defensive positions; use cliffs and walls to your advantage."
+      "Control of the maze corridors is crucial for mobility and defense.",
+      "The throne room is highly defensible but can be isolated if corridors are lost.",
+      "Treasure rooms provide valuable resources but require careful planning to secure.",
+      "Entrance hall is a critical area for controlling reinforcements and retreat paths.",
+      "Southern cliffside offers natural defensive positions but limited mobility."
     ],
-    "givenName": "Labyrinthine Fortress",
+    "givenName": "Fortress Maze",
     "originalName": "Chapter12TheTrueEnemy_Fire_tileset_Minor_Changes__by_Shin19",
-    "description": "A complex indoor fortress with winding corridors and multiple treasure rooms.",
+    "description": "A complex indoor fortress with winding corridors and treasure rooms.",
     "setting": "indoor"
   },
   {
     "distinctRegions": [
       {
-        "name": "North Fortress Interior",
-        "description": "A large indoor area with pillars and stairs, providing defensive positions and multiple entry points.",
+        "name": "Northern Hall",
+        "description": "A large indoor area with pillars and a chest, providing cover and valuable loot.",
         "terrainTypes": [
           "Floor",
           "Pillar",
-          "Stairs",
           "Chest"
         ],
         "fromX": 0,
@@ -542,8 +512,21 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "toY": 4
       },
       {
-        "name": "East Fortress Treasure Room",
-        "description": "A small enclosed room containing a valuable chest, accessible through a door.",
+        "name": "Western Barracks",
+        "description": "A fortified area with stairs and multiple rooms, ideal for defensive positioning.",
+        "terrainTypes": [
+          "Floor",
+          "Stairs",
+          "Wall"
+        ],
+        "fromX": 0,
+        "fromY": 11,
+        "toX": 3,
+        "toY": 17
+      },
+      {
+        "name": "Eastern Armory",
+        "description": "A secured room containing a chest, accessible through a door, likely storing valuable items.",
         "terrainTypes": [
           "Floor",
           "Chest",
@@ -552,69 +535,80 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "fromX": 17,
         "fromY": 8,
         "toX": 19,
-        "toY": 12
+        "toY": 13
       },
       {
         "name": "Central Courtyard",
-        "description": "An open area with plains, forests, and roads, ideal for open combat and maneuvering.",
+        "description": "An open area with scattered trees, roads, and plains, providing mobility and strategic positioning.",
         "terrainTypes": [
           "Plain",
           "Forest",
           "Road",
           "Hill"
         ],
-        "fromX": 0,
+        "fromX": 4,
         "fromY": 5,
-        "toX": 19,
+        "toX": 16,
         "toY": 13
       },
       {
-        "name": "South Pathway",
-        "description": "A narrow pathway with stairs and pillars, providing strategic chokepoints and access to the southern edge.",
+        "name": "Southern Gate",
+        "description": "A southern area with stairs and roads, serving as an entry point and strategic chokepoint.",
+        "terrainTypes": [
+          "Plain",
+          "Road",
+          "Stairs"
+        ],
+        "fromX": 4,
+        "fromY": 14,
+        "toX": 9,
+        "toY": 17
+      },
+      {
+        "name": "Southeast Quarters",
+        "description": "A fortified indoor area with multiple pillars and stairs, suitable for defensive maneuvers.",
         "terrainTypes": [
           "Floor",
-          "Stairs",
           "Pillar",
-          "Road"
+          "Stairs"
         ],
-        "fromX": 0,
+        "fromX": 10,
         "fromY": 14,
         "toX": 19,
         "toY": 17
       }
     ],
     "keyPointsOfInterest": [
-      "Chest at (1,1) in North Fortress Interior",
-      "Chest at (19,10) in East Fortress Treasure Room",
-      "Multiple stairs providing access between different elevations"
+      "Chest in Northern Hall (1,1)",
+      "Chest in Eastern Armory (19,10)",
+      "Multiple stairs providing access to different regions"
     ],
     "chokePoints": [
-      "Door at (19,12) leading to East Fortress Treasure Room",
-      "Narrow pathways and stairs in South Pathway"
+      "Door to Eastern Armory (19,12)",
+      "Stairs leading to Western Barracks and Southeast Quarters"
     ],
     "strategicConsiderations": [
-      "Control of the North Fortress Interior provides defensive advantages and access to valuable items.",
-      "Securing the East Fortress Treasure Room early can provide a significant advantage due to the chest.",
-      "The Central Courtyard offers open combat opportunities but requires careful positioning due to scattered forests and hills.",
-      "The South Pathway's narrow passages and stairs can be effectively used to control enemy movement and create defensive chokepoints."
+      "Northern Hall provides valuable loot and cover, making it a key area to control.",
+      "Central Courtyard offers high mobility but limited cover, ideal for cavalry and ranged units.",
+      "Eastern Armory is a critical area due to its valuable chest, requiring careful approach through the door chokepoint.",
+      "Southern Gate and stairs are crucial for controlling access to the southern regions, making them important defensive positions."
     ],
     "givenName": "Fortress Courtyard",
     "originalName": "Knights_Villagers_Bandits_10_(3C_00_CE_3E)__by_Aura_Wolf",
-    "description": "An outdoor map featuring a central courtyard surrounded by fortress walls and buildings. The area is dotted with trees and has a mix of open spaces and narrow pathways.",
+    "description": "A fortified outdoor area surrounded by stone structures, featuring a central open space with scattered trees and pathways leading to various entrances.",
     "setting": "outdoor"
   },
   {
     "distinctRegions": [
       {
         "name": "Northern Castle Stronghold",
-        "description": "A heavily fortified castle at the northern edge, surrounded by walls and mountains, providing excellent defensive capabilities.",
+        "description": "A heavily fortified castle with walls, gates, and mountains providing natural defense. Ideal for defensive positioning.",
         "terrainTypes": [
           "Wall",
           "Gate",
           "Mountain",
           "Hill",
-          "Plain",
-          "Fort"
+          "Plain"
         ],
         "fromX": 7,
         "fromY": 0,
@@ -623,7 +617,7 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
       },
       {
         "name": "Central River Crossing",
-        "description": "A strategic river running horizontally across the map, featuring multiple bridges and forts, crucial for controlling movement.",
+        "description": "A strategic river area with multiple bridges and forts, crucial for controlling movement across the map.",
         "terrainTypes": [
           "River",
           "Bridge",
@@ -634,11 +628,11 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "fromX": 0,
         "fromY": 5,
         "toX": 16,
-        "toY": 11
+        "toY": 12
       },
       {
         "name": "Western Village Area",
-        "description": "A small village area on the western side, providing resources and shelter, surrounded by forests and plains.",
+        "description": "A small village area providing resources and shelter, surrounded by plains and forests.",
         "terrainTypes": [
           "House",
           "Plain",
@@ -647,12 +641,12 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         ],
         "fromX": 0,
         "fromY": 0,
-        "toX": 4,
+        "toX": 6,
         "toY": 4
       },
       {
         "name": "Eastern Village Area",
-        "description": "A small village area on the eastern side, offering supplies and refuge, surrounded by plains and forests.",
+        "description": "A village area on the eastern side, offering supplies and refuge, surrounded by plains and forests.",
         "terrainTypes": [
           "House",
           "Plain",
@@ -665,8 +659,8 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "toY": 22
       },
       {
-        "name": "Southern Coastal Region",
-        "description": "A large coastal area at the southern edge, featuring cliffs, sea, and open plains, providing limited mobility and strategic positioning.",
+        "name": "Southern Coastal Lake",
+        "description": "A large body of water at the southern edge, surrounded by cliffs, plains, and sea, providing limited access points.",
         "terrainTypes": [
           "Sea",
           "Cliff",
@@ -680,15 +674,14 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
       },
       {
         "name": "Southwestern Town",
-        "description": "A bustling town in the southwest, featuring multiple buildings including an armory, vendor, and village, connected by roads and bridges.",
+        "description": "A bustling town with multiple buildings including an armory, vendor, and village, connected by roads and bridges.",
         "terrainTypes": [
           "Village",
           "Armory",
           "Vendor",
           "Wall",
           "Bridge",
-          "Plain",
-          "Forest"
+          "Plain"
         ],
         "fromX": 0,
         "fromY": 18,
@@ -696,30 +689,12 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "toY": 22
       },
       {
-        "name": "Southeastern Town",
-        "description": "A lively town in the southeast, with various structures including an armory, vendor, and houses, connected by roads and bridges.",
-        "terrainTypes": [
-          "Village",
-          "Armory",
-          "Vendor",
-          "Wall",
-          "Bridge",
-          "Plain",
-          "Forest"
-        ],
-        "fromX": 4,
-        "fromY": 18,
-        "toX": 16,
-        "toY": 22
-      },
-      {
-        "name": "Northeastern Mountain Range",
-        "description": "A rugged mountain area in the northeast, providing natural barriers and limited access, ideal for defensive positioning.",
+        "name": "Mountain Range",
+        "description": "A rugged mountain area providing natural defense, located near the top right, impassable except for flying units.",
         "terrainTypes": [
           "Mountain",
           "Hill",
-          "Cliff",
-          "Plain"
+          "Cliff"
         ],
         "fromX": 10,
         "fromY": 0,
@@ -730,20 +705,22 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
     "keyPointsOfInterest": [
       "Northern Castle Gate at (8,3)",
       "Western Village House at (0,2)",
-      "Eastern Village House at (16,14)",
-      "Southwestern Town Village at (2,20), Armory at (5,20), Vendor at (11,20)",
-      "Southeastern Town Village at (15,18), Armory at (5,20), Vendor at (11,20)"
+      "Eastern Village House at (16,18)",
+      "Southwestern Town Armory at (5,20)",
+      "Southwestern Town Vendor at (11,20)",
+      "Southwestern Town Village at (2,20)",
+      "Multiple Forts along the Central River"
     ],
     "chokePoints": [
-      "Bridges at (4,3), (4,4), (9,8), (10,8), (14,11), (15,11)",
+      "Bridges at (4,3), (4,4), (9,8), (10,8), (14,11), (15,11), (8,20), (8,21)",
       "Castle Gate at (8,3)"
     ],
     "strategicConsiderations": [
-      "Control of the central river and bridges is crucial for mobility and defense.",
-      "The northern castle provides a strong defensive position but can be isolated if bridges are lost.",
+      "Control of the central river bridges is crucial for mobility and defense.",
+      "The Northern Castle provides a strong defensive position but can be isolated if bridges are lost.",
       "Villages and towns offer valuable resources and should be protected or captured early.",
-      "The southern coastal region limits mobility, making it a potential trap or defensive fallback.",
-      "Mountain ranges in the northeast provide natural barriers, ideal for defensive units or ambushes."
+      "The Southern Coastal Lake limits movement, making the surrounding paths critical for maneuvering.",
+      "Mountain Range provides natural barriers, useful for funneling enemy movements or protecting flanks."
     ],
     "givenName": "River Crossing",
     "originalName": "Knights_Villagers_Bandits_13_(01_00_02_03)__by_Aura_Wolf",
@@ -754,7 +731,7 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
     "distinctRegions": [
       {
         "name": "Central Courtyard",
-        "description": "A large open area with plains and scattered forests, providing ample space for maneuvering and combat.",
+        "description": "An open area with grass and pathways, providing ample space for maneuvering and combat.",
         "terrainTypes": [
           "Plain",
           "Forest"
@@ -765,116 +742,112 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "toY": 13
       },
       {
-        "name": "Northern Throne Room",
-        "description": "A fortified room containing a throne, offering defensive advantages and strategic importance.",
+        "name": "Northern Gate",
+        "description": "A fortified entrance area with defensive walls, providing a strategic entry point into the fortress.",
+        "terrainTypes": [
+          "Wall",
+          "Plain"
+        ],
+        "fromX": 7,
+        "fromY": 0,
+        "toX": 14,
+        "toY": 4
+      },
+      {
+        "name": "Western Chambers",
+        "description": "Indoor rooms and corridors with pillars and stairs, suitable for defensive positioning and ambushes.",
+        "terrainTypes": [
+          "Floor",
+          "Pillar",
+          "Stairs",
+          "Wall"
+        ],
+        "fromX": 0,
+        "fromY": 0,
+        "toX": 6,
+        "toY": 8
+      },
+      {
+        "name": "Eastern Chambers",
+        "description": "Indoor rooms and corridors with pillars and stairs, mirroring the western chambers, ideal for defensive tactics.",
+        "terrainTypes": [
+          "Floor",
+          "Pillar",
+          "Stairs",
+          "Wall"
+        ],
+        "fromX": 14,
+        "fromY": 0,
+        "toX": 20,
+        "toY": 8
+      },
+      {
+        "name": "Southern Hallway",
+        "description": "A long corridor with multiple rooms and stairs, connecting to the central courtyard and storage rooms.",
+        "terrainTypes": [
+          "Floor",
+          "Wall",
+          "Stairs",
+          "Pillar"
+        ],
+        "fromX": 0,
+        "fromY": 14,
+        "toX": 20,
+        "toY": 20
+      },
+      {
+        "name": "Storage Rooms",
+        "description": "Rooms containing chests and supplies, valuable for acquiring items and resources.",
+        "terrainTypes": [
+          "Floor",
+          "Chest",
+          "Wall"
+        ],
+        "fromX": 0,
+        "fromY": 14,
+        "toX": 6,
+        "toY": 18
+      },
+      {
+        "name": "Throne Room",
+        "description": "A central room containing a throne, strategically important for controlling the fortress.",
         "terrainTypes": [
           "Floor",
           "Throne",
           "Wall"
         ],
         "fromX": 9,
-        "fromY": 4,
+        "fromY": 5,
         "toX": 11,
-        "toY": 6
-      },
-      {
-        "name": "Western Chambers",
-        "description": "Indoor rooms with pillars and stairs, providing cover and strategic positioning.",
-        "terrainTypes": [
-          "Floor",
-          "Pillar",
-          "Stairs",
-          "Wall"
-        ],
-        "fromX": 0,
-        "fromY": 0,
-        "toX": 5,
-        "toY": 8
-      },
-      {
-        "name": "Eastern Chambers",
-        "description": "Indoor rooms with stairs and pillars, offering multiple entry points and defensive positions.",
-        "terrainTypes": [
-          "Floor",
-          "Pillar",
-          "Stairs",
-          "Wall"
-        ],
-        "fromX": 15,
-        "fromY": 0,
-        "toX": 20,
-        "toY": 9
-      },
-      {
-        "name": "Southern Treasure Rooms",
-        "description": "Rooms containing chests and valuable items, accessible through locked doors and stairs.",
-        "terrainTypes": [
-          "Floor",
-          "Chest",
-          "Door",
-          "Stairs",
-          "Wall"
-        ],
-        "fromX": 0,
-        "fromY": 14,
-        "toX": 8,
-        "toY": 18
-      },
-      {
-        "name": "Southern Entrance",
-        "description": "A fortified southern entrance with stairs leading into the central courtyard.",
-        "terrainTypes": [
-          "Plain",
-          "Road",
-          "Stairs",
-          "Wall"
-        ],
-        "fromX": 9,
-        "fromY": 19,
-        "toX": 12,
-        "toY": 21
-      },
-      {
-        "name": "Southeastern Hall",
-        "description": "A long indoor hallway with pillars and stairs, providing strategic movement and defensive positions.",
-        "terrainTypes": [
-          "Floor",
-          "Pillar",
-          "Stairs",
-          "Wall"
-        ],
-        "fromX": 9,
-        "fromY": 14,
-        "toX": 20,
-        "toY": 18
+        "toY": 7
       }
     ],
     "keyPointsOfInterest": [
-      "Northern Throne at (10,5)",
-      "Southern Treasure Rooms with chests at (0,14), (0,16), (0,18)",
-      "Multiple staircases providing access to different regions"
+      "Throne at (10,5)",
+      "Chests in Storage Rooms at (0,14), (0,16), (0,18)",
+      "Multiple staircases for reinforcements and mobility"
     ],
     "chokePoints": [
-      "Door at (2,16) leading to Southern Treasure Rooms",
+      "Door at (2,16)",
       "Narrow corridors in Western and Eastern Chambers",
-      "Southern Entrance stairs at (9,20)-(11,20)"
+      "Northern Gate entrance"
     ],
     "strategicConsiderations": [
       "Control of the Central Courtyard is crucial for mobility and positioning.",
-      "Securing the Northern Throne Room provides a strong defensive position.",
-      "Southern Treasure Rooms contain valuable items but are vulnerable to being trapped or ambushed.",
-      "Utilize choke points effectively to control enemy movement and protect key areas."
+      "Defending the Northern Gate and choke points can prevent enemy advancement.",
+      "Utilizing indoor chambers for ambushes and defensive stands.",
+      "Securing the Storage Rooms early can provide valuable resources."
     ],
     "givenName": "Fortress Courtyard",
     "originalName": "Nobles_Evil_Doers_11_(3C_00_68_3E)__by_Aura_Wolf",
-    "description": "A mixed indoor and outdoor map featuring a central courtyard surrounded by fortified walls and structures.",
+    "description": "A fortified structure with a central courtyard surrounded by walls and buildings, featuring both indoor and outdoor areas.",
     "setting": "mixed indoor and outdoor"
   },
   {
     "distinctRegions": [
       {
         "name": "Northern Village",
-        "description": "A small village area with buildings, including a house and a village tile, providing cover and potential resources.",
+        "description": "A small village area with a house and a vendor, providing cover and resources.",
         "terrainTypes": [
           "Plain",
           "Road",
@@ -885,25 +858,27 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         ],
         "fromX": 0,
         "fromY": 0,
-        "toX": 8,
-        "toY": 3
+        "toX": 5,
+        "toY": 4
       },
       {
-        "name": "Central Fort",
-        "description": "A fortified area with walls and roads, strategically positioned to control access to the bridges.",
+        "name": "Burning Village",
+        "description": "A village under attack, indicated by a building on fire, creating urgency and a potential rescue scenario.",
         "terrainTypes": [
           "Plain",
           "Road",
-          "Wall"
+          "Wall",
+          "Village",
+          "Forest"
         ],
-        "fromX": 4,
-        "fromY": 4,
-        "toX": 14,
-        "toY": 6
+        "fromX": 14,
+        "fromY": 0,
+        "toX": 18,
+        "toY": 4
       },
       {
-        "name": "Western Bridge",
-        "description": "A stone bridge crossing the river, providing a critical chokepoint for movement between north and south.",
+        "name": "Central Bridges",
+        "description": "Two parallel stone bridges crossing a wide river, crucial for controlling movement across the map.",
         "terrainTypes": [
           "Road",
           "Wall",
@@ -915,121 +890,131 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "toY": 12
       },
       {
-        "name": "Eastern Bridge",
-        "description": "Another stone bridge parallel to the western one, offering an alternative route and strategic flexibility.",
+        "name": "Western Riverbank",
+        "description": "The western side of the river, providing access to the central bridges and strategic positioning.",
         "terrainTypes": [
+          "Plain",
           "Road",
           "Wall",
           "Sea"
         ],
-        "fromX": 13,
-        "fromY": 7,
-        "toX": 14,
-        "toY": 12
-      },
-      {
-        "name": "Southern Riverbank",
-        "description": "Open terrain south of the river, providing ample space for maneuvering and staging attacks on the bridges.",
-        "terrainTypes": [
-          "Plain",
-          "Road",
-          "Forest",
-          "Wall"
-        ],
         "fromX": 0,
-        "fromY": 13,
-        "toX": 18,
+        "fromY": 5,
+        "toX": 6,
         "toY": 15
       },
       {
-        "name": "Eastern Village",
-        "description": "A small village located to the east, providing additional resources and strategic positioning.",
+        "name": "Eastern Riverbank",
+        "description": "The eastern side of the river, leading to the burning village and offering strategic positioning for attacks or defense.",
         "terrainTypes": [
           "Plain",
           "Road",
           "Wall",
-          "Village",
+          "Sea",
           "Forest"
         ],
-        "fromX": 14,
-        "fromY": 0,
+        "fromX": 9,
+        "fromY": 5,
         "toX": 18,
-        "toY": 4
+        "toY": 15
       }
     ],
     "keyPointsOfInterest": [
       "Northern Village at (7,1)",
-      "Eastern Village at (15,3)",
-      "Central Fort area with walls and roads",
-      "Western Bridge chokepoint",
-      "Eastern Bridge chokepoint"
+      "Burning Village at (15,3)",
+      "Central Bridges at (7,7)-(8,12)"
     ],
     "chokePoints": [
-      "Western Bridge (7,7 to 8,12)",
-      "Eastern Bridge (13,7 to 14,12)",
-      "Central Fort walls and roads"
+      "Central Bridges at (7,7)-(8,12)",
+      "Narrow roads leading to villages"
     ],
     "strategicConsiderations": [
-      "Control of the bridges is crucial for movement and defense. Holding these points can significantly restrict enemy mobility.",
-      "The villages provide valuable resources and should be secured early to gain an advantage.",
-      "The Central Fort offers a strong defensive position and should be utilized to control access to the bridges.",
-      "The open terrain of the Southern Riverbank allows for flexible troop deployment and staging of attacks or defenses."
+      "Control of the central bridges is crucial for mobility and map control.",
+      "The burning village presents an urgent objective, potentially requiring rapid deployment.",
+      "The northern village provides resources and cover, making it valuable for defensive positioning.",
+      "Riverbanks offer strategic positions for ranged units to control bridge access."
     ],
-    "givenName": "Twin Bridges Crossing",
+    "givenName": "Twin Bridges",
     "originalName": "Knights_Villagers_Bandits_11_(0E_00_72_10)__by_Aura_Wolf",
-    "description": "A strategic outdoor map featuring two parallel bridges over a wide river, with villages and a fort nearby.",
+    "description": "A strategic map featuring two parallel bridges over a wide river, with key structures on either side.",
     "setting": "outdoor"
   },
   {
     "distinctRegions": [
       {
-        "name": "Northern Cliffside Fortresses",
-        "description": "Elevated area with multiple forts and cliffs, providing strong defensive positions and vantage points.",
-        "terrainTypes": [
-          "Plain",
-          "Cliff",
-          "Fort"
-        ],
-        "fromX": 5,
-        "fromY": 0,
-        "toX": 18,
-        "toY": 4
-      },
-      {
-        "name": "Central Plains",
-        "description": "Open plains with scattered forests and cliffs, ideal for cavalry and mobile units.",
-        "terrainTypes": [
-          "Plain",
-          "Forest",
-          "Cliff"
-        ],
-        "fromX": 0,
-        "fromY": 5,
-        "toX": 18,
-        "toY": 10
-      },
-      {
         "name": "Oasis Town",
-        "description": "A small town featuring houses, an armory, and a vendor, providing resources and cover.",
+        "description": "A small town with buildings, an armory, vendor, houses, and a village near a lake, providing resources and respite from the harsh desert.",
         "terrainTypes": [
+          "Plain",
           "Road",
           "House",
           "Armory",
           "Vendor",
-          "Wall"
+          "Lake",
+          "Bridge",
+          "Village"
         ],
         "fromX": 0,
         "fromY": 8,
-        "toX": 8,
-        "toY": 12
+        "toX": 7,
+        "toY": 19
       },
       {
-        "name": "Southern Lake and Village",
-        "description": "A peaceful area with a lake, bridge, and a village, offering limited mobility but strategic value.",
+        "name": "Desert Fort",
+        "description": "A strategically positioned fortress amidst cliffs and plains, providing defensive advantages and control over the surrounding area.",
+        "terrainTypes": [
+          "Plain",
+          "Fort",
+          "Cliff"
+        ],
+        "fromX": 8,
+        "fromY": 0,
+        "toX": 14,
+        "toY": 4
+      },
+      {
+        "name": "Central Plains",
+        "description": "Expansive open plains with scattered forests, offering mobility but limited defensive cover.",
+        "terrainTypes": [
+          "Plain",
+          "Forest"
+        ],
+        "fromX": 0,
+        "fromY": 5,
+        "toX": 18,
+        "toY": 7
+      },
+      {
+        "name": "Eastern Cliffside Path",
+        "description": "A narrow path along cliffs, providing a natural barrier and strategic chokepoints.",
+        "terrainTypes": [
+          "Plain",
+          "Cliff"
+        ],
+        "fromX": 14,
+        "fromY": 0,
+        "toX": 18,
+        "toY": 10
+      },
+      {
+        "name": "Fortified Wall",
+        "description": "A series of walls and forts protecting the town from the desert, creating defensive chokepoints.",
+        "terrainTypes": [
+          "Wall",
+          "Fort",
+          "Plain"
+        ],
+        "fromX": 2,
+        "fromY": 0,
+        "toX": 8,
+        "toY": 4
+      },
+      {
+        "name": "Southern Lake Region",
+        "description": "A region dominated by lakes and bridges, providing natural barriers and limited movement paths.",
         "terrainTypes": [
           "Lake",
           "Bridge",
-          "Village",
           "Plain"
         ],
         "fromX": 0,
@@ -1038,221 +1023,252 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "toY": 19
       },
       {
-        "name": "Eastern Cliffside",
-        "description": "A rugged area with cliffs and scattered plains, providing natural barriers and defensive positions.",
+        "name": "Southeastern Cliffs",
+        "description": "Cliff-dominated area with limited access, providing strong defensive positions.",
         "terrainTypes": [
           "Cliff",
-          "Plain",
-          "Forest"
+          "Plain"
         ],
         "fromX": 10,
-        "fromY": 11,
+        "fromY": 10,
         "toX": 18,
         "toY": 19
       }
     ],
     "keyPointsOfInterest": [
-      "Multiple Forts at (11,1), (11,3), (8,9), (12,8)",
       "Armory at (0,10)",
       "Vendor at (6,11)",
-      "Houses at (1,8), (7,12)",
       "Village at (1,18)",
-      "Bridge at (3,15)-(4,15)"
+      "Multiple Forts at strategic locations"
     ],
     "chokePoints": [
       "Bridge at (3,15)-(4,15)",
-      "Narrow passages near cliffs at (10,10)-(12,10)",
-      "Walls around Oasis Town"
+      "Narrow paths along cliffs",
+      "Walls and forts creating chokepoints"
     ],
     "strategicConsiderations": [
-      "Northern Cliffside Fortresses offer strong defensive positions and should be secured early.",
-      "Central Plains provide mobility advantages for cavalry and mounted units.",
-      "Oasis Town is crucial for resupply and should be defended or captured quickly.",
-      "Southern Lake and Village area limits mobility but offers strategic control over the southern approach.",
-      "Eastern Cliffside provides natural defensive barriers, ideal for defensive setups or ambushes."
+      "Control of the Desert Fort provides significant defensive advantage.",
+      "Oasis Town offers resources and should be defended or captured early.",
+      "Utilize cliffs and walls to funnel enemy movements and create defensive positions.",
+      "Southern Lake Region restricts movement, making bridges critical chokepoints."
     ],
     "givenName": "Desert Fortress",
     "originalName": "Mages_Mercenaries_3_(42_00_43_44)__by_Aura_Wolf",
-    "description": "A vast desert landscape with scattered fortresses and a small oasis town, divided by a river.",
+    "description": "A vast desert landscape with scattered fortresses and a small oasis town, surrounded by sand dunes and cliffs.",
     "setting": "outdoor"
   },
   {
     "distinctRegions": [
       {
-        "name": "Northern Village",
-        "description": "A small village area with houses and roads, surrounded by open plains and sparse forests. Provides cover and strategic positioning.",
+        "name": "Northern Homestead",
+        "description": "A small cluster of buildings including a village and vendor, surrounded by open plains and forests, providing cover and strategic vantage points.",
         "terrainTypes": [
           "Plain",
-          "Road",
+          "Forest",
           "Village",
-          "Forest"
+          "Vendor",
+          "Road"
         ],
-        "fromX": 4,
+        "fromX": 7,
         "fromY": 0,
         "toX": 14,
-        "toY": 3
+        "toY": 5
       },
       {
         "name": "Central Pathway",
-        "description": "A central road connecting various regions, flanked by open plains and occasional forests. Ideal for rapid troop movement.",
+        "description": "An open road connecting various regions, flanked by plains and occasional forests, ideal for rapid troop movements.",
         "terrainTypes": [
           "Road",
           "Plain",
           "Forest"
         ],
         "fromX": 0,
-        "fromY": 4,
+        "fromY": 3,
         "toX": 14,
         "toY": 6
       },
       {
-        "name": "Southern Fortifications",
-        "description": "A fortified area with walls and defensive structures, providing strong defensive positions and chokepoints.",
+        "name": "Southern Village",
+        "description": "A small village area with houses and open spaces, suitable for defensive setups and ambushes.",
         "terrainTypes": [
-          "Wall",
+          "Village",
+          "House",
           "Road",
           "Plain",
-          "Village"
+          "Forest"
         ],
         "fromX": 0,
         "fromY": 7,
-        "toX": 8,
+        "toX": 14,
         "toY": 12
       },
       {
-        "name": "Eastern Homestead",
-        "description": "A small residential area with houses and vendors, offering resources and strategic cover.",
-        "terrainTypes": [
-          "House",
-          "Vendor",
-          "Road",
-          "Plain"
-        ],
-        "fromX": 8,
-        "fromY": 7,
-        "toX": 14,
-        "toY": 9
-      },
-      {
-        "name": "Western Ruins",
-        "description": "Old stone structures and ruins providing cover and strategic vantage points, surrounded by plains and forests.",
+        "name": "Western Fortifications",
+        "description": "Stone walls and structures providing strong defensive positions, including a village and house for strategic control.",
         "terrainTypes": [
           "Wall",
-          "Plain",
-          "Forest",
-          "Road"
+          "Village",
+          "House",
+          "Road",
+          "Plain"
         ],
         "fromX": 0,
         "fromY": 0,
         "toX": 6,
-        "toY": 3
+        "toY": 6
+      },
+      {
+        "name": "Eastern Forest",
+        "description": "Dense forested area offering concealment and tactical advantages, ideal for guerrilla tactics and ambushes.",
+        "terrainTypes": [
+          "Forest",
+          "Plain",
+          "Road"
+        ],
+        "fromX": 7,
+        "fromY": 3,
+        "toX": 14,
+        "toY": 10
       }
     ],
     "keyPointsOfInterest": [
-      "Village at (3,2)",
-      "Village at (11,1)",
-      "Village at (2,10)",
+      "Northern Village at (11,1)",
       "Vendor at (14,5)",
+      "Southern Village at (2,10)",
       "Armory at (14,11)",
-      "Houses at (8,8)"
+      "Houses at (8,8) and (8,8)"
     ],
     "chokePoints": [
-      "Road between walls at (2,4) and (3,4)",
-      "Road between walls at (6,4) and (6,5)",
-      "Road between walls at (7,7) and (7,8)",
-      "Road between walls at (5,11) and (6,11)"
+      "Central road at (6,6)",
+      "Road intersections at (5,6) and (10,6)",
+      "Narrow passages near walls at (2,4) and (3,4)"
     ],
     "strategicConsiderations": [
-      "Control of the central pathway is crucial for rapid troop movement and reinforcement.",
-      "Northern and southern villages provide valuable resources and defensive positions.",
-      "Eastern homestead offers vendors and houses for strategic cover and resupply.",
-      "Western ruins provide excellent cover and vantage points for ranged units.",
-      "Chokepoints created by walls and narrow roads can be effectively used for defensive strategies."
+      "Utilize the central pathway for rapid troop movements but be cautious of ambushes from adjacent forests.",
+      "Secure the Western Fortifications early to establish a strong defensive position.",
+      "Control the Northern Homestead and Southern Village to maintain supply lines and strategic control points.",
+      "Use the Eastern Forest for stealth and ambush tactics, especially against enemy units traversing the central pathway."
     ],
     "givenName": "Village Outskirts",
     "originalName": "Knights_Villagers_Bandits_6_(0E_00_72_10)__by_Aura_Wolf",
-    "description": "A rural map featuring a small village surrounded by open fields and sparse forests. The area is dotted with houses and a few fortified structures, providing strategic points for defense and attack.",
+    "description": "A rural map featuring scattered buildings, open fields, and patches of forest, ideal for strategic maneuvers.",
     "setting": "outdoor"
   },
   {
     "distinctRegions": [
       {
-        "name": "Main Entrance",
-        "description": "The primary entryway into the castle, featuring large gates and a wide path. It provides direct access to the central courtyard and is crucial for controlling movement.",
+        "name": "Main Courtyard",
+        "description": "Central open area with stone flooring, pillars, and multiple access points. Ideal for defensive positioning and unit mobility.",
+        "terrainTypes": [
+          "Floor",
+          "Pillar"
+        ],
+        "fromX": 4,
+        "fromY": 0,
+        "toX": 12,
+        "toY": 5
+      },
+      {
+        "name": "Western Treasure Room",
+        "description": "Small room containing a chest, accessible through a door. Provides valuable loot.",
+        "terrainTypes": [
+          "Floor",
+          "Chest"
+        ],
+        "fromX": 0,
+        "fromY": 0,
+        "toX": 2,
+        "toY": 2
+      },
+      {
+        "name": "Northern Staircase Corridor",
+        "description": "Corridor with stairs leading to upper levels, providing strategic access for reinforcements.",
+        "terrainTypes": [
+          "Floor",
+          "Stairs"
+        ],
+        "fromX": 7,
+        "fromY": 1,
+        "toX": 8,
+        "toY": 3
+      },
+      {
+        "name": "Eastern Staircase Corridor",
+        "description": "Corridor with stairs and pillars, providing cover and access to upper levels.",
+        "terrainTypes": [
+          "Floor",
+          "Stairs",
+          "Pillar"
+        ],
+        "fromX": 13,
+        "fromY": 4,
+        "toX": 14,
+        "toY": 5
+      },
+      {
+        "name": "Southern Entrance Hall",
+        "description": "Entrance area with stairs and doors, serving as the main entry point to the fortress.",
+        "terrainTypes": [
+          "Floor",
+          "Stairs",
+          "Door"
+        ],
+        "fromX": 0,
+        "fromY": 7,
+        "toX": 1,
+        "toY": 9
+      },
+      {
+        "name": "Southern Staircase Room",
+        "description": "Room with multiple staircases, providing strategic mobility and reinforcement points.",
+        "terrainTypes": [
+          "Floor",
+          "Stairs",
+          "Pillar"
+        ],
+        "fromX": 7,
+        "fromY": 13,
+        "toX": 9,
+        "toY": 13
+      },
+      {
+        "name": "Outer Grounds",
+        "description": "Open outdoor area with plains and forests, providing limited cover and mobility.",
         "terrainTypes": [
           "Plain",
-          "Stairs",
-          "Wall"
+          "Forest"
         ],
         "fromX": 0,
         "fromY": 10,
         "toX": 16,
         "toY": 14
-      },
-      {
-        "name": "Central Courtyard",
-        "description": "An open area surrounded by castle walls, with decorative pillars and pathways. It serves as a central hub connecting various parts of the castle.",
-        "terrainTypes": [
-          "Floor",
-          "Pillar"
-        ],
-        "fromX": 0,
-        "fromY": 4,
-        "toX": 16,
-        "toY": 9
-      },
-      {
-        "name": "Upper Chambers",
-        "description": "A series of rooms and corridors leading to the upper parts of the castle. Contains valuable chests and strategic positions for ranged units.",
-        "terrainTypes": [
-          "Floor",
-          "Chest",
-          "Pillar",
-          "Wall"
-        ],
-        "fromX": 0,
-        "fromY": 0,
-        "toX": 16,
-        "toY": 3
-      },
-      {
-        "name": "Side Staircases",
-        "description": "Narrow staircases providing access to different levels of the castle. These staircases are critical choke points for controlling enemy movement.",
-        "terrainTypes": [
-          "Stairs",
-          "Wall"
-        ],
-        "fromX": 4,
-        "fromY": 7,
-        "toX": 7,
-        "toY": 7
       }
     ],
     "keyPointsOfInterest": [
       "Chest at (1,1)",
-      "Multiple staircases at various locations",
-      "Pillars providing defensive cover"
+      "Multiple staircases at (7,1), (8,3), (13,4), (14,5), (7,13), (8,13), (9,13)",
+      "Doors at (1,3), (0,7), (1,7)"
     ],
     "chokePoints": [
-      "Doors at (1,3) and (0,7)",
-      "Narrow staircases at (4,7)-(7,7)"
+      "Door at (1,3) leading to Western Treasure Room",
+      "Doors at (0,7) and (1,7) controlling access to Southern Entrance Hall"
     ],
     "strategicConsiderations": [
-      "Control of the main entrance is crucial for managing enemy reinforcements.",
-      "Central courtyard provides flexibility for unit movement and positioning.",
-      "Upper chambers offer strategic positions for ranged units and contain valuable loot.",
-      "Side staircases are critical choke points that can be used to funnel enemy units."
+      "Control of the Main Courtyard is crucial for mobility and defense.",
+      "Securing the Western Treasure Room early can provide valuable resources.",
+      "Staircases are critical for reinforcement and flanking maneuvers; controlling these points can significantly impact battle outcomes.",
+      "The Southern Entrance Hall serves as a primary entry point; defending or attacking this area effectively can determine the flow of battle."
     ],
-    "givenName": "Castle Courtyard",
+    "givenName": "Fortress Entrance",
     "originalName": "Knights_Villagers_Bandits_7_(18_00_48_1A)__by_Aura_Wolf",
-    "description": "A fortified castle courtyard with multiple entry points and a central chamber.",
+    "description": "A fortified indoor area with multiple rooms and corridors, featuring a central courtyard and various staircases leading to different sections.",
     "setting": "indoor"
   },
   {
     "distinctRegions": [
       {
         "name": "Western Village",
-        "description": "A small village area with houses providing resources and shelter, surrounded by plains and forests.",
+        "description": "A small village area with houses providing refuge and resources, surrounded by plains and forests.",
         "terrainTypes": [
           "Plain",
           "House",
@@ -1264,8 +1280,8 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "toY": 5
       },
       {
-        "name": "Central Forest",
-        "description": "A dense forested area with thickets, providing excellent cover and strategic movement options.",
+        "name": "Northern Forest",
+        "description": "Dense forest and thicket area ideal for ambushes and defensive positioning.",
         "terrainTypes": [
           "Forest",
           "Thicket",
@@ -1274,11 +1290,24 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "fromX": 6,
         "fromY": 0,
         "toX": 18,
-        "toY": 6
+        "toY": 5
       },
       {
-        "name": "Eastern Fortress",
-        "description": "A fortified structure with walls and a gate, serving as a defensive stronghold and strategic chokepoint.",
+        "name": "Central Mountain Range",
+        "description": "A large impassable mountain range providing a natural barrier and strategic chokepoints.",
+        "terrainTypes": [
+          "Mountain",
+          "Hill",
+          "Plain"
+        ],
+        "fromX": 6,
+        "fromY": 7,
+        "toX": 11,
+        "toY": 12
+      },
+      {
+        "name": "Eastern Fort",
+        "description": "A fortified structure with walls and a gate, providing a strong defensive position.",
         "terrainTypes": [
           "Wall",
           "Gate",
@@ -1290,21 +1319,21 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "toY": 8
       },
       {
-        "name": "Southern Mountain Range",
-        "description": "A large range of impassable mountains and hills, creating natural barriers and limiting movement.",
+        "name": "Southern Plains",
+        "description": "Open grassy plains allowing for easy movement and maneuvering of units.",
         "terrainTypes": [
-          "Mountain",
-          "Hill",
-          "Plain"
+          "Plain",
+          "Forest",
+          "Hill"
         ],
-        "fromX": 4,
-        "fromY": 7,
-        "toX": 11,
+        "fromX": 0,
+        "fromY": 10,
+        "toX": 23,
         "toY": 12
       },
       {
         "name": "Ruined Outpost",
-        "description": "An area with ruins, forests, and plains, providing strategic cover and potential ambush points.",
+        "description": "An area with ruins providing cover and strategic interest.",
         "terrainTypes": [
           "Ruins",
           "Forest",
@@ -1316,25 +1345,12 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "toY": 12
       },
       {
-        "name": "Northern Plains",
-        "description": "Open plains area allowing for fast movement and skirmishes, with scattered forests and hills.",
-        "terrainTypes": [
-          "Plain",
-          "Forest",
-          "Hill"
-        ],
-        "fromX": 19,
-        "fromY": 0,
-        "toX": 23,
-        "toY": 6
-      },
-      {
         "name": "Eastern Cliffs",
-        "description": "A region with cliffs and forests, providing natural defensive positions and limited access.",
+        "description": "A cliffside area providing elevation advantage and limited access.",
         "terrainTypes": [
           "Cliff",
-          "Forest",
-          "Plain"
+          "Plain",
+          "Forest"
         ],
         "fromX": 21,
         "fromY": 2,
@@ -1343,43 +1359,45 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
       }
     ],
     "keyPointsOfInterest": [
-      "Houses at (2,2) and (0,9) providing resources",
-      "Gate at (21,8) serving as a critical chokepoint",
-      "Ruins at (16,10) offering strategic cover"
+      "Western Village houses at (2,2) and (0,9)",
+      "Eastern Fort gate at (21,8)",
+      "Ruins at (16,10)"
     ],
     "chokePoints": [
-      "Gate at (21,8)",
-      "Mountain passes around (7,9) to (11,9)"
+      "Central Mountain Range passes",
+      "Eastern Fort gate at (21,8)"
     ],
     "strategicConsiderations": [
-      "Control of the Eastern Fortress is crucial for defensive positioning and controlling movement.",
-      "The Central Forest provides excellent cover for ambushes and guerrilla tactics.",
-      "The Southern Mountain Range limits mobility, making it important to plan unit placement carefully.",
-      "The Ruined Outpost can serve as a staging area for attacks or defensive maneuvers."
+      "Utilize the dense forests and thickets for ambushes and defensive positioning.",
+      "Control the Eastern Fort for a strong defensive advantage.",
+      "Secure the Western Village early for resources and refuge.",
+      "Use the Southern Plains for rapid unit movement and flanking maneuvers.",
+      "Exploit the Central Mountain Range as a natural barrier to funnel enemy movements."
     ],
-    "givenName": "Mountain Pass Clash",
+    "givenName": "Mountain Pass Ambush",
     "originalName": "Mages_Mercenaries_2_(01_00_38_03)__by_Aura_Wolf",
-    "description": "A rugged outdoor battlefield featuring a mix of mountains, forests, and open plains, with strategic structures scattered throughout.",
+    "description": "A rugged outdoor map featuring a mix of forests, mountains, and a central fort, ideal for strategic ambushes.",
     "setting": "outdoor"
   },
   {
     "distinctRegions": [
       {
-        "name": "Temple Entrance",
-        "description": "The main entryway with wide stairs and open plains, providing initial access to the temple.",
+        "name": "Entrance Hall",
+        "description": "The main entryway with wide steps leading into the temple, featuring open spaces and scattered vegetation.",
         "terrainTypes": [
           "Plain",
+          "Forest",
           "Floor",
-          "Forest"
+          "Wall"
         ],
         "fromX": 0,
         "fromY": 0,
         "toX": 8,
-        "toY": 2
+        "toY": 3
       },
       {
-        "name": "Central Ruined Chamber",
-        "description": "A large central area filled with broken pillars, stairs, and scattered debris, serving as a strategic hub.",
+        "name": "Central Chamber",
+        "description": "A large, open area with decorative pillars, intricate floor patterns, and multiple staircases leading to different levels.",
         "terrainTypes": [
           "Floor",
           "Pillar",
@@ -1391,175 +1409,198 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "toY": 15
       },
       {
-        "name": "Western Corridor",
-        "description": "A narrow passageway with stairs and walls, leading to smaller rooms and providing defensive positions.",
+        "name": "Left Wing Corridor",
+        "description": "A narrow passageway leading to smaller rooms, partially collapsed and filled with debris.",
         "terrainTypes": [
           "Floor",
           "Wall",
           "Stairs"
         ],
         "fromX": 0,
-        "fromY": 3,
+        "fromY": 16,
         "toX": 4,
-        "toY": 12
+        "toY": 20
       },
       {
-        "name": "Eastern Corridor",
-        "description": "A narrow passageway with stairs, walls, and a locked door, leading to smaller rooms and a chest.",
+        "name": "Right Wing Corridor",
+        "description": "A mirrored passageway to the left wing, leading to additional chambers and a chest room.",
         "terrainTypes": [
           "Floor",
           "Wall",
-          "Door",
           "Chest",
           "Stairs"
+        ],
+        "fromX": 11,
+        "fromY": 11,
+        "toX": 17,
+        "toY": 15
+      },
+      {
+        "name": "Flooded Passage",
+        "description": "A waterlogged area with broken tiles, overgrown plants, and scattered pillars, making movement difficult.",
+        "terrainTypes": [
+          "Floor",
+          "Plain",
+          "Pillar"
+        ],
+        "fromX": 5,
+        "fromY": 16,
+        "toX": 17,
+        "toY": 20
+      },
+      {
+        "name": "Upper Balcony",
+        "description": "An elevated platform overlooking the central chamber, accessible by stairs and containing a chest.",
+        "terrainTypes": [
+          "Floor",
+          "Chest",
+          "Stairs",
+          "Door"
         ],
         "fromX": 13,
         "fromY": 0,
         "toX": 17,
-        "toY": 12
-      },
-      {
-        "name": "Lower Sanctuary",
-        "description": "A secluded area at the bottom of the temple, containing remnants of altars and sacred artifacts.",
-        "terrainTypes": [
-          "Floor",
-          "Pillar",
-          "Plain"
-        ],
-        "fromX": 0,
-        "fromY": 16,
-        "toX": 17,
-        "toY": 20
+        "toY": 4
       }
     ],
     "keyPointsOfInterest": [
       "Chest at (12,12)",
       "Chest at (17,2)",
-      "Locked Door at (17,4)",
+      "Door at (17,4)",
       "Multiple staircases providing vertical mobility"
     ],
     "chokePoints": [
-      "Locked Door at (17,4)",
-      "Narrow corridors in Western and Eastern Corridors",
-      "Staircases leading to different levels"
+      "Door at (17,4)",
+      "Narrow corridors in Left and Right Wing Corridors",
+      "Staircases leading to Upper Balcony"
     ],
     "strategicConsiderations": [
-      "Control of the Central Ruined Chamber is crucial for mobility and defense.",
-      "The locked door in the Eastern Corridor can be used to control enemy movement.",
-      "Utilize staircases for quick repositioning and surprise attacks.",
-      "Secure chests early to gain valuable items and resources."
+      "Control of the central chamber is crucial for mobility and access to other regions.",
+      "The upper balcony provides a strategic vantage point for ranged units.",
+      "Flooded passage restricts movement, making it ideal for defensive positioning.",
+      "Securing choke points like doors and narrow corridors can significantly impact enemy movement."
     ],
     "givenName": "Ruined Temple",
     "originalName": "Nobles_Evil_Doers_5_(6C_00_A3_6E)__by_Aura_Wolf",
-    "description": "An ancient, crumbling temple with multiple chambers and corridors, filled with debris and overgrown with vegetation.",
+    "description": "An ancient, crumbling temple with multiple chambers and corridors, surrounded by water and overgrown with vegetation.",
     "setting": "indoor"
   },
   {
     "distinctRegions": [
       {
         "name": "Western Lakeside Village",
-        "description": "A peaceful village near a lake, providing defensive cover and a strategic retreat point.",
+        "description": "A peaceful village area near a lake, enclosed by walls and natural barriers, providing a safe haven and potential recruitment opportunities.",
         "terrainTypes": [
           "Plain",
+          "Forest",
           "Lake",
           "Village",
           "Wall"
         ],
         "fromX": 0,
-        "fromY": 4,
-        "toX": 4,
-        "toY": 7
+        "fromY": 2,
+        "toX": 3,
+        "toY": 6
       },
       {
         "name": "Central Crossroads",
-        "description": "The main intersection of roads, crucial for controlling movement across the map.",
+        "description": "A strategic intersection of roads connecting various key locations, crucial for controlling movement and positioning.",
         "terrainTypes": [
           "Road",
           "Plain",
-          "Wall"
-        ],
-        "fromX": 4,
-        "fromY": 0,
-        "toX": 10,
-        "toY": 4
-      },
-      {
-        "name": "Eastern Ruins and Armory",
-        "description": "Ruins and an armory provide cover and strategic resources, ideal for defensive positioning.",
-        "terrainTypes": [
-          "Ruins",
-          "Armory",
-          "Road",
-          "Wall",
           "Forest"
         ],
-        "fromX": 10,
-        "fromY": 1,
-        "toX": 14,
-        "toY": 7
-      },
-      {
-        "name": "Southern Plains",
-        "description": "Open plains with scattered roads, offering mobility but limited defensive cover.",
-        "terrainTypes": [
-          "Plain",
-          "Road",
-          "Wall",
-          "Cliff",
-          "Lake"
-        ],
-        "fromX": 0,
-        "fromY": 7,
-        "toX": 14,
+        "fromX": 3,
+        "fromY": 0,
+        "toX": 10,
         "toY": 9
       },
       {
-        "name": "Northern Forest Pathway",
-        "description": "A narrow pathway surrounded by forests, providing natural cover and ambush opportunities.",
+        "name": "Eastern Ruins",
+        "description": "Ruined structures providing defensive cover and strategic positioning, ideal for ambushes or defensive stands.",
         "terrainTypes": [
-          "Forest",
+          "Ruins",
           "Road",
           "Plain",
-          "Wall"
+          "Forest"
+        ],
+        "fromX": 10,
+        "fromY": 0,
+        "toX": 14,
+        "toY": 4
+      },
+      {
+        "name": "Southern Armory and Cliffside",
+        "description": "An armory located near cliffs, offering resupply opportunities and a defensible position against attackers.",
+        "terrainTypes": [
+          "Armory",
+          "Road",
+          "Plain",
+          "Cliff"
+        ],
+        "fromX": 11,
+        "fromY": 7,
+        "toX": 14,
+        "toY": 8
+      },
+      {
+        "name": "Eastern Village",
+        "description": "A small village enclosed by walls, strategically positioned along a road, providing potential resources and recruitment.",
+        "terrainTypes": [
+          "Village",
+          "Wall",
+          "Road",
+          "Plain"
+        ],
+        "fromX": 2,
+        "fromY": 6,
+        "toX": 4,
+        "toY": 6
+      },
+      {
+        "name": "Southern Plains",
+        "description": "Open plains with scattered forests, suitable for cavalry maneuvers and open-field engagements.",
+        "terrainTypes": [
+          "Plain",
+          "Forest"
         ],
         "fromX": 0,
-        "fromY": 0,
-        "toX": 3,
-        "toY": 3
+        "fromY": 9,
+        "toX": 14,
+        "toY": 9
       }
     ],
     "keyPointsOfInterest": [
-      "Village at (2,2)",
-      "Village at (3,6)",
+      "Western Village at (2,2)",
+      "Eastern Village at (3,6)",
       "Armory at (13,7)",
-      "Ruins at (11,1) to (13,2)"
+      "Ruins at (11,1) to (13,1)"
     ],
     "chokePoints": [
-      "Road intersection at (4,3)",
-      "Narrow road near walls at (7,4) to (7,7)",
-      "Road near Armory at (12,7)"
+      "Road at (4,0) near the wall",
+      "Road at (8,4) near walls",
+      "Road at (11,7) near the armory"
     ],
     "strategicConsiderations": [
-      "Control of the Central Crossroads is vital for mobility and map dominance.",
-      "The Eastern Ruins and Armory provide strong defensive positions and valuable resources.",
-      "The Western Lakeside Village offers a safe retreat and defensive cover, especially against cavalry.",
-      "The Southern Plains allow for rapid movement but expose units to ranged attacks.",
-      "The Northern Forest Pathway is ideal for ambushes and guerrilla tactics due to natural cover."
+      "The Central Crossroads is crucial for controlling movement across the map. Securing this area early can dictate the flow of battle.",
+      "Villages offer potential recruitment or valuable items; securing them early can provide significant advantages.",
+      "The Eastern Ruins provide excellent defensive cover and can be used to stage ambushes or defensive positions.",
+      "The Southern Armory near cliffs is a defensible position and a valuable resupply point, making it a strategic target for both attackers and defenders.",
+      "The open plains in the south allow for rapid movement and cavalry charges, but also leave units vulnerable to ranged attacks from forest cover."
     ],
     "givenName": "Crossroads of Commerce",
     "originalName": "(7)Ch3BandofMercenaries_Diff_Tileset__by_Shin19",
-    "description": "An outdoor map featuring a network of roads connecting various key locations, including villages, a castle, and a vendor. The map is characterized by its strategic pathways and surrounding natural terrain.",
+    "description": "A bustling outdoor map featuring a network of roads connecting key locations, including villages, a castle, and a vendor. The map is characterized by its strategic pathways and natural barriers.",
     "setting": "outdoor"
   },
   {
     "distinctRegions": [
       {
         "name": "Northern Mountain Range",
-        "description": "Dominated by impassable mountains, this region provides limited access and is ideal for flying units. Offers high defensive value due to terrain.",
+        "description": "A vast, impassable mountain range dominating the northern part of the map, providing natural barriers and limiting movement.",
         "terrainTypes": [
           "Mountain",
-          "Hill",
-          "Plain"
+          "Hill"
         ],
         "fromX": 3,
         "fromY": 0,
@@ -1567,146 +1608,136 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "toY": 5
       },
       {
-        "name": "Northwestern Forest and Plains",
-        "description": "Open area with scattered forests and plains, providing moderate cover and mobility.",
-        "terrainTypes": [
-          "Forest",
-          "Plain",
-          "Hill"
-        ],
-        "fromX": 0,
-        "fromY": 0,
-        "toX": 2,
-        "toY": 4
-      },
-      {
-        "name": "Central Mountain Pass",
-        "description": "A narrow pass through mountains, providing limited mobility and strategic chokepoints.",
-        "terrainTypes": [
-          "Mountain",
-          "Hill",
-          "Plain"
-        ],
-        "fromX": 4,
-        "fromY": 5,
-        "toX": 11,
-        "toY": 7
-      },
-      {
-        "name": "Ruined Outpost",
-        "description": "Area with ruins, providing cover and potential hidden items or ambush points.",
+        "name": "Western Fort Ruins",
+        "description": "Ruined fortifications providing defensive positions and cover, located near the northwest.",
         "terrainTypes": [
           "Ruins",
-          "Plain",
-          "Forest"
+          "Wall",
+          "Forest",
+          "Plain"
         ],
         "fromX": 0,
         "fromY": 5,
-        "toX": 2,
-        "toY": 7
+        "toX": 4,
+        "toY": 9
       },
       {
-        "name": "Central Plains and Hills",
-        "description": "Open plains interspersed with hills, offering moderate cover and mobility.",
+        "name": "Central River Crossing",
+        "description": "A critical bridge and river area that serves as a chokepoint, connecting the northern and southern regions.",
         "terrainTypes": [
+          "River",
+          "Bridge",
           "Plain",
-          "Hill",
           "Forest"
         ],
-        "fromX": 0,
-        "fromY": 7,
+        "fromX": 2,
+        "fromY": 10,
         "toX": 13,
-        "toY": 10
+        "toY": 14
       },
       {
-        "name": "Eastern River Crossing",
-        "description": "A river area with limited crossing points, creating natural chokepoints.",
+        "name": "Eastern Village and Cliffs",
+        "description": "A small village area near cliffs and sea, providing resources and strategic positioning.",
         "terrainTypes": [
-          "River",
+          "Plain",
+          "Forest",
+          "Cliff",
+          "Sea"
+        ],
+        "fromX": 16,
+        "fromY": 0,
+        "toX": 19,
+        "toY": 8
+      },
+      {
+        "name": "Southwestern Castle Grounds",
+        "description": "A fortified castle area with walls and ruins, offering strong defensive positions in the southwest.",
+        "terrainTypes": [
+          "Wall",
+          "Ruins",
           "Plain",
           "Forest"
-        ],
-        "fromX": 12,
-        "fromY": 7,
-        "toX": 15,
-        "toY": 12
-      },
-      {
-        "name": "Southern Ruins and Riverbanks",
-        "description": "Ruins near a river, providing cover and strategic positioning opportunities.",
-        "terrainTypes": [
-          "Ruins",
-          "River",
-          "Forest",
-          "Plain"
         ],
         "fromX": 0,
-        "fromY": 8,
-        "toX": 11,
-        "toY": 13
+        "fromY": 16,
+        "toX": 5,
+        "toY": 19
       },
       {
-        "name": "Southeastern Coastal Cliffs",
-        "description": "Cliffside area adjacent to the sea, accessible primarily by flying units.",
+        "name": "Southeastern Fort and Gate",
+        "description": "A fortified area with a gate and walls, strategically positioned to control the southeastern approach.",
         "terrainTypes": [
-          "Cliff",
-          "Sea",
-          "Plain",
-          "Forest"
-        ],
-        "fromX": 17,
-        "fromY": 5,
-        "toX": 19,
-        "toY": 12
-      },
-      {
-        "name": "Southwestern Fort and Surroundings",
-        "description": "A fortified area with a fort, providing strong defensive positions.",
-        "terrainTypes": [
-          "Fort",
+          "Wall",
+          "Gate",
           "Plain",
           "Forest",
-          "River"
+          "Fort"
         ],
         "fromX": 15,
         "fromY": 16,
         "toX": 19,
         "toY": 19
+      },
+      {
+        "name": "Central Plains",
+        "description": "Open plains and scattered forests providing maneuverability and tactical flexibility in the central area.",
+        "terrainTypes": [
+          "Plain",
+          "Forest",
+          "Hill"
+        ],
+        "fromX": 5,
+        "fromY": 6,
+        "toX": 15,
+        "toY": 9
+      },
+      {
+        "name": "Southern Riverlands",
+        "description": "A region dominated by rivers and forests, providing natural barriers and defensive positions.",
+        "terrainTypes": [
+          "River",
+          "Forest",
+          "Plain"
+        ],
+        "fromX": 6,
+        "fromY": 15,
+        "toX": 14,
+        "toY": 19
       }
     ],
     "keyPointsOfInterest": [
-      "Ruins at (15,2)",
-      "Ruins at (10,8)",
-      "Ruins at (3,9)",
-      "Ruins at (17,13)",
-      "Ruins at (11,18)",
-      "Fort at (16,19)"
+      "Western Fort Ruins",
+      "Eastern Village",
+      "Southwestern Castle Grounds",
+      "Southeastern Fort and Gate",
+      "Central River Crossing"
     ],
     "chokePoints": [
-      "Central Mountain Pass",
-      "River crossings at (3,12) and (12,9)",
-      "Walls near ruins at (2,8) and (2,9)"
+      "Central River Crossing bridge",
+      "Southeastern Fort Gate",
+      "Mountain passes in Northern Mountain Range"
     ],
     "strategicConsiderations": [
-      "Control of the Central Mountain Pass is crucial for mobility and defense.",
-      "Flying units have significant advantages in accessing cliffside and mountainous regions.",
-      "River crossings and walls provide natural chokepoints, ideal for defensive positioning.",
-      "Ruins offer cover and potential hidden items, making them valuable strategic points.",
-      "The Southeastern Coastal Cliffs provide a safe zone for flying units to maneuver and flank enemy positions."
+      "Control of the Central River Crossing is crucial for mobility between northern and southern regions.",
+      "The Northern Mountain Range provides natural barriers, limiting enemy movement and creating defensive opportunities.",
+      "The Eastern Village and Southwestern Castle Grounds offer valuable resources and defensive positions, making them key targets for control.",
+      "The Southeastern Fort and Gate serve as critical defensive positions, controlling access to the southeastern region.",
+      "Utilizing the terrain effectively, especially rivers and forests, can significantly impact battle outcomes."
     ],
     "givenName": "Mountain Pass Clash",
     "originalName": "Nobles_Evil_Doers_2_(01_00_4C_03)__by_Aura_Wolf",
-    "description": "A rugged outdoor battlefield featuring a winding path through mountains and forests, with strategic forts and villages scattered throughout.",
+    "description": "A rugged outdoor map featuring a winding path through mountainous terrain, with strategic forts and villages scattered throughout.",
     "setting": "outdoor"
   },
   {
     "distinctRegions": [
       {
-        "name": "Throne Chamber",
-        "description": "The central area containing the throne, highly defensible and strategically crucial.",
+        "name": "Throne Room",
+        "description": "A grand, ornate room housing the throne, central to the castle's authority and defense.",
         "terrainTypes": [
           "Floor",
-          "Throne"
+          "Throne",
+          "Wall"
         ],
         "fromX": 8,
         "fromY": 0,
@@ -1714,66 +1745,63 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "toY": 4
       },
       {
-        "name": "Main Corridor",
-        "description": "A wide corridor connecting the entrance hall to the throne chamber, providing direct access and strategic mobility.",
+        "name": "Central Corridor",
+        "description": "A wide, central passageway connecting the throne room to various chambers and the entrance hall.",
         "terrainTypes": [
           "Floor",
-          "Door"
+          "Door",
+          "Wall"
         ],
-        "fromX": 8,
+        "fromX": 7,
         "fromY": 4,
-        "toX": 16,
+        "toX": 19,
         "toY": 8
       },
       {
-        "name": "Left Wing Chambers",
-        "description": "A complex of rooms and corridors on the left side, offering multiple tactical positions and access points.",
+        "name": "Left Chambers",
+        "description": "A series of rooms on the left side, suitable for strategic positioning and storage.",
         "terrainTypes": [
           "Floor",
           "Door",
           "Wall",
-          "Stairs",
           "Pillar"
         ],
         "fromX": 0,
         "fromY": 6,
-        "toX": 7,
+        "toX": 6,
         "toY": 18
       },
       {
-        "name": "Right Wing Chambers",
-        "description": "A complex of rooms and corridors on the right side, mirroring the left wing, providing tactical flexibility.",
+        "name": "Right Chambers",
+        "description": "Rooms on the right side mirroring the left chambers, providing additional strategic options.",
         "terrainTypes": [
           "Floor",
           "Door",
           "Wall",
-          "Stairs",
           "Pillar"
         ],
-        "fromX": 17,
+        "fromX": 20,
         "fromY": 6,
         "toX": 25,
         "toY": 18
       },
       {
         "name": "Entrance Hall",
-        "description": "The southernmost area leading into the main corridor, serving as the primary entry point for attackers.",
+        "description": "The main entryway into the castle, leading directly into the central corridor.",
         "terrainTypes": [
           "Floor",
           "Door",
           "Wall",
-          "Stairs",
-          "Plain",
-          "Road"
+          "Stairs"
         ],
-        "fromX": 0,
-        "fromY": 19,
-        "toX": 25,
+        "fromX": 7,
+        "fromY": 18,
+        "toX": 19,
         "toY": 23
       },
       {
         "name": "Outer Courtyard",
-        "description": "An open area surrounding the castle, providing initial staging grounds and limited cover.",
+        "description": "An open area outside the castle, providing initial positioning and maneuvering space.",
         "terrainTypes": [
           "Plain",
           "Road",
@@ -1792,18 +1820,18 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
     ],
     "chokePoints": [
       "Doors at (8,4), (16,4), (6,6), (19,6), (5,9), (20,9), (5,14), (20,14), (7,17), (19,17)",
-      "Narrow corridors in Left and Right Wing Chambers"
+      "Narrow corridors between chambers and central corridor"
     ],
     "strategicConsiderations": [
-      "The Throne Chamber is highly defensible and should be the primary defensive focus.",
-      "Main Corridor provides rapid movement but is vulnerable to ranged attacks from adjacent chambers.",
-      "Left and Right Wing Chambers offer multiple tactical positions for ambushes and defensive setups.",
-      "Entrance Hall is the primary entry point for attackers, making it crucial for initial defense or counterattacks.",
-      "Outer Courtyard provides limited cover and is ideal for initial positioning and staging of units."
+      "Control of the throne room is crucial for victory; it is well-defended and centrally located.",
+      "The central corridor provides rapid movement but is vulnerable to ranged attacks from adjacent chambers.",
+      "Left and right chambers offer defensive positions and opportunities for ambushes.",
+      "Entrance hall is a critical area for controlling reinforcements and managing unit flow.",
+      "Outer courtyard allows initial positioning and flanking maneuvers but is exposed to enemy attacks."
     ],
-    "givenName": "Royal Throne Room",
+    "givenName": "Royal Throne Hall",
     "originalName": "Chapter6TheTrapIsSprung_More_Carpet__by_Shin19",
-    "description": "A grand indoor map featuring a central throne room surrounded by multiple chambers and corridors. The layout is symmetrical, with a focus on the central red-carpeted path leading to the throne.",
+    "description": "A grand indoor castle map featuring a central throne room surrounded by multiple chambers and corridors.",
     "setting": "indoor"
   },
   {
@@ -1822,7 +1850,7 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
       },
       {
         "name": "Central Corridor",
-        "description": "A winding corridor connecting various parts of the map, featuring strategic choke points and stairs for vertical movement.",
+        "description": "A winding corridor connecting various parts of the fortress, featuring multiple stairs and pillars for cover.",
         "terrainTypes": [
           "Floor",
           "Stairs",
@@ -1835,7 +1863,7 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
       },
       {
         "name": "Entrance Hall",
-        "description": "The main entrance area leading into the castle, providing access to the outside and stairs leading upward.",
+        "description": "The main entrance area leading into the fortress, providing initial access and strategic positioning.",
         "terrainTypes": [
           "Floor",
           "Stairs",
@@ -1847,20 +1875,19 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "toY": 12
       },
       {
-        "name": "Royal Chamber",
-        "description": "A large, ornate room with distinct floor patterns and pillars, likely a significant location for strategic positioning.",
+        "name": "Golden Chamber",
+        "description": "A distinct room with a golden floor, possibly a throne room or important area, located in the eastern part of the fortress.",
         "terrainTypes": [
           "Floor",
-          "Pillar",
-          "Stairs"
+          "Pillar"
         ],
         "fromX": 13,
         "fromY": 0,
         "toX": 16,
-        "toY": 8
+        "toY": 13
       },
       {
-        "name": "Castle Courtyard",
+        "name": "Southern Courtyard",
         "description": "An open outdoor area with plains and forests, providing maneuverability and cover.",
         "terrainTypes": [
           "Plain",
@@ -1868,52 +1895,41 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         ],
         "fromX": 0,
         "fromY": 12,
-        "toX": 13,
-        "toY": 13
-      },
-      {
-        "name": "Eastern Courtyard",
-        "description": "A smaller outdoor area with plains and forests, adjacent to the Royal Chamber.",
-        "terrainTypes": [
-          "Plain",
-          "Forest"
-        ],
-        "fromX": 4,
-        "fromY": 12,
-        "toX": 13,
+        "toX": 16,
         "toY": 13
       }
     ],
     "keyPointsOfInterest": [
-      "Treasure Chest at (3,3)",
-      "Multiple Staircases for vertical movement",
-      "Pillars providing cover and strategic positioning"
+      "Chest at (3,3)",
+      "Multiple stairs at various locations for reinforcement and mobility",
+      "Pillars scattered throughout for defensive cover"
     ],
     "chokePoints": [
       "Door at (3,1) leading to Treasure Alcove",
-      "Narrow corridors throughout the Central Corridor",
-      "Staircases acting as vertical choke points"
+      "Narrow corridors and stairs throughout the Central Corridor"
     ],
     "strategicConsiderations": [
-      "Control of the Central Corridor is crucial for mobility and access to other regions.",
+      "Control of the Central Corridor is crucial for mobility and reinforcement.",
       "Securing the Treasure Alcove early can provide valuable resources.",
-      "The Royal Chamber offers strong defensive positions due to pillars and limited entry points.",
-      "Outdoor courtyards provide maneuverability but limited cover, making them vulnerable to ranged attacks."
+      "The Golden Chamber is likely a key objective, requiring careful approach and defense.",
+      "The Entrance Hall serves as a critical staging area for initial deployment and defense.",
+      "Southern Courtyard offers open terrain for flanking maneuvers and ambushes."
     ],
-    "givenName": "Castle Labyrinth",
+    "givenName": "Fortress Labyrinth",
     "originalName": "Knights_Villagers_Bandits_9_(18_00_48_1A)__by_Aura_Wolf",
-    "description": "A complex indoor map featuring winding corridors and strategic choke points, with a mix of open and enclosed spaces.",
+    "description": "A complex indoor fortress with winding corridors and strategic choke points.",
     "setting": "indoor"
   },
   {
     "distinctRegions": [
       {
-        "name": "Throne Room",
-        "description": "Central chamber featuring a throne, surrounded by pillars and accessible through narrow corridors. Highly defensible and strategically important.",
+        "name": "Central Throne Room",
+        "description": "A grand room featuring a throne, pillars, and a chest, providing strategic defensive positions.",
         "terrainTypes": [
           "Floor",
           "Throne",
-          "Pillar"
+          "Pillar",
+          "Chest"
         ],
         "fromX": 8,
         "fromY": 4,
@@ -1921,12 +1937,13 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "toY": 7
       },
       {
-        "name": "Northern Treasure Chamber",
-        "description": "A small, isolated room containing a valuable treasure chest, accessible via narrow corridors and stairs.",
+        "name": "Left Water Chamber",
+        "description": "A chamber with water channels, stairs, and a treasure chest, offering limited mobility and defensive opportunities.",
         "terrainTypes": [
           "Floor",
+          "Lake",
           "Chest",
-          "Lake"
+          "Stairs"
         ],
         "fromX": 0,
         "fromY": 5,
@@ -1934,77 +1951,89 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "toY": 8
       },
       {
-        "name": "Central Waterway Passages",
-        "description": "Corridors with water channels that connect various chambers, creating natural choke points and mobility constraints.",
+        "name": "Lower Waterway",
+        "description": "A complex network of water channels and stone pathways, challenging for mobility but rich in strategic chokepoints.",
         "terrainTypes": [
           "Floor",
           "Lake",
-          "Wall"
+          "Stairs",
+          "Chest"
         ],
         "fromX": 0,
-        "fromY": 8,
-        "toX": 16,
-        "toY": 12
+        "fromY": 20,
+        "toX": 12,
+        "toY": 25
       },
       {
-        "name": "Lower Chambers",
-        "description": "Interconnected rooms with water features, pillars, and stairs, providing multiple strategic positions and defensive opportunities.",
+        "name": "Right Chamber",
+        "description": "A smaller chamber with intricate flooring, pillars, and water access, suitable for ambushes and defensive setups.",
         "terrainTypes": [
           "Floor",
           "Lake",
           "Pillar",
           "Stairs"
         ],
-        "fromX": 0,
-        "fromY": 13,
+        "fromX": 4,
+        "fromY": 9,
         "toX": 16,
-        "toY": 19
+        "toY": 13
       },
       {
-        "name": "Entrance Hall",
-        "description": "The initial area with multiple pathways leading to other chambers, featuring stairs and pillars for strategic positioning.",
+        "name": "Bottom Entrance Hall",
+        "description": "The main entrance area with multiple pathways and stairs leading to other chambers, crucial for controlling map access.",
         "terrainTypes": [
           "Floor",
           "Stairs",
           "Pillar"
         ],
         "fromX": 0,
-        "fromY": 20,
+        "fromY": 14,
         "toX": 16,
-        "toY": 25
+        "toY": 19
+      },
+      {
+        "name": "Upper Central Corridor",
+        "description": "A corridor connecting various chambers, featuring pillars and stairs, important for mobility and quick access.",
+        "terrainTypes": [
+          "Floor",
+          "Pillar",
+          "Stairs"
+        ],
+        "fromX": 0,
+        "fromY": 0,
+        "toX": 16,
+        "toY": 4
       }
     ],
     "keyPointsOfInterest": [
       "Throne at (13,5)",
-      "Treasure Chests at (5,7), (1,24), and (5,24)",
-      "Multiple staircases providing access to different levels"
+      "Chests at (5,7), (1,24), and (5,24)",
+      "Multiple staircases providing vertical mobility"
     ],
     "chokePoints": [
-      "Narrow corridors around the Throne Room",
-      "Waterway passages creating natural choke points",
-      "Staircases connecting different chambers"
+      "Narrow passages near water channels",
+      "Staircases at (2,4), (3,4), (4,4), (12,9), (13,9), (14,9), (11,17), (11,18)"
     ],
     "strategicConsiderations": [
-      "Control of the Throne Room is crucial for defensive advantage.",
-      "Utilize waterway passages to limit enemy mobility and create ambush opportunities.",
-      "Secure treasure chambers early to gain valuable resources.",
-      "Staircases can be used for quick reinforcements or retreats, making them critical points to control."
+      "Control of the Central Throne Room is crucial for defensive advantage.",
+      "Water channels significantly restrict movement, making them ideal for defensive setups.",
+      "Staircases provide critical mobility and reinforcement routes, making their control essential.",
+      "Treasure chests offer valuable resources, incentivizing control of their locations."
     ],
-    "givenName": "Ancient Throne Chambers",
+    "givenName": "Ancient Temple Chambers",
     "originalName": "Nobles_Evil_Doers_1_(18_00_19_1A)__by_Aura_Wolf",
-    "description": "A complex indoor map featuring multiple chambers connected by narrow corridors, with water channels and treasure chests scattered throughout.",
+    "description": "A complex indoor map featuring interconnected chambers with water channels and treasure chests.",
     "setting": "indoor"
   },
   {
     "distinctRegions": [
       {
         "name": "Western Castle Courtyard",
-        "description": "A fortified area with a gate and walls, providing strong defensive positions and control over the western side.",
+        "description": "A fortified area with walls and a gate, providing strong defensive capabilities and control over the western side.",
         "terrainTypes": [
           "Wall",
           "Gate",
-          "Plain",
-          "Forest"
+          "Plain"
         ],
         "fromX": 2,
         "fromY": 3,
@@ -2013,34 +2042,34 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
       },
       {
         "name": "Northern Village Area",
-        "description": "A small village with houses and resources, offering shelter and strategic support.",
+        "description": "A village area with houses and resources, strategically important for gathering supplies and positioning.",
         "terrainTypes": [
           "Village",
           "House",
           "Plain",
           "Forest"
         ],
-        "fromX": 6,
+        "fromX": 4,
         "fromY": 0,
         "toX": 10,
         "toY": 2
       },
       {
         "name": "Central River Crossing",
-        "description": "A critical area with bridges over a river, serving as a key chokepoint for movement between north and south.",
+        "description": "A critical bridge over the river, serving as the main crossing point and a potential chokepoint.",
         "terrainTypes": [
-          "River",
           "Bridge",
+          "River",
           "Plain"
         ],
         "fromX": 5,
         "fromY": 5,
-        "toX": 8,
+        "toX": 7,
         "toY": 7
       },
       {
-        "name": "Eastern Coastal Shore",
-        "description": "A coastal region with cliffs and sea access, providing strategic naval opportunities and limited land access.",
+        "name": "Eastern Shoreline",
+        "description": "A scenic shoreline along the eastern edge, providing a natural boundary and limiting movement.",
         "terrainTypes": [
           "Sea",
           "Cliff",
@@ -2052,90 +2081,63 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "toY": 7
       },
       {
-        "name": "Southern Village and Trade Hub",
-        "description": "A bustling area with vendors, armories, and houses, offering trade and support for units.",
+        "name": "Southern Village and Market",
+        "description": "A southern area with a village, armory, vendor, and houses, offering resources and strategic positioning.",
         "terrainTypes": [
-          "Vendor",
+          "Village",
           "Armory",
+          "Vendor",
           "House",
           "Plain",
           "Forest"
         ],
         "fromX": 4,
         "fromY": 9,
-        "toX": 11,
+        "toX": 12,
         "toY": 12
       },
       {
-        "name": "Southwestern Forest Outpost",
-        "description": "A small outpost surrounded by forests, providing defensive cover and lookout positions.",
+        "name": "Northwestern Cliffs and Forest",
+        "description": "A rugged area with cliffs and forests, providing natural defensive positions and limited mobility.",
         "terrainTypes": [
+          "Cliff",
           "Forest",
           "Plain"
         ],
         "fromX": 0,
-        "fromY": 10,
+        "fromY": 0,
         "toX": 3,
-        "toY": 12
+        "toY": 2
       }
     ],
     "keyPointsOfInterest": [
       "Western Castle Gate at (3,4)",
       "Northern Village at (10,2)",
-      "Central Bridges at (6,6) and (7,6)",
-      "Eastern Coastal Cliffs and Sea",
-      "Southern Village with Armory and Vendors"
+      "Central Bridge at (6,6) and (7,6)",
+      "Southern Village at (11,10)",
+      "Armories and Vendors at (5,9), (5,11), and (4,11)"
     ],
     "chokePoints": [
-      "Western Castle Gate at (3,4)",
-      "Central River Bridges at (6,6) and (7,6)",
-      "Eastern Coastal Cliffs limiting land access"
+      "Central Bridge at (6,6) and (7,6)",
+      "Western Castle Gate at (3,4)"
     ],
     "strategicConsiderations": [
-      "Control of the central bridges is crucial for mobility and defense.",
-      "The Western Castle provides a strong defensive position and should be secured early.",
-      "The Eastern Shore offers naval opportunities but limited land access, making it vulnerable to ranged attacks.",
-      "Southern Village serves as a vital resource and trade hub, important for maintaining unit strength and supplies.",
-      "Forests and cliffs provide natural defensive cover, useful for ambushes and defensive positioning."
+      "Control of the central bridge is crucial for mobility and defense.",
+      "The western castle provides a strong defensive position and should be secured early.",
+      "The northern and southern villages offer valuable resources and should be contested.",
+      "The eastern shoreline limits movement, making it a natural boundary for defensive strategies.",
+      "Utilize the cliffs and forests in the northwest for ambushes and defensive positioning."
     ],
     "givenName": "River Crossing",
     "originalName": "Knights_Villagers_Bandits_2_(01_00_02_03)__by_Aura_Wolf",
-    "description": "A strategic map featuring a central river with bridges, surrounded by villages and a castle.",
+    "description": "A strategic map featuring a central river with a bridge, surrounded by villages and a castle. Ideal for tactical maneuvers and defense.",
     "setting": "outdoor"
   },
   {
     "distinctRegions": [
       {
-        "name": "Northern Village",
-        "description": "A small village area with houses, providing resources and strategic positioning.",
-        "terrainTypes": [
-          "Village",
-          "Road",
-          "Plain",
-          "Forest"
-        ],
-        "fromX": 8,
-        "fromY": 0,
-        "toX": 12,
-        "toY": 4
-      },
-      {
-        "name": "Western Armory",
-        "description": "An armory building located to the west, crucial for weapon supplies and preparation.",
-        "terrainTypes": [
-          "Armory",
-          "Road",
-          "Plain",
-          "Wall"
-        ],
-        "fromX": 0,
-        "fromY": 16,
-        "toX": 4,
-        "toY": 19
-      },
-      {
         "name": "Central Fortress",
-        "description": "A large fortified structure with multiple entry points, serving as the main defensive position.",
+        "description": "A fortified structure with a throne room and treasure chest, serving as the main defensive position.",
         "terrainTypes": [
           "Wall",
           "Floor",
@@ -2145,80 +2147,111 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         ],
         "fromX": 8,
         "fromY": 6,
-        "toX": 14,
+        "toX": 15,
         "toY": 13
       },
       {
-        "name": "Southern Market",
-        "description": "A cluster of buildings including a vendor and house, useful for trading and supplies.",
+        "name": "Northern Village",
+        "description": "A small village area with houses, providing potential resources or allies.",
         "terrainTypes": [
-          "Vendor",
-          "House",
+          "Village",
           "Road",
           "Plain",
-          "Wall"
+          "Forest"
         ],
-        "fromX": 4,
+        "fromX": 8,
+        "fromY": 0,
+        "toX": 12,
+        "toY": 3
+      },
+      {
+        "name": "Western Armory and Village",
+        "description": "An armory and village area providing weapons, supplies, and potential allies.",
+        "terrainTypes": [
+          "Armory",
+          "Village",
+          "Road",
+          "Plain",
+          "Forest",
+          "House"
+        ],
+        "fromX": 0,
+        "fromY": 8,
+        "toX": 4,
+        "toY": 19
+      },
+      {
+        "name": "Southern Village and Vendor",
+        "description": "A village area with houses and a vendor, offering additional support or items.",
+        "terrainTypes": [
+          "Village",
+          "Vendor",
+          "Road",
+          "Plain",
+          "Forest",
+          "House"
+        ],
+        "fromX": 5,
         "fromY": 16,
         "toX": 15,
         "toY": 19
       },
       {
-        "name": "Eastern Outpost",
-        "description": "A small building serving as a lookout or minor defensive position, located to the east.",
+        "name": "Eastern Pathway",
+        "description": "A clear path leading towards the fortress, ideal for advancing troops.",
         "terrainTypes": [
+          "Road",
           "Plain",
-          "Forest",
-          "Road"
+          "Forest"
         ],
-        "fromX": 13,
+        "fromX": 12,
         "fromY": 0,
         "toX": 15,
-        "toY": 5
+        "toY": 15
       },
       {
-        "name": "Central Plains",
-        "description": "Open plains with scattered forests and roads, providing mobility and tactical flexibility.",
+        "name": "Forest Outskirts",
+        "description": "Dense forest areas providing cover and strategic ambush points.",
         "terrainTypes": [
-          "Plain",
           "Forest",
+          "Plain",
           "Road"
         ],
         "fromX": 0,
-        "fromY": 5,
+        "fromY": 0,
         "toX": 7,
-        "toY": 15
+        "toY": 7
       }
     ],
     "keyPointsOfInterest": [
-      "Northern Village at (10,2)",
-      "Western Armory at (3,18)",
-      "Central Fortress with chest at (10,8)",
-      "Southern Market with vendor at (13,17)",
-      "Eastern Outpost"
+      "Central Fortress with throne room and chest",
+      "Northern Village",
+      "Western Armory",
+      "Southern Village with Vendor",
+      "Eastern Pathway"
     ],
     "chokePoints": [
-      "Door at (12,13) leading into Central Fortress",
-      "Door at (14,9) within Central Fortress",
-      "Narrow roads around Central Fortress"
+      "Door at (12,13) leading into the Central Fortress",
+      "Door at (14,9) within the Central Fortress",
+      "Narrow roads leading to the fortress from the east and west"
     ],
     "strategicConsiderations": [
-      "Control of the Central Fortress is crucial for defense and resource management.",
-      "Northern Village and Southern Market provide essential resources and should be secured early.",
-      "Western Armory is vital for equipping units and should be defended or captured quickly.",
-      "Eastern Outpost offers a strategic vantage point for monitoring enemy movements.",
-      "Utilize choke points effectively to control enemy advancement and protect key areas."
+      "Central Fortress is highly defensible; controlling it is crucial for victory.",
+      "Villages and armory provide essential resources and should be secured early.",
+      "Eastern Pathway offers a direct route to the fortress but is vulnerable to ambushes from the Forest Outskirts.",
+      "Use the Forest Outskirts for ambushes and defensive positioning.",
+      "Southern Village and Vendor can provide critical support items; secure them to maintain supply lines."
     ],
     "givenName": "Fortress Approach",
     "originalName": "Mages_Mercenaries_1_(0E_00_72_10)__by_Aura_Wolf",
-    "description": "A strategic outdoor map featuring a central fortress surrounded by various buildings and pathways.",
+    "description": "A strategic outdoor map featuring a central fortress surrounded by various buildings and pathways. The terrain includes forests and open fields, providing tactical opportunities for both offense and defense.",
     "setting": "outdoor"
   },
   {
     "distinctRegions": [
       {
         "name": "Castle Entrance",
-        "description": "A fortified area with walls and open plains, providing defensive positions and controlled access.",
+        "description": "A fortified area at the top left corner, enclosed by walls, providing a strong defensive position.",
         "terrainTypes": [
           "Wall",
           "Plain"
@@ -2226,27 +2259,25 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "fromX": 0,
         "fromY": 0,
         "toX": 4,
-        "toY": 2
+        "toY": 1
       },
       {
         "name": "Northern Hills",
-        "description": "Elevated terrain with hills and cliffs, offering strategic high ground advantage.",
+        "description": "Elevated terrain providing defensive advantages and visibility over the surrounding plains.",
         "terrainTypes": [
           "Hill",
-          "Cliff",
           "Plain"
         ],
         "fromX": 7,
         "fromY": 0,
         "toX": 10,
-        "toY": 3
+        "toY": 1
       },
       {
-        "name": "Mountain Pass",
-        "description": "Impassable mountains and narrow paths, ideal for defensive positioning and ambushes.",
+        "name": "Mountain Barrier",
+        "description": "Impassable mountainous terrain forming a natural barrier at the top right corner.",
         "terrainTypes": [
-          "Mountain",
-          "Plain"
+          "Mountain"
         ],
         "fromX": 12,
         "fromY": 0,
@@ -2255,19 +2286,30 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
       },
       {
         "name": "Central Forest",
-        "description": "Dense forest area providing cover and strategic movement options, crucial for ambushes and stealth.",
+        "description": "Dense forested area providing cover and strategic movement options, ideal for ambushes and defensive maneuvers.",
         "terrainTypes": [
           "Forest",
           "Plain"
         ],
         "fromX": 0,
-        "fromY": 3,
-        "toX": 9,
+        "fromY": 2,
+        "toX": 7,
+        "toY": 8
+      },
+      {
+        "name": "Open Plains",
+        "description": "Expansive open area suitable for cavalry charges and large-scale engagements, offering minimal cover.",
+        "terrainTypes": [
+          "Plain"
+        ],
+        "fromX": 8,
+        "fromY": 2,
+        "toX": 10,
         "toY": 8
       },
       {
         "name": "River Crossing",
-        "description": "Area with two bridges crossing a river, essential for controlling movement across the map.",
+        "description": "A river running vertically with two bridges, crucial for movement between the eastern and western sides of the map.",
         "terrainTypes": [
           "River",
           "Bridge",
@@ -2276,47 +2318,91 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "fromX": 11,
         "fromY": 0,
         "toX": 13,
-        "toY": 8
+        "toY": 9
       },
       {
-        "name": "Eastern Riverbank",
-        "description": "Open grassy area along the river, providing space for maneuvering and potential flanking.",
+        "name": "Southern Cliffs",
+        "description": "Impassable cliffs at the southern edge, limiting movement and providing natural defensive positions.",
         "terrainTypes": [
-          "Plain",
-          "Cliff",
-          "River"
+          "Cliff"
         ],
         "fromX": 10,
-        "fromY": 9,
-        "toX": 14,
+        "fromY": 8,
+        "toX": 12,
         "toY": 9
       }
     ],
     "keyPointsOfInterest": [
-      "Castle Entrance at top left",
-      "Two bridges at coordinates (11,2) and (12,5)",
-      "Mountain Pass at top right"
+      "Castle Entrance at top left corner",
+      "Two bridges at (11,2) and (12,5) for river crossing",
+      "Mountain barrier at top right corner",
+      "Southern cliffs providing natural defense"
     ],
     "chokePoints": [
       "Bridges at (11,2) and (12,5)",
-      "Narrow paths near Mountain Pass"
+      "Narrow passages through the Central Forest"
     ],
     "strategicConsiderations": [
-      "Control of bridges is crucial for map dominance.",
-      "Forests provide excellent cover for ambushes and stealth maneuvers.",
-      "High ground in Northern Hills offers significant tactical advantage.",
-      "Castle Entrance provides strong defensive positions but limited mobility."
+      "Control of the bridges is crucial for mobility and map control.",
+      "The Central Forest provides excellent cover for ambushes and defensive setups.",
+      "The Castle Entrance offers a strong defensive position but can be isolated if bridges are lost.",
+      "Southern cliffs and mountain barriers limit movement, making positioning and control of open areas vital."
     ],
     "givenName": "Forest Crossing",
     "originalName": "(7)Ch01_Diff_Tileset__by_Shin19",
-    "description": "A lush outdoor map featuring a castle, dense forests, and a river with bridges.",
+    "description": "A lush outdoor map featuring a mix of forested areas and open plains, with a river running through the right side, crossed by two bridges.",
     "setting": "outdoor"
   },
   {
     "distinctRegions": [
       {
+        "name": "Northern Mountain Pass",
+        "description": "A narrow, mountainous region providing strategic high ground and limited mobility.",
+        "terrainTypes": [
+          "Mountain",
+          "Hill",
+          "Forest",
+          "Plain"
+        ],
+        "fromX": 0,
+        "fromY": 0,
+        "toX": 19,
+        "toY": 4
+      },
+      {
+        "name": "Western Village Area",
+        "description": "A small village area with houses and a fort, offering defensive positions and resources.",
+        "terrainTypes": [
+          "House",
+          "Fort",
+          "Plain",
+          "Forest",
+          "Mountain"
+        ],
+        "fromX": 0,
+        "fromY": 5,
+        "toX": 8,
+        "toY": 9
+      },
+      {
+        "name": "Eastern Village Area",
+        "description": "A village area on the eastern side, providing supplies and shelter, surrounded by mountains and cliffs.",
+        "terrainTypes": [
+          "House",
+          "Fort",
+          "Plain",
+          "Forest",
+          "Mountain",
+          "Cliff"
+        ],
+        "fromX": 9,
+        "fromY": 5,
+        "toX": 19,
+        "toY": 9
+      },
+      {
         "name": "Central Crossroads",
-        "description": "The central intersection of paths, surrounded by plains and forests, providing access to all areas.",
+        "description": "The central intersection of paths, crucial for controlling movement and strategic positioning.",
         "terrainTypes": [
           "Plain",
           "Forest"
@@ -2327,123 +2413,48 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "toY": 7
       },
       {
-        "name": "Northern Mountain Range",
-        "description": "Impassable mountains forming a natural barrier at the northern edge of the map.",
-        "terrainTypes": [
-          "Mountain",
-          "Hill"
-        ],
-        "fromX": 0,
-        "fromY": 0,
-        "toX": 19,
-        "toY": 4
-      },
-      {
-        "name": "Western Village",
-        "description": "A small village area with houses and a fort, providing resources and defensive positions.",
-        "terrainTypes": [
-          "Plain",
-          "House",
-          "Fort",
-          "Forest"
-        ],
-        "fromX": 0,
-        "fromY": 8,
-        "toX": 4,
-        "toY": 9
-      },
-      {
-        "name": "Eastern Village",
-        "description": "Another village area with houses and a fort, offering strategic advantages and supplies.",
-        "terrainTypes": [
-          "Plain",
-          "House",
-          "Fort",
-          "Forest"
-        ],
-        "fromX": 15,
-        "fromY": 8,
-        "toX": 19,
-        "toY": 9
-      },
-      {
-        "name": "Southern Mountain Pass",
-        "description": "A narrow path through mountains and hills, providing limited access to the southern edge.",
-        "terrainTypes": [
-          "Mountain",
-          "Hill",
-          "Plain",
-          "Forest"
-        ],
-        "fromX": 0,
-        "fromY": 10,
-        "toX": 15,
-        "toY": 12
-      },
-      {
-        "name": "Coastal Edge",
-        "description": "The southeastern edge of the map bordered by cliffs and sea, limiting movement and providing defensive positions.",
+        "name": "Southern Cliff Barrier",
+        "description": "Steep cliffs and mountains forming a natural barrier, significantly limiting movement and providing defensive advantages.",
         "terrainTypes": [
           "Cliff",
-          "Sea",
           "Mountain",
-          "Plain"
+          "Hill",
+          "Forest",
+          "Sea"
         ],
-        "fromX": 16,
+        "fromX": 0,
         "fromY": 10,
         "toX": 19,
         "toY": 12
       }
     ],
     "keyPointsOfInterest": [
-      "Western Village Houses and Fort",
-      "Eastern Village Houses and Fort",
+      "Western Village Houses (1,8) and (15,8)",
+      "Eastern Village House (15,8)",
+      "Forts at (3,8) and (18,5)",
       "Central Crossroads"
     ],
     "chokePoints": [
-      "Southern Mountain Pass",
-      "Central Crossroads"
+      "Northern Mountain Pass",
+      "Central Crossroads",
+      "Southern Cliff Barrier"
     ],
     "strategicConsiderations": [
-      "Control of the Central Crossroads is crucial for mobility and access to all regions.",
-      "The villages provide valuable resources and defensive positions, making them key targets.",
-      "The Southern Mountain Pass is a critical choke point, ideal for defensive strategies.",
-      "The Coastal Edge offers limited access, making it a defensible position against attacks from the south."
+      "Control of the Central Crossroads is crucial for mobility and map control.",
+      "Northern Mountain Pass provides high ground advantage but limited mobility.",
+      "Villages offer resources and defensive positions, making them valuable targets.",
+      "Southern cliffs and mountains create natural defensive barriers, limiting enemy approaches."
     ],
     "givenName": "Mountain Crossroads",
     "originalName": "Knights_Villagers_Bandits_5_(01_00_38_03)__by_Aura_Wolf",
-    "description": "A strategic outdoor map featuring a central crossroads surrounded by mountains and villages.",
+    "description": "A rugged outdoor map featuring a central crossroads surrounded by mountains and villages.",
     "setting": "outdoor"
   },
   {
     "distinctRegions": [
       {
-        "name": "Entrance Hall",
-        "description": "The starting area with a wide open space and stairs leading deeper into the complex. Provides initial positioning and deployment.",
-        "terrainTypes": [
-          "Floor",
-          "Stairs"
-        ],
-        "fromX": 1,
-        "fromY": 12,
-        "toX": 4,
-        "toY": 14
-      },
-      {
-        "name": "Central Corridor",
-        "description": "A long hallway connecting various rooms, featuring decorative pillars for cover and strategic positioning.",
-        "terrainTypes": [
-          "Floor",
-          "Pillar"
-        ],
-        "fromX": 2,
-        "fromY": 6,
-        "toX": 9,
-        "toY": 8
-      },
-      {
-        "name": "Treasure Room",
-        "description": "A secluded room containing a valuable treasure chest, accessible through a locked door.",
+        "name": "Treasure Chamber",
+        "description": "A secluded room in the northeast containing a valuable chest, accessible through narrow corridors.",
         "terrainTypes": [
           "Floor",
           "Chest"
@@ -2454,62 +2465,87 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "toY": 3
       },
       {
-        "name": "Pillar Room",
-        "description": "A room with multiple decorative pillars, providing cover and obstacles, ideal for defensive positioning.",
+        "name": "Central Pillared Hall",
+        "description": "A large central hall with decorative pillars, providing cover and strategic positioning.",
         "terrainTypes": [
           "Floor",
           "Pillar"
         ],
-        "fromX": 6,
-        "fromY": 11,
-        "toX": 12,
-        "toY": 12
+        "fromX": 2,
+        "fromY": 6,
+        "toX": 9,
+        "toY": 8
       },
       {
-        "name": "Narrow Passage",
-        "description": "A tight corridor connecting different sections of the map, creating a strategic chokepoint.",
+        "name": "Northern Corridor",
+        "description": "A narrow corridor connecting the central hall to the treasure chamber, featuring a locked door.",
         "terrainTypes": [
           "Floor",
           "Door"
         ],
-        "fromX": 7,
-        "fromY": 4,
+        "fromX": 6,
+        "fromY": 2,
         "toX": 12,
         "toY": 4
       },
       {
-        "name": "Upper Chambers",
-        "description": "Rooms located in the upper section of the map, accessible via stairs, providing strategic high ground.",
+        "name": "Western Entrance Hall",
+        "description": "The main entrance area in the west, leading directly into the central hall and other passages.",
         "terrainTypes": [
           "Floor",
           "Stairs"
         ],
-        "fromX": 4,
-        "fromY": 5,
-        "toX": 7,
+        "fromX": 1,
+        "fromY": 1,
+        "toX": 4,
         "toY": 5
+      },
+      {
+        "name": "Southern Winding Passage",
+        "description": "A complex, winding passage in the southern area, connecting multiple rooms and featuring several stairs and doors.",
+        "terrainTypes": [
+          "Floor",
+          "Door",
+          "Stairs"
+        ],
+        "fromX": 1,
+        "fromY": 9,
+        "toX": 13,
+        "toY": 14
+      },
+      {
+        "name": "Eastern Side Chambers",
+        "description": "A series of smaller rooms and corridors on the eastern side, providing alternate routes and strategic positions.",
+        "terrainTypes": [
+          "Floor",
+          "Pillar",
+          "Door"
+        ],
+        "fromX": 11,
+        "fromY": 5,
+        "toX": 14,
+        "toY": 12
       }
     ],
     "keyPointsOfInterest": [
-      "Treasure Chest at (12,2)",
-      "Multiple Staircases at (4,5), (7,5), (5,13), (5,14)",
-      "Locked Doors at (7,4), (12,4), (4,12)"
+      "Treasure chest at (12,2)",
+      "Multiple staircases at (4,5), (7,5), (3,9), (5,13), (5,14)",
+      "Locked doors at (7,4), (12,4), (4,12)"
     ],
     "chokePoints": [
-      "Door at (7,4)",
-      "Door at (12,4)",
-      "Door at (4,12)"
+      "Door at (7,4) leading to the northern corridor",
+      "Door at (12,4) near the treasure chamber",
+      "Door at (4,12) in the southern passage"
     ],
     "strategicConsiderations": [
-      "Control of the Central Corridor is crucial for mobility and access to other regions.",
-      "Securing the Treasure Room early can provide valuable resources.",
-      "Utilize the Pillar Room for defensive setups and ambushes.",
-      "The Narrow Passage doors serve as critical chokepoints; controlling these can limit enemy movement.",
-      "Staircases provide strategic high ground and potential reinforcement points."
+      "Control of the central hall is crucial for mobility and defense.",
+      "The treasure chamber is isolated and easily defensible, making it a key objective.",
+      "The southern winding passage offers multiple routes for flanking and ambushes.",
+      "Eastern side chambers provide alternate paths and potential ambush points."
     ],
     "givenName": "Labyrinthine Chambers",
     "originalName": "Alusq_FE8_0A009B0C_in_the_dark__by_FEU",
-    "description": "A complex indoor map with winding corridors and multiple rooms, featuring a treasure chest in a secluded area.",
+    "description": "A complex indoor map with winding corridors and multiple rooms, featuring a mix of open spaces and narrow passages.",
     "setting": "indoor"
   },
   {
@@ -2521,36 +2557,36 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
           "Floor",
           "Plain",
           "Wall",
-          "Door",
-          "Pillar"
+          "Door"
         ],
         "fromX": 0,
-        "fromY": 17,
+        "fromY": 18,
         "toX": 22,
         "toY": 23
       },
       {
         "name": "Central Courtyard",
-        "description": "An open courtyard within the fortress, surrounded by walls and narrow passages. Ideal for defensive positioning.",
+        "description": "An open area within the fortress, surrounded by walls and narrow pathways. Ideal for defensive positioning and controlling movement.",
         "terrainTypes": [
-          "Plain",
           "Floor",
+          "Plain",
           "Wall",
+          "Pillar",
+          "Chest",
           "Stairs"
         ],
         "fromX": 0,
-        "fromY": 11,
+        "fromY": 12,
         "toX": 22,
-        "toY": 16
+        "toY": 17
       },
       {
         "name": "Northern Lake",
-        "description": "A large body of water with cliffs and sea, providing natural barriers and limited access points.",
+        "description": "A large body of water providing a natural barrier to the northeast, limiting movement and creating strategic chokepoints.",
         "terrainTypes": [
           "Sea",
           "Cliff",
-          "Forest",
-          "Plain"
+          "Forest"
         ],
         "fromX": 13,
         "fromY": 0,
@@ -2559,7 +2595,7 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
       },
       {
         "name": "Western Ruins",
-        "description": "Crumbling walls and scattered debris, marking the remains of the fortress's western section. Offers cover and strategic positioning.",
+        "description": "Crumbling structures and pathways leading to the fortress, surrounded by forest. Offers cover and ambush opportunities.",
         "terrainTypes": [
           "Ruins",
           "Forest",
@@ -2572,211 +2608,190 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "toY": 5
       },
       {
-        "name": "Eastern Forest",
-        "description": "A dense forest area with scattered trees, providing cover and strategic movement options.",
+        "name": "Eastern Pathway",
+        "description": "A narrow path leading from the forest to the fortress, bordered by trees and thickets. Ideal for ambushes and controlled movement.",
         "terrainTypes": [
-          "Forest",
           "Plain",
+          "Forest",
           "Thicket"
         ],
         "fromX": 13,
         "fromY": 6,
         "toX": 22,
-        "toY": 10
+        "toY": 11
       },
       {
-        "name": "Southern Fortress Interior",
-        "description": "Interior rooms and corridors of the fortress, containing strategic points like chests and stairs.",
+        "name": "Southern Forest Edge",
+        "description": "A forested area at the southern edge of the fortress, providing cover and strategic positioning for flanking maneuvers.",
         "terrainTypes": [
-          "Floor",
-          "Wall",
-          "Chest",
-          "Stairs",
-          "Door",
-          "Pillar"
+          "Forest",
+          "Plain",
+          "Wall"
         ],
         "fromX": 0,
-        "fromY": 18,
-        "toX": 22,
-        "toY": 23
+        "fromY": 6,
+        "toX": 12,
+        "toY": 11
       }
     ],
     "keyPointsOfInterest": [
       "Chest at (7,20)",
-      "Stairs at (9,12), (18,21), (19,21)",
+      "Stairs at (9,12) and (18,21)",
       "Door at (7,18)",
       "Ruins at (16,1)"
     ],
     "chokePoints": [
       "Door at (7,18)",
-      "Narrow passages around walls in Central Courtyard"
+      "Narrow pathways around Central Courtyard",
+      "Eastern Pathway bordered by thickets"
     ],
     "strategicConsiderations": [
-      "Fortress Entrance is crucial for initial positioning and controlling access to the fortress.",
-      "Central Courtyard provides strong defensive positions but can become a bottleneck.",
+      "Control of the Fortress Entrance is crucial for initial positioning and reinforcements.",
+      "Central Courtyard provides strong defensive positions but can be vulnerable to ranged attacks from surrounding walls.",
       "Northern Lake and cliffs limit movement, making flying units valuable for mobility.",
-      "Eastern Forest offers cover for ambushes and strategic movement.",
-      "Southern Fortress Interior contains valuable items and reinforcements points, requiring careful management."
+      "Western Ruins and Eastern Pathway offer opportunities for ambushes and controlled engagements.",
+      "Southern Forest Edge allows for flanking maneuvers and surprise attacks."
     ],
     "givenName": "Ruined Fortress and Lake",
     "originalName": "Nobles_Evil_Doers_7_(6C_00_A3_6E)__by_Aura_Wolf",
-    "description": "A map featuring a large ruined fortress surrounded by a lake and forested areas. The fortress is divided into multiple sections with narrow pathways and open courtyards.",
+    "description": "A map featuring a large ruined fortress surrounded by a forest and a lake. The fortress is divided into multiple sections with narrow pathways and open courtyards. The lake to the northeast adds a natural barrier.",
     "setting": "outdoor"
   },
   {
     "distinctRegions": [
       {
-        "name": "Northern Village Cluster",
-        "description": "A cluster of villages and houses surrounded by mountains and forests, providing resources and strategic positioning.",
+        "name": "Northern Mountain Castle",
+        "description": "A heavily fortified castle surrounded by mountains and walls, providing excellent defensive capabilities.",
         "terrainTypes": [
-          "Plain",
-          "Village",
-          "House",
           "Mountain",
+          "Wall",
+          "Gate",
+          "Plain",
           "Forest"
         ],
-        "fromX": 0,
+        "fromX": 2,
         "fromY": 0,
-        "toX": 25,
+        "toX": 16,
         "toY": 8
       },
       {
         "name": "Central River Crossing",
-        "description": "A wide river with multiple bridges, serving as a major strategic point for crossing and defense.",
+        "description": "A strategic area with multiple bridges crossing a central river, crucial for controlling movement across the map.",
         "terrainTypes": [
           "River",
           "Bridge",
           "Plain",
-          "Fort"
+          "Forest"
         ],
         "fromX": 0,
-        "fromY": 9,
-        "toX": 34,
+        "fromY": 12,
+        "toX": 25,
         "toY": 17
       },
       {
-        "name": "Eastern Castle Grounds",
-        "description": "A fortified castle area with surrounding open fields, offering a strong defensive position and access to armory and vendor.",
+        "name": "Eastern Riverside Village",
+        "description": "A village near the river, providing resources and a strategic foothold for controlling the eastern side of the map.",
         "terrainTypes": [
+          "Village",
           "Plain",
-          "Wall",
-          "Gate",
-          "Armory",
-          "Vendor",
-          "Village"
+          "Forest",
+          "River"
         ],
         "fromX": 26,
         "fromY": 0,
         "toX": 34,
-        "toY": 8
+        "toY": 9
       },
       {
-        "name": "Southern Mountain Pass",
-        "description": "A narrow passage through mountains and cliffs, ideal for ambushes and defensive maneuvers.",
+        "name": "Southern Open Plains",
+        "description": "Expansive plains with scattered forests and hills, ideal for flexible troop movements and positioning.",
         "terrainTypes": [
-          "Mountain",
-          "Cliff",
           "Plain",
-          "Forest"
+          "Forest",
+          "Hill"
         ],
         "fromX": 0,
         "fromY": 18,
         "toX": 25,
-        "toY": 25
-      },
-      {
-        "name": "Western Bridge Approach",
-        "description": "A bridge leading to the central river, flanked by forests and hills, crucial for advancing troops.",
-        "terrainTypes": [
-          "Plain",
-          "Forest",
-          "Hill",
-          "Bridge"
-        ],
-        "fromX": 0,
-        "fromY": 26,
-        "toX": 25,
         "toY": 34
       },
       {
-        "name": "Southeastern Village Outskirts",
-        "description": "A small village area with open fields, providing resources and a staging ground for attacks.",
+        "name": "Western Mountain Fort",
+        "description": "A fortified area near mountains, providing a strong defensive position and control over the western approach.",
         "terrainTypes": [
+          "Fort",
+          "Mountain",
           "Plain",
+          "Forest"
+        ],
+        "fromX": 0,
+        "fromY": 7,
+        "toX": 8,
+        "toY": 17
+      },
+      {
+        "name": "Island Fortress",
+        "description": "A strategically positioned fortress on an island in the river, accessible only by bridges, offering significant defensive advantages.",
+        "terrainTypes": [
+          "Fort",
+          "River",
+          "Bridge",
+          "Plain"
+        ],
+        "fromX": 22,
+        "fromY": 8,
+        "toX": 28,
+        "toY": 13
+      },
+      {
+        "name": "Southeastern Coastal Village",
+        "description": "A coastal village providing resources and strategic positioning near cliffs and the sea.",
+        "terrainTypes": [
           "Village",
-          "Forest",
-          "Cliff"
+          "Plain",
+          "Cliff",
+          "Sea"
         ],
         "fromX": 26,
         "fromY": 9,
         "toX": 34,
-        "toY": 17
-      },
-      {
-        "name": "Southeastern Coastal Plains",
-        "description": "Open plains and cliffs along the coast, providing limited mobility but strategic positioning for ranged units.",
-        "terrainTypes": [
-          "Plain",
-          "Cliff",
-          "Sea",
-          "Forest"
-        ],
-        "fromX": 26,
-        "fromY": 18,
-        "toX": 34,
-        "toY": 25
-      },
-      {
-        "name": "Southern Forest and Mountain Range",
-        "description": "Dense forests and mountains providing cover and defensive advantages, suitable for guerrilla tactics.",
-        "terrainTypes": [
-          "Forest",
-          "Mountain",
-          "Plain",
-          "Hill"
-        ],
-        "fromX": 26,
-        "fromY": 26,
-        "toX": 34,
-        "toY": 34
+        "toY": 18
       }
     ],
     "keyPointsOfInterest": [
-      "Northern villages and houses for resources",
-      "Central river bridges for strategic crossing",
-      "Eastern castle with armory and vendor",
-      "Southern mountain pass for ambushes",
-      "Western bridge approach for troop advancement",
-      "Southeastern village outskirts for staging attacks"
+      "Northern Mountain Castle Gate at (6,6)",
+      "Eastern Riverside Village at (33,9)",
+      "Island Fortress at (24,8)",
+      "Western Mountain Fort at (8,8)",
+      "Southeastern Coastal Village at (33,9)",
+      "Armory at (25,4)",
+      "Vendor at (26,5)"
     ],
     "chokePoints": [
-      "Central river bridges",
-      "Eastern castle gates",
-      "Southern mountain pass",
-      "Western bridge approach"
+      "Bridges at (23,6), (23,7), (11,16), (27,12), (27,13)",
+      "Gates at (6,6), (8,25), (30,4), (28,18)"
     ],
     "strategicConsiderations": [
-      "Control of the central river bridges is crucial for mobility and defense.",
-      "Eastern castle grounds provide strong defensive positions and resources.",
-      "Southern mountain pass is ideal for ambushes and defensive tactics.",
-      "Western bridge approach is critical for advancing troops and controlling the central area.",
-      "Southeastern village outskirts offer resources and a staging ground for attacks, but are vulnerable to enemy advances.",
-      "Utilize forests and mountains for cover and guerrilla tactics, especially in the southern regions."
+      "Control of the central river bridges is crucial for mobility and map dominance.",
+      "The Northern Mountain Castle and Island Fortress provide strong defensive positions that can be difficult to assault directly.",
+      "The open plains in the south allow for rapid troop movements but offer limited defensive cover.",
+      "Villages and armories provide essential resources and should be secured early to maintain a strategic advantage.",
+      "Choke points such as bridges and gates can be effectively used to control enemy movements and set up defensive ambushes."
     ],
-    "givenName": "River Crossing Confrontation",
+    "givenName": "Riverland Convergence",
     "originalName": "Snakey1_FE8_01003803_Many_Castles__by_FEU",
-    "description": "A strategic map featuring a central river with multiple bridges, surrounded by villages and castles. The terrain includes mountains and forests, providing tactical advantages.",
+    "description": "A map featuring a central river with multiple bridges, surrounded by castles and villages. The terrain includes mountains, forests, and open plains, providing strategic opportunities for movement and defense.",
     "setting": "outdoor"
   },
   {
     "distinctRegions": [
       {
         "name": "Grand Entrance",
-        "description": "The main entryway to the fortress, featuring large doors and a wide path, providing a strategic point for initial engagements.",
+        "description": "The main entryway into the fortress, heavily fortified with walls and stairs, providing strategic defensive positions.",
         "terrainTypes": [
-          "Floor",
-          "Door",
-          "Wall"
+          "Wall",
+          "Stairs",
+          "Floor"
         ],
         "fromX": 4,
         "fromY": 0,
@@ -2784,75 +2799,82 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "toY": 2
       },
       {
-        "name": "Central Hall",
-        "description": "An expansive indoor area with pillars and stairs, connecting various corridors and rooms, ideal for defensive positioning.",
-        "terrainTypes": [
-          "Floor",
-          "Pillar",
-          "Stairs",
-          "Wall"
-        ],
-        "fromX": 4,
-        "fromY": 3,
-        "toX": 11,
-        "toY": 5
-      },
-      {
         "name": "Left Corridor",
-        "description": "A narrow passage on the left side of the fortress, providing limited movement and strategic chokepoints.",
+        "description": "A narrow passageway on the left side of the fortress, featuring multiple stairs and doors, ideal for controlled movement and defense.",
         "terrainTypes": [
           "Floor",
-          "Door",
           "Wall",
+          "Door",
           "Stairs"
         ],
         "fromX": 0,
-        "fromY": 5,
-        "toX": 3,
-        "toY": 15
+        "fromY": 3,
+        "toX": 6,
+        "toY": 8
       },
       {
         "name": "Right Corridor",
-        "description": "A narrow passage on the right side of the fortress, mirroring the left corridor with similar strategic chokepoints.",
+        "description": "A narrow passageway on the right side of the fortress, mirroring the left corridor with stairs and doors, suitable for strategic positioning.",
         "terrainTypes": [
           "Floor",
-          "Door",
           "Wall",
+          "Door",
           "Stairs"
         ],
-        "fromX": 12,
-        "fromY": 5,
+        "fromX": 9,
+        "fromY": 3,
         "toX": 15,
-        "toY": 15
+        "toY": 8
+      },
+      {
+        "name": "Central Courtyard",
+        "description": "An open central area within the fortress, featuring pillars and open floor space, providing access to multiple corridors and strategic points.",
+        "terrainTypes": [
+          "Floor",
+          "Pillar"
+        ],
+        "fromX": 5,
+        "fromY": 3,
+        "toX": 10,
+        "toY": 5
       },
       {
         "name": "Outer Grounds",
-        "description": "The open grassy area surrounding the fortress, providing ample space for maneuvering and flanking.",
+        "description": "Expansive grassy plains surrounding the fortress, offering open space for maneuvering and potential flanking routes.",
         "terrainTypes": [
-          "Plain",
-          "Forest"
+          "Plain"
         ],
         "fromX": 0,
-        "fromY": 16,
+        "fromY": 17,
         "toX": 15,
         "toY": 18
+      },
+      {
+        "name": "Southern Plains",
+        "description": "Open plains located just outside the fortress walls, providing ample space for unit deployment and movement.",
+        "terrainTypes": [
+          "Plain"
+        ],
+        "fromX": 0,
+        "fromY": 7,
+        "toX": 15,
+        "toY": 16
       }
     ],
     "keyPointsOfInterest": [
-      "Main Entrance Doors at (7,6) and (8,6)",
-      "Central Hall Pillars at (6,4) and (9,4)",
-      "Multiple Staircases for vertical movement at various locations"
+      "Central gate at the Grand Entrance",
+      "Multiple staircases providing vertical mobility",
+      "Doors acting as choke points in corridors"
     ],
     "chokePoints": [
-      "Main Entrance Doors at (7,6) and (8,6)",
-      "Corridor Doors at (3,9) and (12,9)",
-      "Narrow passages in Left and Right Corridors"
+      "Doors at (7,6) and (8,6) connecting corridors to the central courtyard",
+      "Doors at (3,9) and (12,9) controlling access to the southern plains"
     ],
     "strategicConsiderations": [
-      "Control of the Grand Entrance is crucial for initial engagements and defense.",
-      "Central Hall provides strong defensive positions with pillars and stairs for cover.",
-      "Left and Right Corridors offer strategic chokepoints for controlling enemy movement.",
-      "Outer Grounds allow for flanking maneuvers and positioning of ranged units."
+      "Utilize the narrow corridors and doors to control enemy movement and create defensive choke points.",
+      "The central courtyard provides a strategic hub for quick access to various parts of the fortress.",
+      "The outer grounds and southern plains offer opportunities for flanking and positioning ranged units effectively.",
+      "Staircases can be used for rapid repositioning and surprise attacks or retreats."
     ],
     "givenName": "Fortress Entrance",
     "originalName": "Alusq_FE8_3C00CE3E_afro_comb_fort__by_FEU",
@@ -2876,84 +2898,83 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "fromX": 0,
         "fromY": 0,
         "toX": 17,
-        "toY": 5
+        "toY": 4
       },
       {
-        "name": "Central Square",
-        "description": "An open area with a central village building, surrounded by roads and paths connecting to other regions.",
+        "name": "Central Plaza",
+        "description": "A central open area with roads connecting various parts of the map, ideal for mobility and strategic positioning.",
         "terrainTypes": [
           "Plain",
           "Road",
-          "Village",
-          "Wall"
+          "Forest",
+          "Wall",
+          "Village"
         ],
         "fromX": 0,
         "fromY": 5,
         "toX": 17,
-        "toY": 10
+        "toY": 9
       },
       {
         "name": "Eastern Homestead",
-        "description": "A small residential area with houses and a village, providing strategic cover and resources.",
+        "description": "A solitary house surrounded by open terrain and forests, providing a strategic vantage point.",
         "terrainTypes": [
           "Plain",
           "Road",
+          "Forest",
           "House",
-          "Village",
-          "Wall",
-          "Forest"
+          "Wall"
         ],
-        "fromX": 8,
-        "fromY": 4,
+        "fromX": 14,
+        "fromY": 0,
         "toX": 17,
-        "toY": 10
+        "toY": 5
       },
       {
         "name": "Southern Fortifications",
-        "description": "A fortified area with walls, stairs, and narrow passages, ideal for defensive positioning.",
+        "description": "A fortified area with walls, stairs, and narrow passages, ideal for defensive strategies.",
         "terrainTypes": [
           "Wall",
           "Road",
           "Stairs",
-          "Plain",
-          "Forest"
+          "Plain"
         ],
         "fromX": 0,
-        "fromY": 11,
+        "fromY": 10,
         "toX": 17,
         "toY": 14
       },
       {
         "name": "Western Pathway",
-        "description": "A path lined with trees and forests, connecting the northern village to the central square.",
+        "description": "A path connecting the northern village to the central plaza, featuring roads and forests for cover.",
         "terrainTypes": [
-          "Plain",
           "Road",
           "Forest",
+          "Plain",
           "Wall"
         ],
         "fromX": 0,
         "fromY": 0,
         "toX": 5,
-        "toY": 10
+        "toY": 9
       }
     ],
     "keyPointsOfInterest": [
       "Armory at (2,2)",
       "Vendor at (16,3)",
-      "Villages at (6,5), (10,8), and (6,5)",
+      "Villages at (6,5), (10,8)",
       "Houses at (11,4), (2,8)"
     ],
     "chokePoints": [
-      "Narrow roads between walls at (10,3)-(12,3), (10,4)-(12,4), and (11,6)-(12,6)",
-      "Stairs at (6,13)-(7,13) and (17,13)"
+      "Narrow passages near walls at (10,3)-(12,3), (10,4)-(12,4)",
+      "Stairs at (6,13)-(7,13), (6,13)-(7,13), (17,13)"
     ],
     "strategicConsiderations": [
-      "Control of the Northern Village provides access to valuable resources like the armory and vendor.",
-      "Central Square is crucial for mobility and connecting different regions, making it a key area to control.",
-      "Eastern Homestead offers defensive positions and resources, ideal for staging attacks or defense.",
-      "Southern Fortifications provide strong defensive positions, especially useful for holding off enemy advances.",
-      "Western Pathway is important for quick troop movements and flanking maneuvers, but vulnerable to ambushes due to surrounding forests."
+      "Control of the Northern Village provides access to valuable resources and cover.",
+      "Central Plaza is crucial for mobility and connecting different map regions.",
+      "Eastern Homestead offers a strategic vantage point for ranged units.",
+      "Southern Fortifications are ideal for defensive setups, especially around stairs and narrow passages.",
+      "Western Pathway is essential for quick movement between the northern and central areas, with forests providing cover."
     ],
     "givenName": "Village Outskirts",
     "originalName": "Knights_Villagers_Bandits_3_(0E_00_72_10)__by_Aura_Wolf",
@@ -2963,8 +2984,8 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
   {
     "distinctRegions": [
       {
-        "name": "Throne Chamber",
-        "description": "A grand room with a prominent throne, symbolizing power and authority. Highly defensible and strategically important.",
+        "name": "Throne Room",
+        "description": "A grand room housing the throne, central to the map's strategic importance.",
         "terrainTypes": [
           "Floor",
           "Throne",
@@ -2976,8 +2997,8 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "toY": 4
       },
       {
-        "name": "Treasure Vault",
-        "description": "A secure room containing a valuable chest, likely holding treasures or important items. Accessible through a locked door.",
+        "name": "Treasure Chamber",
+        "description": "A secure chamber containing a valuable chest, accessible through a locked door.",
         "terrainTypes": [
           "Floor",
           "Chest",
@@ -2991,11 +3012,11 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
       },
       {
         "name": "Main Corridor",
-        "description": "A wide corridor connecting various parts of the map, adorned with decorative tiles and pillars for cover.",
+        "description": "A wide, central corridor connecting various rooms and strategic points.",
         "terrainTypes": [
           "Floor",
           "Pillar",
-          "Wall"
+          "Stairs"
         ],
         "fromX": 7,
         "fromY": 0,
@@ -3003,58 +3024,57 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "toY": 6
       },
       {
-        "name": "Entrance Hall",
-        "description": "The initial entry point into the map, leading to other areas. Contains stairs for reinforcements.",
-        "terrainTypes": [
-          "Floor",
-          "Stairs",
-          "Wall"
-        ],
-        "fromX": 0,
-        "fromY": 9,
-        "toX": 13,
-        "toY": 12
-      },
-      {
-        "name": "Side Chambers",
-        "description": "Smaller rooms and corridors branching off from the main areas, possibly for strategic positioning and ambushes.",
+        "name": "Side Corridor",
+        "description": "A narrow passageway providing alternative routes and tactical positioning.",
         "terrainTypes": [
           "Floor",
           "Wall",
           "Stairs"
         ],
         "fromX": 0,
-        "fromY": 0,
-        "toX": 6,
+        "fromY": 3,
+        "toX": 5,
         "toY": 6
+      },
+      {
+        "name": "Entrance Hall",
+        "description": "The initial entry area, crucial for initial positioning and early engagements.",
+        "terrainTypes": [
+          "Floor",
+          "Pillar",
+          "Stairs"
+        ],
+        "fromX": 0,
+        "fromY": 10,
+        "toX": 13,
+        "toY": 12
       }
     ],
     "keyPointsOfInterest": [
       "Throne at (15,3)",
-      "Chest at (4,7)",
-      "Multiple stairs for reinforcements at (3,2), (5,4), (11,5), (9,10), (9,11), (14,7), (15,7), (16,7), (17,5)"
+      "Treasure Chest at (4,7)",
+      "Multiple staircases at (2,11), (5,4), (9,10), (11,5), (14,7), (15,7), (16,7), (17,5)"
     ],
     "chokePoints": [
-      "Door at (6,7) leading to Treasure Vault",
-      "Narrow corridors around pillars in Main Corridor"
+      "Door at (6,7) leading to Treasure Chamber",
+      "Narrow passages in Side Corridor and near Entrance Hall"
     ],
     "strategicConsiderations": [
-      "Control of the Throne Chamber is crucial for victory; it is highly defensible.",
-      "Treasure Vault contains valuable items; securing it early can provide significant advantages.",
-      "Main Corridor provides mobility but is vulnerable to ranged attacks due to pillars and narrow spaces.",
-      "Entrance Hall is a critical area for reinforcements; controlling stairs can prevent enemy reinforcements.",
-      "Side Chambers offer opportunities for ambushes and defensive positioning."
+      "Control of the Throne Room is essential for victory; it is well-defended and difficult to breach.",
+      "The Treasure Chamber offers valuable items but is guarded by a locked door, making it a risky but rewarding target.",
+      "Main Corridor provides mobility and quick access to various map areas, making it crucial for controlling unit movement.",
+      "Side Corridor and Entrance Hall offer alternative routes for flanking and surprise attacks, but their narrowness can lead to bottlenecks."
     ],
     "givenName": "Royal Throne Room",
     "originalName": "Knights_Villagers_Bandits_8_(18_00_19_1A)__by_Aura_Wolf",
-    "description": "An ornate indoor map featuring a grand throne room, surrounded by intricate corridors and chambers.",
+    "description": "An ornate indoor map featuring a throne room, treasure chamber, and various corridors.",
     "setting": "indoor"
   },
   {
     "distinctRegions": [
       {
         "name": "Northern Castle",
-        "description": "A fortified castle area with walls and a gate, providing strong defensive positions.",
+        "description": "A fortified castle with walls and a gate, providing strong defensive positions and control over the northern area.",
         "terrainTypes": [
           "Wall",
           "Gate",
@@ -3063,57 +3083,58 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         ],
         "fromX": 3,
         "fromY": 0,
-        "toX": 5,
+        "toX": 7,
         "toY": 2
       },
       {
-        "name": "Western Fort",
-        "description": "A small fortification strategically placed along the western road, offering defensive advantages.",
+        "name": "Western City",
+        "description": "A bustling city area with houses, a village, and roads, offering resources and strategic positioning.",
         "terrainTypes": [
-          "Fort",
+          "House",
+          "Village",
           "Plain",
           "Forest"
         ],
         "fromX": 0,
-        "fromY": 3,
-        "toX": 7,
-        "toY": 8
+        "fromY": 9,
+        "toX": 5,
+        "toY": 12
       },
       {
         "name": "Eastern City",
-        "description": "A bustling city enclosed by walls, featuring a village and houses, providing significant strategic value.",
+        "description": "A vibrant city area with houses, villages, and roads, mirroring the western city and providing strategic resources.",
         "terrainTypes": [
-          "Wall",
-          "Village",
           "House",
-          "Plain"
+          "Village",
+          "Plain",
+          "Forest"
         ],
-        "fromX": 11,
-        "fromY": 6,
+        "fromX": 10,
+        "fromY": 8,
         "toX": 14,
-        "toY": 10
-      },
-      {
-        "name": "Southern City",
-        "description": "A vibrant city with protective walls, houses, and a village, offering strong defensive and economic benefits.",
-        "terrainTypes": [
-          "Wall",
-          "Village",
-          "House",
-          "Plain"
-        ],
-        "fromX": 3,
-        "fromY": 9,
-        "toX": 10,
         "toY": 11
       },
       {
+        "name": "Central Villages",
+        "description": "Scattered villages and forts providing resources and shelter, strategically located between the cities and the castle.",
+        "terrainTypes": [
+          "Village",
+          "Fort",
+          "Plain",
+          "Forest"
+        ],
+        "fromX": 4,
+        "fromY": 4,
+        "toX": 10,
+        "toY": 8
+      },
+      {
         "name": "Mountain Pass",
-        "description": "A rugged mountainous region providing natural barriers and limited access, ideal for defensive maneuvers.",
+        "description": "A rugged mountainous area with cliffs and mountains, offering strategic high ground and limited access points.",
         "terrainTypes": [
           "Mountain",
-          "Hill",
           "Cliff",
+          "Hill",
           "Forest"
         ],
         "fromX": 8,
@@ -3122,69 +3143,54 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "toY": 4
       },
       {
-        "name": "Central Village",
-        "description": "A small village centrally located, providing a strategic resting and resupply point.",
+        "name": "Southern Pathway",
+        "description": "A road leading southward, connecting the cities and providing access to other regions, with open plains and scattered forests.",
         "terrainTypes": [
-          "Village",
-          "Plain",
-          "Forest"
-        ],
-        "fromX": 4,
-        "fromY": 11,
-        "toX": 8,
-        "toY": 14
-      },
-      {
-        "name": "Southern Village",
-        "description": "A peaceful village near the mountains, offering a quiet retreat and strategic positioning.",
-        "terrainTypes": [
-          "Village",
           "Plain",
           "Forest",
           "Hill",
           "Mountain"
         ],
-        "fromX": 11,
-        "fromY": 11,
+        "fromX": 0,
+        "fromY": 13,
         "toX": 14,
         "toY": 14
       }
     ],
     "keyPointsOfInterest": [
       "Northern Castle Gate at (4,2)",
+      "Western City Village at (4,11)",
       "Eastern City Village at (12,8)",
-      "Southern City Village at (4,11)",
-      "Central Village at (4,11)",
-      "Southern Village at (11,11)",
-      "Houses at (10,10), (1,12)"
+      "Central Fort at (7,4)",
+      "Mountain Pass with cliffs and mountains"
     ],
     "chokePoints": [
       "Northern Castle Gate at (4,2)",
-      "Walls surrounding Eastern City and Southern City",
-      "Mountain Pass cliffs and mountains"
+      "Mountain Pass cliffs and narrow paths",
+      "Walls around Eastern and Western Cities"
     ],
     "strategicConsiderations": [
-      "Northern Castle provides strong defensive positions, ideal for holding against enemy advances.",
-      "Eastern and Southern Cities offer economic and defensive advantages, crucial for maintaining control.",
-      "Mountain Pass restricts movement, making it a critical area for controlling enemy mobility.",
-      "Central and Southern Villages provide valuable resupply points, essential for sustaining prolonged engagements.",
-      "Western Fort offers strategic defense along the western road, useful for controlling troop movements."
+      "Northern Castle provides strong defensive positions; controlling it is crucial for map dominance.",
+      "Cities offer resources and reinforcements; securing them early can provide a significant advantage.",
+      "Mountain Pass offers high ground advantage but limited mobility; ideal for ranged units.",
+      "Central Villages are key for maintaining supply lines and unit recovery.",
+      "Southern Pathway is open and vulnerable; careful positioning and scouting are essential to avoid ambushes."
     ],
-    "givenName": "Twin Cities Crossroads",
+    "givenName": "Twin Cities and Castle Approach",
     "originalName": "Knights_Villagers_Bandits_1_(01_00_02_03)__by_Aura_Wolf",
-    "description": "A vibrant map featuring two bustling cities connected by winding roads, surrounded by forests and mountains.",
+    "description": "A map featuring two prominent cities connected by roads, with a central castle and surrounding villages. The terrain includes forests, mountains, and a cave entrance.",
     "setting": "outdoor"
   },
   {
     "distinctRegions": [
       {
-        "name": "Northern Coastal Cliffs",
-        "description": "A rugged coastal area with cliffs and sea, providing limited access and excellent defensive positions.",
+        "name": "Northern Coastal Plains",
+        "description": "Open plains and forests along the northern coast, bordered by cliffs and sea. Provides limited mobility and defensive positions.",
         "terrainTypes": [
-          "Sea",
-          "Cliff",
           "Plain",
-          "Forest"
+          "Forest",
+          "Cliff",
+          "Sea"
         ],
         "fromX": 0,
         "fromY": 0,
@@ -3192,71 +3198,90 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "toY": 4
       },
       {
-        "name": "Central Plains and Forests",
-        "description": "Open plains interspersed with forests, offering moderate cover and mobility for units.",
-        "terrainTypes": [
-          "Plain",
-          "Forest"
-        ],
-        "fromX": 0,
-        "fromY": 5,
-        "toX": 20,
-        "toY": 10
-      },
-      {
-        "name": "Western Village and Fortifications",
-        "description": "A fortified village area with walls and a gate, providing strong defensive capabilities and resources.",
+        "name": "Western Village Area",
+        "description": "A village and house surrounded by walls and cliffs, accessible via bridges. Important for resources and unit recruitment.",
         "terrainTypes": [
           "Village",
+          "House",
           "Wall",
-          "Gate",
+          "Bridge",
           "Plain",
-          "Forest"
+          "Cliff"
         ],
         "fromX": 0,
         "fromY": 6,
         "toX": 4,
-        "toY": 12
+        "toY": 9
       },
       {
-        "name": "Eastern Village and Fortifications",
-        "description": "A fortified village area with walls and a gate, strategically important for controlling eastern movements.",
+        "name": "Central Castle Grounds",
+        "description": "Central area featuring a castle with walls and gates, providing strong defensive positions and strategic control.",
         "terrainTypes": [
-          "Village",
           "Wall",
           "Gate",
           "Plain",
-          "Forest"
+          "Cliff"
+        ],
+        "fromX": 10,
+        "fromY": 11,
+        "toX": 12,
+        "toY": 12
+      },
+      {
+        "name": "Eastern Village Enclave",
+        "description": "A village enclosed by walls and cliffs, accessible by bridges. Key area for securing resources and strategic positioning.",
+        "terrainTypes": [
+          "Village",
+          "Wall",
+          "Bridge",
+          "Plain",
+          "Cliff"
         ],
         "fromX": 15,
         "fromY": 2,
         "toX": 17,
-        "toY": 12
+        "toY": 4
       },
       {
-        "name": "Southern Plains and Bridges",
-        "description": "Open plains with multiple bridges, crucial for controlling troop movements and supply lines.",
+        "name": "Southern Plains and Fort",
+        "description": "Open plains with a fort providing defensive bonuses. Important for controlling southern access routes.",
         "terrainTypes": [
           "Plain",
-          "Bridge",
-          "Forest"
+          "Fort",
+          "Cliff",
+          "Bridge"
         ],
         "fromX": 0,
-        "fromY": 13,
+        "fromY": 14,
         "toX": 20,
-        "toY": 18
+        "toY": 16
       },
       {
-        "name": "Southern Coastal Cliffs",
-        "description": "A coastal area with cliffs and sea, limiting access and providing natural defensive barriers.",
+        "name": "Southeastern Merchant Area",
+        "description": "Area containing an armory, vendor, and houses, providing essential supplies and equipment.",
+        "terrainTypes": [
+          "Armory",
+          "Vendor",
+          "House",
+          "Plain",
+          "Cliff",
+          "Bridge"
+        ],
+        "fromX": 0,
+        "fromY": 16,
+        "toX": 20,
+        "toY": 20
+      },
+      {
+        "name": "River Network",
+        "description": "Extensive network of rivers and bridges creating natural barriers and chokepoints throughout the map.",
         "terrainTypes": [
           "Sea",
-          "Cliff",
-          "Plain",
-          "Forest"
+          "Bridge",
+          "Cliff"
         ],
         "fromX": 0,
-        "fromY": 19,
+        "fromY": 0,
         "toX": 20,
         "toY": 20
       }
@@ -3264,32 +3289,33 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
     "keyPointsOfInterest": [
       "Western Village at (3,8)",
       "Eastern Village at (16,4)",
-      "Central Fort at (12,14)",
+      "Central Castle Gate at (11,12)",
+      "Southern Fort at (12,14)",
       "Armory at (1,16)",
-      "Vendor at (2,19)"
+      "Vendor at (2,19)",
+      "House at (16,18)"
     ],
     "chokePoints": [
-      "Western Gate at (11,12)",
-      "Eastern Gate at (11,12)",
-      "Bridges at (7,9), (15,8), (16,8), (13,16), (4,17), (4,18)"
+      "Bridges at (7,9), (15,8), (16,8), (13,16), (4,17), (4,18)",
+      "Castle Gate at (11,12)"
     ],
     "strategicConsiderations": [
-      "Control of bridges is crucial for mobility and supply lines.",
-      "Fortified villages provide defensive strongholds and resources.",
-      "Coastal cliffs limit movement, making them ideal for defensive positioning.",
-      "Central plains offer open combat areas, suitable for cavalry and ranged units.",
-      "Southern coastal cliffs provide natural barriers, restricting enemy flanking maneuvers."
+      "Control of bridges is crucial for mobility and defense, as they serve as natural chokepoints.",
+      "Securing villages early provides valuable resources and potential unit recruitment.",
+      "The central castle offers strong defensive positions and should be prioritized for control.",
+      "Southern fort and merchant area provide essential supplies and equipment, making them key strategic targets.",
+      "Utilize cliffs and sea as natural barriers to limit enemy movement and protect vulnerable units."
     ],
-    "givenName": "River Crossing Clash",
+    "givenName": "Riverland Crossroads",
     "originalName": "Mages_Mercenaries_4_(01_00_02_03)__by_Aura_Wolf",
-    "description": "A strategic map featuring multiple river crossings and fortified positions. The terrain is varied with bridges connecting key areas, making control of these points crucial.",
+    "description": "A map featuring a network of rivers and bridges connecting various strategic points, including villages and a central castle.",
     "setting": "outdoor"
   },
   {
     "distinctRegions": [
       {
-        "name": "Fortress Interior",
-        "description": "The interior of the fortress, featuring floors, pillars, and stairs. Highly defensible with limited entry points.",
+        "name": "Fortress Courtyard",
+        "description": "An open area within the fortress walls, providing defensive positions and access to interior rooms.",
         "terrainTypes": [
           "Floor",
           "Pillar",
@@ -3298,104 +3324,116 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "fromX": 9,
         "fromY": 0,
         "toX": 15,
+        "toY": 6
+      },
+      {
+        "name": "Fortress Entrance",
+        "description": "The main entrance to the fortress, heavily fortified with walls and stairs for strategic defense.",
+        "terrainTypes": [
+          "Floor",
+          "Wall",
+          "Stairs"
+        ],
+        "fromX": 9,
+        "fromY": 0,
+        "toX": 15,
         "toY": 7
       },
       {
+        "name": "Northern Plains",
+        "description": "Open plains and forests providing cover and mobility, bordered by cliffs and walls.",
+        "terrainTypes": [
+          "Plain",
+          "Forest",
+          "Cliff"
+        ],
+        "fromX": 0,
+        "fromY": 0,
+        "toX": 8,
+        "toY": 5
+      },
+      {
+        "name": "Western Cliffside",
+        "description": "A rugged area with cliffs and forests, providing natural defensive positions.",
+        "terrainTypes": [
+          "Plain",
+          "Forest",
+          "Cliff"
+        ],
+        "fromX": 0,
+        "fromY": 6,
+        "toX": 6,
+        "toY": 9
+      },
+      {
         "name": "Riverside Path",
-        "description": "A narrow path along the river, including a bridge and road, providing access to the fortress. Vulnerable to ranged attacks from cliffs.",
+        "description": "A winding path along the river, including a bridge crossing, crucial for mobility and control.",
         "terrainTypes": [
           "Road",
           "Bridge",
           "Plain"
         ],
         "fromX": 0,
-        "fromY": 0,
-        "toX": 3,
-        "toY": 4
-      },
-      {
-        "name": "Cliffside Forest",
-        "description": "Forested area with cliffs and sea, providing natural barriers and cover. Ideal for ambushes and defensive positioning.",
-        "terrainTypes": [
-          "Forest",
-          "Cliff",
-          "Sea",
-          "Plain"
-        ],
-        "fromX": 1,
-        "fromY": 1,
-        "toX": 8,
-        "toY": 9
-      },
-      {
-        "name": "Village Outskirts",
-        "description": "A small village area near the river, featuring a village tile and roads. Important for resource gathering and unit recruitment.",
-        "terrainTypes": [
-          "Village",
-          "Road",
-          "Plain",
-          "Forest"
-        ],
-        "fromX": 0,
-        "fromY": 10,
-        "toX": 3,
+        "fromY": 6,
+        "toX": 12,
         "toY": 11
       },
       {
-        "name": "Secluded Fort",
-        "description": "A small isolated fort providing strategic advantage and defensive capabilities. Accessible via roads.",
+        "name": "Southern Coastal Area",
+        "description": "A coastal region with cliffs and sea, limiting movement and providing strategic chokepoints.",
         "terrainTypes": [
-          "Fort",
+          "Sea",
+          "Cliff",
+          "Forest",
+          "Plain"
+        ],
+        "fromX": 4,
+        "fromY": 6,
+        "toX": 9,
+        "toY": 11
+      },
+      {
+        "name": "Eastern Fortified Road",
+        "description": "A road leading to a fort, providing strategic control and defensive advantage.",
+        "terrainTypes": [
           "Road",
+          "Fort",
+          "Forest",
           "Plain"
         ],
         "fromX": 10,
-        "fromY": 9,
-        "toX": 12,
-        "toY": 10
-      },
-      {
-        "name": "Open Plains",
-        "description": "Open area with minimal cover, ideal for cavalry and ranged units. Connects the fortress and secluded fort.",
-        "terrainTypes": [
-          "Plain",
-          "Road",
-          "Forest"
-        ],
-        "fromX": 9,
         "fromY": 8,
         "toX": 15,
-        "toY": 11
+        "toY": 10
       }
     ],
     "keyPointsOfInterest": [
-      "Fortress Entrance at (9,0)",
-      "Village at (2,10)",
-      "Secluded Fort at (12,10)",
-      "Stairs inside Fortress at (9,2) and (12,7)"
+      "Fortress Entrance",
+      "Bridge at (0,2)",
+      "Stairs at (9,2) and (12,7)",
+      "Fort at (12,10)"
     ],
     "chokePoints": [
       "Bridge at (0,2)",
-      "Fortress Entrance at (9,0)",
-      "Narrow paths through cliffs at (1,4) and (5,8)"
+      "Entrance stairs at (9,2)",
+      "Narrow road leading to fort at (12,10)"
     ],
     "strategicConsiderations": [
-      "Control of the fortress interior is crucial for defense and reinforcement.",
-      "The riverside path is vulnerable to ranged attacks from cliffs; use caution when advancing.",
-      "The secluded fort provides a strategic advantage for controlling the southern region.",
-      "Open plains offer mobility advantages for cavalry but leave units exposed to ranged attacks.",
-      "Village outskirts are important for resource management and unit recruitment; secure early."
+      "Control of the bridge and fortress entrance is crucial for mobility and defense.",
+      "The cliffs and forests provide natural defensive positions, ideal for ranged units.",
+      "The fort at (12,10) offers a strong defensive position and should be prioritized for control.",
+      "The riverside path is essential for quick troop movements and flanking maneuvers."
     ],
     "givenName": "Fortress Riverfront",
     "originalName": "Nobles_Evil_Doers_4_(6C_00_A3_6E)__by_Aura_Wolf",
-    "description": "A strategic map featuring a fortress by a river, with a village and a fort nearby.",
+    "description": "A strategic map featuring a fortress by a river, with a village and a bridge crossing.",
     "setting": "outdoor"
   },
   {
     "distinctRegions": [
       {
         "name": "Western Castle Grounds",
-        "description": "A fortified area with walls and a gate, providing strong defensive positions.",
+        "description": "A fortified area with walls and a gate, providing strong defensive positions. Contains forests and plains for tactical maneuvers.",
         "terrainTypes": [
           "Plain",
           "Forest",
@@ -3408,28 +3446,14 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "toY": 8
       },
       {
-        "name": "Central River Crossing",
-        "description": "A strategic river with bridges, serving as critical choke points for movement.",
+        "name": "Eastern Fortress Area",
+        "description": "A heavily fortified area with walls, cliffs, and a gate. Offers strong defensive positions and limited access points.",
         "terrainTypes": [
-          "River",
-          "Bridge",
           "Plain",
-          "Fort"
-        ],
-        "fromX": 8,
-        "fromY": 0,
-        "toX": 11,
-        "toY": 6
-      },
-      {
-        "name": "Eastern Fortress",
-        "description": "A heavily fortified area with walls, cliffs, and a gate, providing excellent defensive capabilities.",
-        "terrainTypes": [
+          "Cliff",
           "Wall",
           "Gate",
-          "Cliff",
-          "Fort",
-          "Plain"
+          "Fort"
         ],
         "fromX": 18,
         "fromY": 2,
@@ -3437,81 +3461,95 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "toY": 5
       },
       {
-        "name": "Northern Forest Villages",
-        "description": "A region with scattered forests and forts, offering cover and defensive positions.",
+        "name": "Central River Crossing",
+        "description": "A strategic river with bridges, serving as critical choke points for controlling movement across the map.",
         "terrainTypes": [
-          "Forest",
-          "Fort",
+          "River",
+          "Bridge",
+          "Plain"
+        ],
+        "fromX": 8,
+        "fromY": 0,
+        "toX": 11,
+        "toY": 6
+      },
+      {
+        "name": "Northern Villages and Hills",
+        "description": "A region with scattered forts, forests, hills, and cliffs, providing cover and strategic vantage points.",
+        "terrainTypes": [
           "Plain",
-          "Hill"
+          "Forest",
+          "Hill",
+          "Fort",
+          "Cliff"
         ],
         "fromX": 0,
         "fromY": 0,
-        "toX": 7,
+        "toX": 17,
         "toY": 4
       },
       {
         "name": "Southern Coastal Plains",
-        "description": "Open plains near the sea, with scattered forests and forts, suitable for rapid movement.",
+        "description": "Open plains and forests near the coast, offering open movement and limited cover. Contains houses and forts for strategic control.",
         "terrainTypes": [
           "Plain",
           "Forest",
-          "Fort",
           "Sea",
-          "Cliff"
+          "House",
+          "Fort"
         ],
         "fromX": 0,
         "fromY": 9,
-        "toX": 18,
+        "toX": 23,
         "toY": 12
       },
       {
-        "name": "Mountain Range",
-        "description": "A rugged mountainous area providing natural defense and limited mobility.",
+        "name": "Eastern Mountain Barrier",
+        "description": "Impassable mountains forming a natural barrier, restricting movement and providing strategic defensive positions.",
         "terrainTypes": [
-          "Mountain",
-          "Hill",
-          "Cliff"
+          "Mountain"
         ],
-        "fromX": 12,
+        "fromX": 18,
         "fromY": 0,
         "toX": 23,
-        "toY": 2
+        "toY": 1
       }
     ],
     "keyPointsOfInterest": [
       "Western Castle Gate at (2,7)",
-      "Central Bridges at (11,4) and (11,5)",
       "Eastern Fortress Gate at (19,4)",
-      "Southern House at (3,11) and (20,10)"
+      "Central Bridges at (11,4) and (11,5)",
+      "Forts at (6,2), (14,1), (9,5), (14,5), (23,4), (23,8), (2,10), (6,10), (10,5)",
+      "Houses at (3,11) and (20,10)"
     ],
     "chokePoints": [
       "Western Castle Gate at (2,7)",
-      "Central River Bridges at (11,4) and (11,5)",
-      "Eastern Fortress Gate at (19,4)"
+      "Eastern Fortress Gate at (19,4)",
+      "Central Bridges at (11,4) and (11,5)"
     ],
     "strategicConsiderations": [
-      "Control of the central bridges is crucial for mobility and reinforcement.",
+      "Control of the central bridges is crucial for mobility and map control.",
       "The Western Castle and Eastern Fortress provide strong defensive positions and should be prioritized for defense or assault.",
-      "The Southern Coastal Plains offer open terrain for cavalry and rapid troop movements but are vulnerable to ranged attacks from cliffs and forts.",
-      "The Mountain Range restricts movement and provides natural defensive barriers, ideal for positioning ranged units."
+      "The Northern Villages and Hills offer advantageous terrain for ranged units and ambushes.",
+      "Southern Coastal Plains allow for rapid movement but offer limited cover, making units vulnerable to ranged attacks.",
+      "The Eastern Mountain Barrier restricts movement, funneling units through limited paths and creating natural defensive positions."
     ],
-    "givenName": "River Crossing Battle",
+    "givenName": "River Crossing Clash",
     "originalName": "Nobles_Evil_Doers_3_(01_00_02_03)__by_Aura_Wolf",
-    "description": "A strategic map featuring a central river with a bridge, surrounded by castles and villages. The terrain includes forests and mountains, providing tactical advantages.",
+    "description": "A strategic map featuring a central river with bridges, surrounded by castles and villages. The terrain includes forests, mountains, and plains, offering diverse tactical opportunities.",
     "setting": "outdoor"
   },
   {
     "distinctRegions": [
       {
-        "name": "Northern Fortress",
-        "description": "A fortified area with walls and a gate, providing strong defensive positions and control over the northern part of the map.",
+        "name": "Northern Castle",
+        "description": "A heavily fortified castle with defensive walls and a gate, providing strong defensive positions.",
         "terrainTypes": [
           "Wall",
           "Gate",
           "Plain",
           "Forest",
-          "Fort"
+          "Cliff"
         ],
         "fromX": 10,
         "fromY": 0,
@@ -3519,117 +3557,145 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "toY": 2
       },
       {
-        "name": "Southern Fortress",
-        "description": "A fortified area at the southern end, mirroring the northern fortress, providing strategic defense and control.",
+        "name": "Western Fortress Town",
+        "description": "A fortified town featuring an armory, vendor, and houses, providing resources and defensive positions.",
         "terrainTypes": [
-          "Wall",
-          "Village",
           "Plain",
           "Forest",
-          "Fort"
+          "House",
+          "Vendor",
+          "Armory",
+          "Wall"
         ],
-        "fromX": 10,
-        "fromY": 12,
-        "toX": 12,
-        "toY": 14
+        "fromX": 0,
+        "fromY": 0,
+        "toX": 6,
+        "toY": 6
+      },
+      {
+        "name": "Eastern Fortress Town",
+        "description": "A fortified town with a fort and houses, strategically positioned near the sea.",
+        "terrainTypes": [
+          "Plain",
+          "Forest",
+          "Fort",
+          "House",
+          "Wall",
+          "Sea"
+        ],
+        "fromX": 8,
+        "fromY": 4,
+        "toX": 14,
+        "toY": 8
       },
       {
         "name": "Central Lake",
-        "description": "A large body of water creating a natural barrier, limiting movement and providing strategic chokepoints.",
+        "description": "A large body of water providing natural barriers and strategic chokepoints.",
         "terrainTypes": [
-          "Sea"
+          "Sea",
+          "Plain",
+          "Fort"
         ],
         "fromX": 9,
         "fromY": 6,
         "toX": 14,
-        "toY": 9
+        "toY": 10
       },
       {
-        "name": "Western Village",
-        "description": "A small village surrounded by walls, offering resources and shelter, strategically positioned on the western side.",
+        "name": "Southern Mountain Pass",
+        "description": "A mountainous area with hills and mountains, providing natural defensive positions and limited mobility.",
         "terrainTypes": [
-          "Village",
-          "Wall",
+          "Mountain",
+          "Hill",
           "Plain",
           "Forest"
         ],
-        "fromX": 1,
-        "fromY": 6,
+        "fromX": 0,
+        "fromY": 14,
+        "toX": 4,
+        "toY": 16
+      },
+      {
+        "name": "Northern Road",
+        "description": "A winding road connecting the northern castle to the central areas, providing mobility and strategic access.",
+        "terrainTypes": [
+          "Plain",
+          "Forest",
+          "Cliff"
+        ],
+        "fromX": 7,
+        "fromY": 0,
+        "toX": 9,
+        "toY": 5
+      },
+      {
+        "name": "Central Forest Path",
+        "description": "A forested area with paths leading through, providing cover and strategic ambush opportunities.",
+        "terrainTypes": [
+          "Forest",
+          "Plain"
+        ],
+        "fromX": 4,
+        "fromY": 7,
+        "toX": 8,
+        "toY": 12
+      },
+      {
+        "name": "Southern Village",
+        "description": "A small village located in the southern area, providing resources and strategic value.",
+        "terrainTypes": [
+          "Village",
+          "Plain",
+          "Wall"
+        ],
+        "fromX": 2,
+        "fromY": 8,
         "toX": 3,
         "toY": 8
       },
       {
-        "name": "Eastern Pathway",
-        "description": "A winding path connecting the northern and southern fortresses, passing by the central lake, crucial for mobility.",
+        "name": "Southeastern Village",
+        "description": "A village located in the southeastern corner, providing resources and strategic value.",
         "terrainTypes": [
+          "Village",
           "Plain",
-          "Forest",
-          "Fort"
+          "Wall"
         ],
-        "fromX": 7,
-        "fromY": 3,
-        "toX": 10,
-        "toY": 12
-      },
-      {
-        "name": "Mountain Range",
-        "description": "A small mountain range providing natural defense and limiting movement, located at the bottom left.",
-        "terrainTypes": [
-          "Mountain",
-          "Hill",
-          "Forest",
-          "Plain"
-        ],
-        "fromX": 0,
+        "fromX": 11,
         "fromY": 14,
-        "toX": 3,
-        "toY": 16
-      },
-      {
-        "name": "Northern Village Cluster",
-        "description": "A cluster of villages and houses providing resources, located at the top left, offering strategic value.",
-        "terrainTypes": [
-          "House",
-          "Vendor",
-          "Armory",
-          "Plain",
-          "Forest"
-        ],
-        "fromX": 0,
-        "fromY": 0,
-        "toX": 5,
-        "toY": 4
+        "toX": 12,
+        "toY": 14
       }
     ],
     "keyPointsOfInterest": [
-      "Northern Fortress Gate at (11,2)",
-      "Southern Fortress Village at (11,14)",
-      "Western Village at (2,8)",
-      "Armory at (3,4)",
-      "Vendor at (3,2)"
+      "Northern Castle Gate",
+      "Western Fortress Town Armory and Vendor",
+      "Eastern Fortress Town Fort",
+      "Central Lake Forts",
+      "Southern and Southeastern Villages"
     ],
     "chokePoints": [
-      "Gate at Northern Fortress (11,2)",
-      "Narrow paths around Central Lake",
-      "Walls surrounding Western Village"
+      "Northern Castle Gate",
+      "Central Lake area",
+      "Mountain Pass in the south"
     ],
     "strategicConsiderations": [
-      "Control of the fortresses is crucial for defense and offense.",
-      "The central lake significantly restricts movement, making control of surrounding paths vital.",
-      "The Western Village provides valuable resources and should be secured early.",
-      "Mountain Range offers defensive advantages but limits mobility, requiring careful positioning of units.",
-      "Northern Village Cluster provides early-game resources and should be contested quickly."
+      "Control of the Northern Castle provides a strong defensive position and access to the northern road.",
+      "Western and Eastern Fortress Towns offer resources and defensive positions, crucial for maintaining control of the map.",
+      "Central Lake area provides natural barriers and chokepoints, ideal for defensive strategies.",
+      "Southern Mountain Pass limits mobility, making it a strategic area for ambushes and defensive setups.",
+      "Villages provide resources and should be secured early to gain strategic advantages."
     ],
-    "givenName": "Twin Fortresses Pathway",
+    "givenName": "Twin Fortresses",
     "originalName": "Knights_Villagers_Bandits_12_(01_00_02_03)__by_Aura_Wolf",
-    "description": "A strategic outdoor map featuring two fortresses connected by a winding path, with a central lake and surrounding villages.",
+    "description": "A strategic map featuring two fortified towns, a central lake, and a northern castle, connected by winding roads and surrounded by forests and mountains.",
     "setting": "outdoor"
   },
   {
     "distinctRegions": [
       {
         "name": "Northern Chambers",
-        "description": "A series of enclosed rooms with narrow passages, pillars, and stairs, providing defensive positions and strategic mobility.",
+        "description": "A series of enclosed rooms and corridors with limited access points, providing defensive positions and strategic control.",
         "terrainTypes": [
           "Floor",
           "Wall",
@@ -3643,7 +3709,7 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
       },
       {
         "name": "Central Waterway",
-        "description": "A wide channel of water running horizontally through the center, creating natural barriers and chokepoints.",
+        "description": "A wide water channel running horizontally through the center of the map, acting as a natural barrier and strategic chokepoint.",
         "terrainTypes": [
           "Sea",
           "Lake",
@@ -3652,62 +3718,79 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         "fromX": 0,
         "fromY": 16,
         "toX": 31,
-        "toY": 19
-      },
-      {
-        "name": "Eastern Bridge",
-        "description": "A stone bridge crossing the waterway, connecting the northern and southern parts, crucial for mobility and control.",
-        "terrainTypes": [
-          "Bridge",
-          "Floor"
-        ],
-        "fromX": 15,
-        "fromY": 16,
-        "toX": 16,
         "toY": 17
       },
       {
-        "name": "Western Bridge",
-        "description": "A stone bridge crossing the waterway, connecting the northern and southern parts, crucial for mobility and control.",
-        "terrainTypes": [
-          "Bridge",
-          "Floor"
-        ],
-        "fromX": 15,
-        "fromY": 16,
-        "toX": 16,
-        "toY": 17
-      },
-      {
-        "name": "Southern Halls",
-        "description": "Open halls with access to the waterway and bridges, featuring pillars and stairs for strategic positioning.",
+        "name": "Southern Passage",
+        "description": "A narrow corridor running parallel to the central waterway, providing access to the lower sections and strategic mobility.",
         "terrainTypes": [
           "Floor",
           "Wall",
-          "Pillar",
-          "Stairs"
+          "Stairs",
+          "Pillar"
         ],
         "fromX": 0,
-        "fromY": 20,
+        "fromY": 18,
         "toX": 31,
         "toY": 25
+      },
+      {
+        "name": "Eastern Reservoir",
+        "description": "A large water-filled area with stone platforms, located at the far right of the map, providing limited access and defensive advantage.",
+        "terrainTypes": [
+          "Sea",
+          "Lake",
+          "Wall"
+        ],
+        "fromX": 25,
+        "fromY": 12,
+        "toX": 31,
+        "toY": 24
+      },
+      {
+        "name": "Western Alcoves",
+        "description": "Small, enclosed spaces with limited access, located at the far left of the map, ideal for defensive positioning and ambushes.",
+        "terrainTypes": [
+          "Floor",
+          "Wall",
+          "Pillar"
+        ],
+        "fromX": 0,
+        "fromY": 7,
+        "toX": 7,
+        "toY": 15
+      },
+      {
+        "name": "Central Courtyard",
+        "description": "Open area with scattered pillars and plain terrain, providing maneuverability and strategic positioning.",
+        "terrainTypes": [
+          "Floor",
+          "Plain",
+          "Pillar"
+        ],
+        "fromX": 8,
+        "fromY": 7,
+        "toX": 24,
+        "toY": 15
       }
     ],
     "keyPointsOfInterest": [
-      "Eastern Bridge at (15,16)-(16,17)",
-      "Western Bridge at (15,16)-(16,17)",
-      "Multiple staircases for reinforcements and mobility"
+      "Central Waterway bridges at (15,16) and (16,16)",
+      "Multiple staircases providing vertical mobility",
+      "Eastern Reservoir platforms",
+      "Western Alcoves for defensive positioning"
     ],
     "chokePoints": [
-      "Eastern Bridge",
-      "Western Bridge",
-      "Narrow passages in Northern Chambers"
+      "Bridges over the Central Waterway",
+      "Narrow corridors in the Northern Chambers",
+      "Entrances to the Eastern Reservoir"
     ],
     "strategicConsiderations": [
-      "Control of bridges is essential for mobility and map control.",
-      "Northern Chambers provide defensive positions but limited mobility.",
-      "Southern Halls offer open spaces for maneuvering but require careful positioning to avoid being flanked.",
-      "Utilize staircases for rapid deployment and reinforcement."
+      "Control of the Central Waterway bridges is crucial for mobility and defense.",
+      "Northern Chambers offer strong defensive positions but limited escape routes.",
+      "Eastern Reservoir provides defensive advantage but limited maneuverability.",
+      "Western Alcoves are ideal for ambushes and defensive setups.",
+      "Southern Passage allows for strategic flanking and quick access to other regions."
     ],
     "givenName": "Ancient Aqueduct",
     "originalName": "Nobles_Evil_Doers_8_(6C_00_A3_6E)__by_Aura_Wolf",

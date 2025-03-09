@@ -64,18 +64,26 @@ stop-vector-db:
 
 process-maps:
     rm -rf server/vector-db/seed-data/maps.json
+    rm -rf server/vector-db/data/maps.json
     just run server/map-processing/process-all-maps.ts
+    just start-vector-db
 
 process-portraits:
     rm -rf server/vector-db/seed-data/portraits-male.json
+    rm -rf server/vector-db/data/portraits-male.json
     rm -rf server/vector-db/seed-data/portraits-female.json
-    just start-vector-db
+    rm -rf server/vector-db/data/portraits-female.json
     just run server/portrait-processing/process-all-portraits.ts
+    just start-vector-db
 
 process-music:
     rm -rf server/vector-db/seed-data/music.json
+    rm -rf server/vector-db/data/music.json
     just run server/music-processing/process-all-music.ts
+    just start-vector-db
 
 process-items:
     rm -rf server/vector-db/seed-data/items.json
+    rm -rf server/vector-db/data/items.json
     just run server/item-processing/process-items.ts
+    just start-vector-db
