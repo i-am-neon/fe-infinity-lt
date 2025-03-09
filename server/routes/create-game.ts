@@ -1,7 +1,7 @@
 import chooseTopLevelMusic from "@/ai/choose-top-level-music.ts";
+import genChapter from "@/ai/gen-chapter.ts";
 import genInitialGameIdea from "@/ai/gen-initial-game-idea.ts";
 import genWorldSummary from "@/ai/gen-world-summary.ts";
-import { insertGame } from "@/db/games.ts";
 import initializeProject from "@/game-engine-io/initialize-project.ts";
 import writeChapter from "@/game-engine-io/write-chapter/write-chapter.ts";
 import writeStubChapter from "@/game-engine-io/write-chapter/write-stub-chapter.ts";
@@ -9,7 +9,7 @@ import { getCurrentLogger, setCurrentLogger } from "@/lib/current-logger.ts";
 import removeExistingGame from "@/lib/remove-existing-game.ts";
 import runGame from "@/run-game.ts";
 import { Game } from "@/types/game.ts";
-import genChapter from "@/ai/gen-chapter.ts";
+import { insertGame } from "../db/games.ts";
 
 // In-memory store for game creation errors
 const gameCreationErrors = new Map<string, string>();

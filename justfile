@@ -33,7 +33,7 @@ stop:
 clean:
     just stop
     find lt-maker-fork -maxdepth 1 -type d -name "*.ltproj" ! -name "default.ltproj" ! -name "testing_proj.ltproj" -exec rm -rf {} +
-    rm -f server/db/local.db
+    rm -f server/db/sqlite.db
     just clean-logs
     just clean-saves
 
@@ -49,15 +49,12 @@ run path:
 ###################
 # Vector DB
 ###################
-# Initialize PostgreSQL with pgvector extension installed and configured.
 start-vector-db:
-	brew install pgvector || true
-	brew services restart postgresql@14
 	just run server/vector-db/init.ts
 	just run server/vector-db/seed-vectors.ts
 
 stop-vector-db:
-    brew services stop postgresql@14
+	-pkill -f "vector-db"
 
 ###################
 # Asset Processing
@@ -66,18 +63,27 @@ stop-vector-db:
 # Make sure the vector db is running before processing assets!
 
 process-maps:
-    rm -rf server/vector-db/seed-vectors/maps.json
+    rm -rf server/vector-db/seed-data/maps.json
+    rm -rf server/vector-db/data/maps.json
     just run server/map-processing/process-all-maps.ts
+    just start-vector-db
 
 process-portraits:
-    rm -rf server/vector-db/seed-vectors/portraits.json
-    just start-vector-db
+    rm -rf server/vector-db/seed-data/portraits-male.json
+    rm -rf server/vector-db/data/portraits-male.json
+    rm -rf server/vector-db/seed-data/portraits-female.json
+    rm -rf server/vector-db/data/portraits-female.json
     just run server/portrait-processing/process-all-portraits.ts
+    just start-vector-db
 
 process-music:
-    rm -rf server/vector-db/seed-vectors/music.json
+    rm -rf server/vector-db/seed-data/music.json
+    rm -rf server/vector-db/data/music.json
     just run server/music-processing/process-all-music.ts
+    just start-vector-db
 
 process-items:
-    rm -rf server/vector-db/seed-vectors/items.json
+    rm -rf server/vector-db/seed-data/items.json
+    rm -rf server/vector-db/data/items.json
     just run server/item-processing/process-items.ts
+    just start-vector-db

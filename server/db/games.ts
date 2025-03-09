@@ -1,6 +1,6 @@
-import { db } from "@/db/connection.ts";
-import { initializeDatabase } from "@/db/init.ts";
 import { Game } from "@/types/game.ts";
+import { db } from "./connection.ts";
+import { initializeDatabase } from "./init.ts";
 
 /**
  * Insert a Game into the database.
@@ -44,7 +44,7 @@ export function insertGame(game: Game): void {
       usedPortraitsJson,
       worldSummaryJson,
       initialGameIdeaJson,
-        JSON.stringify(game.deadCharacters ?? []),
+      JSON.stringify(game.deadCharacters ?? []),
     ]
   );
 }
@@ -264,3 +264,4 @@ if (import.meta.main) {
   const retrieved = getGameByNid("example-game");
   console.log("Retrieved Game:", retrieved);
 }
+

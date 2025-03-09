@@ -1,10 +1,10 @@
-import createEmbedding from "@/vector-db/create-embedding.ts";
-import storeVector from "@/vector-db/store-vector.ts";
 import OpenAI from "openai";
-import { VectorType } from "@/vector-db/types/vector-type.ts";
+import createEmbedding from "./create-embedding.ts";
+import { VectorType } from "./types/vector-type.ts";
+import { generateId, storeVector } from "./vector-store.ts";
 
 export interface GenerateAndStoreVectorOptions {
-  id: string;
+  id?: string;
   text: string;
   metadata: Record<string, unknown>;
   vectorType: VectorType;
@@ -17,53 +17,30 @@ export default async function generateAndStoreVector({
   metadata,
   vectorType,
   model = "text-embedding-3-small",
-}: GenerateAndStoreVectorOptions): Promise<void> {
+}: GenerateAndStoreVectorOptions): Promise<string> {
+  // Generate embedding
   const embedding = await createEmbedding({ text, model });
-  await storeVector({ id, embedding, metadata, vectorType });
 
-  function getSeedFilePathByType(type: VectorType): string {
-    if (type === "maps") {
-      return new URL("./seed-vectors/maps.json", import.meta.url).pathname;
-    } else if (type === "portraits-male") {
-      return new URL("./seed-vectors/portraits-male.json", import.meta.url)
-        .pathname;
-    } else if (type === "portraits-female") {
-      return new URL("./seed-vectors/portraits-female.json", import.meta.url)
-        .pathname;
-    } else if (type === "items") {
-      return new URL("./seed-vectors/items.json", import.meta.url).pathname;
-    } else {
-      throw new Error("invalid vector type");
-    }
-  }
-  const seedFilePath = getSeedFilePathByType(vectorType);
-  let seedVectors: Array<{
-    id: string;
-    embedding: number[];
-    metadata: Record<string, unknown>;
-  }> = [];
-  try {
-    const data = await Deno.readTextFile(seedFilePath);
-    seedVectors = JSON.parse(data);
-  } catch (error) {
-    console.log(
-      `No seed vectors file found for ${vectorType}, creating a new one.`
-    );
-  }
-  seedVectors.push({ id, embedding, metadata });
-  await Deno.writeTextFile(seedFilePath, JSON.stringify(seedVectors, null, 2));
+  // Use provided ID or generate a new one
+  const vectorId = id || generateId();
+
+  // Store the vector
+  await storeVector({
+    id: vectorId,
+    embedding,
+    metadata,
+    vectorType,
+  });
+
+  return vectorId;
 }
 
 if (import.meta.main) {
-  const id = "sample-id";
-  const text = "Hello world. This is a sample text to embed.";
-  const metadata = { type: "demo" };
-  await generateAndStoreVector({
-    id,
-    text,
-    metadata,
-    vectorType: "portraits-male",
+  const id = await generateAndStoreVector({
+    text: "Hello world. This is a sample text to embed.",
+    metadata: { type: "demo" },
+    vectorType: "maps",
   });
-  console.log("Generated and stored embedding for sample-id.");
-}
 
+  console.log(`Generated and stored embedding with ID: ${id}`);
+}

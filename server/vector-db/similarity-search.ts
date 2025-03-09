@@ -1,87 +1,68 @@
-import pool from "@/vector-db/connection.ts";
-import { VectorType } from "@/vector-db/types/vector-type.ts";
-import createEmbedding from "@/vector-db/create-embedding.ts";
-import { adaptiveSimilaritySearch } from "@/vector-db/adapter.ts";
+import { getVectorStore } from "./init.ts";
+import { VectorType } from "./types/vector-type.ts";
+import { Vector } from "./vector-store.ts";
 
-export default async function similaritySearch({
-  searchQuery,
-  topK = 3,
-  vectorType,
-}: {
-  searchQuery: string;
-  topK: number;
-  vectorType: VectorType;
-}): Promise<
-  Array<{
-    id: string;
-    score: number;
-    metadata: Record<string, unknown> | null;
-  }>
-> {
-  // Use the adapter which will route to the appropriate implementation
-  return adaptiveSimilaritySearch({ searchQuery, topK, vectorType });
+export interface TypedSimilarityResult<T> {
+  id: string;
+  score: number;
+  metadata: T;
 }
 
-// This function is the original PostgreSQL implementation that's used when not in Electron
-export async function pgSimilaritySearch({
-  searchQuery,
-  topK = 3,
+export default async function similaritySearch<T = Record<string, unknown>>({
   vectorType,
+  query,
+  limit = 5,
+  transform,
 }: {
-  searchQuery: string;
-  topK: number;
   vectorType: VectorType;
-}): Promise<
-  Array<{
-    id: string;
-    score: number;
-    metadata: Record<string, unknown> | null;
-  }>
-> {
-  const client = await pool.connect();
-  try {
-    let tableName = "";
-    if (vectorType === "maps") {
-      tableName = "maps_vectors";
-    } else if (vectorType === "portraits-male") {
-      tableName = "portraits_male_vectors";
-    } else if (vectorType === "portraits-female") {
-      tableName = "portraits_female_vectors";
-    } else if (vectorType === "items") {
-      tableName = "items_vectors";
-    } else {
-      tableName = "music_vectors";
-    }
-    const embedding = await createEmbedding({ text: searchQuery });
+  query: string;
+  limit?: number;
+  transform?: (vector: Vector) => T;
+}): Promise<TypedSimilarityResult<T>[]> {
+  const vectorStore = await getVectorStore();
+  const results = await vectorStore.findSimilar(vectorType, query, limit);
 
-    const embeddingLiteral = "[" + embedding.join(",") + "]";
-    const query = `
-      SELECT
-        id,
-        1 - (embedding <#> $1::vector) AS score,
-        metadata
-      FROM ${tableName}
-      ORDER BY embedding <#> $1::vector
-      LIMIT $2;
-    `;
-    const result = await client.query(query, [embeddingLiteral, topK]);
-    return result.rows as Array<{
-      id: string;
-      score: number;
-      metadata: Record<string, unknown> | null;
-    }>;
-  } finally {
-    client.release();
-  }
+  return results.map((result) => ({
+    id: result.vector.id,
+    score: result.similarity,
+    metadata: transform
+      ? transform(result.vector)
+      : (result.vector.metadata as T),
+  }));
 }
 
 if (import.meta.main) {
-  // Example usage for maps
-  const res = await similaritySearch({
-    searchQuery: "Magic Necklace",
-    topK: 3,
-    vectorType: "items",
-  });
+  // Example usage
+  (async () => {
+    const vectorStore = await getVectorStore();
 
-  console.log("similarity search results:", res);
+    // Check if we have any vectors
+    const malePortraits = vectorStore.getVectors("portraits-male");
+    const femalePortraits = vectorStore.getVectors("portraits-female");
+    console.log(
+      `Available vectors: ${malePortraits.length} male portraits, ${femalePortraits.length} female portraits`
+    );
+
+    // Example query
+    const query = "young male with silver hair";
+    const results = await similaritySearch({
+      vectorType: "portraits-male",
+      query,
+      limit: 3,
+    });
+
+    console.log(`Search query: "${query}"`);
+    if (results.length === 0) {
+      console.log("No results found. Check if vectors are properly loaded.");
+    } else {
+      console.log(
+        "Search results:",
+        results.map((r) => ({
+          similarity: r.score.toFixed(4),
+          id: r.id,
+          metadata: r.metadata,
+        }))
+      );
+    }
+  })();
 }

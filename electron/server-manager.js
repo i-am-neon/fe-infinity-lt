@@ -33,7 +33,7 @@ const getServerEnv = () => {
     PGPASSWORD: 'password',
     PGDATABASE: 'postgres',
     // Path for SQLite database
-    DB_PATH: path.join(dataDir, 'local.db')
+    DB_PATH: path.join(dataDir, 'sqlite.db')
   };
 };
 

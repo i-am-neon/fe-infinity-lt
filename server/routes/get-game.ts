@@ -28,7 +28,7 @@ export async function handleGetGame(req: Request): Promise<Response> {
         }
       );
     }
-    
+
     // Check if there was an error during game creation
     const creationError = getGameCreationError(nid);
 
@@ -36,7 +36,7 @@ export async function handleGetGame(req: Request): Promise<Response> {
       JSON.stringify({
         success: true,
         game,
-        creationError
+        creationError,
       }),
       {
         headers: { "Content-Type": "application/json" },

@@ -1,5 +1,6 @@
 import { testPrologueChapter } from "@/ai/test-data/prologueTestData.ts";
 import { ChapterIdea } from "@/ai/types/chapter-idea.ts";
+import { MapMetadata } from "@/types/maps/map-metadata.ts";
 import similaritySearch from "@/vector-db/similarity-search.ts";
 import { z } from "zod";
 import generateStructuredData from "./lib/generate-structured-data.ts";
@@ -45,9 +46,9 @@ Given the user's Fire Emblem chapter idea, provide a brief single-line string (n
   });
 
   // 2) Run similarity search
-  const topResults = await similaritySearch({
-    searchQuery,
-    topK: 5,
+  const topResults = await similaritySearch<MapMetadata>({
+    query: searchQuery,
+    limit: 5,
     vectorType: "maps",
   });
   if (!topResults.length) {
