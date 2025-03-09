@@ -43,115 +43,94 @@ export default async function runGame(
     const ltMakerPath = getLtMakerPath();
     Deno.chdir(ltMakerPath);
 
-    // Determine the appropriate Python command and args based on platform and environment
+    // Determine the appropriate Python command and args based on platform
     let pythonCommand: string;
     let pythonArgs: string[];
-    let winePrefix: string | undefined;
 
     if (Deno.build.os === "windows") {
       // Windows - use native Python directly
       pythonCommand = "..\\bin\\python\\python.exe";
       pythonArgs = ["run_engine_for_project.py", normalizedProjectPath];
     } else {
-      // macOS/Linux - look for bundled Wine
-      const { resolve } = await import("@std/path");
-
-      // Try multiple possible Wine locations
-      const possibleWinePaths = [
-        resolve(ltMakerPath, "../electron/bin/wine/bin/wine"),
-        resolve(
-          ltMakerPath,
-          "../electron/bin/wine/Wine Stable.app/Contents/MacOS/wine"
-        ),
-        resolve(
-          ltMakerPath,
-          "../electron/bin/wine/Wine Stable.app/Contents/Resources/wine/bin/wine"
-        ),
-      ];
-
-      console.log("Checking for Wine in the following locations:");
-      possibleWinePaths.forEach((path) => console.log(` - ${path}`));
-
-      let bundledWinePath = null;
-
-      // Try each path in order
-      for (const winePath of possibleWinePaths) {
-        try {
-          await Deno.stat(winePath);
-          console.log(`Found Wine at: ${winePath}`);
-          bundledWinePath = winePath;
-          break;
-        } catch (e) {
-          console.log(`Wine not found at: ${winePath}`);
-        }
-      }
-
-      if (!bundledWinePath) {
-        // Bundled Wine not found - throw error
-        console.error(
-          `Bundled Wine not found in any of the expected locations`
+      // macOS/Linux - look for Wine in system locations
+      let systemWinePath = await findSystemWine();
+      if (!systemWinePath) {
+        throw new Error(
+          "Wine not found on your system. Please install Wine to run the game."
         );
-        throw new Error(`Cannot run game: Bundled Wine not found`);
       }
 
-      pythonCommand = bundledWinePath;
+      console.log(`Using system Wine at: ${systemWinePath}`);
+      pythonCommand = systemWinePath;
       pythonArgs = [
         "python",
         "run_engine_for_project.py",
         normalizedProjectPath,
       ];
-
-      // Set up Wine prefix - prefer custom prefix, fall back to default
-      const customWinePrefixPath = resolve(
-        ltMakerPath,
-        "../electron/bin/wine/prefix"
-      );
-      try {
-        // Only set WINEPREFIX if the directory exists
-        if (await Deno.stat(customWinePrefixPath).catch(() => null)) {
-          winePrefix = customWinePrefixPath;
-          console.log(`Using custom Wine prefix: ${winePrefix}`);
-        } else {
-          // Try Python wine prefix as fallback
-          const pythonWinePrefixPath = resolve(
-            ltMakerPath,
-            "../electron/bin/python/prefix"
-          );
-          if (await Deno.stat(pythonWinePrefixPath).catch(() => null)) {
-            winePrefix = pythonWinePrefixPath;
-            console.log(`Using Python Wine prefix: ${winePrefix}`);
-          } else {
-            console.log("Custom Wine prefix not found, using default");
-          }
-        }
-      } catch (error) {
-        console.log(`Error checking Wine prefix: ${(error as Error).message}`);
-      }
     }
 
     console.log(
       `Running game with command: ${pythonCommand} ${pythonArgs.join(" ")}`
     );
 
-    const env = {
-      ...Deno.env.toObject(),
-    };
-
-    // Only add WINEPREFIX to env if it's defined
-    if (winePrefix) {
-      env.WINEPREFIX = winePrefix;
-    }
-
     const runCommand = new Deno.Command(pythonCommand, {
       args: pythonArgs,
       stdout: "inherit",
       stderr: "inherit",
-      env,
     });
     await runCommand.output();
   } finally {
     Deno.chdir(originalDir);
   }
+}
+
+// Function to find Wine in system locations
+async function findSystemWine(): Promise<string | null> {
+  try {
+    // First try using 'which' to find Wine in PATH
+    const whichCommand = new Deno.Command("which", {
+      args: ["wine"],
+      stdout: "piped",
+      stderr: "piped",
+    });
+    const whichResult = await whichCommand.output();
+
+    if (whichResult.code === 0) {
+      const winePath = new TextDecoder().decode(whichResult.stdout).trim();
+      console.log(`Found Wine in PATH: ${winePath}`);
+      return winePath;
+    }
+  } catch (e) {
+    console.log("Error using 'which wine':", e);
+  }
+
+  // If 'which' fails, check common system locations
+  const commonLocations = [
+    // macOS homebrew and standard locations
+    "/opt/homebrew/bin/wine",
+    "/usr/local/bin/wine",
+    // Standard Linux locations
+    "/usr/bin/wine",
+    // macOS app bundles
+    "/Applications/Wine Stable.app/Contents/Resources/wine/bin/wine",
+    "/Applications/Wine Stable.app/Contents/MacOS/wine",
+  ];
+
+  for (const location of commonLocations) {
+    try {
+      const stat = await Deno.stat(location);
+      if (stat.isFile) {
+        console.log(`Found Wine at system location: ${location}`);
+        return location;
+      }
+    } catch {
+      // Location doesn't exist, continue to next
+    }
+  }
+
+  // No Wine found
+  console.error("No Wine installation found in system locations");
+  return null;
 }
 
 if (import.meta.main) {

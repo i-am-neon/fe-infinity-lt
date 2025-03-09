@@ -22,33 +22,26 @@ export default async function runPythonScript({
   const pythonCommand = isElectron
     ? Deno.build.os === "windows"
       ? "..\\bin\\python\\python.exe"
-      : "wine"
-    : "python3";
+      : await findSystemWine()
+    : Deno.build.os === "windows"
+      ? "python"
+      : "python3";
+      
+  if (!pythonCommand) {
+    throw new Error("Wine not found on your system. Please install Wine to run Python scripts.");
+  }
 
   // For Wine on macOS/Linux, we need to use different args
-  const extraArgs = isElectron && Deno.build.os !== "windows"
+  const extraArgs = isElectron && Deno.build.os !== "windows" && pythonCommand !== "python3"
     ? ["python"]
     : [];
 
   logger.debug("Using Python command", { pythonCommand, extraArgs, isElectron });
 
-  logger.debug("Using Python command", { pythonCommand, isElectron });
-
-  // Create absolute path for WINEPREFIX
-  const winePrefixRelative = "../electron/python/prefix";
-  const winePrefixAbsolute = isElectron && Deno.build.os !== "windows"
-    ? new URL(winePrefixRelative, `file://${Deno.cwd()}/`).pathname
-    : undefined;
-
-  logger.debug("Wine prefix path", { winePrefixAbsolute });
-
   const command = new Deno.Command(pythonCommand, {
     args: [...extraArgs, fullPath, ...args],
     stdout: "piped",
     stderr: "piped",
-    env: isElectron && Deno.build.os !== "windows"
-      ? { ...Deno.env.toObject(), "WINEPREFIX": winePrefixAbsolute }
-      : undefined,
   });
 
   const { stdout, stderr } = await command.output();
@@ -84,6 +77,55 @@ export default async function runPythonScript({
   }
 
   return { output, error: actualError };
+}
+
+// Function to find Wine in system locations
+async function findSystemWine(): Promise<string> {
+  try {
+    // First try using 'which' to find Wine in PATH
+    const whichCommand = new Deno.Command("which", {
+      args: ["wine"],
+      stdout: "piped",
+      stderr: "piped",
+    });
+    const whichResult = await whichCommand.output();
+    
+    if (whichResult.code === 0) {
+      const winePath = new TextDecoder().decode(whichResult.stdout).trim();
+      console.log(`Found Wine in PATH: ${winePath}`);
+      return winePath;
+    }
+  } catch (e) {
+    console.log("Error using 'which wine':", e);
+  }
+
+  // If 'which' fails, check common system locations
+  const commonLocations = [
+    // macOS homebrew and standard locations
+    "/opt/homebrew/bin/wine",
+    "/usr/local/bin/wine",
+    // Standard Linux locations
+    "/usr/bin/wine",
+    // macOS app bundles
+    "/Applications/Wine Stable.app/Contents/Resources/wine/bin/wine",
+    "/Applications/Wine Stable.app/Contents/MacOS/wine",
+  ];
+
+  for (const location of commonLocations) {
+    try {
+      const stat = await Deno.stat(location);
+      if (stat.isFile) {
+        console.log(`Found Wine at system location: ${location}`);
+        return location;
+      }
+    } catch {
+      // Location doesn't exist, continue to next
+    }
+  }
+
+  // No Wine found - return python3 as fallback for non-Electron environments
+  console.error("No Wine installation found in system locations");
+  return "python3";
 }
 
 if (import.meta.main) {
