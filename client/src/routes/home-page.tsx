@@ -34,6 +34,7 @@ export default function HomePage() {
   // Test function states
   const [testingMockGame, setTestingMockGame] = useState(false);
   const [testingSimilarity, setTestingSimilarity] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [testResults, setTestResults] = useState<any>(null);
   const [showTestResults, setShowTestResults] = useState(false);
 
@@ -105,7 +106,7 @@ export default function HomePage() {
     try {
       const res = await apiCall<{
         success: boolean;
-        game?: any;
+        game?: unknown;
         error?: string;
         message?: string;
       }>("add-mock-game", {
@@ -132,7 +133,7 @@ export default function HomePage() {
     try {
       const res = await apiCall<{
         success: boolean;
-        results?: any[];
+        results?: unknown[];
         error?: string;
       }>("test-similarity-search");
 
@@ -292,3 +293,4 @@ export default function HomePage() {
     </div>
   );
 }
+
