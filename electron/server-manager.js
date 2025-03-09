@@ -1,11 +1,10 @@
-const { spawn } = require('child_process');
-const path = require('path');
 const fs = require('fs');
+const path = require('path');
+const { spawn } = require('child_process');
 const { app } = require('electron');
 const logger = require('./logger');
 
 let denoProcess = null;
-let pgProcess = null;
 let serverReady = false;
 
 // Get user data directory for storing databases
@@ -26,123 +25,9 @@ const getServerEnv = () => {
 
   return {
     ...process.env,
-    // PostgreSQL connection details (for embedded PostgreSQL)
-    PGHOST: 'localhost',
-    PGPORT: '5432',
-    PGUSER: 'postgres',
-    PGPASSWORD: 'password',
-    PGDATABASE: 'postgres',
     // Path for SQLite database
     DB_PATH: path.join(dataDir, 'sqlite.db')
   };
-};
-
-// Start the embedded PostgreSQL server
-const startPostgres = () => {
-  return new Promise((resolve, reject) => {
-    const dataDir = getDataDir();
-    const pgDataDir = path.join(dataDir, 'pgdata');
-
-    // Check if bundled binaries exist
-    const initdbPath = path.join(__dirname, 'bin', process.platform === 'win32' ? 'initdb.exe' : 'initdb');
-    if (!fs.existsSync(initdbPath)) {
-      const errorMsg = `Bundled PostgreSQL binaries not found at: ${initdbPath}. Please run download-binaries.js first.`;
-      logger.log('error', errorMsg);
-      console.error(errorMsg);
-      reject(new Error(errorMsg));
-      return;
-    }
-
-    // Create PostgreSQL data directory if it doesn't exist
-    if (!fs.existsSync(pgDataDir)) {
-      fs.mkdirSync(pgDataDir, { recursive: true });
-
-      // Initialize PostgreSQL database using bundled initdb
-      logger.log('info', `Initializing PostgreSQL database using bundled binary: ${initdbPath}`);
-      const pgInitProcess = spawn(
-        initdbPath,
-        ['-D', pgDataDir, '-U', 'postgres', '--auth=trust'],
-        { env: process.env }
-      );
-
-      pgInitProcess.stdout.on('data', (data) => {
-        logger.log('info', `PostgreSQL initdb: ${data}`);
-      });
-
-      pgInitProcess.stderr.on('data', (data) => {
-        logger.log('warn', `PostgreSQL initdb warning: ${data}`);
-      });
-
-      pgInitProcess.on('close', (code) => {
-        if (code !== 0) {
-          const errorMsg = 'Failed to initialize PostgreSQL database with bundled binary';
-          logger.log('error', errorMsg);
-          console.error(errorMsg);
-          reject(new Error(errorMsg));
-          return;
-        }
-
-        startPostgresServer(pgDataDir, resolve, reject);
-      });
-    } else {
-      startPostgresServer(pgDataDir, resolve, reject);
-    }
-  });
-};
-
-// Start the PostgreSQL server process
-const startPostgresServer = (pgDataDir, resolve, reject) => {
-  // Always use bundled postgres binary
-  const postgresBinPath = path.join(__dirname, 'bin', process.platform === 'win32' ? 'postgres.exe' : 'postgres');
-
-  // Check if bundled postgres binary exists
-  if (!fs.existsSync(postgresBinPath)) {
-    const errorMsg = `Bundled PostgreSQL server binary not found at: ${postgresBinPath}. Please run download-binaries.js first.`;
-    logger.log('error', errorMsg);
-    console.error(errorMsg);
-    reject(new Error(errorMsg));
-    return;
-  }
-
-  logger.log('info', `Starting PostgreSQL server using bundled binary: ${postgresBinPath}`);
-  pgProcess = spawn(
-    postgresBinPath,
-    ['-D', pgDataDir],
-    { env: process.env }
-  );
-
-  pgProcess.stdout.on('data', (data) => {
-    const output = data.toString();
-    logger.log('info', `PostgreSQL: ${output}`);
-    console.log(`PostgreSQL: ${output}`);
-    if (output.includes('database system is ready to accept connections')) {
-      logger.log('info', 'PostgreSQL server is ready');
-      console.log('PostgreSQL server is ready');
-      resolve();
-    }
-  });
-
-  pgProcess.stderr.on('data', (data) => {
-    const error = data.toString();
-    logger.log('warn', `PostgreSQL error: ${error}`);
-    console.error(`PostgreSQL error: ${error}`);
-    // Still continue even with some errors as PostgreSQL might output warnings
-  });
-
-  pgProcess.on('error', (err) => {
-    const errorMsg = `Failed to start PostgreSQL server with bundled binary: ${err.message}`;
-    logger.log('error', errorMsg, { error: err });
-    console.error(errorMsg);
-    reject(err);
-  });
-
-  // Set timeout in case PostgreSQL doesn't start properly
-  setTimeout(() => {
-    if (pgProcess) {
-      logger.log('info', 'PostgreSQL server startup timeout reached, assuming it is running');
-      resolve(); // Assume it's running after timeout
-    }
-  }, 5000);
 };
 
 // Start the Deno server
@@ -531,7 +416,7 @@ const seedVectorDb = async () => {
 
 // Function to get Wine path from local system
 function getWinePath() {
-  if (isWindows) {
+  if (process.platform === 'win32') {
     return null;
   }
 
@@ -567,7 +452,7 @@ function getWinePath() {
       if (process.platform === 'linux') {
         const commonLinuxPaths = [
           '/usr/bin/wine',
-          '/usr/local/bin/wine'
+          '/usr/local/wine'
         ];
 
         for (const linuxPath of commonLinuxPaths) {
@@ -590,6 +475,7 @@ function getWinePath() {
 
 // Setup Python with Wine (for macOS and Linux)
 async function setupPythonWithWine() {
+  const isWindows = process.platform === 'win32';
   if (isWindows) {
     return; // Not needed on Windows
   }
@@ -674,6 +560,40 @@ print("Installation complete!")
   }
 }
 
+// Helper to execute commands with output capture option
+async function execCommand(command, args, options = {}) {
+  return new Promise((resolve, reject) => {
+    const captureOutput = options.capture === true;
+    const childProcess = spawn(command, args, {
+      ...options,
+      stdio: captureOutput ? ['ignore', 'pipe', 'pipe'] : undefined
+    });
+
+    let stdout = '';
+    let stderr = '';
+
+    if (captureOutput) {
+      childProcess.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+
+      childProcess.stderr.on('data', (data) => {
+        stderr += data.toString();
+      });
+    }
+
+    childProcess.on('close', (code) => {
+      if (code === 0) {
+        resolve(captureOutput ? { stdout, stderr } : undefined);
+      } else {
+        reject(new Error(`Command exited with code ${code}`));
+      }
+    });
+
+    childProcess.on('error', reject);
+  });
+}
+
 // Start all required services
 const startServer = async () => {
   try {
@@ -689,24 +609,6 @@ const startServer = async () => {
       logger.log('error', errorMsg);
       console.error(errorMsg);
       throw new Error(errorMsg);
-    }
-
-    // Start PostgreSQL using bundled binaries only
-    try {
-      // Check for bundled PostgreSQL binary before attempting to start
-      const postgresBinPath = path.join(__dirname, 'bin', process.platform === 'win32' ? 'postgres.exe' : 'postgres');
-      if (!fs.existsSync(postgresBinPath)) {
-        logger.log('warn', `Bundled PostgreSQL binary not found at: ${postgresBinPath}, skipping PostgreSQL startup`);
-        console.warn(`Bundled PostgreSQL binary not found at: ${postgresBinPath}, skipping PostgreSQL startup`);
-      } else {
-        logger.log('info', 'Starting PostgreSQL using bundled binary...');
-        await startPostgres();
-        logger.log('info', 'PostgreSQL started successfully with bundled binary');
-      }
-    } catch (err) {
-      logger.log('warn', 'PostgreSQL startup failed using bundled binary, continuing anyway', { error: err.message });
-      console.warn('PostgreSQL startup failed using bundled binary, continuing anyway:', err);
-      // Continue even if PostgreSQL fails - our adapter can handle it
     }
 
     // Start Deno server, which will initialize everything else
@@ -772,13 +674,6 @@ const stopServer = () => {
     console.log('Stopping Deno server...');
     denoProcess.kill();
     denoProcess = null;
-  }
-
-  if (pgProcess) {
-    logger.log('info', 'Stopping PostgreSQL server...');
-    console.log('Stopping PostgreSQL server...');
-    pgProcess.kill();
-    pgProcess = null;
   }
 
   serverReady = false;
