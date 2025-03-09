@@ -1,7 +1,7 @@
 import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
 import { ensureDir } from "jsr:@std/fs";
-import { VectorStore } from "./vector-store.ts";
 import { VectorType } from "./types/vector-type.ts";
+import { VectorStore } from "./vector-store.ts";
 
 const DATA_DIR = getPathWithinServer("/vector-db/data");
 const SUPPORTED_VECTOR_TYPES: VectorType[] = [
@@ -14,7 +14,9 @@ const SUPPORTED_VECTOR_TYPES: VectorType[] = [
 
 let vectorStore: VectorStore | null = null;
 
-export async function initializeVectorDb(clearExisting = false): Promise<VectorStore> {
+export async function initializeVectorDb(
+  clearExisting = false
+): Promise<VectorStore> {
   // Check for command line arguments
   if (Deno.args.includes("--clear")) {
     clearExisting = true;
@@ -30,7 +32,7 @@ export async function initializeVectorDb(clearExisting = false): Promise<VectorS
   // Log the count of vectors for each type
   for (const vectorType of SUPPORTED_VECTOR_TYPES) {
     const vectors = vectorStore.getVectors(vectorType);
-    console.log(`Loaded ${vectors.length} vectors for ${vectorType}`);
+    // console.log(`Loaded ${vectors.length} vectors for ${vectorType}`);
   }
 
   console.log("Vector database initialized");
