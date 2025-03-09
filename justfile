@@ -53,6 +53,9 @@ start-vector-db:
 	just run server/vector-db/init.ts
 	just run server/vector-db/seed-vectors.ts
 
+stop-vector-db:
+	-pkill -f "vector-db"
+
 ###################
 # Asset Processing
 ###################
@@ -60,18 +63,19 @@ start-vector-db:
 # Make sure the vector db is running before processing assets!
 
 process-maps:
-    rm -rf server/vector-db/seed-vectors/maps.json
+    rm -rf server/vector-db/seed-data/maps.json
     just run server/map-processing/process-all-maps.ts
 
 process-portraits:
-    rm -rf server/vector-db/seed-vectors/portraits.json
+    rm -rf server/vector-db/seed-data/portraits-male.json
+    rm -rf server/vector-db/seed-data/portraits-female.json
     just start-vector-db
     just run server/portrait-processing/process-all-portraits.ts
 
 process-music:
-    rm -rf server/vector-db/seed-vectors/music.json
+    rm -rf server/vector-db/seed-data/music.json
     just run server/music-processing/process-all-music.ts
 
 process-items:
-    rm -rf server/vector-db/seed-vectors/items.json
+    rm -rf server/vector-db/seed-data/items.json
     just run server/item-processing/process-items.ts

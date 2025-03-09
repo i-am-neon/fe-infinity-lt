@@ -1,40 +1,47 @@
-import createEmbedding from "./create-embedding.ts";
-import { SimilarityResult, VectorType } from "./types/vector-type.ts";
-import {
-  initVectorStore,
-  similaritySearch as performSimilaritySearch,
-} from "./vector-store.ts";
+import { getVectorStore } from "./init.ts";
+import { VectorType } from "./types/vector-type.ts";
 
 export default async function similaritySearch({
-  searchQuery,
-  topK = 3,
   vectorType,
+  query,
+  limit = 5,
 }: {
-  searchQuery: string;
-  topK: number;
   vectorType: VectorType;
-}): Promise<SimilarityResult[]> {
-  // Reload vectors to ensure we have the latest data
-  await initVectorStore();
-
-  // Generate embedding for the search query
-  const queryEmbedding = await createEmbedding({ text: searchQuery });
-
-  // Perform similarity search
-  return performSimilaritySearch({
-    queryEmbedding,
-    topK,
-    vectorType,
-  });
+  query: string;
+  limit?: number;
+}): Promise<Array<{ vector: any; similarity: number }>> {
+  const vectorStore = await getVectorStore();
+  const results = await vectorStore.findSimilar(vectorType, query, limit);
+  return results;
 }
 
 if (import.meta.main) {
   // Example usage
-  const results = await similaritySearch({
-    searchQuery: "blonde girl",
-    topK: 3,
-    vectorType: "portraits-female",
-  });
-
-  console.log("Search results:", results);
+  (async () => {
+    const vectorStore = await getVectorStore();
+    
+    // Check if we have any vectors
+    const malePortraits = vectorStore.getVectors("portraits-male");
+    const femalePortraits = vectorStore.getVectors("portraits-female");
+    console.log(`Available vectors: ${malePortraits.length} male portraits, ${femalePortraits.length} female portraits`);
+    
+    // Example query
+    const query = "young male with silver hair";
+    const results = await similaritySearch({
+      vectorType: "portraits-male",
+      query,
+      limit: 3,
+    });
+    
+    console.log(`Search query: "${query}"`);
+    if (results.length === 0) {
+      console.log("No results found. Check if vectors are properly loaded.");
+    } else {
+      console.log("Search results:", results.map(r => ({
+        similarity: r.similarity.toFixed(4),
+        id: r.vector.id,
+        metadata: r.vector.metadata
+      })));
+    }
+  })();
 }

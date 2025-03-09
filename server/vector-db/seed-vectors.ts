@@ -2,9 +2,11 @@ import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
 import { ensureDir } from "@std/fs";
 import { Vector, VectorType } from "./types/vector-type.ts";
 import { clearVectors, storeVector } from "./vector-store.ts";
+import { getVectorStore } from "./init.ts";
 
 export async function seedVectors(
-  seedFiles?: Record<VectorType, string>
+  seedFiles?: Record<VectorType, string>,
+  clearExisting = false
 ): Promise<void> {
   // Default seed files paths if not provided
   const defaultSeedFiles: Record<VectorType, string> = {
@@ -22,7 +24,7 @@ export async function seedVectors(
   const filesToSeed = seedFiles || defaultSeedFiles;
 
   for (const [vectorType, filePath] of Object.entries(filesToSeed)) {
-    await seedVectorsFromFile(vectorType as VectorType, filePath);
+    await seedVectorsFromFile(vectorType as VectorType, filePath, clearExisting);
   }
 
   console.log("Vector seeding complete");
@@ -30,13 +32,20 @@ export async function seedVectors(
 
 async function seedVectorsFromFile(
   vectorType: VectorType,
-  filePath: string
+  filePath: string,
+  clearExisting = false
 ): Promise<void> {
   console.log(`Seeding ${vectorType} vectors from ${filePath}...`);
 
   try {
-    // Clear existing vectors
-    await clearVectors(vectorType);
+    // Get current vector store
+    const vectorStore = await getVectorStore();
+    const existingVectors = vectorStore.getVectors(vectorType);
+    
+    // Clear existing vectors only if requested
+    if (clearExisting) {
+      await clearVectors(vectorType);
+    }
 
     // Read seed file
     let vectors: Vector[] = [];
@@ -88,48 +97,26 @@ async function seedVectorsFromFile(
       }
     }
 
-    // If we have data files but no seed files, copy them
-    if (vectors.length === 0) {
-      const dataFilePath = getPathWithinServer(
-        `/vector-db/data/${
-          vectorType === "maps"
-            ? "maps"
-            : vectorType === "portraits-male"
-            ? "portraits-male"
-            : vectorType === "portraits-female"
-            ? "portraits-female"
-            : vectorType === "items"
-            ? "items"
-            : "music"
-        }.json`
-      );
-
-      try {
-        const dataContent = await Deno.readTextFile(dataFilePath);
-        const dataVectors = JSON.parse(dataContent) as Vector[];
-        if (dataVectors.length > 0) {
-          console.log(
-            `Found ${dataVectors.length} vectors in data file, copying to seed file`
-          );
-          vectors = dataVectors;
-          await Deno.writeTextFile(filePath, JSON.stringify(vectors, null, 2));
-        }
-      } catch (dataErr) {
-        // Ignore if data file doesn't exist either
-      }
-    }
-
-    // Store each vector
+    // Store each vector (skip if it already exists)
+    let addedCount = 0;
+    const existingIds = new Set(existingVectors.map(v => v.id));
+    
     for (const vector of vectors) {
+      if (!clearExisting && existingIds.has(vector.id)) {
+        // Skip existing vector
+        continue;
+      }
+      
       await storeVector({
         id: vector.id,
         embedding: vector.embedding,
         metadata: vector.metadata,
         vectorType,
       });
+      addedCount++;
     }
 
-    console.log(`Seeded ${vectors.length} vectors for ${vectorType}`);
+    console.log(`Seeded ${addedCount} vectors for ${vectorType}`);
   } catch (error) {
     console.error(`Error seeding vectors for ${vectorType}:`, error);
     console.log(`Skipping ${vectorType} vectors seeding`);
@@ -139,4 +126,3 @@ async function seedVectorsFromFile(
 if (import.meta.main) {
   await seedVectors();
 }
-

@@ -1,106 +1,188 @@
-import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
-import shortUuid from "@/lib/short-uuid.ts";
-import { ensureDir } from "@std/fs";
-import { SimilarityResult, Vector, VectorType } from "./types/vector-type.ts";
+import createEmbedding from "@/vector-db/create-embedding.ts";
+import { ensureDir } from "jsr:@std/fs";
+import { join } from "jsr:@std/path";
+import { VectorType } from "./types/vector-type.ts";
+import { getVectorStore } from "./init.ts";
 
-// Constants
-const VECTOR_DATA_DIR = getPathWithinServer("vector-db/data");
-const VECTOR_FILE_MAP: Record<VectorType, string> = {
-  maps: `${VECTOR_DATA_DIR}/maps.json`,
-  "portraits-male": `${VECTOR_DATA_DIR}/portraits-male.json`,
-  "portraits-female": `${VECTOR_DATA_DIR}/portraits-female.json`,
-  music: `${VECTOR_DATA_DIR}/music.json`,
-  items: `${VECTOR_DATA_DIR}/items.json`,
+export type Vector = {
+  id: string;
+  embedding: number[];
+  text: string;
+  metadata: Record<string, unknown>;
 };
 
-// In-memory vector storage
-const vectorStore: Record<VectorType, Vector[]> = {
-  maps: [],
-  "portraits-male": [],
-  "portraits-female": [],
-  music: [],
-  items: [],
-};
+export class VectorStore {
+  private dataDir: string;
+  vectors: Record<VectorType, Vector[]> = {
+    maps: [],
+    "portraits-male": [],
+    "portraits-female": [],
+    music: [],
+    items: [],
+  };
 
-// Initialize the vector store
-export async function initVectorStore(): Promise<void> {
-  // Ensure the data directory exists
-  await ensureDir(VECTOR_DATA_DIR);
-
-  // Load all vector types
-  await Promise.all(
-    Object.entries(VECTOR_FILE_MAP).map(async ([type, filePath]) => {
-      await loadVectorsFromFile(type as VectorType);
-    })
-  );
-
-  console.log("Vector store initialized");
-}
-
-// Load vectors from file
-async function loadVectorsFromFile(vectorType: VectorType): Promise<void> {
-  const filePath = VECTOR_FILE_MAP[vectorType];
-  try {
-    const fileContent = await Deno.readTextFile(filePath);
-    vectorStore[vectorType] = JSON.parse(fileContent);
-    console.log(
-      `Loaded ${vectorStore[vectorType].length} vectors for ${vectorType}`
-    );
-  } catch (error) {
-    if (!(error instanceof Deno.errors.NotFound)) {
-      console.error(`Error loading vectors for ${vectorType}:`, error);
-    }
-    // Initialize as empty array if file doesn't exist
-    vectorStore[vectorType] = [];
-    // Create the file
-    await Deno.writeTextFile(filePath, JSON.stringify([], null, 2));
-    console.log(`Created empty vector store for ${vectorType}`);
+  constructor(dataDir: string) {
+    this.dataDir = dataDir;
   }
-}
 
-// Save vectors to file
-async function saveVectorsToFile(vectorType: VectorType): Promise<void> {
-  const filePath = VECTOR_FILE_MAP[vectorType];
-  try {
-    // Save to data directory
+  /**
+   * Initializes the vector store by loading all vectors from disk.
+   * @param clearExisting Whether to clear existing vectors in memory before loading (default: true)
+   */
+  async initialize(clearExisting = true): Promise<void> {
+    // Ensure the data directory exists
+    await ensureDir(this.dataDir);
+
+    // Only clear if specified
+    if (clearExisting) {
+      // Reset vectors
+      this.vectors = {
+        maps: [],
+        "portraits-male": [],
+        "portraits-female": [],
+        music: [],
+        items: [],
+      };
+    }
+
+    // Load all vectors from disk
+    await this.loadVectors("maps");
+    await this.loadVectors("portraits-male");
+    await this.loadVectors("portraits-female");
+    await this.loadVectors("music");
+    await this.loadVectors("items");
+  }
+
+  /**
+   * Loads vectors from disk for the given vector type.
+   */
+  private async loadVectors(vectorType: VectorType): Promise<void> {
+    try {
+      const filePath = join(this.dataDir, `${vectorType}.json`);
+      const text = await Deno.readTextFile(filePath);
+      const existingVectors = JSON.parse(text) as Vector[];
+
+      // Only add vectors that don't already exist (based on id)
+      const existingIds = new Set(this.vectors[vectorType].map((v) => v.id));
+      for (const vector of existingVectors) {
+        if (!existingIds.has(vector.id)) {
+          this.vectors[vectorType].push(vector);
+        }
+      }
+    } catch (error) {
+      if (!(error instanceof Deno.errors.NotFound)) {
+        console.error(`Error loading vectors for ${vectorType}:`, error);
+      }
+      // If the file doesn't exist, we'll just have an empty array
+    }
+  }
+
+  /**
+   * Saves all vectors to disk for the given vector type.
+   */
+  async saveVectors(vectorType: VectorType): Promise<void> {
+    const filePath = join(this.dataDir, `${vectorType}.json`);
     await Deno.writeTextFile(
       filePath,
-      JSON.stringify(vectorStore[vectorType], null, 2)
+      JSON.stringify(this.vectors[vectorType], null, 2)
     );
+  }
 
-    // Also save to seed-data directory for persistence
-    const seedFilePath = getPathWithinServer(
-      `/vector-db/seed-data/${
-        vectorType === "maps"
-          ? "maps"
-          : vectorType === "portraits-male"
-          ? "portraits-male"
-          : vectorType === "portraits-female"
-          ? "portraits-female"
-          : vectorType === "items"
-          ? "items"
-          : "music"
-      }.json`
-    );
+  /**
+   * Clears all vectors for the given vector type.
+   */
+  async clearVectors(vectorType: VectorType): Promise<void> {
+    this.vectors[vectorType] = [];
+    await this.saveVectors(vectorType);
+  }
 
-    // Ensure seed-data directory exists
-    await ensureDir(getPathWithinServer("vector-db/seed-data"));
+  /**
+   * Returns all vectors for the given vector type.
+   */
+  getVectors(vectorType: VectorType): Vector[] {
+    return this.vectors[vectorType];
+  }
 
-    // Write to seed file
-    await Deno.writeTextFile(
-      seedFilePath,
-      JSON.stringify(vectorStore[vectorType], null, 2)
-    );
+  /**
+   * Adds a vector to the store and saves it to disk.
+   */
+  async addVector(
+    vectorType: VectorType,
+    id: string,
+    embedding: number[],
+    text: string,
+    metadata: Record<string, unknown>
+  ): Promise<void> {
+    // Add the vector to memory
+    this.vectors[vectorType].push({
+      id,
+      embedding,
+      text,
+      metadata,
+    });
 
-    console.log(
-      `Saved ${vectorStore[vectorType].length} vectors for ${vectorType} to data and seed files`
-    );
-  } catch (error) {
-    console.error(`Error saving vectors for ${vectorType}:`, error);
+    // Save to disk
+    await this.saveVectors(vectorType);
+  }
+
+  /**
+   * Calculates the cosine similarity between two vectors.
+   */
+  private cosineSimilarity(a: number[], b: number[]): number {
+    let dotProduct = 0;
+    let normA = 0;
+    let normB = 0;
+    for (let i = 0; i < a.length; i++) {
+      dotProduct += a[i] * b[i];
+      normA += a[i] * a[i];
+      normB += b[i] * b[i];
+    }
+    return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
+  }
+
+  /**
+   * Find the most similar vectors to the given query.
+   */
+  async findSimilar(
+    vectorType: VectorType,
+    query: string,
+    limit = 5
+  ): Promise<Array<{ vector: Vector; similarity: number }>> {
+    // Generate an embedding for the query
+    const embedding = await createEmbedding({ text: query });
+
+    // Calculate similarity for each vector
+    const similarities = this.vectors[vectorType].map((vector) => ({
+      vector,
+      similarity: this.cosineSimilarity(embedding, vector.embedding),
+    }));
+
+    // Sort by similarity (descending)
+    similarities.sort((a, b) => b.similarity - a.similarity);
+
+    // Return the top results
+    return similarities.slice(0, limit);
   }
 }
 
-// Store a vector
+/**
+ * Generates a unique ID for a vector.
+ */
+export function generateId(): string {
+  return crypto.randomUUID();
+}
+
+/**
+ * Clears all vectors for the given vector type.
+ */
+export async function clearVectors(vectorType: VectorType): Promise<void> {
+  const vectorStore = await getVectorStore();
+  await vectorStore.clearVectors(vectorType);
+}
+
+/**
+ * Stores a vector in the vector store.
+ */
 export async function storeVector({
   id,
   embedding,
@@ -112,105 +194,6 @@ export async function storeVector({
   metadata: Record<string, unknown>;
   vectorType: VectorType;
 }): Promise<void> {
-  // Check if vector with this ID already exists
-  const existingIndex = vectorStore[vectorType].findIndex((v) => v.id === id);
-
-  if (existingIndex >= 0) {
-    // Update existing vector
-    vectorStore[vectorType][existingIndex] = { id, embedding, metadata };
-  } else {
-    // Add new vector
-    vectorStore[vectorType].push({ id, embedding, metadata });
-  }
-
-  // Save to both data and seed files
-  await saveVectorsToFile(vectorType);
-}
-
-// Calculate cosine similarity
-function cosineSimilarity(vecA: number[], vecB: number[]): number {
-  if (vecA.length !== vecB.length) {
-    throw new Error("Vectors must have the same length");
-  }
-
-  let dotProduct = 0;
-  let normA = 0;
-  let normB = 0;
-
-  for (let i = 0; i < vecA.length; i++) {
-    dotProduct += vecA[i] * vecB[i];
-    normA += vecA[i] * vecA[i];
-    normB += vecB[i] * vecB[i];
-  }
-
-  normA = Math.sqrt(normA);
-  normB = Math.sqrt(normB);
-
-  if (normA === 0 || normB === 0) {
-    return 0;
-  }
-
-  return dotProduct / (normA * normB);
-}
-
-// Perform similarity search
-export async function similaritySearch({
-  queryEmbedding,
-  topK = 3,
-  vectorType,
-}: {
-  queryEmbedding: number[];
-  topK: number;
-  vectorType: VectorType;
-}): Promise<SimilarityResult[]> {
-  // Get vectors for this type
-  const vectors = vectorStore[vectorType];
-
-  // Calculate similarity scores
-  const results = vectors.map((vector) => {
-    const similarity = cosineSimilarity(queryEmbedding, vector.embedding);
-    return {
-      id: vector.id,
-      score: similarity,
-      metadata: vector.metadata,
-    };
-  });
-
-  // Sort by similarity (highest first) and take top K
-  return results.sort((a, b) => b.score - a.score).slice(0, topK);
-}
-
-// Generate a unique ID
-export function generateId(): string {
-  return shortUuid();
-}
-
-// Clear all vectors for a type
-export async function clearVectors(vectorType: VectorType): Promise<void> {
-  vectorStore[vectorType] = [];
-  await saveVectorsToFile(vectorType);
-}
-
-// Get all vectors for a type
-export function getAllVectors(vectorType: VectorType): Vector[] {
-  return [...vectorStore[vectorType]];
-}
-
-if (import.meta.main) {
-  await initVectorStore();
-  console.log("Vector store initialized");
-
-  // Example: Store a vector
-  const sampleVector = {
-    id: generateId(),
-    embedding: new Array(1536).fill(0).map(() => Math.random() * 2 - 1),
-    metadata: { name: "Test vector", description: "A test vector" },
-  };
-
-  await storeVector({
-    ...sampleVector,
-    vectorType: "maps",
-  });
-
-  console.log("Vector stored successfully");
+  const vectorStore = await getVectorStore();
+  await vectorStore.addVector(vectorType, id, embedding, "", metadata);
 }
