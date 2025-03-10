@@ -48,6 +48,71 @@ function isSystemPythonAvailable() {
   }
 }
 
+// Check if required Python packages are installed and install them if not
+async function ensurePythonDependencies() {
+  if (process.platform !== 'darwin') {
+    logger.log('info', 'Skipping Python dependency check on non-macOS platform');
+    return true;
+  }
+
+  try {
+    const fs = require('fs');
+    const { execSync } = require('child_process');
+    const path = require('path');
+    
+    logger.log('info', 'Checking Python dependencies for LT game engine...');
+    
+    const ltMakerPath = path.join(app.getAppPath(), '..', 'lt-maker-fork');
+    const editorRequirementsPath = path.join(ltMakerPath, 'requirements_editor.txt');
+    const engineRequirementsPath = path.join(ltMakerPath, 'requirements_engine.txt');
+    
+    // Check if requirements files exist
+    if (!fs.existsSync(editorRequirementsPath)) {
+      logger.log('error', `Editor requirements file not found: ${editorRequirementsPath}`);
+      return false;
+    }
+    
+    if (!fs.existsSync(engineRequirementsPath)) {
+      logger.log('error', `Engine requirements file not found: ${engineRequirementsPath}`);
+      return false;
+    }
+    
+    // Check if pygame is installed
+    try {
+      execSync('python3 -c "import pygame"', { encoding: 'utf8' });
+      logger.log('info', 'pygame is already installed');
+    } catch (error) {
+      logger.log('info', 'pygame not found, installing requirements...');
+      
+      try {
+        // Install editor requirements
+        logger.log('info', 'Installing editor requirements...');
+        execSync(`python3 -m pip install --user -r "${editorRequirementsPath}"`, {
+          encoding: 'utf8',
+          stdio: 'inherit'
+        });
+        
+        // Install engine requirements
+        logger.log('info', 'Installing engine requirements...');
+        execSync(`python3 -m pip install --user -r "${engineRequirementsPath}"`, {
+          encoding: 'utf8',
+          stdio: 'inherit'
+        });
+        
+        logger.log('info', 'Python dependencies successfully installed');
+      } catch (installError) {
+        logger.log('error', `Failed to install Python dependencies: ${installError.message}`);
+        return false;
+      }
+    }
+    
+    return true;
+  } catch (error) {
+    logger.log('error', `Error checking Python dependencies: ${error.message}`);
+    return false;
+  }
+}
+
 // Start the Deno server
 const startDenoServer = () => {
   return new Promise((resolve, reject) => {
@@ -660,6 +725,13 @@ const startServer = async () => {
         logger.log('error', 'System Python not found on macOS');
         console.error('System Python not found on macOS');
         throw new Error('System Python (python3) not found. Please install Python 3 via Homebrew (brew install python).');
+      }
+      
+      // Check and install LT game dependencies
+      logger.log('info', 'Checking and installing Python dependencies for LT game...');
+      const dependenciesInstalled = await ensurePythonDependencies();
+      if (!dependenciesInstalled) {
+        logger.log('warn', 'Failed to install all required Python dependencies. Some game features may not work.');
       }
     }
 

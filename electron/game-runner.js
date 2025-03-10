@@ -153,6 +153,8 @@ function getWinePythonEnv() {
     ...process.env,
     WINEDEBUG: '-all', // Suppress Wine debug messages
     WINEDLLOVERRIDES: 'mscoree,mshtml=', // Avoid Wine trying to use Internet Explorer
+    // Ensure Python can find installed packages in user's site-packages
+    PYTHONPATH: process.env.PYTHONPATH || '',
   };
 
   // Only set WINEPREFIX if we have a valid path
