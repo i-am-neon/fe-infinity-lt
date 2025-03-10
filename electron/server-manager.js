@@ -76,7 +76,18 @@ const startDenoServer = () => {
     const isMac = process.platform === 'darwin';
 
     // Use bundled Deno for all platforms
-    const denoCommand = path.join(__dirname, 'bin', process.platform === 'win32' ? 'deno.exe' : 'deno');
+    // When packaged in asar, binaries should be in resources/app.asar.unpacked/bin
+    const appPath = app.getAppPath();
+    let denoCommand;
+    
+    if (appPath.includes('app.asar')) {
+      // In production, use the unpacked path
+      const unpackedPath = appPath.replace('app.asar', 'app.asar.unpacked');
+      denoCommand = path.join(unpackedPath, 'bin', process.platform === 'win32' ? 'deno.exe' : 'deno');
+    } else {
+      // In development, use the normal path
+      denoCommand = path.join(__dirname, 'bin', process.platform === 'win32' ? 'deno.exe' : 'deno');
+    }
 
     // Verify bundled Deno exists
     if (!fs.existsSync(denoCommand)) {
@@ -186,7 +197,7 @@ const startDenoServer = () => {
       {
         cwd: serverPath,
         env: serverEnv,
-        shell: isMac // Use shell on macOS
+        shell: false // Don't use shell to avoid path escaping issues with spaces
       }
     );
 
@@ -285,7 +296,17 @@ const startDenoServerFallback = (serverPath, resolve, reject) => {
   };
 
   // Always use bundled Deno
-  const bundledDenoPath = path.join(__dirname, 'bin', process.platform === 'win32' ? 'deno.exe' : 'deno');
+  const appPath = app.getAppPath();
+  let bundledDenoPath;
+  
+  if (appPath.includes('app.asar')) {
+    // In production, use the unpacked path
+    const unpackedPath = appPath.replace('app.asar', 'app.asar.unpacked');
+    bundledDenoPath = path.join(unpackedPath, 'bin', process.platform === 'win32' ? 'deno.exe' : 'deno');
+  } else {
+    // In development, use the normal path
+    bundledDenoPath = path.join(__dirname, 'bin', process.platform === 'win32' ? 'deno.exe' : 'deno');
+  }
 
   if (!fs.existsSync(bundledDenoPath)) {
     const errorMessage = `Bundled Deno not found at ${bundledDenoPath}. Cannot start server without bundled binaries.`;

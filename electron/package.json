@@ -48,7 +48,8 @@
     ],
     "asar": true,
     "asarUnpack": [
-      "**/*.node"
+      "**/*.node",
+      "bin/**/*"
     ],
     "extraResources": [
       {
