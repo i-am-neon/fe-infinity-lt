@@ -11,7 +11,7 @@
   "scripts": {
     "start": "electron .",
     "dev": "concurrently \"cd ../client && pnpm dev\" \"wait-on http://localhost:5173 && electron . --dev\"",
-    "postinstall": "electron-builder install-app-deps && node download-binaries.js",
+    "postinstall": "electron-builder install-app-deps && node download-binaries.js --skip-macos-system-deps",
     "generate-icons": "electron-icon-builder --input=../client/public/vite.svg --output=icons",
     "build:client": "cd ../client && pnpm build",
     "verify-client-build": "node -e \"const fs=require('fs');const path=require('path');const distDir=path.join(__dirname,'../client/dist');const indexFile=path.join(distDir,'index.html');const assetsDir=path.join(distDir,'assets');if(!fs.existsSync(distDir)||!fs.existsSync(indexFile)||!fs.existsSync(assetsDir)){console.error('React build not found or incomplete. Run build:client first.');process.exit(1);}console.log('React build verified:');console.log('- dist directory:', fs.existsSync(distDir));console.log('- index.html:', fs.existsSync(indexFile));console.log('- assets directory:', fs.existsSync(assetsDir));\"",

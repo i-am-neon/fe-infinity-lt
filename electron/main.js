@@ -280,12 +280,14 @@ app.whenReady().then(async () => {
     userDataPath: app.getPath('userData')
   });
 
-  // Check for Wine on macOS/Linux
+  // Check for Wine and Python on macOS/Linux
   if (process.platform !== 'win32') {
     try {
       const { execSync } = require('child_process');
       let wineInstalled = false;
+      let pythonInstalled = false;
       
+      // Check for Wine
       try {
         execSync('which wine', { encoding: 'utf8' });
         wineInstalled = true;
@@ -307,21 +309,47 @@ app.whenReady().then(async () => {
         }
       }
       
-      if (!wineInstalled) {
-        logger.log('error', 'Wine is not installed. Showing error dialog...');
-        dialog.showErrorBox(
-          'Wine Required',
-          'Wine is required to run this application but was not found on your system.\n\n' +
-          'Please install Wine before running FE Infinity:\n' +
-          '- macOS: brew install --cask --no-quarantine wine-stable\n' +
-          '- Linux: Use your distribution\'s package manager to install wine\n\n' +
-          'The application will now exit.'
-        );
+      // Check for Python on macOS
+      if (process.platform === 'darwin') {
+        try {
+          const pythonVersion = execSync('python3 --version', { encoding: 'utf8' }).trim();
+          pythonInstalled = true;
+          logger.log('info', `Python is installed: ${pythonVersion}`);
+        } catch (e) {
+          logger.log('warn', 'Python not found in PATH');
+          pythonInstalled = false;
+        }
+      } else {
+        // For Linux, we're not using system Python
+        pythonInstalled = true;
+      }
+      
+      // Show error message if Wine or Python is missing
+      const missingComponents = [];
+      if (!wineInstalled) missingComponents.push('Wine');
+      if (!pythonInstalled && process.platform === 'darwin') missingComponents.push('Python');
+      
+      if (missingComponents.length > 0) {
+        logger.log('error', `Missing required components: ${missingComponents.join(', ')}`);
+        
+        let errorMessage = 'The following required components were not found on your system:\n\n';
+        
+        if (!wineInstalled) {
+          errorMessage += '• Wine: Install via Homebrew with:\n  brew install --cask --no-quarantine wine-stable\n\n';
+        }
+        
+        if (!pythonInstalled && process.platform === 'darwin') {
+          errorMessage += '• Python: Install via Homebrew with:\n  brew install python\n\n';
+        }
+        
+        errorMessage += 'Please install the missing components and restart the application.';
+        
+        dialog.showErrorBox('Required Components Missing', errorMessage);
         app.quit();
         return;
       }
     } catch (error) {
-      logger.log('error', 'Error checking for Wine installation', { error: error.message });
+      logger.log('error', 'Error checking for required components', { error: error.message });
     }
   }
 

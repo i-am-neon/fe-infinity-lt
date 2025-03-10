@@ -111,9 +111,18 @@ async function downloadDeno() {
   console.log('Deno downloaded successfully');
 }
 
-// Download and setup Python
+// Download Python
 async function downloadPython() {
   console.log('Downloading Python...');
+
+  // Check if we should use system Python on macOS
+  const useSystemPythonOnMac = isMac &&
+    (process.argv.includes('--skip-macos-system-deps') || process.env.USE_SYSTEM_PYTHON === 'true');
+  
+  if (useSystemPythonOnMac) {
+    console.log('Skipping Python download for macOS - using system Python instead');
+    return;
+  }
 
   const pythonDir = path.join(__dirname, 'bin', 'python');
 
@@ -381,23 +390,35 @@ async function main() {
     const isMac = process.platform === 'darwin';
     const isWindows = process.platform === 'win32';
     const isLinux = process.platform === 'linux';
+    const skipMacosSystemDeps = process.argv.includes('--skip-macos-system-deps');
+    
+    console.log('Starting binary download process...');
+    
+    if (isMac && skipMacosSystemDeps) {
+      console.log('macOS detected with --skip-macos-system-deps flag');
+      console.log('Skipping bundled Python - system Python will be used instead');
+      console.log('Make sure to install: brew install python wine-stable');
+    }
 
-    // Always download binaries regardless of dev or prod mode
-    // Wine is the only exception that can use system installation
-    console.log('Downloading required binaries for bin directory');
-
-    // Normal download flow
+    // Download Deno for all platforms
+    console.log('Downloading Deno binary...');
     await downloadDeno();
 
-    // Download Python for all platforms
-    await downloadPython();
+    // Download Python for all platforms except macOS with --skip-macos-system-deps
+    if (!(isMac && skipMacosSystemDeps)) {
+      console.log('Downloading Python...');
+      await downloadPython();
+    }
 
     // No Wine download for non-Windows platforms - users must install themselves
     if (!isWindows) {
       console.log('Wine is required for non-Windows platforms. Please ensure Wine is installed on your system.');
-      // We still need to setup Python with Wine but using system Wine
-      if (process.env.NODE_ENV !== 'development') {
-        await setupPythonWithWine();
+      
+      // Only try to setup Python with Wine when we're using bundled Python
+      if (!isMac || !skipMacosSystemDeps) {
+        if (process.env.NODE_ENV !== 'development') {
+          await setupPythonWithWine();
+        }
       }
     }
 

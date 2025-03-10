@@ -30,6 +30,24 @@ const getServerEnv = () => {
   };
 };
 
+// Check if system Python is available
+function isSystemPythonAvailable() {
+  if (process.platform !== 'darwin') {
+    return false; // Only relevant for macOS
+  }
+
+  try {
+    const { execSync } = require('child_process');
+    // Try to run python3 --version
+    const pythonVersion = execSync('python3 --version', { encoding: 'utf8' }).trim();
+    logger.log('info', `Found system Python: ${pythonVersion}`);
+    return true;
+  } catch (error) {
+    logger.log('error', 'System Python not found or not properly installed');
+    return false;
+  }
+}
+
 // Start the Deno server
 const startDenoServer = () => {
   return new Promise((resolve, reject) => {
@@ -174,7 +192,8 @@ const startDenoServer = () => {
       SERVER_DIR: serverPath,
       DENO_ENV: process.env.NODE_ENV || (isDev ? 'development' : 'production'),
       ELECTRON_LOG_DIR: logDir,
-      NODE_ENV: isDev ? 'development' : 'production'
+      NODE_ENV: isDev ? 'development' : 'production',
+      USE_SYSTEM_PYTHON: isMac ? 'true' : 'false'
     };
 
     // Log the command and env for debugging
@@ -187,7 +206,8 @@ const startDenoServer = () => {
         RESOURCES_PATH: serverEnv.RESOURCES_PATH,
         LT_MAKER_PATH: serverEnv.LT_MAKER_PATH,
         SERVER_DIR: serverEnv.SERVER_DIR,
-        DENO_ENV: serverEnv.DENO_ENV
+        DENO_ENV: serverEnv.DENO_ENV,
+        USE_SYSTEM_PYTHON: serverEnv.USE_SYSTEM_PYTHON
       }
     });
 
@@ -292,7 +312,8 @@ const startDenoServerFallback = (serverPath, resolve, reject) => {
     SERVER_DIR: serverPath,
     DENO_ENV: process.env.NODE_ENV || 'production',
     ELECTRON_LOG_DIR: logDir,
-    NODE_ENV: process.env.NODE_ENV || 'production'
+    NODE_ENV: process.env.NODE_ENV || 'production',
+    USE_SYSTEM_PYTHON: process.platform === 'darwin' ? 'true' : 'false'
   };
 
   // Always use bundled Deno
@@ -630,6 +651,16 @@ const startServer = async () => {
       logger.log('error', errorMsg);
       console.error(errorMsg);
       throw new Error(errorMsg);
+    }
+
+    // On macOS, check if system Python is available
+    if (isMac) {
+      const hasPython = isSystemPythonAvailable();
+      if (!hasPython) {
+        logger.log('error', 'System Python not found on macOS');
+        console.error('System Python not found on macOS');
+        throw new Error('System Python (python3) not found. Please install Python 3 via Homebrew (brew install python).');
+      }
     }
 
     // Start Deno server, which will initialize everything else

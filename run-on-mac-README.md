@@ -1,34 +1,46 @@
 # FE Infinity: Lex Talionis
 
-## Prerequisites
+## macOS Prerequisites
+
+The application requires Python 3 and Wine to be installed on your system. Follow these simple steps:
 
 ```bash
 # Install Homebrew if not installed
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-# Install Wine
-brew install wine-stable
+# Install Python 3
+brew install python
 
-# Install Miniconda
-brew install --cask miniconda
-
-# Initialize conda in your shell
-conda init "$(basename "${SHELL}")"
+# Install Wine - the --no-quarantine flag prevents macOS from blocking Wine
+brew install --cask --no-quarantine wine-stable
 ```
 
-## First Time Setup
+That's it! Once these are installed, the application should work without any additional setup.
 
-```bash
-conda create -n fe-i-lt python=3.11.7
-conda activate fe-i-lt
+## Troubleshooting
 
-# Setup Windows Python
-curl -O https://www.python.org/ftp/python/3.11.7/python-3.11.7-amd64.exe
-wine python-3.11.7-amd64.exe
+If you receive an error about missing components:
 
-# Install requirements in Wine Python
-wine pip install -r requirements_editor.txt -r requirements_engine.txt
-```
+1. Make sure both Python and Wine are properly installed:
+   ```bash
+   # Check Python installation
+   python3 --version
+   
+   # Check Wine installation
+   wine --version
+   ```
+
+2. Make sure they're in your PATH:
+   ```bash
+   which python3
+   which wine
+   ```
+
+3. If Wine was installed but is not found, you might need to add it to your PATH:
+   ```bash
+   echo 'export PATH="/Applications/Wine Stable.app/Contents/Resources/wine/bin:$PATH"' >> ~/.zshrc
+   source ~/.zshrc
+   ```
 
 ## Running the Game
 

@@ -78,7 +78,7 @@ function getLtMakerPath() {
   return path.join(app.getAppPath(), 'lt-maker-fork');
 }
 
-// Get path to bundled Python
+// Get path to Python
 function getBundledPythonPath() {
   if (process.platform === 'win32') {
     // Windows uses the embedded Python directly
@@ -88,8 +88,17 @@ function getBundledPythonPath() {
     }
     return pythonPath;
   } else if (process.platform === 'darwin') {
-    // For macOS, use locally installed Python
-    return 'python3';
+    // For macOS, use system Python
+    try {
+      // Check if python3 is installed and accessible
+      const { execSync } = require('child_process');
+      const pythonPath = execSync('which python3', { encoding: 'utf8' }).trim();
+      logger.log('info', `Using system Python at: ${pythonPath}`);
+      return pythonPath;
+    } catch (error) {
+      logger.log('error', 'System Python not found. Please install Python 3.');
+      throw new Error('System Python (python3) not found. Please install Python 3 via Homebrew (brew install python).');
+    }
   } else {
     // Linux still uses Wine with bundled Python
     // Return the Wine Python path (this is the path within the Wine environment)
