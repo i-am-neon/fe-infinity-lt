@@ -87,8 +87,11 @@ function getBundledPythonPath() {
       throw new Error(`Bundled Python not found at: ${pythonPath}. Please ensure binaries are downloaded correctly.`);
     }
     return pythonPath;
+  } else if (process.platform === 'darwin') {
+    // For macOS, use locally installed Python
+    return 'python3';
   } else {
-    // macOS and Linux use Wine with bundled Python
+    // Linux still uses Wine with bundled Python
     // Return the Wine Python path (this is the path within the Wine environment)
     return 'python';
   }
@@ -205,7 +208,7 @@ async function runGameWithWine(projectNameEndingInDotLtProj) {
         // Get the bundled Python environment
         const pythonEnv = getWinePythonEnv();
 
-        console.log('Using bundled Python with Wine');
+        console.log('Using local Python with Wine on macOS');
 
         const wineProcess = spawn(
           winePath,
