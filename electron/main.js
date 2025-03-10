@@ -286,7 +286,7 @@ app.whenReady().then(async () => {
       const { execSync } = require('child_process');
       let wineInstalled = false;
       let pythonInstalled = false;
-      
+
       // Check for Wine
       try {
         execSync('which wine', { encoding: 'utf8' });
@@ -294,12 +294,12 @@ app.whenReady().then(async () => {
         logger.log('info', 'Wine is installed and available in PATH');
       } catch (e) {
         logger.log('warn', 'Wine not found in PATH. Checking common locations...');
-        
+
         // Check common locations based on platform
         const commonPaths = process.platform === 'darwin'
           ? ['/usr/local/bin/wine', '/opt/homebrew/bin/wine', '/Applications/Wine Stable.app/Contents/Resources/wine/bin/wine']
           : ['/usr/bin/wine', '/usr/local/bin/wine'];
-        
+
         for (const winePath of commonPaths) {
           if (require('fs').existsSync(winePath)) {
             wineInstalled = true;
@@ -308,7 +308,7 @@ app.whenReady().then(async () => {
           }
         }
       }
-      
+
       // Check for Python on macOS
       if (process.platform === 'darwin') {
         try {
@@ -323,27 +323,27 @@ app.whenReady().then(async () => {
         // For Linux, we're not using system Python
         pythonInstalled = true;
       }
-      
+
       // Show error message if Wine or Python is missing
       const missingComponents = [];
       if (!wineInstalled) missingComponents.push('Wine');
       if (!pythonInstalled && process.platform === 'darwin') missingComponents.push('Python');
-      
+
       if (missingComponents.length > 0) {
         logger.log('error', `Missing required components: ${missingComponents.join(', ')}`);
-        
+
         let errorMessage = 'The following required components were not found on your system:\n\n';
-        
+
         if (!wineInstalled) {
           errorMessage += '• Wine: Install via Homebrew with:\n  brew install --cask --no-quarantine wine-stable\n\n';
         }
-        
+
         if (!pythonInstalled && process.platform === 'darwin') {
           errorMessage += '• Python: Install via Homebrew with:\n  brew install python\n\n';
         }
-        
+
         errorMessage += 'Please install the missing components and restart the application.';
-        
+
         dialog.showErrorBox('Required Components Missing', errorMessage);
         app.quit();
         return;
@@ -594,23 +594,23 @@ app.on('activate', () => {
 ipcMain.handle('runGame', async (_, projectPath) => {
   try {
     logger.log('info', `IPC request to run game received`, { projectPath });
-    
+
     if (!projectPath) {
       logger.log('error', 'Missing project path in IPC runGame request');
       return { success: false, error: 'Missing project path' };
     }
-    
+
     // Verify the project exists before attempting to run
     const resourcesPath = process.resourcesPath || app.getAppPath();
     const ltMakerPath = path.join(resourcesPath, 'lt-maker-fork');
     const projectFullPath = path.join(ltMakerPath, projectPath);
-    
+
     if (!fs.existsSync(projectFullPath)) {
       const errorMsg = `Project not found: ${projectPath} (full path: ${projectFullPath})`;
       logger.log('error', errorMsg);
       return { success: false, error: errorMsg };
     }
-    
+
     // Check metadata.json exists
     const metadataPath = path.join(projectFullPath, 'metadata.json');
     if (!fs.existsSync(metadataPath)) {
@@ -618,24 +618,24 @@ ipcMain.handle('runGame', async (_, projectPath) => {
       logger.log('error', errorMsg);
       return { success: false, error: errorMsg };
     }
-    
+
     logger.log('info', `Launching game through Wine: ${projectPath}`);
-    
+
     await runGameWithWine(projectPath);
     logger.log('info', `Game launch initiated successfully`);
-    
+
     return { success: true };
   } catch (error) {
     logger.log('error', 'Error running game via IPC', {
       error: error.message,
       stack: error.stack
     });
-    
+
     dialog.showErrorBox(
       'Game Launch Failed',
       `Failed to launch the game: ${error.message}`
     );
-    
+
     return { success: false, error: error.message };
   }
 });

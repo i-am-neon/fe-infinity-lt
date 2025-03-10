@@ -11,7 +11,7 @@ const PORT = 8989;
 function startGameLauncherServer() {
   return new Promise((resolve, reject) => {
     logger.log('info', `Starting game launcher HTTP server on port ${PORT}...`);
-    
+
     const server = http.createServer((req, res) => {
       // Only handle POST requests to /run-game
       if (req.method === 'POST' && req.url === '/run-game') {
@@ -19,19 +19,19 @@ function startGameLauncherServer() {
         res.setHeader('Access-Control-Allow-Origin', '*');
         res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
         res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-        
+
         let body = '';
-        
+
         // Collect request body data
         req.on('data', (chunk) => {
           body += chunk.toString();
         });
-        
+
         // Process the request
         req.on('end', async () => {
           try {
             logger.log('info', `Received run-game request`, { body });
-            
+
             let projectPath;
             try {
               const parsedBody = JSON.parse(body);
@@ -48,7 +48,7 @@ function startGameLauncherServer() {
               }));
               return;
             }
-            
+
             if (!projectPath) {
               logger.log('error', 'Missing projectPath parameter');
               res.statusCode = 400;
@@ -58,12 +58,12 @@ function startGameLauncherServer() {
               }));
               return;
             }
-            
+
             // Verify the project exists before attempting to run
             const resourcesPath = process.resourcesPath || app.getAppPath();
             const ltMakerPath = path.join(resourcesPath, 'lt-maker-fork');
             const projectFullPath = path.join(ltMakerPath, projectPath);
-            
+
             if (!fs.existsSync(projectFullPath)) {
               const errorMsg = `Project not found: ${projectPath} (full path: ${projectFullPath})`;
               logger.log('error', errorMsg);
@@ -74,7 +74,7 @@ function startGameLauncherServer() {
               }));
               return;
             }
-            
+
             // Check metadata.json exists
             const metadataPath = path.join(projectFullPath, 'metadata.json');
             if (!fs.existsSync(metadataPath)) {
@@ -87,13 +87,13 @@ function startGameLauncherServer() {
               }));
               return;
             }
-            
+
             logger.log('info', `HTTP endpoint received request to run game: ${projectPath}`);
-            
+
             try {
               await runGameWithWine(projectPath);
               logger.log('info', `Game launch requested successfully`);
-              
+
               res.statusCode = 200;
               res.end(JSON.stringify({ success: true }));
             } catch (gameError) {
@@ -101,7 +101,7 @@ function startGameLauncherServer() {
                 error: gameError.message,
                 stack: gameError.stack
               });
-              
+
               res.statusCode = 500;
               res.end(JSON.stringify({
                 success: false,
@@ -113,7 +113,7 @@ function startGameLauncherServer() {
               error: error.message,
               stack: error.stack
             });
-            
+
             res.statusCode = 500;
             res.end(JSON.stringify({
               success: false,
@@ -136,12 +136,12 @@ function startGameLauncherServer() {
         res.end(JSON.stringify({ success: false, error: 'Not found' }));
       }
     });
-    
+
     server.listen(PORT, () => {
       logger.log('info', `Game launcher HTTP server running on port ${PORT}`);
       resolve(server);
     });
-    
+
     server.on('error', (err) => {
       logger.log('error', `Failed to start game launcher server`, {
         error: err.message,

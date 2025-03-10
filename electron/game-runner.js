@@ -15,12 +15,12 @@ function getWinePath() {
   try {
     // Check if wine is installed and accessible in PATH
     const { execSync } = require('child_process');
-    
+
     // First check if wine is in PATH
     try {
       const winePath = execSync('which wine', { encoding: 'utf8' }).trim();
       console.log(`Found Wine in PATH: ${winePath}`);
-      
+
       // Verify it's executable
       try {
         fs.accessSync(winePath, fs.constants.X_OK);
@@ -40,7 +40,7 @@ function getWinePath() {
         '/Applications/Wine Stable.app/Contents/Resources/wine/bin/wine',
         '/Applications/Wine Stable.app/Contents/MacOS/wine'
       ];
-      
+
       for (const macPath of commonMacPaths) {
         if (fs.existsSync(macPath)) {
           console.log(`Found Wine at: ${macPath}`);
@@ -55,7 +55,7 @@ function getWinePath() {
         '/usr/bin/wine',
         '/usr/local/bin/wine'
       ];
-      
+
       for (const linuxPath of commonLinuxPaths) {
         if (fs.existsSync(linuxPath)) {
           console.log(`Found Wine at: ${linuxPath}`);
@@ -63,7 +63,7 @@ function getWinePath() {
         }
       }
     }
-    
+
     // If we get here, Wine is not installed
     const errorMsg = 'Wine is not installed or not found in PATH. Please install Wine to run the game.';
     console.error(errorMsg);
@@ -76,6 +76,11 @@ function getWinePath() {
 
 // Get the LT maker path
 function getLtMakerPath() {
+  // For packaged apps, use resourcesPath instead of app.getAppPath()
+  // app.getAppPath() points to the asar file, but we need the Resources directory
+  if (app.isPackaged) {
+    return path.join(process.resourcesPath, 'lt-maker-fork');
+  }
   return path.join(app.getAppPath(), 'lt-maker-fork');
 }
 
@@ -178,7 +183,7 @@ async function runGameWithWine(projectNameEndingInDotLtProj) {
         platform: process.platform,
         arch: process.arch
       });
-      
+
       // Make sure we're using the correct path to lt-maker-fork
       const ltMakerPath = process.env.NODE_ENV === 'development'
         ? path.join(app.getAppPath(), '..', 'lt-maker-fork')
@@ -233,7 +238,7 @@ async function runGameWithWine(projectNameEndingInDotLtProj) {
 
         // Get the environment for Python with Wine
         const pythonEnv = getWinePythonEnv();
-        
+
         // Check Python path on macOS
         // Get the Python path - on macOS for packaged app we need to use system Python
         const pythonPath = getBundledPythonPath();
@@ -250,14 +255,14 @@ async function runGameWithWine(projectNameEndingInDotLtProj) {
         // Set a timeout to prevent indefinite hanging
         const timeout = 120000; // 2 minutes timeout (increased from 60s)
         const timeoutId = setTimeout(() => {
-          logger.log('error', `Wine process timed out after ${timeout/1000} seconds`);
+          logger.log('error', `Wine process timed out after ${timeout / 1000} seconds`);
           if (wineProcess && !wineProcess.killed) {
             logger.log('info', 'Killing Wine process due to timeout');
             wineProcess.kill();
           }
           resolve(); // Resolve anyway to prevent hanging UI
         }, timeout);
-        
+
         // Enhanced Wine process - use direct Python command on macOS
         // Important: On macOS in packaged app, we need to use a different approach
         try {
@@ -271,10 +276,10 @@ export WINEPREFIX=${pythonEnv.WINEPREFIX || '~/.wine'}
 
           fs.writeFileSync(tempScriptPath, scriptContent);
           fs.chmodSync(tempScriptPath, 0o755);
-          
+
           logger.log('info', `Created Wine wrapper script at ${tempScriptPath}`);
           logger.log('info', `Script content: ${scriptContent}`);
-          
+
           // Launch with shell script - this helps with macOS path issues
           const wineProcess = spawn(
             '/bin/bash',
@@ -284,7 +289,7 @@ export WINEPREFIX=${pythonEnv.WINEPREFIX || '~/.wine'}
               stdio: ['ignore', 'pipe', 'pipe']
             }
           );
-          
+
           // Unref the child to allow the Node.js event loop to exit even if the process is still running
           wineProcess.unref();
 
@@ -316,7 +321,7 @@ export WINEPREFIX=${pythonEnv.WINEPREFIX || '~/.wine'}
             });
             reject(err);
           });
-          
+
           // Resolve after a short delay to allow the game to start but not block UI
           setTimeout(() => {
             logger.log('info', 'Resolving Wine process promise to unblock UI');
@@ -347,7 +352,7 @@ export WINEPREFIX=${pythonEnv.WINEPREFIX || '~/.wine'}
             stdio: ['ignore', 'pipe', 'pipe']
           }
         );
-        
+
         // Unref the child to allow the Node.js event loop to exit
         pythonProcess.unref();
 
@@ -378,7 +383,7 @@ export WINEPREFIX=${pythonEnv.WINEPREFIX || '~/.wine'}
           });
           reject(err);
         });
-        
+
         // Resolve after a short delay to allow the game to start but not block UI
         setTimeout(() => {
           logger.log('info', 'Resolving Python process promise to unblock UI');
