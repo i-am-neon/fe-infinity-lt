@@ -62,6 +62,51 @@ async function ensurePythonDependencies() {
     
     logger.log('info', 'Checking Python dependencies for LT game engine...');
     
+    // Find Python 3.11 specifically
+    let python311Path = '';
+    try {
+      // First try python3.11 directly
+      python311Path = execSync('which python3.11', { encoding: 'utf8' }).trim();
+      logger.log('info', `Found Python 3.11 at: ${python311Path}`);
+    } catch (err) {
+      // Try common locations
+      const pythonLocations = [
+        '/opt/homebrew/bin/python3.11',
+        '/usr/local/bin/python3.11',
+        '/usr/bin/python3.11'
+      ];
+      
+      for (const location of pythonLocations) {
+        if (fs.existsSync(location)) {
+          python311Path = location;
+          logger.log('info', `Found Python 3.11 at: ${python311Path}`);
+          break;
+        }
+      }
+      
+      // If still not found, try python3 but verify version
+      if (!python311Path) {
+        try {
+          const pythonPath = execSync('which python3', { encoding: 'utf8' }).trim();
+          const versionOutput = execSync(`${pythonPath} --version`, { encoding: 'utf8' }).trim();
+          
+          if (versionOutput.includes('Python 3.11')) {
+            python311Path = pythonPath;
+            logger.log('info', `Found Python 3.11 via python3: ${python311Path} (${versionOutput})`);
+          } else {
+            logger.log('warn', `System python3 is not 3.11: ${versionOutput}`);
+          }
+        } catch (pythonErr) {
+          logger.log('error', `Failed to find python3: ${pythonErr.message}`);
+        }
+      }
+    }
+    
+    if (!python311Path) {
+      logger.log('error', 'Python 3.11 not found. Please install it with: brew install python@3.11');
+      return false;
+    }
+    
     const ltMakerPath = path.join(app.getAppPath(), '..', 'lt-maker-fork');
     const editorRequirementsPath = path.join(ltMakerPath, 'requirements_editor.txt');
     const engineRequirementsPath = path.join(ltMakerPath, 'requirements_engine.txt');
@@ -77,31 +122,31 @@ async function ensurePythonDependencies() {
       return false;
     }
     
-    // Check if pygame is installed
+    // Check if pygame is installed for Python 3.11
     try {
-      execSync('python3 -c "import pygame"', { encoding: 'utf8' });
-      logger.log('info', 'pygame is already installed');
+      execSync(`${python311Path} -c "import pygame"`, { encoding: 'utf8' });
+      logger.log('info', 'pygame is already installed for Python 3.11');
     } catch (error) {
-      logger.log('info', 'pygame not found, installing requirements...');
+      logger.log('info', 'pygame not found for Python 3.11, installing requirements...');
       
       try {
         // Install editor requirements
-        logger.log('info', 'Installing editor requirements...');
-        execSync(`python3 -m pip install --user -r "${editorRequirementsPath}"`, {
+        logger.log('info', `Installing editor requirements for Python 3.11...`);
+        execSync(`${python311Path} -m pip install --user -r "${editorRequirementsPath}"`, {
           encoding: 'utf8',
           stdio: 'inherit'
         });
         
         // Install engine requirements
-        logger.log('info', 'Installing engine requirements...');
-        execSync(`python3 -m pip install --user -r "${engineRequirementsPath}"`, {
+        logger.log('info', `Installing engine requirements for Python 3.11...`);
+        execSync(`${python311Path} -m pip install --user -r "${engineRequirementsPath}"`, {
           encoding: 'utf8',
           stdio: 'inherit'
         });
         
-        logger.log('info', 'Python dependencies successfully installed');
+        logger.log('info', 'Python 3.11 dependencies successfully installed');
       } catch (installError) {
-        logger.log('error', `Failed to install Python dependencies: ${installError.message}`);
+        logger.log('error', `Failed to install Python 3.11 dependencies: ${installError.message}`);
         return false;
       }
     }
