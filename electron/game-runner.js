@@ -369,13 +369,9 @@ export WINEPREFIX=${pythonEnv.WINEPREFIX || '~/.wine'}
             reject(err);
           });
 
-          // Resolve after a short delay to allow the game to start but not block UI
-          setTimeout(() => {
-            logger.log('info', 'Resolving Wine process promise to unblock UI');
-            resolve();
-          }, 2000);
-        } catch (spawnError) {
-          clearTimeout(timeoutId);
+        // Don't resolve the promise early - wait for the process to complete on its own
+        // The promise will resolve when the Python process closes or errors out
+        logger.log('info', 'Waiting for game process to exit before resolving...');
           logger.log('error', 'Error spawning Wine process', {
             error: spawnError.message,
             stack: spawnError.stack
