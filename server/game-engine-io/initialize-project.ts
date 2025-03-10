@@ -40,6 +40,7 @@ export default async function initializeProject(projectName: string) {
       ltMakerPath,
       normalizedProjectPath,
     ],
+    useSystemPython: true, // Use system Python for initialization
   });
   
   console.log(`Python script output: ${output}`);
