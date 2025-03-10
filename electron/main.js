@@ -593,14 +593,49 @@ app.on('activate', () => {
 // Handle IPC request to run a game
 ipcMain.handle('runGame', async (_, projectPath) => {
   try {
+    logger.log('info', `IPC request to run game received`, { projectPath });
+    
+    if (!projectPath) {
+      logger.log('error', 'Missing project path in IPC runGame request');
+      return { success: false, error: 'Missing project path' };
+    }
+    
+    // Verify the project exists before attempting to run
+    const resourcesPath = process.resourcesPath || app.getAppPath();
+    const ltMakerPath = path.join(resourcesPath, 'lt-maker-fork');
+    const projectFullPath = path.join(ltMakerPath, projectPath);
+    
+    if (!fs.existsSync(projectFullPath)) {
+      const errorMsg = `Project not found: ${projectPath} (full path: ${projectFullPath})`;
+      logger.log('error', errorMsg);
+      return { success: false, error: errorMsg };
+    }
+    
+    // Check metadata.json exists
+    const metadataPath = path.join(projectFullPath, 'metadata.json');
+    if (!fs.existsSync(metadataPath)) {
+      const errorMsg = `metadata.json not found in project: ${projectPath}`;
+      logger.log('error', errorMsg);
+      return { success: false, error: errorMsg };
+    }
+    
+    logger.log('info', `Launching game through Wine: ${projectPath}`);
+    
     await runGameWithWine(projectPath);
+    logger.log('info', `Game launch initiated successfully`);
+    
     return { success: true };
   } catch (error) {
-    console.error('Error running game:', error);
+    logger.log('error', 'Error running game via IPC', {
+      error: error.message,
+      stack: error.stack
+    });
+    
     dialog.showErrorBox(
       'Game Launch Failed',
       `Failed to launch the game: ${error.message}`
     );
+    
     return { success: false, error: error.message };
   }
 });

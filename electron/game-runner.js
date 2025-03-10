@@ -169,19 +169,32 @@ function getWinePythonEnv() {
 async function runGameWithWine(projectNameEndingInDotLtProj) {
   return new Promise((resolve, reject) => {
     try {
+      // Add logging for app paths and environment
+      const logger = require('./logger');
+      logger.log('info', 'Running game with Wine', {
+        projectPath: projectNameEndingInDotLtProj,
+        appPath: app.getAppPath(),
+        resourcesPath: process.resourcesPath,
+        platform: process.platform,
+        arch: process.arch
+      });
+      
       // Make sure we're using the correct path to lt-maker-fork
       const ltMakerPath = process.env.NODE_ENV === 'development'
         ? path.join(app.getAppPath(), '..', 'lt-maker-fork')
         : getLtMakerPath();
 
       // Log the paths for debugging
-      console.log(`App path: ${app.getAppPath()}`);
-      console.log(`Actual lt-maker path: ${ltMakerPath}`);
+      logger.log('info', 'Path resolution for game launcher', {
+        appPath: app.getAppPath(),
+        ltMakerPath: ltMakerPath
+      });
 
       // Verify the LT Maker directory exists
       if (!fs.existsSync(ltMakerPath)) {
-        console.error(`LT Maker directory not found at: ${ltMakerPath}`);
-        reject(new Error(`LT Maker directory not found at: ${ltMakerPath}`));
+        const errorMsg = `LT Maker directory not found at: ${ltMakerPath}`;
+        logger.log('error', errorMsg);
+        reject(new Error(errorMsg));
         return;
       }
 
@@ -190,15 +203,16 @@ async function runGameWithWine(projectNameEndingInDotLtProj) {
         let winePath;
         try {
           winePath = getWinePath();
+          logger.log('info', `Using Wine at: ${winePath}`);
         } catch (wineError) {
-          console.error('Fatal Wine error:', wineError.message);
+          logger.log('error', 'Fatal Wine error', { error: wineError.message });
           reject(wineError);
           return;
         }
 
         if (!winePath) {
           const error = new Error('Wine is not available');
-          console.error('Fatal Wine error:', error.message);
+          logger.log('error', 'Wine not available on system');
           reject(error);
           return;
         }
@@ -206,107 +220,120 @@ async function runGameWithWine(projectNameEndingInDotLtProj) {
         // Normalize project path for Wine and ensure it uses forward slashes
         const normalizedProjectPath = projectNameEndingInDotLtProj.replace(/\\/g, '/');
 
-        console.log(`Running game with Wine: ${normalizedProjectPath}`);
-        console.log(`LT Maker path: ${ltMakerPath}`);
+        logger.log('info', `Running game with normalized path: ${normalizedProjectPath}`);
 
         // Check if metadata.json exists before running
         const metadataPath = path.join(ltMakerPath, normalizedProjectPath, 'metadata.json');
         if (!fs.existsSync(metadataPath)) {
-          console.error(`Error: metadata.json not found at ${metadataPath}`);
-          reject(new Error(`Game cannot run: metadata.json not found for ${normalizedProjectPath}`));
+          const errorMsg = `Game cannot run: metadata.json not found for ${normalizedProjectPath}`;
+          logger.log('error', errorMsg, { metadataPath });
+          reject(new Error(errorMsg));
           return;
         }
 
-        // Get the bundled Python environment
+        // Get the environment for Python with Wine
         const pythonEnv = getWinePythonEnv();
-
-        console.log('Using local Python with Wine on macOS');
         
+        // Check Python path on macOS
+        // Get the Python path - on macOS for packaged app we need to use system Python
+        const pythonPath = getBundledPythonPath();
+        logger.log('info', `Using Python path: ${pythonPath}`);
+
+        // Log execution command for debugging
+        const fullCommand = `${winePath} ${pythonPath} run_engine_for_project.py ${normalizedProjectPath}`;
+        logger.log('info', `Executing command: ${fullCommand}`, {
+          cwd: ltMakerPath,
+          wineDebug: pythonEnv.WINEDEBUG,
+          winePrefix: pythonEnv.WINEPREFIX
+        });
+
         // Set a timeout to prevent indefinite hanging
-        const timeout = 60000; // 60 seconds timeout
+        const timeout = 120000; // 2 minutes timeout (increased from 60s)
         const timeoutId = setTimeout(() => {
-          console.error(`Wine process timed out after ${timeout/1000} seconds`);
+          logger.log('error', `Wine process timed out after ${timeout/1000} seconds`);
           if (wineProcess && !wineProcess.killed) {
-            console.log('Killing Wine process due to timeout');
+            logger.log('info', 'Killing Wine process due to timeout');
             wineProcess.kill();
           }
           resolve(); // Resolve anyway to prevent hanging UI
         }, timeout);
         
-        // Log the command before executing
-        console.log(`Executing Wine command: ${winePath} ${getBundledPythonPath()} run_engine_for_project.py ${normalizedProjectPath}`);
-        console.log(`Working directory: ${ltMakerPath}`);
-        console.log(`Wine environment variables: WINEDEBUG=${pythonEnv.WINEDEBUG || 'not set'}, WINEPREFIX=${pythonEnv.WINEPREFIX || 'not set'}`);
-        
-        // Detach process to prevent it from blocking electron
-        const wineProcess = spawn(
-          winePath,
-          [
-            getBundledPythonPath(),
-            'run_engine_for_project.py',
-            normalizedProjectPath
-          ],
-          {
-            cwd: ltMakerPath,
-            env: pythonEnv,
-            detached: true, // Detach the process from Electron
-            stdio: ['ignore', 'pipe', 'pipe'] // Keep stdio pipes for logging
-          }
-        );
-        
-        // Unref the child to allow the Node.js event loop to exit even if the process is still running
-        wineProcess.unref();
+        // Enhanced Wine process - use direct Python command on macOS
+        // Important: On macOS in packaged app, we need to use a different approach
+        try {
+          // Create shell script for running Wine
+          const tempScriptPath = path.join(app.getPath('temp'), 'run-wine.sh');
+          let scriptContent = `#!/bin/bash
+cd "${ltMakerPath}"
+export WINEDEBUG=${pythonEnv.WINEDEBUG || '-all'}
+export WINEPREFIX=${pythonEnv.WINEPREFIX || '~/.wine'}
+"${winePath}" "${pythonPath}" run_engine_for_project.py "${normalizedProjectPath}" 2>&1`;
 
-        wineProcess.stdout.on('data', (data) => {
-          const output = data.toString().trim();
-          console.log(`Game stdout: ${output}`);
-        });
+          fs.writeFileSync(tempScriptPath, scriptContent);
+          fs.chmodSync(tempScriptPath, 0o755);
+          
+          logger.log('info', `Created Wine wrapper script at ${tempScriptPath}`);
+          logger.log('info', `Script content: ${scriptContent}`);
+          
+          // Launch with shell script - this helps with macOS path issues
+          const wineProcess = spawn(
+            '/bin/bash',
+            [tempScriptPath],
+            {
+              detached: true,
+              stdio: ['ignore', 'pipe', 'pipe']
+            }
+          );
+          
+          // Unref the child to allow the Node.js event loop to exit even if the process is still running
+          wineProcess.unref();
 
-        wineProcess.stderr.on('data', (data) => {
-          const output = data.toString().trim();
-          console.error(`Game stderr: ${output}`);
-        });
+          wineProcess.stdout.on('data', (data) => {
+            const output = data.toString().trim();
+            logger.log('info', `Game stdout: ${output}`);
+          });
 
-        wineProcess.on('close', (code) => {
-          clearTimeout(timeoutId); // Clear the timeout
-          console.log(`Game process closed with code ${code}`);
-          resolve(); // Always resolve to prevent hanging
-        });
+          wineProcess.stderr.on('data', (data) => {
+            const output = data.toString().trim();
+            logger.log('error', `Game stderr: ${output}`);
+          });
 
-        wineProcess.on('exit', (code) => {
-          clearTimeout(timeoutId); // Clear the timeout
-          console.log(`Game process exited with code ${code}`);
-          resolve(); // Always resolve to prevent hanging
-        });
+          wineProcess.on('close', (code) => {
+            clearTimeout(timeoutId);
+            logger.log('info', `Game process closed with code ${code}`);
+            if (code !== 0) {
+              logger.log('error', `Wine process exited with non-zero code: ${code}`);
+            }
+            resolve();
+          });
 
-        wineProcess.on('error', (err) => {
-          clearTimeout(timeoutId); // Clear the timeout
-          console.error('Failed to start game process:', err);
-
-          // Provide more helpful error message about bundled Wine
-          if (err.code === 'ENOENT') {
-            const errorMessage = `Bundled Wine executable failed to run.
-This is likely due to a missing or corrupted Wine installation in the application bundle.
-Please contact support or reinstall the application.
-
-Error details: ${err.message}`;
-            console.error(errorMessage);
-            reject(new Error(errorMessage));
-          } else {
-            console.error('Wine execution error:', err.message);
+          wineProcess.on('error', (err) => {
+            clearTimeout(timeoutId);
+            logger.log('error', 'Failed to start game process', {
+              error: err.message,
+              code: err.code,
+              path: tempScriptPath
+            });
             reject(err);
-          }
-        });
-        
-        // Resolve after a short delay to allow the game to start but not block UI
-        setTimeout(() => {
-          console.log('Resolving Wine process promise to unblock UI');
-          resolve();
-        }, 2000);
+          });
+          
+          // Resolve after a short delay to allow the game to start but not block UI
+          setTimeout(() => {
+            logger.log('info', 'Resolving Wine process promise to unblock UI');
+            resolve();
+          }, 2000);
+        } catch (spawnError) {
+          clearTimeout(timeoutId);
+          logger.log('error', 'Error spawning Wine process', {
+            error: spawnError.message,
+            stack: spawnError.stack
+          });
+          reject(spawnError);
+        }
       } else {
         // On Windows, we run our bundled Python directly
         const pythonPath = getBundledPythonPath();
-        console.log(`Using bundled Python: ${pythonPath}`);
+        logger.log('info', `Using bundled Python on Windows: ${pythonPath}`);
 
         const pythonProcess = spawn(
           pythonPath,
@@ -325,36 +352,45 @@ Error details: ${err.message}`;
         pythonProcess.unref();
 
         pythonProcess.stdout.on('data', (data) => {
-          console.log(`Game stdout: ${data.toString().trim()}`);
+          const output = data.toString().trim();
+          logger.log('info', `Game stdout: ${output}`);
         });
 
         pythonProcess.stderr.on('data', (data) => {
-          console.error(`Game stderr: ${data.toString().trim()}`);
+          const output = data.toString().trim();
+          logger.log('error', `Game stderr: ${output}`);
         });
 
         pythonProcess.on('close', (code) => {
-          console.log(`Game process closed with code ${code}`);
+          logger.log('info', `Game process closed with code ${code}`);
           resolve();
         });
 
         pythonProcess.on('exit', (code) => {
-          console.log(`Game process exited with code ${code}`);
+          logger.log('info', `Game process exited with code ${code}`);
           resolve();
         });
 
         pythonProcess.on('error', (err) => {
-          console.error('Failed to start game process:', err);
+          logger.log('error', 'Failed to start game process:', {
+            error: err.message,
+            stack: err.stack
+          });
           reject(err);
         });
         
         // Resolve after a short delay to allow the game to start but not block UI
         setTimeout(() => {
-          console.log('Resolving Python process promise to unblock UI');
+          logger.log('info', 'Resolving Python process promise to unblock UI');
           resolve();
         }, 2000);
       }
     } catch (error) {
-      console.error('Unexpected error in runGameWithWine:', error);
+      const logger = require('./logger');
+      logger.log('error', 'Unexpected error in runGameWithWine', {
+        error: error.message,
+        stack: error.stack
+      });
       reject(error);
     }
   });
