@@ -1,0 +1,7 @@
+{
+  "exclude": [
+    "electron/bin/python/prefix",
+    "**/.git",
+    "**/node_modules"
+  ]
+}
