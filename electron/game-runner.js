@@ -97,7 +97,7 @@ function getBundledPythonPath() {
     // For macOS, try to find Python 3.11.x specifically (required by the game)
     try {
       const { execSync } = require('child_process');
-      
+
       // Check for Python 3.11 in common Homebrew locations first
       const pythonLocations = [
         '/opt/homebrew/bin/python3.11',
@@ -105,7 +105,7 @@ function getBundledPythonPath() {
         '/opt/homebrew/bin/python3',
         '/usr/local/bin/python3'
       ];
-      
+
       // First check if we can find Python 3.11 directly
       try {
         // Try to see if python3.11 is available
@@ -115,7 +115,7 @@ function getBundledPythonPath() {
       } catch (specificVersionError) {
         logger.log('info', 'Python 3.11 not found in PATH, checking alternate locations');
       }
-      
+
       // Check each location
       for (const pyLocation of pythonLocations) {
         if (fs.existsSync(pyLocation)) {
@@ -123,7 +123,7 @@ function getBundledPythonPath() {
             // Verify version before using
             const versionOutput = execSync(`${pyLocation} --version`, { encoding: 'utf8' }).trim();
             logger.log('info', `Found Python at ${pyLocation}: ${versionOutput}`);
-            
+
             // Use it if it's version 3.11 or higher
             if (versionOutput.includes('Python 3.11') || versionOutput.includes('Python 3.12')) {
               logger.log('info', `Using Python 3.11+: ${pyLocation}`);
@@ -134,19 +134,19 @@ function getBundledPythonPath() {
           }
         }
       }
-      
+
       // Fall back to system Python, but warn that it might not work if it's < 3.11
       const systemPythonPath = execSync('which python3', { encoding: 'utf8' }).trim();
       const versionOutput = execSync(`${systemPythonPath} --version`, { encoding: 'utf8' }).trim();
       logger.log('warn', `Using system Python: ${versionOutput} at ${systemPythonPath}`);
       logger.log('warn', 'Game requires Python 3.11+. If startup fails, please install Python 3.11+: brew install python@3.11');
-      
+
       // If system Python version is < 3.10, show a clear error since we know TypeAlias won't work
       if (versionOutput.includes('Python 3.9') || versionOutput.includes('Python 3.8') ||
-          versionOutput.includes('Python 3.7') || versionOutput.includes('Python 3.6')) {
+        versionOutput.includes('Python 3.7') || versionOutput.includes('Python 3.6')) {
         throw new Error(`Python ${versionOutput} is too old. The game requires Python 3.11+. Please install using: brew install python@3.11`);
       }
-      
+
       return systemPythonPath;
     } catch (error) {
       logger.log('error', `Python error: ${error.message}`);
@@ -368,10 +368,8 @@ export WINEPREFIX=${pythonEnv.WINEPREFIX || '~/.wine'}
             });
             reject(err);
           });
-
-        // Don't resolve the promise early - wait for the process to complete on its own
-        // The promise will resolve when the Python process closes or errors out
-        logger.log('info', 'Waiting for game process to exit before resolving...');
+        } catch (spawnError) {
+          clearTimeout(timeoutId);
           logger.log('error', 'Error spawning Wine process', {
             error: spawnError.message,
             stack: spawnError.stack
