@@ -2,6 +2,7 @@ const { spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 const { app } = require('electron');
+const logger = require('./logger');
 
 // Function to get Wine path from the local system
 // NOTE: Wine is the exception - we use system Wine instead of bundled
