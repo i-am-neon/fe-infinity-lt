@@ -32,6 +32,7 @@ export default function HomePage() {
   // Test function states
   const [testingMockGame, setTestingMockGame] = useState(false);
   const [testingSimilarity, setTestingSimilarity] = useState(false);
+  const [runningDefault, setRunningDefault] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [testResults, setTestResults] = useState<any>(null);
   const [showTestResults, setShowTestResults] = useState(false);
@@ -136,6 +137,25 @@ export default function HomePage() {
     }
   }, []);
 
+  // Handler for running default project
+  const handleRunDefaultProject = useCallback(async () => {
+    setRunningDefault(true);
+    setError(null);
+
+    try {
+      await apiCall("run-game", {
+        method: "POST",
+        body: { directory: "default.ltproj" },
+      });
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Unknown error occurred";
+      setError(errorMessage);
+    } finally {
+      setRunningDefault(false);
+    }
+  }, []);
+
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
@@ -221,6 +241,16 @@ export default function HomePage() {
             )}
             Test Similarity Search
           </Button>
+          <Button
+            onClick={handleRunDefaultProject}
+            disabled={runningDefault}
+            variant="outline"
+          >
+            {runningDefault && (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            )}
+            Run Default Project
+          </Button>
         </div>
 
         {/* Test Results */}
@@ -247,4 +277,3 @@ export default function HomePage() {
     </div>
   );
 }
-
