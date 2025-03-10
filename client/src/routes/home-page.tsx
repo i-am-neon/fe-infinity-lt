@@ -145,7 +145,7 @@ export default function HomePage() {
     try {
       await apiCall("run-game", {
         method: "POST",
-        body: { directory: "default.ltproj" },
+        body: { directory: "testing_proj.ltproj" },
       });
     } catch (err) {
       const errorMessage =

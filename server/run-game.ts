@@ -31,9 +31,14 @@ export default async function runGame(
     );
   }
 
-  // In Electron environment, use IPC to run the game
+  // In Electron environment, use sendToElectron to communicate with the main process
   if (isElectronEnvironment()) {
-    await sendToElectron(normalizedProjectPath);
+    console.log(`Running game in Electron environment: ${normalizedProjectPath}`);
+    const result = await sendToElectron(normalizedProjectPath);
+    
+    if (!result.success) {
+      throw new Error(`Failed to run game: ${result.error || 'Unknown error'}`);
+    }
     return;
   }
 

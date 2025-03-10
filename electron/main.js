@@ -49,22 +49,22 @@ function createMainWindow() {
   // Check if running in development mode
   const isDev = process.argv.includes('--dev');
 
+  // Always start the game launcher HTTP server in any mode
+  startGameLauncherServer().then(server => {
+    console.log('Game launcher HTTP server started successfully');
+    app.on('before-quit', () => {
+      server.close();
+    });
+  }).catch(err => {
+    console.error('Failed to start game launcher server:', err);
+  });
+
   // Load from Vite dev server in development
   if (isDev) {
     console.log('Running in development mode');
     process.env.NODE_ENV = 'development';
     mainWindow.loadURL('http://localhost:5173');
     mainWindow.webContents.openDevTools();
-
-    // Start HTTP game launcher server in development mode
-    startGameLauncherServer().then(server => {
-      console.log('Game launcher HTTP server started successfully');
-      app.on('before-quit', () => {
-        server.close();
-      });
-    }).catch(err => {
-      console.error('Failed to start game launcher server:', err);
-    });
   } else {
     // In production, we need to handle path resolution differently
     try {

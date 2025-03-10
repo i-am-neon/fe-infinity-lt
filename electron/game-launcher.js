@@ -1,11 +1,13 @@
 const http = require('http');
 const { runGameWithWine } = require('./game-runner');
 
-// Create a simple HTTP server for development mode
+// Create a simple HTTP server for all modes (both development and production)
 const PORT = 8989;
 
 function startGameLauncherServer() {
   return new Promise((resolve, reject) => {
+    console.log(`Attempting to start game launcher HTTP server on port ${PORT}...`);
+    
     const server = http.createServer((req, res) => {
       // Only handle POST requests to /run-game
       if (req.method === 'POST' && req.url === '/run-game') {
@@ -24,6 +26,7 @@ function startGameLauncherServer() {
         // Process the request
         req.on('end', async () => {
           try {
+            console.log(`Received run-game request with body: ${body}`);
             const { projectPath } = JSON.parse(body);
             
             if (!projectPath) {

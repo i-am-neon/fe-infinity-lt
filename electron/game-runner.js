@@ -209,7 +209,24 @@ async function runGameWithWine(projectNameEndingInDotLtProj) {
         const pythonEnv = getWinePythonEnv();
 
         console.log('Using local Python with Wine on macOS');
-
+        
+        // Set a timeout to prevent indefinite hanging
+        const timeout = 60000; // 60 seconds timeout
+        const timeoutId = setTimeout(() => {
+          console.error(`Wine process timed out after ${timeout/1000} seconds`);
+          if (wineProcess && !wineProcess.killed) {
+            console.log('Killing Wine process due to timeout');
+            wineProcess.kill();
+          }
+          resolve(); // Resolve anyway to prevent hanging UI
+        }, timeout);
+        
+        // Log the command before executing
+        console.log(`Executing Wine command: ${winePath} ${getBundledPythonPath()} run_engine_for_project.py ${normalizedProjectPath}`);
+        console.log(`Working directory: ${ltMakerPath}`);
+        console.log(`Wine environment variables: WINEDEBUG=${pythonEnv.WINEDEBUG || 'not set'}, WINEPREFIX=${pythonEnv.WINEPREFIX || 'not set'}`);
+        
+        // Detach process to prevent it from blocking electron
         const wineProcess = spawn(
           winePath,
           [
@@ -219,29 +236,39 @@ async function runGameWithWine(projectNameEndingInDotLtProj) {
           ],
           {
             cwd: ltMakerPath,
-            env: pythonEnv
+            env: pythonEnv,
+            detached: true, // Detach the process from Electron
+            stdio: ['ignore', 'pipe', 'pipe'] // Keep stdio pipes for logging
           }
         );
+        
+        // Unref the child to allow the Node.js event loop to exit even if the process is still running
+        wineProcess.unref();
 
         wineProcess.stdout.on('data', (data) => {
-          console.log(`Game stdout: ${data}`);
+          const output = data.toString().trim();
+          console.log(`Game stdout: ${output}`);
         });
 
         wineProcess.stderr.on('data', (data) => {
-          console.error(`Game stderr: ${data}`);
+          const output = data.toString().trim();
+          console.error(`Game stderr: ${output}`);
         });
 
         wineProcess.on('close', (code) => {
-          if (code === 0) {
-            console.log(`Game process exited with code ${code}`);
-            resolve();
-          } else {
-            console.error(`Game process exited with code ${code}`);
-            reject(new Error(`Game exited with code ${code}`));
-          }
+          clearTimeout(timeoutId); // Clear the timeout
+          console.log(`Game process closed with code ${code}`);
+          resolve(); // Always resolve to prevent hanging
+        });
+
+        wineProcess.on('exit', (code) => {
+          clearTimeout(timeoutId); // Clear the timeout
+          console.log(`Game process exited with code ${code}`);
+          resolve(); // Always resolve to prevent hanging
         });
 
         wineProcess.on('error', (err) => {
+          clearTimeout(timeoutId); // Clear the timeout
           console.error('Failed to start game process:', err);
 
           // Provide more helpful error message about bundled Wine
@@ -258,6 +285,12 @@ Error details: ${err.message}`;
             reject(err);
           }
         });
+        
+        // Resolve after a short delay to allow the game to start but not block UI
+        setTimeout(() => {
+          console.log('Resolving Wine process promise to unblock UI');
+          resolve();
+        }, 2000);
       } else {
         // On Windows, we run our bundled Python directly
         const pythonPath = getBundledPythonPath();
@@ -270,23 +303,46 @@ Error details: ${err.message}`;
             projectNameEndingInDotLtProj
           ],
           {
-            cwd: ltMakerPath
+            cwd: ltMakerPath,
+            detached: true,
+            stdio: ['ignore', 'pipe', 'pipe']
           }
         );
+        
+        // Unref the child to allow the Node.js event loop to exit
+        pythonProcess.unref();
+
+        pythonProcess.stdout.on('data', (data) => {
+          console.log(`Game stdout: ${data.toString().trim()}`);
+        });
+
+        pythonProcess.stderr.on('data', (data) => {
+          console.error(`Game stderr: ${data.toString().trim()}`);
+        });
 
         pythonProcess.on('close', (code) => {
-          if (code === 0) {
-            resolve();
-          } else {
-            reject(new Error(`Game exited with code ${code}`));
-          }
+          console.log(`Game process closed with code ${code}`);
+          resolve();
+        });
+
+        pythonProcess.on('exit', (code) => {
+          console.log(`Game process exited with code ${code}`);
+          resolve();
         });
 
         pythonProcess.on('error', (err) => {
+          console.error('Failed to start game process:', err);
           reject(err);
         });
+        
+        // Resolve after a short delay to allow the game to start but not block UI
+        setTimeout(() => {
+          console.log('Resolving Python process promise to unblock UI');
+          resolve();
+        }, 2000);
       }
     } catch (error) {
+      console.error('Unexpected error in runGameWithWine:', error);
       reject(error);
     }
   });
