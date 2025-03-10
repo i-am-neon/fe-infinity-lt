@@ -43,7 +43,8 @@
       "*.html",
       "*.png",
       "node_modules/**/*",
-      "bin/**/*"
+      "bin/**/*",
+      "!bin/python/prefix/**/*"
     ],
     "asar": true,
     "asarUnpack": [
