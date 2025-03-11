@@ -382,13 +382,14 @@ export default function GameDetailPage() {
       </NonClosableDialog>
 
       <div className="p-6 space-y-4">
-        <a
-          href="/"
-          className="inline-flex items-center mb-4 text-sm font-medium hover:underline"
+        <Button
+          variant="ghost"
+          className="inline-flex items-center mb-4"
+          onClick={() => navigate("/")}
         >
           <ChevronLeft className="w-4 h-4 mr-1" />
-          Back to Home
-        </a>
+          Back
+        </Button>
         {loading ? (
           <div>Loading...</div>
         ) : !data?.success || !data.game ? (
