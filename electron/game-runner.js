@@ -94,7 +94,8 @@ function getBundledPythonPath() {
     }
     return pythonPath;
   } else if (process.platform === 'darwin') {
-    // For macOS, try to find Python 3.11.x specifically (required by the game)
+    // For macOS, we need system Python for initialization, but we'll use Wine for running the game
+    // This function now only provides the system Python path on macOS
     try {
       const { execSync } = require('child_process');
 
@@ -153,8 +154,7 @@ function getBundledPythonPath() {
       throw new Error('Python 3.11+ is required but not found. Please install using: brew install python@3.11');
     }
   } else {
-    // Linux still uses Wine with bundled Python
-    // Return the Wine Python path (this is the path within the Wine environment)
+    // Linux also uses Wine with python command inside Wine environment
     return 'python';
   }
 }
@@ -250,7 +250,7 @@ async function runGameWithWine(projectNameEndingInDotLtProj) {
         return;
       }
 
-      // On macOS, we use Wine
+      // On macOS or Linux, we always use Wine
       if (process.platform === 'darwin' || process.platform === 'linux') {
         let winePath;
         try {
@@ -286,10 +286,10 @@ async function runGameWithWine(projectNameEndingInDotLtProj) {
         // Get the environment for Python with Wine
         const pythonEnv = getWinePythonEnv();
 
-        // Check Python path on macOS
-        // Get the Python path - on macOS for packaged app we need to use system Python
-        const pythonPath = getBundledPythonPath();
-        logger.log('info', `Using Python path: ${pythonPath}`);
+        // For macOS/Linux with Wine, we use 'python' inside the Wine environment
+        // We don't use the system Python for running the game, only for initialization
+        const pythonPath = 'python'; // Use Python within Wine environment
+        logger.log('info', `Using Python path within Wine: ${pythonPath}`);
 
         // Log execution command for debugging
         const fullCommand = `${winePath} ${pythonPath} run_engine_for_project.py ${normalizedProjectPath}`;

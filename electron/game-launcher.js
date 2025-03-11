@@ -59,10 +59,44 @@ function startGameLauncherServer() {
               return;
             }
 
-            // Verify the project exists before attempting to run
-            const resourcesPath = process.resourcesPath || app.getAppPath();
-            const ltMakerPath = path.join(resourcesPath, 'lt-maker-fork');
+            // Use improved path resolution logic to find lt-maker-fork directory
+            let ltMakerPath;
+            // Try multiple potential locations
+            const potentialLocations = [
+              // Development location
+              path.join(app.getAppPath(), '..', 'lt-maker-fork'),
+              // Direct from app path
+              path.join(app.getAppPath(), 'lt-maker-fork'),
+              // From resources
+              path.join(process.resourcesPath || app.getAppPath(), 'lt-maker-fork'),
+              // From resources/app
+              path.join(process.resourcesPath || app.getAppPath(), 'app', 'lt-maker-fork')
+            ];
+
+            // Find the first location that exists
+            let foundPath = false;
+            for (const location of potentialLocations) {
+              if (fs.existsSync(location)) {
+                ltMakerPath = location;
+                foundPath = true;
+                logger.log('info', `Found lt-maker-fork at: ${ltMakerPath}`);
+                break;
+              }
+            }
+
+            if (!foundPath) {
+              const errorMsg = `lt-maker-fork directory not found in any expected location`;
+              logger.log('error', errorMsg, { searchedLocations: potentialLocations });
+              res.statusCode = 404;
+              res.end(JSON.stringify({
+                success: false,
+                error: errorMsg
+              }));
+              return;
+            }
+
             const projectFullPath = path.join(ltMakerPath, projectPath);
+            logger.log('info', `Looking for project at: ${projectFullPath}`);
 
             if (!fs.existsSync(projectFullPath)) {
               const errorMsg = `Project not found: ${projectPath} (full path: ${projectFullPath})`;
