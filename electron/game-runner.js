@@ -207,15 +207,25 @@ function getWinePythonEnv() {
     }
   }
 
-  // Set Python environment variables for site-packages
+  // Set Python environment variables for site-packages and the LT maker path
   const pythonDir = path.join(app.getAppPath(), 'bin', 'python');
   const sitePackagesDir = path.join(pythonDir, 'Lib', 'site-packages');
   const pythonPath = process.env.PYTHONPATH || '';
   
-  // Ensure our site-packages directory is in PYTHONPATH
+  // Get the LT maker path for the Python path
+  const ltMakerForPython = process.env.NODE_ENV === 'development'
+    ? path.join(app.getAppPath(), '..', 'lt-maker-fork')
+    : getLtMakerPath();
+  
+  // Ensure our site-packages directory and LT maker directory are in PYTHONPATH
   let updatedPythonPath = pythonPath;
-  if (!pythonPath.includes(sitePackagesDir)) {
+  if (!pythonPath.includes(sitePackagesDir) || !pythonPath.includes(ltMakerForPython)) {
+    // Add site-packages if needed
     updatedPythonPath = pythonPath ? `${sitePackagesDir}:${pythonPath}` : sitePackagesDir;
+    // Add LT maker path if needed
+    if (!updatedPythonPath.includes(ltMakerForPython)) {
+      updatedPythonPath = `${ltMakerForPython}:${updatedPythonPath}`;
+    }
   }
 
   // Build Wine environment
@@ -318,12 +328,22 @@ async function runGameWithWine(projectNameEndingInDotLtProj) {
 
         // Create a temporary Windows batch file to run the game
         const tempBatchPath = path.join(require('os').tmpdir(), 'run_game.bat');
+        // Get the Wine-compatible path to the run_engine_for_project.py script
+        const ltMakerWinePath = ltMakerPath.replace(/\//g, '\\');
+        // Note: Using raw string (r prefix) to avoid Python unicode escaping issues with backslashes
         const batchContent = `@echo off
-cd /d %~dp0
-${pythonExe.replace(/\\/g, '\\')} run_engine_for_project.py ${normalizedProjectPath}
+cd /d "${ltMakerWinePath}"
+set PYTHONPATH=${ltMakerWinePath}
+
+REM Install required Python packages if not already installed
+${pythonExe.replace(/\\/g, '\\')} -m pip install -r "${ltMakerWinePath}\\requirements_engine.txt" --quiet
+
+REM Run the game
+${pythonExe.replace(/\\/g, '\\')} -c "import sys; sys.path.insert(0, r'${ltMakerWinePath}'); import run_engine_for_project; run_engine_for_project.main('${normalizedProjectPath}')"
 `;
         fs.writeFileSync(tempBatchPath, batchContent);
         logger.log('info', `Created temporary batch file: ${tempBatchPath}`);
+        logger.log('info', `Batch file content: ${batchContent}`);
 
         // Log execution command for debugging
         const fullCommand = `${winePath} cmd /c ${tempBatchPath}`;
