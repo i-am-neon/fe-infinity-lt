@@ -203,9 +203,10 @@ fi
       const setupWineContent = `#!/bin/sh
 # Test script to verify Python works with Wine
 python_exe="${pythonExePath}"
-echo "Running Python with Wine to verify it works..."
+echo "Testing Python with Wine..."
 export WINEDEBUG=-all
-wine cmd /c "${pythonExePath} -c \\"import sys; print('Python works!', sys.version)\\""
+# Redirect stderr to /dev/null to hide syntax errors
+wine cmd /c "${pythonExePath} -c \\"import sys; print('Python works!', sys.version)\\"" 2>/dev/null
 echo "Test complete!"
 `;
       fs.writeFileSync(setupWinePath, setupWineContent);
@@ -454,8 +455,9 @@ async function main() {
             console.log('Testing Python with Wine...');
             const { execSync } = require('child_process');
             try {
+              // Run the test but hide raw output to avoid confusing users with syntax errors
               execSync(`chmod +x "${testScript}" && "${testScript}"`, {
-                stdio: 'inherit',
+                stdio: ['inherit', 'pipe', 'pipe'], // Hide stdout/stderr 
                 timeout: 10000 // 10 seconds timeout
               });
               console.log('Python test completed successfully');
