@@ -161,9 +161,11 @@ async function downloadPython() {
     }
 
     if (isWindows) {
-      // On Windows, directly install packages
-      console.log('Installing pip and packages...');
+      // On Windows, directly install packages - this is the key part of the process
+      // This is where dependencies get installed ONCE during download-binaries
+      console.log('Installing pip and packages for bundled Python...');
       await execCommand(path.join(pythonDir, 'python.exe'), [getPipPath], { cwd: pythonDir });
+      console.log('Installing all required packages for bundled Python (this may take a while)...');
       await installPythonRequirements(path.join(pythonDir, 'python.exe'));
     } else {
       // For non-Windows platforms, create proper installation scripts that will be used by Wine
@@ -224,22 +226,87 @@ echo "Test complete!"
 async function installPythonRequirements(pythonExecutable) {
   console.log('Installing Python requirements...');
 
-  const ltMakerPath = path.join(app.getAppPath(), isWindows ? 'lt-maker-fork' : '..', 'lt-maker-fork');
-
   try {
-    // Install editor requirements
-    const editorRequirementsPath = path.join(ltMakerPath, 'requirements_editor.txt');
-    console.log(`Installing editor requirements from ${editorRequirementsPath}`);
-    await execCommand(pythonExecutable, ['-m', 'pip', 'install', '-r', editorRequirementsPath]);
+    const ltMakerPath = path.resolve(__dirname, '..', 'lt-maker-fork');
+    
+    // First make sure pip is up to date
+    console.log('Upgrading pip...');
+    try {
+      await execCommand(pythonExecutable, ['-m', 'pip', 'install', '--upgrade', 'pip'], { capture: true });
+    } catch (pipError) {
+      console.error('Failed to upgrade pip:', pipError);
+      // Continue anyway - the bundled version might work
+    }
 
-    // Install engine requirements
-    const engineRequirementsPath = path.join(ltMakerPath, 'requirements_engine.txt');
-    console.log(`Installing engine requirements from ${engineRequirementsPath}`);
-    await execCommand(pythonExecutable, ['-m', 'pip', 'install', '-r', engineRequirementsPath]);
+    // On Windows, we can use the Python executable directly
+    if (process.platform === 'win32') {
+      // Install engine requirements first (most important)
+      const engineRequirementsPath = path.join(ltMakerPath, 'requirements_engine.txt');
+      console.log(`Installing engine requirements from ${engineRequirementsPath}`);
+      await execCommand(pythonExecutable, ['-m', 'pip', 'install', '-r', engineRequirementsPath, '--no-cache-dir'], { capture: true });
+      
+      // Install editor requirements if time permits (lower priority)
+      try {
+        const editorRequirementsPath = path.join(ltMakerPath, 'requirements_editor.txt');
+        console.log(`Installing editor requirements from ${editorRequirementsPath}`);
+        await execCommand(pythonExecutable, ['-m', 'pip', 'install', '-r', editorRequirementsPath, '--no-cache-dir'], { capture: true });
+      } catch (editorError) {
+        console.warn('Failed to install editor requirements - continuing anyway:', editorError);
+      }
+    } else {
+      // On macOS/Linux, use the install_dependencies.py script since we need Wine
+      console.log('Running full install script through pythonSetup...');
+      await pythonSetup.runPythonInstallScript();
+    }
 
-    console.log('Python requirements installed successfully');
+    // Verify the installation worked
+    console.log('Verifying Python package installation...');
+    const checkDepsPath = path.join(__dirname, 'bin', 'python', 'check_dependencies.py');
+    
+    if (process.platform === 'win32') {
+      try {
+        const output = await execCommand(pythonExecutable, [checkDepsPath], { capture: true });
+        console.log('Python dependency verification output:', output.stdout);
+        console.log('Python requirements installed successfully');
+      } catch (verifyError) {
+        console.error('Python dependency verification failed:', verifyError);
+        throw verifyError;
+      }
+    } else {
+      // For macOS/Linux, create a separate verification script with Wine
+      const pythonDir = path.join(__dirname, 'bin', 'python');
+      const winePath = getWinePath();
+      
+      if (winePath) {
+        // Create verification batch file
+        const verifyBatchPath = path.join(pythonDir, 'verify_deps.bat');
+        const pythonExe = path.join(pythonDir, 'python.exe').replace(/\\/g, '\\\\');
+        const checkScriptPath = checkDepsPath.replace(/\\/g, '\\\\');
+        
+        const batchContent = `@echo off
+${pythonExe} "${checkScriptPath}"
+exit %ERRORLEVEL%
+`;
+        
+        fs.writeFileSync(verifyBatchPath, batchContent);
+        
+        try {
+          const { execSync } = require('child_process');
+          const output = execSync(`${winePath} cmd /c "${verifyBatchPath}"`, { 
+            encoding: 'utf8',
+            timeout: 10000 // 10 second timeout
+          });
+          console.log('Python dependency verification output:', output);
+          console.log('Python requirements installed successfully');
+        } catch (verifyError) {
+          console.error('Python dependency verification failed:', verifyError);
+          // Continue anyway - we'll try at runtime
+        }
+      }
+    }
   } catch (error) {
     console.error('Failed to install Python requirements:', error);
+    console.warn('Python dependencies may need to be installed at runtime');
     // Continue anyway
   }
 }
