@@ -2,7 +2,7 @@ const { app, BrowserWindow, dialog, ipcMain } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const { startServer, stopServer, isServerReady } = require('./server-manager');
-const { runGameWithWine } = require('./game-runner');
+const { runGameWithWine, preparePythonEnvironment } = require('./game-runner');
 const { startGameLauncherServer } = require('./game-launcher');
 const logger = require('./logger');
 
@@ -500,6 +500,19 @@ app.whenReady().then(async () => {
         const exists = fs.existsSync(altPath);
         logger.log('info', `Alternative LT Maker path exists: ${exists}`, { path: altPath });
       }
+    }
+
+    // Initialize Python environment for game engine
+    try {
+      logger.log('info', 'Initializing Python environment for game engine...');
+      await preparePythonEnvironment();
+      logger.log('info', 'Python environment initialized');
+    } catch (pythonError) {
+      logger.log('error', 'Failed to initialize Python environment', {
+        error: pythonError.message,
+        stack: pythonError.stack
+      });
+      // Continue anyway - we'll retry during game launch
     }
 
     // Start server components with retries

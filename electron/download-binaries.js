@@ -4,6 +4,7 @@ const path = require('path');
 const axios = require('axios');
 const extract = require('extract-zip');
 const { spawn } = require('child_process');
+const pythonSetup = require('./python_setup');
 
 const binariesDir = path.join(__dirname, 'bin');
 
@@ -165,21 +166,12 @@ async function downloadPython() {
       await execCommand(path.join(pythonDir, 'python.exe'), [getPipPath], { cwd: pythonDir });
       await installPythonRequirements(path.join(pythonDir, 'python.exe'));
     } else {
-      // For non-Windows platforms, create installation script that will be executed by Wine
-      const setupScriptPath = path.join(pythonDir, 'setup_packages.py');
+      // For non-Windows platforms, create proper installation scripts that will be used by Wine
       const ltMakerPath = path.resolve(__dirname, '..', 'lt-maker-fork');
-      const requirementsPath = path.join(ltMakerPath, 'requirements_engine.txt');
       
-      // Create a minimal script - we need to include the imports
-      const setupScriptContent = `
-import sys
-print("Python is running!")
-print("Python executable:", sys.executable)
-print("Python version:", sys.version)
-# That's all we need to verify Python works in Wine
-`;
-      fs.writeFileSync(setupScriptPath, setupScriptContent);
-      console.log(`Created Python setup script at ${setupScriptPath}`);
+      // Create the improved installation script
+      const installScriptPath = pythonSetup.createPythonInstallScript();
+      console.log(`Created enhanced Python dependencies script at ${installScriptPath}`);
 
       // Now create a Wine wrapper script for Python
       const pythonScriptPath = path.join(pythonDir, 'python');
@@ -372,16 +364,25 @@ async function main() {
     console.log('Downloading Python...');
     await downloadPython();
 
-    // Check Wine availability and setup Python packages for non-Windows platforms
+    // Install Python packages with the enhanced installation script
+    console.log('Setting up Python dependencies...');
+    try {
+      // Run the Python installation script which handles platform differences internally
+      await pythonSetup.runPythonInstallScript();
+    } catch (setupError) {
+      console.error('Failed to install Python dependencies during setup:', setupError);
+      console.warn('Python dependencies will be installed when the user first runs the game');
+    }
+
+    // Verify Python with Wine is working for non-Windows platforms
     if (!isWindows) {
       const hasWine = await checkWineAvailability();
       if (hasWine) {
         try {
-          // Try to install packages with Wine
+          // Try to test that Python with Wine works
           const pythonDir = path.join(__dirname, 'bin', 'python');
-          // We're now using test_python.sh instead of setup.sh
-          
           const testScript = path.join(pythonDir, 'test_python.sh');
+          
           if (fs.existsSync(testScript)) {
             console.log('Testing Python with Wine...');
             const { execSync } = require('child_process');
@@ -393,18 +394,17 @@ async function main() {
               console.log('Python test completed successfully');
             } catch (testError) {
               console.error('Python test failed:', testError);
-              console.warn('Wine-based Python may not work correctly. Python scripts will still be created but may not execute properly.');
+              console.warn('Wine-based Python may not work correctly. Dependencies will be installed at runtime if needed.');
             }
           } else {
             console.warn('Python test script not found');
           }
         } catch (setupError) {
-          console.error('Failed to install Python packages:', setupError);
-          console.warn('You may need to manually run the setup.sh script in the electron/bin/python directory');
+          console.error('Failed to test Python with Wine:', setupError);
         }
       } else {
-        console.warn('Wine is not available. Python packages could not be installed automatically.');
-        console.warn('You will need to install Wine and then run setup.sh in the electron/bin/python directory');
+        console.warn('Wine is not available. The dependencies will be installed when the user runs the game.');
+        console.warn('For best performance, install Wine using your package manager (e.g., brew install --cask --no-quarantine wine-stable)');
       }
     }
 

@@ -330,16 +330,26 @@ async function runGameWithWine(projectNameEndingInDotLtProj) {
         const tempBatchPath = path.join(require('os').tmpdir(), 'run_game.bat');
         // Get the Wine-compatible path to the run_engine_for_project.py script
         const ltMakerWinePath = ltMakerPath.replace(/\//g, '\\');
-        // Note: Using raw string (r prefix) to avoid Python unicode escaping issues with backslashes
+        // Get the path to our install_dependencies.py script
+        const installDepsScriptPath = path.join(app.getAppPath(), 'bin', 'python', 'install_dependencies.py');
+        const installDepsWinePath = installDepsScriptPath.replace(/\//g, '\\');
+        
+        // Create an enhanced batch file that properly installs dependencies before running the game
         const batchContent = `@echo off
 cd /d "${ltMakerWinePath}"
 set PYTHONPATH=${ltMakerWinePath}
 
-REM Install required Python packages if not already installed
-${pythonExe.replace(/\\/g, '\\')} -m pip install -r "${ltMakerWinePath}\\requirements_engine.txt" --quiet
+REM Initialize Python environment
+echo Installing required Python packages...
+${pythonExe.replace(/\\/g, '\\')} "${installDepsWinePath}"
+if %ERRORLEVEL% NEQ 0 (
+  echo Failed to install required dependencies.
+  echo Attempting to run game anyway...
+)
 
-REM Run the game
-${pythonExe.replace(/\\/g, '\\')} -c "import sys; sys.path.insert(0, r'${ltMakerWinePath}'); import run_engine_for_project; run_engine_for_project.main('${normalizedProjectPath}')"
+REM Run the game with proper Python configuration
+echo Starting game engine...
+${pythonExe.replace(/\\/g, '\\')} -c "import sys, os; sys.path.insert(0, r'${ltMakerWinePath}'); os.environ['PYTHONPATH'] = r'${ltMakerWinePath}' + os.pathsep + os.environ.get('PYTHONPATH', ''); import run_engine_for_project; run_engine_for_project.main('${normalizedProjectPath}')"
 `;
         fs.writeFileSync(tempBatchPath, batchContent);
         logger.log('info', `Created temporary batch file: ${tempBatchPath}`);
@@ -370,12 +380,21 @@ ${pythonExe.replace(/\\/g, '\\')} -c "import sys; sys.path.insert(0, r'${ltMaker
           // Create an improved shell script for running Wine with the batch file
           const tempScriptPath = path.join(app.getPath('temp'), 'run-wine.sh');
           let scriptContent = `#!/bin/bash
+# Run Wine with the enhanced batch file that installs dependencies
 cd "${ltMakerPath}"
 export WINEDEBUG=${pythonEnv.WINEDEBUG || '-all'}
 export WINEPREFIX=${pythonEnv.WINEPREFIX || '~/.wine'}
+
 # Set Python environment variables
 export PYTHONIOENCODING=utf-8
 export PYTHONUNBUFFERED=1
+
+# Show important information
+echo "==========================================="
+echo "Installing Python dependencies and running game..."
+echo "This might take a moment on first run"
+echo "==========================================="
+
 # Run Wine with cmd to execute the batch file
 "${winePath}" cmd /c "${tempBatchPath.replace(/\\/g, '/')}" 2>&1`;
 
@@ -441,11 +460,39 @@ export PYTHONUNBUFFERED=1
         const pythonPath = getBundledPythonPath();
         logger.log('info', `Using bundled Python on Windows: ${pythonPath}`);
 
+        // First run the dependency installation script
+        logger.log('info', 'Installing required Python packages for Windows...');
+        const installDepsPath = path.join(app.getAppPath(), 'bin', 'python', 'install_dependencies.py');
+        
+        try {
+          // Run synchronously to wait for dependencies to be installed
+          const { execSync } = require('child_process');
+          execSync(`"${pythonPath}" "${installDepsPath}"`, {
+            cwd: ltMakerPath,
+            stdio: 'pipe'  // Capture output
+          });
+          logger.log('info', 'Dependencies installed successfully for Windows');
+        } catch (depError) {
+          logger.log('error', `Failed to install dependencies: ${depError.message}`);
+          if (depError.stdout) {
+            logger.log('error', `Dependency installation stdout: ${depError.stdout.toString()}`);
+          }
+          if (depError.stderr) {
+            logger.log('error', `Dependency installation stderr: ${depError.stderr.toString()}`);
+          }
+          // Continue anyway - maybe some dependencies are already installed
+          logger.log('warn', 'Attempting to run game despite dependency installation failure');
+        }
+
+        // Now run the game with proper PYTHONPATH setup to ensure modules can be found
+        logger.log('info', 'Starting game with improved Python environment setup');
+        
+        // Use -c to run Python with enhanced environment setup
         const pythonProcess = spawn(
           pythonPath,
           [
-            'run_engine_for_project.py',
-            projectNameEndingInDotLtProj
+            '-c',
+            `import sys, os; sys.path.insert(0, r'${ltMakerPath}'); os.environ['PYTHONPATH'] = r'${ltMakerPath}' + os.pathsep + os.environ.get('PYTHONPATH', ''); import run_engine_for_project; run_engine_for_project.main('${projectNameEndingInDotLtProj}')`
           ],
           {
             cwd: ltMakerPath,
@@ -502,6 +549,73 @@ export PYTHONUNBUFFERED=1
   });
 }
 
+// Prepare Python environment by pre-installing dependencies
+async function preparePythonEnvironment() {
+  return new Promise((resolve, reject) => {
+    logger.log('info', 'Preparing Python environment by pre-installing dependencies...');
+    
+    // Skip on non-Windows platforms for now - we'll handle macOS with Wine at runtime
+    if (process.platform !== 'win32') {
+      logger.log('info', 'Skipping dependency pre-installation on non-Windows platform');
+      resolve();
+      return;
+    }
+    
+    const pythonPath = getBundledPythonPath();
+    const ltMakerPath = process.env.NODE_ENV === 'development'
+      ? path.join(app.getAppPath(), '..', 'lt-maker-fork')
+      : getLtMakerPath();
+    
+    const installDepsPath = path.join(app.getAppPath(), 'bin', 'python', 'install_dependencies.py');
+    
+    try {
+      // Run synchronously to wait for dependencies to be installed
+      const { spawn } = require('child_process');
+      const depProcess = spawn(pythonPath, [installDepsPath], {
+        cwd: ltMakerPath,
+        stdio: ['ignore', 'pipe', 'pipe']
+      });
+      
+      let stdoutData = '';
+      let stderrData = '';
+      
+      depProcess.stdout.on('data', (data) => {
+        const output = data.toString().trim();
+        stdoutData += output + '\n';
+        logger.log('info', `Python dependency installer: ${output}`);
+      });
+      
+      depProcess.stderr.on('data', (data) => {
+        const output = data.toString().trim();
+        stderrData += output + '\n';
+        logger.log('error', `Python dependency installer error: ${output}`);
+      });
+      
+      depProcess.on('close', (code) => {
+        if (code === 0) {
+          logger.log('info', 'Python dependencies pre-installed successfully');
+          resolve();
+        } else {
+          logger.log('warn', `Python dependency pre-installation exited with code ${code}`);
+          // Resolve anyway since we'll retry at runtime
+          resolve();
+        }
+      });
+      
+      depProcess.on('error', (err) => {
+        logger.log('error', `Failed to start Python dependency installer: ${err.message}`);
+        // Resolve anyway since we'll retry at runtime
+        resolve();
+      });
+    } catch (error) {
+      logger.log('error', `Error during Python dependency pre-installation: ${error.message}`);
+      // Resolve anyway since we'll retry at runtime
+      resolve();
+    }
+  });
+}
+
 module.exports = {
-  runGameWithWine
+  runGameWithWine,
+  preparePythonEnvironment
 };
