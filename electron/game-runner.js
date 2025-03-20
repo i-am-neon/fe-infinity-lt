@@ -94,8 +94,15 @@ function getBundledPythonPath() {
     }
     return pythonPath;
   } else if (process.platform === 'darwin') {
-    // For macOS, we need system Python for initialization, but we'll use Wine for running the game
-    // This function now only provides the system Python path on macOS
+    // For macOS, we'll use bundled Python for initialization and Wine for running the game
+    // First try to use bundled Python if available
+    const bundledPythonPath = path.join(app.getAppPath(), 'bin', 'python', 'python');
+    if (fs.existsSync(bundledPythonPath)) {
+      logger.log('info', `Using bundled Python for macOS: ${bundledPythonPath}`);
+      return bundledPythonPath;
+    }
+    
+    // If bundled Python isn't available, fall back to system Python
     try {
       const { execSync } = require('child_process');
 
@@ -200,19 +207,38 @@ function getWinePythonEnv() {
     }
   }
 
+  // Set Python environment variables for site-packages
+  const pythonDir = path.join(app.getAppPath(), 'bin', 'python');
+  const sitePackagesDir = path.join(pythonDir, 'Lib', 'site-packages');
+  const pythonPath = process.env.PYTHONPATH || '';
+  
+  // Ensure our site-packages directory is in PYTHONPATH
+  let updatedPythonPath = pythonPath;
+  if (!pythonPath.includes(sitePackagesDir)) {
+    updatedPythonPath = pythonPath ? `${sitePackagesDir}:${pythonPath}` : sitePackagesDir;
+  }
+
   // Build Wine environment
   const wineEnv = {
     ...process.env,
     WINEDEBUG: '-all', // Suppress Wine debug messages
     WINEDLLOVERRIDES: 'mscoree,mshtml=', // Avoid Wine trying to use Internet Explorer
-    // Ensure Python can find installed packages in user's site-packages
-    PYTHONPATH: process.env.PYTHONPATH || '',
+    PYTHONPATH: updatedPythonPath,
+    // Enable unbuffered output for Python
+    PYTHONUNBUFFERED: '1',
+    // Set Python home to our bundled Python
+    PYTHONHOME: pythonDir
   };
 
   // Only set WINEPREFIX if we have a valid path
   if (winePrefix) {
     wineEnv.WINEPREFIX = winePrefix;
   }
+
+  logger.log('info', `Python environment variables`, { 
+    PYTHONPATH: wineEnv.PYTHONPATH, 
+    PYTHONHOME: wineEnv.PYTHONHOME
+  });
 
   return wineEnv;
 }
@@ -286,13 +312,21 @@ async function runGameWithWine(projectNameEndingInDotLtProj) {
         // Get the environment for Python with Wine
         const pythonEnv = getWinePythonEnv();
 
-        // For macOS/Linux with Wine, we use 'python' inside the Wine environment
-        // We don't use the system Python for running the game, only for initialization
-        const pythonPath = 'python'; // Use Python within Wine environment
-        logger.log('info', `Using Python path within Wine: ${pythonPath}`);
+        // Use a direct approach with Wine and a simple command
+        const pythonExe = path.join(app.getAppPath(), 'bin', 'python', 'python.exe');
+        logger.log('info', `Using Python executable with Wine: ${pythonExe}`);
+
+        // Create a temporary Windows batch file to run the game
+        const tempBatchPath = path.join(require('os').tmpdir(), 'run_game.bat');
+        const batchContent = `@echo off
+cd /d %~dp0
+${pythonExe.replace(/\\/g, '\\')} run_engine_for_project.py ${normalizedProjectPath}
+`;
+        fs.writeFileSync(tempBatchPath, batchContent);
+        logger.log('info', `Created temporary batch file: ${tempBatchPath}`);
 
         // Log execution command for debugging
-        const fullCommand = `${winePath} ${pythonPath} run_engine_for_project.py ${normalizedProjectPath}`;
+        const fullCommand = `${winePath} cmd /c ${tempBatchPath}`;
         logger.log('info', `Executing command: ${fullCommand}`, {
           cwd: ltMakerPath,
           wineDebug: pythonEnv.WINEDEBUG,
@@ -313,13 +347,17 @@ async function runGameWithWine(projectNameEndingInDotLtProj) {
         // Enhanced Wine process - use direct Python command on macOS
         // Important: On macOS in packaged app, we need to use a different approach
         try {
-          // Create shell script for running Wine
+          // Create an improved shell script for running Wine with the batch file
           const tempScriptPath = path.join(app.getPath('temp'), 'run-wine.sh');
           let scriptContent = `#!/bin/bash
 cd "${ltMakerPath}"
 export WINEDEBUG=${pythonEnv.WINEDEBUG || '-all'}
 export WINEPREFIX=${pythonEnv.WINEPREFIX || '~/.wine'}
-"${winePath}" "${pythonPath}" run_engine_for_project.py "${normalizedProjectPath}" 2>&1`;
+# Set Python environment variables
+export PYTHONIOENCODING=utf-8
+export PYTHONUNBUFFERED=1
+# Run Wine with cmd to execute the batch file
+"${winePath}" cmd /c "${tempBatchPath.replace(/\\/g, '/')}" 2>&1`;
 
           fs.writeFileSync(tempScriptPath, scriptContent);
           fs.chmodSync(tempScriptPath, 0o755);
@@ -332,8 +370,10 @@ export WINEPREFIX=${pythonEnv.WINEPREFIX || '~/.wine'}
             '/bin/bash',
             [tempScriptPath],
             {
+              cwd: ltMakerPath,
               detached: true,
-              stdio: ['ignore', 'pipe', 'pipe']
+              stdio: ['ignore', 'pipe', 'pipe'],
+              env: pythonEnv
             }
           );
 

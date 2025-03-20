@@ -2,143 +2,51 @@ import { getPathWithinLtMaker } from "@/file-io/get-path-within-lt-maker.ts";
 import { getCurrentLogger } from "@/lib/current-logger.ts";
 import { isElectronEnvironment } from "@/lib/env-detector.ts";
 
-// Function to find Python 3.11 on macOS/Linux
-async function findSystemPython311(): Promise<string | null> {
-  try {
-    // First try python3.11 directly
-    try {
-      const whichCommand = new Deno.Command("which", {
-        args: ["python3.11"],
-        stdout: "piped",
-        stderr: "piped",
-      });
-      const whichResult = await whichCommand.output();
-      
-      if (whichResult.code === 0) {
-        const pythonPath = new TextDecoder().decode(whichResult.stdout).trim();
-        console.log(`Found Python 3.11 in PATH: ${pythonPath}`);
-        return pythonPath;
-      }
-    } catch (e) {
-      console.log("Error finding python3.11:", e);
-    }
-
-    // Check common locations for Python 3.11
-    const commonLocations = [
-      // Homebrew paths
-      "/opt/homebrew/bin/python3.11",
-      "/usr/local/bin/python3.11",
-      // System paths
-      "/usr/bin/python3.11",
-      "/usr/local/Cellar/python@3.11/3.11.*/bin/python3.11"
-    ];
-
-    for (const location of commonLocations) {
-      try {
-        // If location has a wildcard, try to find matching paths
-        if (location.includes("*")) {
-          const basePath = location.substring(0, location.indexOf("*"));
-          try {
-            if (await Deno.stat(basePath.substring(0, basePath.lastIndexOf("/")))) {
-              // List the directory
-              const entries = Deno.readDirSync(basePath.substring(0, basePath.lastIndexOf("/")));
-              for (const entry of Array.from(entries)) {
-                if (entry.isDirectory && entry.name.startsWith(basePath.substring(basePath.lastIndexOf("/") + 1))) {
-                  const potentialPath = location.replace("*", entry.name.substring(entry.name.lastIndexOf("/") + 1));
-                  try {
-                    const stat = await Deno.stat(potentialPath);
-                    if (stat.isFile) {
-                      console.log(`Found Python 3.11 at expanded path: ${potentialPath}`);
-                      return potentialPath;
-                    }
-                  } catch {
-                    // Path doesn't exist
-                  }
-                }
-              }
-            }
-          } catch {
-            // Base path doesn't exist
-          }
-          continue;
-        }
-
-        const stat = await Deno.stat(location);
-        if (stat.isFile) {
-          console.log(`Found Python 3.11 at known location: ${location}`);
-          return location;
-        }
-      } catch {
-        // Location doesn't exist, continue to next
-      }
-    }
-
-    // Verify python3 version as last resort
-    try {
-      const versionCmd = new Deno.Command("python3", {
-        args: ["--version"],
-        stdout: "piped",
-        stderr: "piped",
-      });
-      const versionResult = await versionCmd.output();
-      const versionOutput = new TextDecoder().decode(versionResult.stdout || versionResult.stderr).trim();
-      
-      if (versionOutput.includes("Python 3.11") || versionOutput.includes("Python 3.12")) {
-        console.log(`System python3 is version 3.11+: ${versionOutput}`);
-        return "python3";
-      } else {
-        console.log(`System python3 version is not 3.11+: ${versionOutput}`);
-      }
-    } catch (e) {
-      console.log("Error checking python3 version:", e);
-    }
-
-    // No suitable Python found
-    return null;
-  } catch (error) {
-    console.error("Error finding Python 3.11:", error);
-    return null;
-  }
-}
+// Not using system Python anymore, all Python is bundled and run with Wine
 
 export default async function runPythonScript({
   pathToPythonScript,
   args = [],
-  useSystemPython = false,
 }: {
   pathToPythonScript: string;
   args?: string[];
-  useSystemPython?: boolean;
 }) {
   const fullPath = pathToPythonScript.startsWith("/")
     ? pathToPythonScript
     : getPathWithinLtMaker(pathToPythonScript);
   const logger = getCurrentLogger();
-  logger.debug("Running Python script", { path: fullPath, args, useSystemPython });
+  logger.debug("Running Python script", { path: fullPath, args });
 
   // Determine if we're in Electron environment
   const isElectron = isElectronEnvironment();
 
-  // Get the appropriate Python command based on environment and useSystemPython flag
+  // Get the appropriate Python command based on environment
   let pythonCommand;
-  if (useSystemPython && (Deno.build.os === "darwin" || Deno.build.os === "linux")) {
-    // Force use of system Python 3.11 on macOS/Linux when requested
-    const python311Path = await findSystemPython311();
-    if (python311Path) {
-      pythonCommand = python311Path;
-      logger.debug("Forcing use of system Python 3.11", { pythonCommand });
+  
+  if (isElectron) {
+    // In Electron, always use bundled Python
+    if (Deno.build.os === "windows") {
+      pythonCommand = "..\\bin\\python\\python.exe";
     } else {
-      pythonCommand = "python3";
-      logger.debug("Python 3.11 not found, defaulting to python3", { pythonCommand });
+      // For macOS/Linux, use the Python wrapper script
+      const bundledPythonPath = "../bin/python/python";
+      try {
+        const stat = await Deno.stat(bundledPythonPath);
+        if (stat.isFile) {
+          pythonCommand = bundledPythonPath;
+          logger.debug("Using bundled Python wrapper script", { pythonCommand });
+        } else {
+          throw new Error("Bundled Python wrapper script not found");
+        }
+      } catch (e) {
+        logger.error("Bundled Python wrapper script not found", { error: e.message });
+        throw new Error("Bundled Python wrapper script not found. Please run the download-binaries.js script first.");
+      }
     }
   } else {
-    pythonCommand = isElectron
-      ? Deno.build.os === "windows"
-        ? "..\\bin\\python\\python.exe"
-        : await findSystemWine()
-      : Deno.build.os === "windows"
-        ? "python"
-        : "python3";
+    // When running standalone (not in Electron)
+    pythonCommand = Deno.build.os === "windows" ? "python" : "python3";
+    logger.debug("Using system Python (not in Electron environment)", { pythonCommand });
   }
       
   if (!pythonCommand) {

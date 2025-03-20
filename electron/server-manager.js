@@ -30,133 +30,9 @@ const getServerEnv = () => {
   };
 };
 
-// Check if system Python is available
-function isSystemPythonAvailable() {
-  if (process.platform !== 'darwin') {
-    return false; // Only relevant for macOS
-  }
+// Not using system Python anymore, all Python is bundled
 
-  try {
-    const { execSync } = require('child_process');
-    // Try to run python3 --version
-    const pythonVersion = execSync('python3 --version', { encoding: 'utf8' }).trim();
-    logger.log('info', `Found system Python: ${pythonVersion}`);
-    return true;
-  } catch (error) {
-    logger.log('error', 'System Python not found or not properly installed');
-    return false;
-  }
-}
-
-// Check if required Python packages are installed and install them if not
-async function ensurePythonDependencies() {
-  if (process.platform !== 'darwin') {
-    logger.log('info', 'Skipping Python dependency check on non-macOS platform');
-    return true;
-  }
-
-  try {
-    const fs = require('fs');
-    const { execSync } = require('child_process');
-    const path = require('path');
-    
-    logger.log('info', 'Checking Python dependencies for LT game engine...');
-    
-    // Find Python 3.11 specifically
-    let python311Path = '';
-    try {
-      // First try python3.11 directly
-      python311Path = execSync('which python3.11', { encoding: 'utf8' }).trim();
-      logger.log('info', `Found Python 3.11 at: ${python311Path}`);
-    } catch (err) {
-      // Try common locations
-      const pythonLocations = [
-        '/opt/homebrew/bin/python3.11',
-        '/usr/local/bin/python3.11',
-        '/usr/bin/python3.11'
-      ];
-      
-      for (const location of pythonLocations) {
-        if (fs.existsSync(location)) {
-          python311Path = location;
-          logger.log('info', `Found Python 3.11 at: ${python311Path}`);
-          break;
-        }
-      }
-      
-      // If still not found, try python3 but verify version
-      if (!python311Path) {
-        try {
-          const pythonPath = execSync('which python3', { encoding: 'utf8' }).trim();
-          const versionOutput = execSync(`${pythonPath} --version`, { encoding: 'utf8' }).trim();
-          
-          if (versionOutput.includes('Python 3.11')) {
-            python311Path = pythonPath;
-            logger.log('info', `Found Python 3.11 via python3: ${python311Path} (${versionOutput})`);
-          } else {
-            logger.log('warn', `System python3 is not 3.11: ${versionOutput}`);
-          }
-        } catch (pythonErr) {
-          logger.log('error', `Failed to find python3: ${pythonErr.message}`);
-        }
-      }
-    }
-    
-    if (!python311Path) {
-      logger.log('error', 'Python 3.11 not found. Please install it with: brew install python@3.11');
-      return false;
-    }
-    
-    const ltMakerPath = path.join(app.getAppPath(), '..', 'lt-maker-fork');
-    const editorRequirementsPath = path.join(ltMakerPath, 'requirements_editor.txt');
-    const engineRequirementsPath = path.join(ltMakerPath, 'requirements_engine.txt');
-    
-    // Check if requirements files exist
-    if (!fs.existsSync(editorRequirementsPath)) {
-      logger.log('error', `Editor requirements file not found: ${editorRequirementsPath}`);
-      return false;
-    }
-    
-    if (!fs.existsSync(engineRequirementsPath)) {
-      logger.log('error', `Engine requirements file not found: ${engineRequirementsPath}`);
-      return false;
-    }
-    
-    // Check if pygame is installed for Python 3.11
-    try {
-      execSync(`${python311Path} -c "import pygame"`, { encoding: 'utf8' });
-      logger.log('info', 'pygame is already installed for Python 3.11');
-    } catch (error) {
-      logger.log('info', 'pygame not found for Python 3.11, installing requirements...');
-      
-      try {
-        // Install editor requirements
-        logger.log('info', `Installing editor requirements for Python 3.11...`);
-        execSync(`${python311Path} -m pip install --user -r "${editorRequirementsPath}"`, {
-          encoding: 'utf8',
-          stdio: 'inherit'
-        });
-        
-        // Install engine requirements
-        logger.log('info', `Installing engine requirements for Python 3.11...`);
-        execSync(`${python311Path} -m pip install --user -r "${engineRequirementsPath}"`, {
-          encoding: 'utf8',
-          stdio: 'inherit'
-        });
-        
-        logger.log('info', 'Python 3.11 dependencies successfully installed');
-      } catch (installError) {
-        logger.log('error', `Failed to install Python 3.11 dependencies: ${installError.message}`);
-        return false;
-      }
-    }
-    
-    return true;
-  } catch (error) {
-    logger.log('error', `Error checking Python dependencies: ${error.message}`);
-    return false;
-  }
-}
+// Not using system Python dependencies anymore, all Python is bundled
 
 // Start the Deno server
 const startDenoServer = () => {
@@ -423,7 +299,7 @@ const startDenoServerFallback = (serverPath, resolve, reject) => {
     DENO_ENV: process.env.NODE_ENV || 'production',
     ELECTRON_LOG_DIR: logDir,
     NODE_ENV: process.env.NODE_ENV || 'production',
-    USE_SYSTEM_PYTHON: process.platform === 'darwin' ? 'true' : 'false'
+    // Python is always bundled now, no system Python flag needed
   };
 
   // Always use bundled Deno
@@ -566,10 +442,10 @@ const seedVectorDb = async () => {
   });
 };
 
-// Function to get Wine path from local system
-function getWinePath() {
+// Function to get Wine binary path from local system
+async function getWineBinary() {
   if (process.platform === 'win32') {
-    return null;
+    return null; // Not needed on Windows
   }
 
   try {
@@ -581,7 +457,7 @@ function getWinePath() {
       logger.log('info', `Found Wine in PATH: ${winePath}`);
       return winePath;
     } catch (error) {
-      logger.log('error', 'Wine not found in PATH', { error: error.message });
+      logger.log('warn', 'Wine not found in PATH', { error: error.message });
 
       // Check common locations on macOS
       if (process.platform === 'darwin') {
@@ -604,7 +480,7 @@ function getWinePath() {
       if (process.platform === 'linux') {
         const commonLinuxPaths = [
           '/usr/bin/wine',
-          '/usr/local/wine'
+          '/usr/local/bin/wine'
         ];
 
         for (const linuxPath of commonLinuxPaths) {
@@ -615,102 +491,16 @@ function getWinePath() {
         }
       }
 
-      const errorMessage = 'Wine is not installed or not found in PATH. Please install Wine to run the server.';
-      logger.log('error', errorMessage);
-      throw new Error(errorMessage);
+      logger.log('error', 'Wine is not installed or not found in PATH');
+      return null;
     }
   } catch (error) {
     logger.log('error', 'Error checking for Wine', { error: error.message });
-    throw new Error(`Wine is required but not found: ${error.message}`);
+    return null;
   }
 }
 
-// Setup Python with Wine (for macOS and Linux)
-async function setupPythonWithWine() {
-  const isWindows = process.platform === 'win32';
-  if (isWindows) {
-    return; // Not needed on Windows
-  }
-
-  console.log('Setting up Python with Wine...');
-  const pythonDir = path.join(__dirname, 'bin', 'python');
-  const pythonInstallerPath = path.join(pythonDir, 'python-3.11.7-amd64.exe');
-  const winePath = getWinePath();
-
-  if (!fs.existsSync(pythonInstallerPath)) {
-    console.error('Python installer not downloaded');
-    return;
-  }
-
-  if (!winePath) {
-    console.error('Bundled Wine not found - cannot set up Python with Wine');
-    throw new Error('Bundled Wine not found - cannot set up Python with Wine');
-  }
-
-  try {
-    // Create a custom Wine prefix for Python
-    const pythonWinePrefix = path.join(pythonDir, 'prefix');
-
-    if (!fs.existsSync(pythonWinePrefix)) {
-      fs.mkdirSync(pythonWinePrefix, { recursive: true });
-    }
-
-    // Set environment variables for Wine
-    const wineEnv = {
-      ...process.env,
-      WINEDEBUG: '-all',
-      WINEPREFIX: pythonWinePrefix
-    };
-
-    // Run Python installer silently
-    console.log('Running Python installer with Wine...');
-    await execCommand(winePath, [pythonInstallerPath, '/quiet', 'InstallAllUsers=0', 'PrependPath=1', 'Include_test=0'], {
-      env: wineEnv,
-      timeout: 120000 // 2 minutes timeout
-    });
-
-    // Create a script to install pip and requirements
-    const pipScriptPath = path.join(pythonDir, 'install_requirements.py');
-    const pipScriptContent = `
-import subprocess
-import sys
-
-def install_package(package):
-    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
-
-# Install pip
-print("Installing pip...")
-try:
-    import ensurepip
-    ensurepip._bootstrap()
-except ImportError:
-    print("ensurepip not available, trying get-pip.py...")
-    import urllib.request
-    urllib.request.urlretrieve("https://bootstrap.pypa.io/get-pip.py", "get-pip.py")
-    subprocess.check_call([sys.executable, "get-pip.py"])
-
-# Install requirements
-print("Installing requirements...")
-subprocess.check_call([sys.executable, "-m", "pip", "install", "pygame-ce==2.3.2", "pyinstaller==6.2.0", "typing-extensions==4.8.0", "PyQt5==5.15.10"])
-
-print("Installation complete!")
-`;
-
-    fs.writeFileSync(pipScriptPath, pipScriptContent);
-
-    // Run the script with Wine Python
-    console.log('Installing pip and requirements with Wine Python...');
-    await execCommand(winePath, ['python', pipScriptPath], {
-      env: wineEnv,
-      timeout: 300000 // 5 minutes timeout
-    });
-
-    console.log('Python setup with Wine completed successfully');
-  } catch (error) {
-    console.error('Failed to setup Python with Wine:', error);
-    // Continue anyway
-  }
-}
+// Not using Wine prefix for Python anymore
 
 // Helper to execute commands with output capture option
 async function execCommand(command, args, options = {}) {
@@ -763,20 +553,38 @@ const startServer = async () => {
       throw new Error(errorMsg);
     }
 
-    // On macOS, check if system Python is available
-    if (isMac) {
-      const hasPython = isSystemPythonAvailable();
-      if (!hasPython) {
-        logger.log('error', 'System Python not found on macOS');
-        console.error('System Python not found on macOS');
-        throw new Error('System Python (python3) not found. Please install Python 3 via Homebrew (brew install python).');
-      }
+    // Check for bundled Python
+    if (!isWindows) {
+      const bundledPythonPath = path.join(__dirname, 'bin', 'python', 'python');
+      const hasBundledPython = fs.existsSync(bundledPythonPath);
+      logger.log('info', `Bundled Python: ${hasBundledPython ? 'found' : 'not found'}`, { path: bundledPythonPath });
       
-      // Check and install LT game dependencies
-      logger.log('info', 'Checking and installing Python dependencies for LT game...');
-      const dependenciesInstalled = await ensurePythonDependencies();
-      if (!dependenciesInstalled) {
-        logger.log('warn', 'Failed to install all required Python dependencies. Some game features may not work.');
+      if (!hasBundledPython) {
+        // Check if Wine is available for running Python
+        const winePath = await getWineBinary();
+        const hasWine = !!winePath;
+        
+        logger.log('info', `Wine for running Python: ${hasWine ? 'found' : 'not found'}`, { path: winePath || 'not available' });
+        
+        if (!hasBundledPython) {
+          logger.log('error', 'Bundled Python not found');
+          console.error('Bundled Python not found');
+          throw new Error('Python not found. Please run the download-binaries.js script first.');
+        }
+      } else {
+        if (isMac) {
+          // Check if Wine is available for running Python on macOS
+          const winePath = await getWineBinary();
+          const hasWine = !!winePath;
+          
+          if (!hasWine) {
+            logger.log('error', 'Wine is required to run bundled Python on macOS but was not found');
+            console.error('Wine is required to run bundled Python on macOS but was not found');
+            throw new Error('Wine not found. Please install Wine using: brew install --cask --no-quarantine wine-stable');
+          } else {
+            logger.log('info', `Using bundled Python with Wine: ${winePath}`);
+          }
+        }
       }
     }
 
