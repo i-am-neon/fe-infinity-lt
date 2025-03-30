@@ -550,9 +550,25 @@ const startServer = async () => {
 
     // Check for bundled Python
     if (!isWindows) {
-      const bundledPythonPath = path.join(__dirname, 'bin', 'python', 'python');
-      const hasBundledPython = fs.existsSync(bundledPythonPath);
-      logger.log('info', `Bundled Python: ${hasBundledPython ? 'found' : 'not found'}`, { path: bundledPythonPath });
+      // Check multiple possible locations for Python
+      const possiblePythonPaths = [
+        path.join(__dirname, 'bin', 'python', 'python_embed', 'python.exe'),  // Direct path to executable
+        path.join(__dirname, 'bin', 'python', 'python')                       // Wrapper script
+      ];
+      
+      let foundPythonPath = null;
+      for (const pythonPath of possiblePythonPaths) {
+        if (fs.existsSync(pythonPath)) {
+          foundPythonPath = pythonPath;
+          break;
+        }
+      }
+      
+      const hasBundledPython = !!foundPythonPath;
+      logger.log('info', `Bundled Python: ${hasBundledPython ? 'found' : 'not found'}`, { 
+        path: foundPythonPath || 'not found',
+        checkedPaths: possiblePythonPaths
+      });
       
       if (!hasBundledPython) {
         // Check if Wine is available for running Python
@@ -561,11 +577,9 @@ const startServer = async () => {
         
         logger.log('info', `Wine for running Python: ${hasWine ? 'found' : 'not found'}`, { path: winePath || 'not available' });
         
-        if (!hasBundledPython) {
-          logger.log('error', 'Bundled Python not found');
-          console.error('Bundled Python not found');
-          throw new Error('Python not found. Please run the download-binaries.js script first.');
-        }
+        logger.log('error', 'Bundled Python not found');
+        console.error('Bundled Python not found');
+        throw new Error('Python not found. Please run the download-binaries.js script first.');
       } else {
         if (isMac) {
           // Check if Wine is available for running Python on macOS
@@ -577,7 +591,7 @@ const startServer = async () => {
             console.error('Wine is required to run bundled Python on macOS but was not found');
             throw new Error('Wine not found. Please install Wine using: brew install --cask --no-quarantine wine-stable');
           } else {
-            logger.log('info', `Using bundled Python with Wine: ${winePath}`);
+            logger.log('info', `Using bundled Python with Wine: ${winePath} and Python at ${foundPythonPath}`);
           }
         }
       }

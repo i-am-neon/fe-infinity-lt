@@ -115,100 +115,99 @@ async function downloadDeno() {
 // Download Python
 async function downloadPython() {
   console.log('Setting up bundled Python environment...');
-  
+
   const pythonBaseDir = path.join(__dirname, 'bin', 'python');
-  
+
   // Create base directory if it doesn't exist
   if (!fs.existsSync(pythonBaseDir)) {
     fs.mkdirSync(pythonBaseDir, { recursive: true });
   }
-  
+
   // Check if Python is already installed
   if (fs.existsSync(path.join(pythonBaseDir, 'python_embed', 'python.exe'))) {
     console.log('Python already installed, skipping...');
     return;
   }
-  
+
   try {
     // Use Python embeddable package directly
     console.log('Setting up Python embeddable package...');
-      
+
     // Download the embeddable package
     const pythonUrl = 'https://www.python.org/ftp/python/3.11.7/python-3.11.7-embed-amd64.zip';
     const pythonFileName = 'python-3.11.7-embed-amd64.zip';
     const downloadPath = path.join(pythonBaseDir, pythonFileName);
-    
+
     await downloadFile(pythonUrl, downloadPath);
     console.log(`Downloaded Python to ${downloadPath}`);
-    
+
     // Extract the embeddable package
     console.log('Extracting Python embeddable package...');
-    
+
     // Create python_embed subdirectory for a cleaner structure
     const pythonEmbedDir = path.join(pythonBaseDir, 'python_embed');
     if (!fs.existsSync(pythonEmbedDir)) {
       fs.mkdirSync(pythonEmbedDir, { recursive: true });
     }
-    
+
     await extract(downloadPath, { dir: pythonEmbedDir });
     console.log('Extracted Python embeddable package');
-    
+
     // Delete the zip file
     fs.unlinkSync(downloadPath);
-    
+
     // Enable site-packages by uncommenting 'import site' in python311._pth
     const pthPath = path.join(pythonEmbedDir, 'python311._pth');
     if (fs.existsSync(pthPath)) {
-        let pthContent = fs.readFileSync(pthPath, 'utf8');
-        pthContent = pthContent.replace('#import site', 'import site');
-        fs.writeFileSync(pthPath, pthContent);
-        console.log('Modified python311._pth to enable site-packages');
+      let pthContent = fs.readFileSync(pthPath, 'utf8');
+      pthContent = pthContent.replace('#import site', 'import site');
+      fs.writeFileSync(pthPath, pthContent);
+      console.log('Modified python311._pth to enable site-packages');
+    }
+
+    // Download and install pip
+    console.log('Installing pip...');
+    const getPipUrl = 'https://bootstrap.pypa.io/get-pip.py';
+    const getPipPath = path.join(pythonEmbedDir, 'get-pip.py');
+    await downloadFile(getPipUrl, getPipPath);
+
+    if (isWindows) {
+      // On Windows, we can run Python directly
+      console.log('Installing pip for Python...');
+      await execCommand(path.join(pythonEmbedDir, 'python.exe'), [getPipPath], { cwd: pythonEmbedDir });
+
+      // Create pip batch file for easier access
+      const pipBatchContent = `@echo off\r\n"%~dp0python_embed\\python.exe" "%~dp0python_embed\\Scripts\\pip.exe" %*`;
+      fs.writeFileSync(path.join(pythonBaseDir, 'python-pip.bat'), pipBatchContent);
+      console.log('Created pip batch file');
+
+      // Create site-packages directory if it doesn't exist
+      const sitePackagesDir = path.join(pythonEmbedDir, 'Lib', 'site-packages');
+      if (!fs.existsSync(sitePackagesDir)) {
+        fs.mkdirSync(sitePackagesDir, { recursive: true });
+        console.log('Created site-packages directory');
       }
-      
-      // Download and install pip
-      console.log('Installing pip...');
-      const getPipUrl = 'https://bootstrap.pypa.io/get-pip.py';
-      const getPipPath = path.join(pythonEmbedDir, 'get-pip.py');
-      await downloadFile(getPipUrl, getPipPath);
-      
-      if (isWindows) {
-        // On Windows, we can run Python directly
-        console.log('Installing pip for Python...');
-        await execCommand(path.join(pythonEmbedDir, 'python.exe'), [getPipPath], { cwd: pythonEmbedDir });
-        
-        // Create pip batch file for easier access
-        const pipBatchContent = `@echo off\r\n"%~dp0python_embed\\python.exe" "%~dp0python_embed\\Scripts\\pip.exe" %*`;
-        fs.writeFileSync(path.join(pythonBaseDir, 'python-pip.bat'), pipBatchContent);
-        console.log('Created pip batch file');
-        
-        // Create site-packages directory if it doesn't exist
-        const sitePackagesDir = path.join(pythonEmbedDir, 'Lib', 'site-packages');
-        if (!fs.existsSync(sitePackagesDir)) {
-          fs.mkdirSync(sitePackagesDir, { recursive: true });
-          console.log('Created site-packages directory');
-        }
-        
-        // Install required packages
-        console.log('Installing required packages...');
-        const ltMakerPath = path.resolve(__dirname, '..', 'lt-maker-fork');
-        const requirementsPath = path.join(ltMakerPath, 'requirements_engine.txt');
-        
-        if (fs.existsSync(requirementsPath)) {
-          await execCommand(path.join(pythonEmbedDir, 'python.exe'), 
-                         ['-m', 'pip', 'install', '-r', requirementsPath, '--no-cache-dir'], 
-                         { cwd: pythonEmbedDir });
-          console.log('Installed required packages');
-        } else {
-          console.warn(`Requirements file not found at ${requirementsPath}`);
-        }
-      }
-      
-      // Clean up the get-pip.py file
-      if (fs.existsSync(getPipPath)) {
-        fs.unlinkSync(getPipPath);
+
+      // Install required packages
+      console.log('Installing required packages...');
+      const ltMakerPath = path.resolve(__dirname, '..', 'lt-maker-fork');
+      const requirementsPath = path.join(ltMakerPath, 'requirements_engine.txt');
+
+      if (fs.existsSync(requirementsPath)) {
+        await execCommand(path.join(pythonEmbedDir, 'python.exe'),
+          ['-m', 'pip', 'install', '-r', requirementsPath, '--no-cache-dir'],
+          { cwd: pythonEmbedDir });
+        console.log('Installed required packages');
+      } else {
+        console.warn(`Requirements file not found at ${requirementsPath}`);
       }
     }
-    
+
+    // Clean up the get-pip.py file
+    if (fs.existsSync(getPipPath)) {
+      fs.unlinkSync(getPipPath);
+    }
+
     // Make sure Python executable has execute permissions
     if (!isWindows) {
       // Set execute permissions for all .exe files
@@ -217,14 +216,14 @@ async function downloadPython() {
         path.join(pythonEmbedDir, 'python.exe'),
         path.join(pythonEmbedDir, 'pythonw.exe')
       ];
-      
+
       for (const exeFile of exeFiles) {
         if (fs.existsSync(exeFile)) {
           fs.chmodSync(exeFile, 0o755);
           console.log(`Added execute permission to ${path.basename(exeFile)}`);
         }
       }
-      
+
       // Find and chmod all .exe files in Scripts directory
       const scriptsDir = path.join(pythonEmbedDir, 'Scripts');
       if (fs.existsSync(scriptsDir)) {
@@ -237,12 +236,49 @@ async function downloadPython() {
           }
         }
       }
+
+      // Create a Python wrapper script to use with Wine
+      console.log('Creating Python wrapper script for macOS/Linux...');
+      const wrapperScriptPath = path.join(pythonBaseDir, 'python');
+      const wrapperScriptContent = `#!/bin/bash
+# Wrapper script for running Python with Wine
+# This script is necessary because the application looks for 'python' on macOS,
+# but we need to run the Windows Python executable through Wine.
+
+# Get the directory of this script
+DIR="\$( cd "\$( dirname "\${BASH_SOURCE[0]}" )" && pwd )"
+
+# Point to the Windows Python executable
+PYTHON_EXE="\$DIR/python_embed/python.exe"
+
+# Check if Wine is available
+WINE_BIN=\$(which wine)
+if [ -z "\$WINE_BIN" ]; then
+    echo "ERROR: Wine is not installed or not found in PATH."
+    echo "Please install Wine using: brew install --cask --no-quarantine wine-stable"
+    exit 1
+fi
+
+# Check if the Python executable exists
+if [ ! -f "\$PYTHON_EXE" ]; then
+    echo "ERROR: Python executable not found at \$PYTHON_EXE"
+    echo "Please ensure the bundled Python environment is properly installed."
+    exit 1
+fi
+
+# Run the command using Wine
+# Pass all arguments to the Python executable
+"\$WINE_BIN" "\$PYTHON_EXE" "\$@"
+`;
+      fs.writeFileSync(wrapperScriptPath, wrapperScriptContent);
+      fs.chmodSync(wrapperScriptPath, 0o755);
+      console.log(`Created Python wrapper script at ${wrapperScriptPath}`);
       
       // Create a diagnostic test script
       const testScriptPath = path.join(pythonBaseDir, 'test_python.sh');
       const testScriptContent = `#!/bin/bash
 # Test script to verify Python works with Wine
-cd "$(dirname "$0")"
+cd "\$(dirname "\$0")"
 echo "Testing Python with Wine..."
 cd python_embed
 
@@ -264,7 +300,7 @@ echo "Test complete!"
       fs.chmodSync(testScriptPath, 0o755);
       console.log(`Created Python test script at ${testScriptPath}`);
     }
-    
+
     console.log('Python environment setup completed successfully');
   } catch (error) {
     console.error('Failed to set up Python environment:', error);
@@ -279,7 +315,7 @@ async function installPythonRequirements(pythonExecutable) {
 
   try {
     const ltMakerPath = path.resolve(__dirname, '..', 'lt-maker-fork');
-    
+
     // First make sure pip is up to date
     console.log('Upgrading pip...');
     try {
@@ -295,7 +331,7 @@ async function installPythonRequirements(pythonExecutable) {
       const engineRequirementsPath = path.join(ltMakerPath, 'requirements_engine.txt');
       console.log(`Installing engine requirements from ${engineRequirementsPath}`);
       await execCommand(pythonExecutable, ['-m', 'pip', 'install', '-r', engineRequirementsPath, '--no-cache-dir'], { capture: true });
-      
+
       // Install editor requirements if time permits (lower priority)
       try {
         const editorRequirementsPath = path.join(ltMakerPath, 'requirements_editor.txt');
@@ -313,7 +349,7 @@ async function installPythonRequirements(pythonExecutable) {
     // Verify the installation worked
     console.log('Verifying Python package installation...');
     const checkDepsPath = path.join(__dirname, 'bin', 'python', 'check_dependencies.py');
-    
+
     if (process.platform === 'win32') {
       try {
         const output = await execCommand(pythonExecutable, [checkDepsPath], { capture: true });
@@ -327,23 +363,23 @@ async function installPythonRequirements(pythonExecutable) {
       // For macOS/Linux, create a separate verification script with Wine
       const pythonDir = path.join(__dirname, 'bin', 'python');
       const winePath = getWinePath();
-      
+
       if (winePath) {
         // Create verification batch file
         const verifyBatchPath = path.join(pythonDir, 'verify_deps.bat');
         const pythonExe = path.join(pythonDir, 'python.exe').replace(/\\/g, '\\\\');
         const checkScriptPath = checkDepsPath.replace(/\\/g, '\\\\');
-        
+
         const batchContent = `@echo off
 ${pythonExe} "${checkScriptPath}"
 exit %ERRORLEVEL%
 `;
-        
+
         fs.writeFileSync(verifyBatchPath, batchContent);
-        
+
         try {
           const { execSync } = require('child_process');
-          const output = execSync(`${winePath} cmd /c "${verifyBatchPath}"`, { 
+          const output = execSync(`${winePath} cmd /c "${verifyBatchPath}"`, {
             encoding: 'utf8',
             timeout: 10000 // 10 second timeout
           });
@@ -370,7 +406,7 @@ async function checkWineAvailability() {
 
   console.log('Checking Wine availability...');
   const winePath = getWinePath();
-  
+
   if (winePath) {
     console.log(`Wine is available at: ${winePath}`);
     return true;
@@ -470,7 +506,7 @@ async function main() {
   try {
     // Platform checks
     const isDev = process.argv.includes('--dev') || process.env.NODE_ENV === 'development';
-    
+
     console.log('Starting binary download process...');
 
     // Download Deno for all platforms
@@ -489,7 +525,7 @@ async function main() {
           // Try to test that Python with Wine works
           const pythonDir = path.join(__dirname, 'bin', 'python');
           const testScript = path.join(pythonDir, 'test_python.sh');
-          
+
           if (fs.existsSync(testScript)) {
             console.log('Testing Python with Wine...');
             const { execSync } = require('child_process');

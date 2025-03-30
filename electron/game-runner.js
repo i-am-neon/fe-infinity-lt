@@ -95,11 +95,18 @@ function getBundledPythonPath() {
     return pythonPath;
   } else if (process.platform === 'darwin') {
     // For macOS, we'll use bundled Python with Wine
-    // First check for the Python executable directly
-    const pythonExePath = path.join(app.getAppPath(), 'bin', 'python', 'python.exe');
+    // First check for the Python executable in the python_embed directory
+    const pythonExePath = path.join(app.getAppPath(), 'bin', 'python', 'python_embed', 'python.exe');
     if (fs.existsSync(pythonExePath)) {
       logger.log('info', `Using bundled Python.exe with Wine for macOS: ${pythonExePath}`);
       return pythonExePath;
+    }
+    
+    // Also try the legacy location path
+    const legacyPythonExePath = path.join(app.getAppPath(), 'bin', 'python', 'python.exe');
+    if (fs.existsSync(legacyPythonExePath)) {
+      logger.log('info', `Using bundled Python.exe with Wine for macOS (legacy path): ${legacyPythonExePath}`);
+      return legacyPythonExePath;
     }
 
     // Fall back to the wrapper script
@@ -291,8 +298,10 @@ async function runGameWithWine(projectNameEndingInDotLtProj) {
         // Get the Wine-compatible path to the run_engine_for_project.py script
         const ltMakerWinePath = toWinePath(ltMakerPath);
         
+        // Get the path to the actual Python executable in the bundled environment
+        const bundledPythonExe = path.join(app.getAppPath(), 'bin', 'python', 'python_embed', 'python.exe');
         // Convert Python executable path to Wine path format
-        const pythonWineExe = toWinePath(path.join(app.getAppPath(), 'bin', 'python', 'python.exe'));
+        const pythonWineExe = toWinePath(bundledPythonExe);
         
         // Create a simple batch file to run the game without dependency checks
         // Use a different approach with a script file instead of command line
