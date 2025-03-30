@@ -123,9 +123,15 @@ async function downloadPython() {
     fs.mkdirSync(pythonBaseDir, { recursive: true });
   }
 
-  // Check if Python is already installed
+  // Check if Python is already installed in the python_embed directory
   if (fs.existsSync(path.join(pythonBaseDir, 'python_embed', 'python.exe'))) {
-    console.log('Python already installed, skipping...');
+    console.log('Python already installed in python_embed directory, skipping...');
+    return;
+  }
+  
+  // Also check the legacy location (for backward compatibility)
+  if (fs.existsSync(path.join(pythonBaseDir, 'python.exe'))) {
+    console.log('Python already installed in legacy location, skipping...');
     return;
   }
 
@@ -173,8 +179,17 @@ async function downloadPython() {
 
     if (isWindows) {
       // On Windows, we can run Python directly
-      console.log('Installing pip for Python...');
-      await execCommand(path.join(pythonEmbedDir, 'python.exe'), [getPipPath], { cwd: pythonEmbedDir });
+      console.log('Installing pip for Python embeddable package...');
+      
+      // Ensure the python.exe exists before trying to execute it
+      const pythonExePath = path.join(pythonEmbedDir, 'python.exe');
+      if (!fs.existsSync(pythonExePath)) {
+        console.error(`ERROR: Python executable not found at ${pythonExePath}`);
+        throw new Error(`Python executable not found. Cannot install dependencies.`);
+      }
+      
+      console.log(`Using Python at: ${pythonExePath}`);
+      await execCommand(pythonExePath, [getPipPath], { cwd: pythonEmbedDir });
 
       // Create pip batch file for easier access
       const pipBatchContent = `@echo off\r\n"%~dp0python_embed\\python.exe" "%~dp0python_embed\\Scripts\\pip.exe" %*`;
@@ -194,10 +209,39 @@ async function downloadPython() {
       const requirementsPath = path.join(ltMakerPath, 'requirements_engine.txt');
 
       if (fs.existsSync(requirementsPath)) {
-        await execCommand(path.join(pythonEmbedDir, 'python.exe'),
-          ['-m', 'pip', 'install', '-r', requirementsPath, '--no-cache-dir'],
-          { cwd: pythonEmbedDir });
-        console.log('Installed required packages');
+        console.log(`Installing packages from requirements file: ${requirementsPath}`);
+        try {
+          // First try pip as a module
+          await execCommand(path.join(pythonEmbedDir, 'python.exe'),
+            ['-m', 'pip', 'install', '-r', requirementsPath, '--no-cache-dir'],
+            { cwd: pythonEmbedDir, capture: true });
+          console.log('Installed required packages using pip module');
+        } catch (pipModuleError) {
+          console.warn(`Error installing with pip module: ${pipModuleError.message}`);
+          
+          // Try with Scripts/pip.exe directly
+          const pipExePath = path.join(pythonEmbedDir, 'Scripts', 'pip.exe');
+          if (fs.existsSync(pipExePath)) {
+            console.log(`Falling back to direct pip executable: ${pipExePath}`);
+            await execCommand(pipExePath,
+              ['install', '-r', requirementsPath, '--no-cache-dir'],
+              { cwd: pythonEmbedDir, capture: true });
+            console.log('Installed required packages using pip executable');
+          } else {
+            throw new Error(`Pip executable not found at ${pipExePath}`);
+          }
+        }
+        
+        // Verify critical packages were installed
+        console.log('Verifying pygame installation...');
+        try {
+          const result = await execCommand(path.join(pythonEmbedDir, 'python.exe'),
+            ['-c', 'import pygame; print(f"Pygame version: {pygame.__version__}")'],
+            { cwd: pythonEmbedDir, capture: true });
+          console.log(result.stdout);
+        } catch (verifyError) {
+          console.warn(`WARNING: Pygame may not be installed correctly: ${verifyError.message}`);
+        }
       } else {
         console.warn(`Requirements file not found at ${requirementsPath}`);
       }

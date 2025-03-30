@@ -87,12 +87,22 @@ function getLtMakerPath() {
 // Get path to Python
 function getBundledPythonPath() {
   if (process.platform === 'win32') {
-    // Windows uses the embedded Python directly
-    const pythonPath = path.join(app.getAppPath(), 'bin', 'python', 'python.exe');
-    if (!fs.existsSync(pythonPath)) {
-      throw new Error(`Bundled Python not found at: ${pythonPath}. Please ensure binaries are downloaded correctly.`);
+    // Windows uses the embedded Python directly from the python_embed directory
+    const pythonPath = path.join(app.getAppPath(), 'bin', 'python', 'python_embed', 'python.exe');
+    if (fs.existsSync(pythonPath)) {
+      logger.log('info', `Found Python at ${pythonPath}`);
+      return pythonPath;
     }
-    return pythonPath;
+    
+    // Fallback to older location if not found
+    const fallbackPath = path.join(app.getAppPath(), 'bin', 'python', 'python.exe');
+    if (fs.existsSync(fallbackPath)) {
+      logger.log('info', `Found Python at fallback location: ${fallbackPath}`);
+      return fallbackPath;
+    }
+    
+    throw new Error(`Bundled Python not found at: ${pythonPath} or ${fallbackPath}. Please ensure binaries are downloaded correctly.`);
+    }
   } else if (process.platform === 'darwin') {
     // For macOS, we'll use bundled Python with Wine
     // First check for the Python executable in the python_embed directory
@@ -489,8 +499,20 @@ ls -la "${tempBatchPath}"
       } else {
         // On Windows, we run our bundled Python directly
         logger.log('info', 'Using Windows-native execution path - no Wine needed');
+        
+        // Get the Python path and verify it exists
         const pythonPath = getBundledPythonPath();
         logger.log('info', `Using bundled Python on Windows: ${pythonPath}`);
+        
+        // Verify the Python executable exists with explicit check
+        if (!fs.existsSync(pythonPath)) {
+          const errorMsg = `Critical error: Python executable not found at ${pythonPath}`;
+          logger.log('error', errorMsg);
+          reject(new Error(errorMsg));
+          return;
+        }
+        
+        logger.log('info', `Python executable found at ${pythonPath} - verified`);
 
         // Skip dependency checks at runtime - they should be installed during download-binaries
         logger.log('info', 'Starting game directly without dependency checks');
