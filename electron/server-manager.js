@@ -30,9 +30,6 @@ const getServerEnv = () => {
   };
 };
 
-// Not using system Python anymore, all Python is bundled
-
-// Not using system Python dependencies anymore, all Python is bundled
 
 // Start the Deno server
 const startDenoServer = () => {
@@ -178,8 +175,7 @@ const startDenoServer = () => {
       SERVER_DIR: serverPath,
       DENO_ENV: process.env.NODE_ENV || (isDev ? 'development' : 'production'),
       ELECTRON_LOG_DIR: logDir,
-      NODE_ENV: isDev ? 'development' : 'production',
-      USE_SYSTEM_PYTHON: isMac ? 'true' : 'false'
+      NODE_ENV: isDev ? 'development' : 'production'
     };
 
     // Log the command and env for debugging
@@ -192,8 +188,7 @@ const startDenoServer = () => {
         RESOURCES_PATH: serverEnv.RESOURCES_PATH,
         LT_MAKER_PATH: serverEnv.LT_MAKER_PATH,
         SERVER_DIR: serverEnv.SERVER_DIR,
-        DENO_ENV: serverEnv.DENO_ENV,
-        USE_SYSTEM_PYTHON: serverEnv.USE_SYSTEM_PYTHON
+        DENO_ENV: serverEnv.DENO_ENV
       }
     });
 

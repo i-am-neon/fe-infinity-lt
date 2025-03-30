@@ -255,8 +255,8 @@ async function installPythonRequirements(pythonExecutable) {
         console.warn('Failed to install editor requirements - continuing anyway:', editorError);
       }
     } else {
-      // On macOS/Linux, use the install_dependencies.py script since we need Wine
-      console.log('Running full install script through pythonSetup...');
+      // On macOS/Linux, we'll use Wine to run the bundled Python
+      console.log('Running Python setup through Wine...');
       await pythonSetup.runPythonInstallScript();
     }
 

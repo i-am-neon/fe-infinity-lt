@@ -283,7 +283,7 @@ async function runPythonInstallScript() {
       
       if (wineOutput === 'not found') {
         console.warn('Wine not found, cannot install Python dependencies during setup');
-        console.warn('Dependencies will be installed when the user runs the game');
+        console.warn('Wine is required to run the application on macOS');
         return;
       }
       
@@ -329,20 +329,20 @@ exit $?
             resolve();
           } else {
             console.warn(`Python dependency installation failed with code ${code}`);
-            console.warn('Dependencies will be installed when the user runs the game');
+            console.warn('Please ensure Wine is properly installed and configured');
             resolve(); // Resolve anyway to continue
           }
         });
         
         process.on('error', (err) => {
           console.error('Failed to run Python installation with Wine:', err);
-          console.warn('Dependencies will be installed when the user runs the game');
+          console.warn('Please ensure Wine is properly installed and configured');
           resolve(); // Resolve anyway to continue
         });
       });
     } catch (error) {
       console.error('Error checking Wine availability:', error);
-      console.warn('Dependencies will be installed when the user runs the game');
+      console.warn('Wine is required to run the application on macOS');
     }
   }
 }

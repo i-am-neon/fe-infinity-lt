@@ -94,72 +94,14 @@ function getBundledPythonPath() {
     }
     return pythonPath;
   } else if (process.platform === 'darwin') {
-    // For macOS, we'll use bundled Python for initialization and Wine for running the game
-    // First try to use bundled Python if available
+    // For macOS, we'll use bundled Python with Wine
+    // Use bundled Python
     const bundledPythonPath = path.join(app.getAppPath(), 'bin', 'python', 'python');
-    if (fs.existsSync(bundledPythonPath)) {
-      logger.log('info', `Using bundled Python for macOS: ${bundledPythonPath}`);
-      return bundledPythonPath;
+    if (!fs.existsSync(bundledPythonPath)) {
+      throw new Error(`Bundled Python not found at: ${bundledPythonPath}. Please ensure binaries are downloaded correctly.`);
     }
-
-    // If bundled Python isn't available, fall back to system Python
-    try {
-      const { execSync } = require('child_process');
-
-      // Check for Python 3.11 in common Homebrew locations first
-      const pythonLocations = [
-        '/opt/homebrew/bin/python3.11',
-        '/usr/local/bin/python3.11',
-        '/opt/homebrew/bin/python3',
-        '/usr/local/bin/python3'
-      ];
-
-      // First check if we can find Python 3.11 directly
-      try {
-        // Try to see if python3.11 is available
-        const python311Path = execSync('which python3.11', { encoding: 'utf8' }).trim();
-        logger.log('info', `Found Python 3.11 at: ${python311Path}`);
-        return python311Path;
-      } catch (specificVersionError) {
-        logger.log('info', 'Python 3.11 not found in PATH, checking alternate locations');
-      }
-
-      // Check each location
-      for (const pyLocation of pythonLocations) {
-        if (fs.existsSync(pyLocation)) {
-          try {
-            // Verify version before using
-            const versionOutput = execSync(`${pyLocation} --version`, { encoding: 'utf8' }).trim();
-            logger.log('info', `Found Python at ${pyLocation}: ${versionOutput}`);
-
-            // Use it if it's version 3.11 or higher
-            if (versionOutput.includes('Python 3.11') || versionOutput.includes('Python 3.12')) {
-              logger.log('info', `Using Python 3.11+: ${pyLocation}`);
-              return pyLocation;
-            }
-          } catch (e) {
-            logger.log('info', `Error checking Python version at ${pyLocation}: ${e.message}`);
-          }
-        }
-      }
-
-      // Fall back to system Python, but warn that it might not work if it's < 3.11
-      const systemPythonPath = execSync('which python3', { encoding: 'utf8' }).trim();
-      const versionOutput = execSync(`${systemPythonPath} --version`, { encoding: 'utf8' }).trim();
-      logger.log('warn', `Using system Python: ${versionOutput} at ${systemPythonPath}`);
-      logger.log('warn', 'Game requires Python 3.11+. If startup fails, please install Python 3.11+: brew install python@3.11');
-
-      // If system Python version is < 3.10, show a clear error since we know TypeAlias won't work
-      if (versionOutput.includes('Python 3.9') || versionOutput.includes('Python 3.8') ||
-        versionOutput.includes('Python 3.7') || versionOutput.includes('Python 3.6')) {
-        throw new Error(`Python ${versionOutput} is too old. The game requires Python 3.11+. Please install using: brew install python@3.11`);
-      }
-
-      return systemPythonPath;
-    } catch (error) {
-      logger.log('error', `Python error: ${error.message}`);
-      throw new Error('Python 3.11+ is required but not found. Please install using: brew install python@3.11');
-    }
+    logger.log('info', `Using bundled Python for macOS: ${bundledPythonPath}`);
+    return bundledPythonPath;
   } else {
     // Linux also uses Wine with python command inside Wine environment
     return 'python';
