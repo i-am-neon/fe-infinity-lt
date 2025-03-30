@@ -84,49 +84,98 @@ function getLtMakerPath() {
   return path.join(app.getAppPath(), 'lt-maker-fork');
 }
 
-// Get path to Python
+// Get path to Python with better error handling and fallbacks
 function getBundledPythonPath() {
   if (process.platform === 'win32') {
-    // Windows uses the embedded Python directly from the python_embed directory
-    const pythonPath = path.join(app.getAppPath(), 'bin', 'python', 'python_embed', 'python.exe');
-    if (fs.existsSync(pythonPath)) {
-      logger.log('info', `Found Python at ${pythonPath}`);
-      return pythonPath;
+    // Windows - try multiple possible locations
+    const possiblePaths = [
+      path.join(app.getAppPath(), 'bin', 'python', 'python_embed', 'python.exe'),
+      path.join(app.getAppPath(), 'bin', 'python', 'python.exe'),
+      // Add system Python as last resort
+      "python.exe"
+    ];
+
+    for (const pythonPath of possiblePaths) {
+      try {
+        // For system Python, we can't use fs.existsSync
+        if (pythonPath === "python.exe") {
+          logger.log('info', `Attempting to use system Python: ${pythonPath}`);
+          return pythonPath;
+        }
+
+        if (fs.existsSync(pythonPath)) {
+          logger.log('info', `Found Python at ${pythonPath}`);
+          return pythonPath;
+        }
+      } catch (error) {
+        logger.log('warn', `Error checking Python path ${pythonPath}: ${error.message}`);
+      }
     }
 
-    // Fallback to older location if not found
-    const fallbackPath = path.join(app.getAppPath(), 'bin', 'python', 'python.exe');
-    if (fs.existsSync(fallbackPath)) {
-      logger.log('info', `Found Python at fallback location: ${fallbackPath}`);
-      return fallbackPath;
-    }
+    // If we reach here and none of the paths worked, log a detailed error but return system Python
+    logger.log('warn', `Bundled Python not found at expected locations. Attempting to use system Python.`);
+    return "python.exe";
 
-    throw new Error(`Bundled Python not found at: ${pythonPath} or ${fallbackPath}. Please ensure binaries are downloaded correctly.`);
   } else if (process.platform === 'darwin') {
     // For macOS, we'll use bundled Python with Wine
-    // First check for the Python executable in the python_embed directory
-    const pythonExePath = path.join(app.getAppPath(), 'bin', 'python', 'python_embed', 'python.exe');
-    if (fs.existsSync(pythonExePath)) {
-      logger.log('info', `Using bundled Python.exe with Wine for macOS: ${pythonExePath}`);
-      return pythonExePath;
+    // Try multiple possible locations
+    const possiblePaths = [
+      path.join(app.getAppPath(), 'bin', 'python', 'python_embed', 'python.exe'),
+      path.join(app.getAppPath(), 'bin', 'python', 'python.exe'),
+      path.join(app.getAppPath(), 'bin', 'python', 'python'),
+      // Last resort - use system python
+      "python"
+    ];
+
+    for (const pythonPath of possiblePaths) {
+      try {
+        // For system Python, we can't use fs.existsSync
+        if (pythonPath === "python") {
+          logger.log('info', `Attempting to use system Python: ${pythonPath}`);
+          return pythonPath;
+        }
+
+        if (fs.existsSync(pythonPath)) {
+          logger.log('info', `Found Python at ${pythonPath}`);
+          return pythonPath;
+        }
+      } catch (error) {
+        logger.log('warn', `Error checking Python path ${pythonPath}: ${error.message}`);
+      }
     }
 
-    // Also try the legacy location path
-    const legacyPythonExePath = path.join(app.getAppPath(), 'bin', 'python', 'python.exe');
-    if (fs.existsSync(legacyPythonExePath)) {
-      logger.log('info', `Using bundled Python.exe with Wine for macOS (legacy path): ${legacyPythonExePath}`);
-      return legacyPythonExePath;
-    }
+    // If we reach here, log a warning but return system python
+    logger.log('warn', `Bundled Python not found at expected locations. Attempting to use system Python.`);
+    return "python";
 
-    // Fall back to the wrapper script
-    const bundledPythonPath = path.join(app.getAppPath(), 'bin', 'python', 'python');
-    if (!fs.existsSync(bundledPythonPath)) {
-      throw new Error(`Bundled Python not found at: ${bundledPythonPath}. Please ensure binaries are downloaded correctly.`);
-    }
-    logger.log('info', `Using bundled Python wrapper for macOS: ${bundledPythonPath}`);
-    return bundledPythonPath;
   } else {
-    // Linux also uses Wine with python command inside Wine environment
+    // Linux also tries multiple approaches
+    const possiblePaths = [
+      path.join(app.getAppPath(), 'bin', 'python', 'python_embed', 'python.exe'),
+      path.join(app.getAppPath(), 'bin', 'python', 'python.exe'),
+      path.join(app.getAppPath(), 'bin', 'python', 'python'),
+      "python"
+    ];
+
+    for (const pythonPath of possiblePaths) {
+      try {
+        // For system Python, we can't use fs.existsSync
+        if (pythonPath === "python") {
+          logger.log('info', `Attempting to use system Python: ${pythonPath}`);
+          return pythonPath;
+        }
+
+        if (fs.existsSync(pythonPath)) {
+          logger.log('info', `Found Python at ${pythonPath}`);
+          return pythonPath;
+        }
+      } catch (error) {
+        logger.log('warn', `Error checking Python path ${pythonPath}: ${error.message}`);
+      }
+    }
+
+    // Fallback to system python
+    logger.log('info', `Using system Python command`);
     return 'python';
   }
 }
@@ -655,15 +704,15 @@ async function runPythonScript(scriptPath) {
   return new Promise((resolve, reject) => {
     try {
       logger.log('info', `Running Python script: ${scriptPath}`);
-      
+
       // Make sure we're using the correct path to lt-maker-fork
       const ltMakerPath = process.env.NODE_ENV === 'development'
         ? path.join(app.getAppPath(), '..', 'lt-maker-fork')
         : getLtMakerPath();
-      
+
       // Get the directory of the script
       const scriptDir = path.dirname(scriptPath);
-      
+
       // On macOS or Linux, we need to use Wine
       if (process.platform === 'darwin' || process.platform === 'linux') {
         logger.log('info', 'Using Wine to run Python script on macOS/Linux');
@@ -676,16 +725,16 @@ async function runPythonScript(scriptPath) {
           reject(wineError);
           return;
         }
-        
+
         // Get the environment for Python with Wine
         const pythonEnv = getWinePythonEnv();
-        
+
         // Use similar approach as runGame
         logger.log('info', `Running Python script with Wine: ${scriptPath}`);
-        
+
         // Get the script name from the path
         const scriptName = path.basename(scriptPath);
-        
+
         // Launch with shell command
         const wineProcess = spawn(
           winePath,
@@ -697,17 +746,17 @@ async function runPythonScript(scriptPath) {
             env: pythonEnv
           }
         );
-        
+
         wineProcess.stdout.on('data', (data) => {
           const output = data.toString().trim();
           logger.log('info', `Python script stdout: ${output}`);
         });
-        
+
         wineProcess.stderr.on('data', (data) => {
           const output = data.toString().trim();
           logger.log('error', `Python script stderr: ${output}`);
         });
-        
+
         wineProcess.on('close', (code) => {
           logger.log('info', `Python script process closed with code ${code}`);
           if (code !== 0) {
@@ -717,7 +766,7 @@ async function runPythonScript(scriptPath) {
             resolve();
           }
         });
-        
+
         wineProcess.on('error', (err) => {
           logger.log('error', 'Failed to start Python script process', {
             error: err.message,
@@ -729,19 +778,39 @@ async function runPythonScript(scriptPath) {
       } else {
         // On Windows, we run Python directly
         logger.log('info', 'Running Python script on Windows');
-        
-        // Get the Python path
-        const pythonPath = getBundledPythonPath();
-        logger.log('info', `Using bundled Python on Windows: ${pythonPath}`);
-        
-        // Verify the Python executable exists
-        if (!fs.existsSync(pythonPath)) {
-          const errorMsg = `Python executable not found at ${pythonPath}`;
-          logger.log('error', errorMsg);
+
+        // Get the Python path - try multiple possible locations for Python
+        logger.log('info', 'Looking for Python executable on Windows');
+
+        const possiblePythonPaths = [
+          path.join(app.getAppPath(), 'bin', 'python', 'python_embed', 'python.exe'),
+          path.join(app.getAppPath(), 'bin', 'python', 'python.exe'),
+          "python.exe" // Fallback to system Python if bundled is not found
+        ];
+
+        let pythonPath = null;
+        for (const potentialPath of possiblePythonPaths) {
+          logger.log('info', `Checking Python path: ${potentialPath}`);
+          try {
+            if (fs.existsSync(potentialPath)) {
+              pythonPath = potentialPath;
+              logger.log('info', `Found Python at: ${pythonPath}`);
+              break;
+            }
+          } catch (error) {
+            logger.log('error', `Error checking Python path ${potentialPath}: ${error.message}`);
+          }
+        }
+
+        if (!pythonPath) {
+          const errorMsg = `Python executable not found at any expected location`;
+          logger.log('error', errorMsg, { checkedPaths: possiblePythonPaths });
           reject(new Error(errorMsg));
           return;
         }
-        
+
+        logger.log('info', `Using Python at: ${pythonPath}`);
+
         // Run the Python script
         const pythonProcess = spawn(
           pythonPath,
@@ -756,20 +825,20 @@ async function runPythonScript(scriptPath) {
             }
           }
         );
-        
+
         // Unref the child to allow the Node.js event loop to exit
         pythonProcess.unref();
-        
+
         pythonProcess.stdout.on('data', (data) => {
           const output = data.toString().trim();
           logger.log('info', `Python script stdout: ${output}`);
         });
-        
+
         pythonProcess.stderr.on('data', (data) => {
           const output = data.toString().trim();
           logger.log('error', `Python script stderr: ${output}`);
         });
-        
+
         pythonProcess.on('close', (code) => {
           logger.log('info', `Python script process closed with code ${code}`);
           if (code !== 0) {
@@ -779,7 +848,7 @@ async function runPythonScript(scriptPath) {
             resolve();
           }
         });
-        
+
         pythonProcess.on('error', (err) => {
           logger.log('error', 'Failed to start Python script process', {
             error: err.message,
