@@ -295,7 +295,7 @@ async function runPythonInstallScript() {
       const scriptPath = installScriptPath.replace(/\\/g, '\\\\');
       
       const batchContent = `@echo off
-${pythonExe} "${scriptPath}"
+"${pythonExe.replace(/\//g, '\\')}" "${scriptPath.replace(/\//g, '\\')}"
 exit %ERRORLEVEL%
 `;
       
@@ -305,7 +305,7 @@ exit %ERRORLEVEL%
       const shellPath = path.join(pythonDir, 'install_deps.sh');
       const shellContent = `#!/bin/bash
 export WINEDEBUG=-all
-wine cmd /c "${batchPath.replace(/\\/g, '/')}"
+wine cmd /c "${batchPath.replace(/\//g, '\\\\')}"
 exit $?
 `;
       

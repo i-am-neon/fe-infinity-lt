@@ -95,12 +95,19 @@ function getBundledPythonPath() {
     return pythonPath;
   } else if (process.platform === 'darwin') {
     // For macOS, we'll use bundled Python with Wine
-    // Use bundled Python
+    // First check for the Python executable directly
+    const pythonExePath = path.join(app.getAppPath(), 'bin', 'python', 'python.exe');
+    if (fs.existsSync(pythonExePath)) {
+      logger.log('info', `Using bundled Python.exe with Wine for macOS: ${pythonExePath}`);
+      return pythonExePath;
+    }
+
+    // Fall back to the wrapper script
     const bundledPythonPath = path.join(app.getAppPath(), 'bin', 'python', 'python');
     if (!fs.existsSync(bundledPythonPath)) {
       throw new Error(`Bundled Python not found at: ${bundledPythonPath}. Please ensure binaries are downloaded correctly.`);
     }
-    logger.log('info', `Using bundled Python for macOS: ${bundledPythonPath}`);
+    logger.log('info', `Using bundled Python wrapper for macOS: ${bundledPythonPath}`);
     return bundledPythonPath;
   } else {
     // Linux also uses Wine with python command inside Wine environment
@@ -270,16 +277,80 @@ async function runGameWithWine(projectNameEndingInDotLtProj) {
 
         // Create a temporary Windows batch file to run the game
         const tempBatchPath = path.join(require('os').tmpdir(), 'run_game.bat');
+        
+        // Function to convert Unix path to Wine-compatible Windows path
+        const toWinePath = (unixPath) => {
+          // First try to convert absolute paths that should be accessible via Z: drive
+          if (unixPath.startsWith('/')) {
+            return 'Z:' + unixPath.replace(/\//g, '\\');
+          }
+          // Otherwise just convert slashes
+          return unixPath.replace(/\//g, '\\');
+        };
+        
         // Get the Wine-compatible path to the run_engine_for_project.py script
-        const ltMakerWinePath = ltMakerPath.replace(/\//g, '\\');
+        const ltMakerWinePath = toWinePath(ltMakerPath);
+        
+        // Convert Python executable path to Wine path format
+        const pythonWineExe = toWinePath(path.join(app.getAppPath(), 'bin', 'python', 'python.exe'));
+        
         // Create a simple batch file to run the game without dependency checks
+        // Use a different approach with a script file instead of command line
+        const pythonScriptPath = path.join(require('os').tmpdir(), 'run_game.py');
+        const pythonWineScriptPath = toWinePath(pythonScriptPath);
+        
+        // Create a Python script file that will run the game
+        const pythonScriptContent = `
+import sys
+import os
+
+# Add LT Maker to Python path
+sys.path.insert(0, r'${ltMakerWinePath}')
+os.environ['PYTHONPATH'] = r'${ltMakerWinePath}' + os.pathsep + os.environ.get('PYTHONPATH', '')
+
+# Import and run the game
+import run_engine_for_project
+run_engine_for_project.main('${normalizedProjectPath}')
+`;
+        
+        // Write the Python script to a file
+        fs.writeFileSync(pythonScriptPath, pythonScriptContent);
+        
+        // Create a simple batch file that just calls Python with the script file
         const batchContent = `@echo off
 cd /d "${ltMakerWinePath}"
 set PYTHONPATH=${ltMakerWinePath}
 
+REM Debug information
+echo Python executable: "${pythonWineExe}"
+echo Python script: "${pythonWineScriptPath}"
+echo Current directory: %cd%
+
+REM Check if Python executable exists
+if exist "${pythonWineExe}" (
+    echo Python executable found
+) else (
+    echo Python executable NOT found
+)
+
+REM Check if the Python script exists
+if exist "${pythonWineScriptPath}" (
+    echo Python script found
+) else (
+    echo Python script NOT found
+)
+
+REM Create a simplified script inline
+echo import sys > run_game_simple.py
+echo import os >> run_game_simple.py
+echo sys.path.insert(0, r'${ltMakerWinePath}') >> run_game_simple.py
+echo os.environ['PYTHONPATH'] = r'${ltMakerWinePath}' + os.pathsep + os.environ.get('PYTHONPATH', '') >> run_game_simple.py
+echo import run_engine_for_project >> run_game_simple.py
+echo run_engine_for_project.main('${normalizedProjectPath}') >> run_game_simple.py
+
 REM Run the game with proper Python configuration
 echo Starting game engine...
-${pythonExe.replace(/\\/g, '\\')} -c "import sys, os; sys.path.insert(0, r'${ltMakerWinePath}'); os.environ['PYTHONPATH'] = r'${ltMakerWinePath}' + os.pathsep + os.environ.get('PYTHONPATH', ''); import run_engine_for_project; run_engine_for_project.main('${normalizedProjectPath}')"
+"${pythonWineExe}" run_game_simple.py
 `;
         fs.writeFileSync(tempBatchPath, batchContent);
         logger.log('info', `Created temporary batch file: ${tempBatchPath}`);
@@ -309,6 +380,16 @@ ${pythonExe.replace(/\\/g, '\\')} -c "import sys, os; sys.path.insert(0, r'${ltM
         try {
           // Create an improved shell script for running Wine with the batch file
           const tempScriptPath = path.join(app.getPath('temp'), 'run-wine.sh');
+          
+          // Convert Unix paths to Wine paths
+          const wineTempBatchPath = tempBatchPath.replace(/^\//g, 'Z:\\').replace(/\//g, '\\');
+          
+          // Convert the batch file path to a DOS path that Wine can understand
+          // Wine uses Z: drive to map to the Unix root directory
+          const wineBatchPath = tempBatchPath.startsWith('/') 
+            ? `Z:${tempBatchPath.replace(/\//g, '\\')}` 
+            : tempBatchPath.replace(/\//g, '\\');
+            
           let scriptContent = `#!/bin/bash
 # Run Wine with the enhanced batch file that installs dependencies
 cd "${ltMakerPath}"
@@ -319,8 +400,16 @@ export WINEPREFIX=${pythonEnv.WINEPREFIX || '~/.wine'}
 export PYTHONIOENCODING=utf-8
 export PYTHONUNBUFFERED=1
 
-# Run Wine with cmd to execute the batch file
-"${winePath}" cmd /c "${tempBatchPath.replace(/\\/g, '/')}" 2>&1`;
+# Debug info to help diagnose path issues
+echo "Running Wine with batch file at: ${tempBatchPath}"
+echo "Wine executable: ${winePath}"
+echo "Wine batch path: ${wineBatchPath}"
+
+# Make sure the batch file is accessible to Wine
+ls -la "${tempBatchPath}"
+
+# Run Wine with cmd to execute the batch file using Wine's Z: drive mapping for absolute paths
+"${winePath}" cmd /c "${wineBatchPath}" 2>&1`;
 
           fs.writeFileSync(tempScriptPath, scriptContent);
           fs.chmodSync(tempScriptPath, 0o755);
@@ -329,12 +418,17 @@ export PYTHONUNBUFFERED=1
           logger.log('info', `Script content: ${scriptContent}`);
 
           // Launch with shell script - this helps with macOS path issues
+          logger.log('info', `Running wine wrapper at: ${tempScriptPath}`);
+          
+          // Log the command we're about to execute
+          logger.log('info', `Executing: /bin/bash ${tempScriptPath}`);
+          
           const wineProcess = spawn(
             '/bin/bash',
             [tempScriptPath],
             {
               cwd: ltMakerPath,
-              detached: true,
+              detached: false, // Changed to false to ensure we capture all output
               stdio: ['ignore', 'pipe', 'pipe'],
               env: pythonEnv
             }
