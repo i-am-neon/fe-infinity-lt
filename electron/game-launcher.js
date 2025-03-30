@@ -162,20 +162,64 @@ function startGameLauncherServer() {
               
               logger.log('info', `Received request to run Python script: ${scriptPath}`);
               
-              // In Electron, use bundled Python
-              // Try finding bundled Python
-              const possiblePythonPaths = [
-                path.join(app.getAppPath(), 'bin', 'python', 'python_embed', 'python.exe'),
-                path.join(app.getAppPath(), 'bin', 'python', 'python.exe'),
-              ];
+              // In Electron, use bundled Python, properly handling asar vs asar.unpacked paths
+              // Create possible Python paths, accounting for asar packaging
+              const appPath = app.getAppPath();
+              let basePaths = [];
               
+              if (appPath.includes('app.asar')) {
+                // In packaged app, binaries must be in .unpacked directory
+                const unpackedPath = appPath.replace('app.asar', 'app.asar.unpacked');
+                basePaths = [
+                  // First try unpacked path (which should be correct in production)
+                  unpackedPath,
+                  // Then try resources dir directly
+                  process.resourcesPath
+                ];
+              } else {
+                // In dev mode
+                basePaths = [
+                  // First try the app directory directly
+                  appPath,
+                  // Then try going one level up (common in dev setups)
+                  path.join(appPath, '..')
+                ];
+              }
+              
+              logger.log('info', `Base paths for Python search: ${JSON.stringify(basePaths)}`);
+              
+              // Build the full list of possible Python paths
+              const possiblePythonPaths = [];
+              
+              // Add all combinations of paths
+              for (const basePath of basePaths) {
+                possiblePythonPaths.push(
+                  path.join(basePath, 'bin', 'python', 'python_embed', 'python.exe'),
+                  path.join(basePath, 'bin', 'python', 'python.exe')
+                );
+              }
+              
+              logger.log('info', `Searching for Python in paths: ${JSON.stringify(possiblePythonPaths)}`);
+              
+              // Try each path
               let pythonPath = null;
               for (const potentialPath of possiblePythonPaths) {
-                logger.log('info', `Checking for Python at: ${potentialPath}`);
-                if (fs.existsSync(potentialPath)) {
-                  pythonPath = potentialPath;
-                  logger.log('info', `Found bundled Python at: ${pythonPath}`);
-                  break;
+                try {
+                  logger.log('info', `Checking for Python at: ${potentialPath}`);
+                  if (fs.existsSync(potentialPath)) {
+                    pythonPath = potentialPath;
+                    logger.log('info', `Found bundled Python at: ${pythonPath}`);
+                    // Also verify we can execute it
+                    try {
+                      fs.accessSync(potentialPath, fs.constants.X_OK);
+                      logger.log('info', `Python at ${pythonPath} is executable`);
+                    } catch (accessErr) {
+                      logger.log('warn', `Python at ${pythonPath} exists but may not be executable: ${accessErr.message}`);
+                    }
+                    break;
+                  }
+                } catch (checkErr) {
+                  logger.log('warn', `Error checking path ${potentialPath}: ${checkErr.message}`);
                 }
               }
               

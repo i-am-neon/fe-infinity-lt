@@ -86,15 +86,50 @@ function getLtMakerPath() {
 
 // Get path to Python with better error handling and fallbacks
 function getBundledPythonPath() {
-  if (process.platform === 'win32') {
-    // Windows - try multiple possible locations
-    const possiblePaths = [
-      path.join(app.getAppPath(), 'bin', 'python', 'python_embed', 'python.exe'),
-      path.join(app.getAppPath(), 'bin', 'python', 'python.exe'),
-      // Add system Python as last resort
-      "python.exe"
+  // In Electron, properly handle asar vs asar.unpacked paths
+  // Create possible Python paths, accounting for asar packaging
+  const appPath = app.getAppPath();
+  let basePaths = [];
+  
+  if (appPath.includes('app.asar')) {
+    // In packaged app, binaries must be in .unpacked directory
+    const unpackedPath = appPath.replace('app.asar', 'app.asar.unpacked');
+    basePaths = [
+      // First try unpacked path (which should be correct in production)
+      unpackedPath,
+      // Then try resources dir directly
+      process.resourcesPath
     ];
-
+  } else {
+    // In dev mode
+    basePaths = [
+      // First try the app directory directly
+      appPath,
+      // Then try going one level up (common in dev setups)
+      path.join(appPath, '..')
+    ];
+  }
+  
+  logger.log('info', `Base paths for Python search: ${JSON.stringify(basePaths)}`);
+  
+  if (process.platform === 'win32') {
+    // Windows - build a list of all possible Python paths
+    const possiblePaths = [];
+    
+    // Add all combinations of paths
+    for (const basePath of basePaths) {
+      possiblePaths.push(
+        path.join(basePath, 'bin', 'python', 'python_embed', 'python.exe'),
+        path.join(basePath, 'bin', 'python', 'python.exe')
+      );
+    }
+    
+    // Add system Python as last resort
+    possiblePaths.push("python.exe");
+    
+    logger.log('info', `Searching for Python in paths: ${JSON.stringify(possiblePaths)}`);
+    
+    // Try each path
     for (const pythonPath of possiblePaths) {
       try {
         // For system Python, we can't use fs.existsSync
@@ -102,31 +137,47 @@ function getBundledPythonPath() {
           logger.log('info', `Attempting to use system Python: ${pythonPath}`);
           return pythonPath;
         }
-
+        
         if (fs.existsSync(pythonPath)) {
           logger.log('info', `Found Python at ${pythonPath}`);
+          // Verify it's executable
+          try {
+            fs.accessSync(pythonPath, fs.constants.X_OK);
+            logger.log('info', `Python at ${pythonPath} is executable`);
+          } catch (accessErr) {
+            logger.log('warn', `Python at ${pythonPath} exists but may not be executable: ${accessErr.message}`);
+          }
           return pythonPath;
         }
       } catch (error) {
         logger.log('warn', `Error checking Python path ${pythonPath}: ${error.message}`);
       }
     }
-
+    
     // If we reach here and none of the paths worked, log a detailed error but return system Python
     logger.log('warn', `Bundled Python not found at expected locations. Attempting to use system Python.`);
     return "python.exe";
 
   } else if (process.platform === 'darwin') {
     // For macOS, we'll use bundled Python with Wine
-    // Try multiple possible locations
-    const possiblePaths = [
-      path.join(app.getAppPath(), 'bin', 'python', 'python_embed', 'python.exe'),
-      path.join(app.getAppPath(), 'bin', 'python', 'python.exe'),
-      path.join(app.getAppPath(), 'bin', 'python', 'python'),
-      // Last resort - use system python
-      "python"
-    ];
-
+    // Build a list of all possible Python paths
+    const possiblePaths = [];
+    
+    // Add all combinations of paths
+    for (const basePath of basePaths) {
+      possiblePaths.push(
+        path.join(basePath, 'bin', 'python', 'python_embed', 'python.exe'),
+        path.join(basePath, 'bin', 'python', 'python.exe'),
+        path.join(basePath, 'bin', 'python', 'python')
+      );
+    }
+    
+    // Add system Python as last resort
+    possiblePaths.push("python");
+    
+    logger.log('info', `Searching for Python in paths: ${JSON.stringify(possiblePaths)}`);
+    
+    // Try each path
     for (const pythonPath of possiblePaths) {
       try {
         // For system Python, we can't use fs.existsSync
@@ -134,29 +185,48 @@ function getBundledPythonPath() {
           logger.log('info', `Attempting to use system Python: ${pythonPath}`);
           return pythonPath;
         }
-
+        
         if (fs.existsSync(pythonPath)) {
           logger.log('info', `Found Python at ${pythonPath}`);
+          // Verify it's executable for non-system paths
+          if (!pythonPath.includes("python.exe")) {
+            try {
+              fs.accessSync(pythonPath, fs.constants.X_OK);
+              logger.log('info', `Python at ${pythonPath} is executable`);
+            } catch (accessErr) {
+              logger.log('warn', `Python at ${pythonPath} exists but may not be executable: ${accessErr.message}`);
+            }
+          }
           return pythonPath;
         }
       } catch (error) {
         logger.log('warn', `Error checking Python path ${pythonPath}: ${error.message}`);
       }
     }
-
+    
     // If we reach here, log a warning but return system python
     logger.log('warn', `Bundled Python not found at expected locations. Attempting to use system Python.`);
     return "python";
-
+    
   } else {
-    // Linux also tries multiple approaches
-    const possiblePaths = [
-      path.join(app.getAppPath(), 'bin', 'python', 'python_embed', 'python.exe'),
-      path.join(app.getAppPath(), 'bin', 'python', 'python.exe'),
-      path.join(app.getAppPath(), 'bin', 'python', 'python'),
-      "python"
-    ];
-
+    // Linux - build a list of all possible Python paths
+    const possiblePaths = [];
+    
+    // Add all combinations of paths
+    for (const basePath of basePaths) {
+      possiblePaths.push(
+        path.join(basePath, 'bin', 'python', 'python_embed', 'python.exe'),
+        path.join(basePath, 'bin', 'python', 'python.exe'),
+        path.join(basePath, 'bin', 'python', 'python')
+      );
+    }
+    
+    // Add system Python as last resort
+    possiblePaths.push("python");
+    
+    logger.log('info', `Searching for Python in paths: ${JSON.stringify(possiblePaths)}`);
+    
+    // Try each path
     for (const pythonPath of possiblePaths) {
       try {
         // For system Python, we can't use fs.existsSync
@@ -164,18 +234,27 @@ function getBundledPythonPath() {
           logger.log('info', `Attempting to use system Python: ${pythonPath}`);
           return pythonPath;
         }
-
+        
         if (fs.existsSync(pythonPath)) {
           logger.log('info', `Found Python at ${pythonPath}`);
+          // Verify it's executable for non-system paths
+          if (!pythonPath.includes("python.exe")) {
+            try {
+              fs.accessSync(pythonPath, fs.constants.X_OK);
+              logger.log('info', `Python at ${pythonPath} is executable`);
+            } catch (accessErr) {
+              logger.log('warn', `Python at ${pythonPath} exists but may not be executable: ${accessErr.message}`);
+            }
+          }
           return pythonPath;
         }
       } catch (error) {
         logger.log('warn', `Error checking Python path ${pythonPath}: ${error.message}`);
       }
     }
-
+    
     // Fallback to system python
-    logger.log('info', `Using system Python command`);
+    logger.log('warn', `Bundled Python not found at expected locations. Falling back to system Python.`);
     return 'python';
   }
 }
@@ -779,32 +858,13 @@ async function runPythonScript(scriptPath) {
         // On Windows, we run Python directly
         logger.log('info', 'Running Python script on Windows');
 
-        // Get the Python path - try multiple possible locations for Python
-        logger.log('info', 'Looking for Python executable on Windows');
-
-        const possiblePythonPaths = [
-          path.join(app.getAppPath(), 'bin', 'python', 'python_embed', 'python.exe'),
-          path.join(app.getAppPath(), 'bin', 'python', 'python.exe'),
-          "python.exe" // Fallback to system Python if bundled is not found
-        ];
-
-        let pythonPath = null;
-        for (const potentialPath of possiblePythonPaths) {
-          logger.log('info', `Checking Python path: ${potentialPath}`);
-          try {
-            if (fs.existsSync(potentialPath)) {
-              pythonPath = potentialPath;
-              logger.log('info', `Found Python at: ${pythonPath}`);
-              break;
-            }
-          } catch (error) {
-            logger.log('error', `Error checking Python path ${potentialPath}: ${error.message}`);
-          }
-        }
-
+        // Get the Python path using our improved function
+        logger.log('info', 'Getting Python path for running script');
+        const pythonPath = getBundledPythonPath();
+        
         if (!pythonPath) {
           const errorMsg = `Python executable not found at any expected location`;
-          logger.log('error', errorMsg, { checkedPaths: possiblePythonPaths });
+          logger.log('error', errorMsg);
           reject(new Error(errorMsg));
           return;
         }
