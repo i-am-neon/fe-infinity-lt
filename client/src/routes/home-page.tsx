@@ -156,6 +156,21 @@ export default function HomePage() {
     }
   }, []);
 
+  // Handler for running LT Maker editor
+  const handleRunEditor = useCallback(async () => {
+    setError(null);
+
+    try {
+      await apiCall("run-editor", {
+        method: "POST",
+      });
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Unknown error occurred";
+      setError(errorMessage);
+    }
+  }, []);
+
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
@@ -250,6 +265,12 @@ export default function HomePage() {
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             )}
             Run Default Project
+          </Button>
+          <Button
+            onClick={handleRunEditor}
+            variant="outline"
+          >
+            Open LT Editor
           </Button>
         </div>
 

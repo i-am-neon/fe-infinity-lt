@@ -51,6 +51,9 @@ export async function handleRequest(req: Request): Promise<Response> {
   } else if (req.method === "POST" && url.pathname === "/delete-game") {
     const { handleDeleteGame } = await import("./delete-game.ts");
     response = await handleDeleteGame(req);
+  } else if (req.method === "POST" && url.pathname === "/run-editor") {
+    const { handleRunEditor } = await import("./run-editor.ts");
+    response = await handleRunEditor(req);
   } else {
     // Default route
     response = new Response("Not Found", { status: 404 });
