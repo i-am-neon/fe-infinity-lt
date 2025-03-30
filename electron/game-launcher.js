@@ -52,7 +52,7 @@ function startGameLauncherServer() {
             if (req.url === '/run-game') {
               // Run Game endpoint
               const projectPath = parsedBody.projectPath;
-              
+
               if (!projectPath) {
                 logger.log('error', 'Missing projectPath parameter');
                 res.statusCode = 400;
@@ -63,123 +63,124 @@ function startGameLauncherServer() {
                 return;
               }
 
-            // Use improved path resolution logic to find lt-maker-fork directory
-            let ltMakerPath;
-            // Try multiple potential locations
-            const potentialLocations = [
-              // Development location
-              path.join(app.getAppPath(), '..', 'lt-maker-fork'),
-              // Direct from app path
-              path.join(app.getAppPath(), 'lt-maker-fork'),
-              // From resources
-              path.join(process.resourcesPath || app.getAppPath(), 'lt-maker-fork'),
-              // From resources/app
-              path.join(process.resourcesPath || app.getAppPath(), 'app', 'lt-maker-fork')
-            ];
+              // Use improved path resolution logic to find lt-maker-fork directory
+              let ltMakerPath;
+              // Try multiple potential locations
+              const potentialLocations = [
+                // Development location
+                path.join(app.getAppPath(), '..', 'lt-maker-fork'),
+                // Direct from app path
+                path.join(app.getAppPath(), 'lt-maker-fork'),
+                // From resources
+                path.join(process.resourcesPath || app.getAppPath(), 'lt-maker-fork'),
+                // From resources/app
+                path.join(process.resourcesPath || app.getAppPath(), 'app', 'lt-maker-fork')
+              ];
 
-            // Find the first location that exists
-            let foundPath = false;
-            for (const location of potentialLocations) {
-              if (fs.existsSync(location)) {
-                ltMakerPath = location;
-                foundPath = true;
-                logger.log('info', `Found lt-maker-fork at: ${ltMakerPath}`);
-                break;
+              // Find the first location that exists
+              let foundPath = false;
+              for (const location of potentialLocations) {
+                if (fs.existsSync(location)) {
+                  ltMakerPath = location;
+                  foundPath = true;
+                  logger.log('info', `Found lt-maker-fork at: ${ltMakerPath}`);
+                  break;
+                }
               }
-            }
 
-            if (!foundPath) {
-              const errorMsg = `lt-maker-fork directory not found in any expected location`;
-              logger.log('error', errorMsg, { searchedLocations: potentialLocations });
-              res.statusCode = 404;
-              res.end(JSON.stringify({
-                success: false,
-                error: errorMsg
-              }));
-              return;
-            }
-
-            const projectFullPath = path.join(ltMakerPath, projectPath);
-            logger.log('info', `Looking for project at: ${projectFullPath}`);
-
-            if (!fs.existsSync(projectFullPath)) {
-              const errorMsg = `Project not found: ${projectPath} (full path: ${projectFullPath})`;
-              logger.log('error', errorMsg);
-              res.statusCode = 404;
-              res.end(JSON.stringify({
-                success: false,
-                error: errorMsg
-              }));
-              return;
-            }
-
-            // Check metadata.json exists
-            const metadataPath = path.join(projectFullPath, 'metadata.json');
-            if (!fs.existsSync(metadataPath)) {
-              const errorMsg = `metadata.json not found in project: ${projectPath}`;
-              logger.log('error', errorMsg);
-              res.statusCode = 404;
-              res.end(JSON.stringify({
-                success: false,
-                error: errorMsg
-              }));
-              return;
-            }
-
-            logger.log('info', `HTTP endpoint received request to run game: ${projectPath}`);
-
-            if (req.url === '/run-game') {
-              try {
-                await runGame(projectPath);
-                logger.log('info', `Game launch requested successfully`);
-
-                res.statusCode = 200;
-                res.end(JSON.stringify({ success: true }));
-              } catch (gameError) {
-                logger.log('error', 'Error running game', {
-                  error: gameError.message,
-                  stack: gameError.stack
-                });
-
-                res.statusCode = 500;
+              if (!foundPath) {
+                const errorMsg = `lt-maker-fork directory not found in any expected location`;
+                logger.log('error', errorMsg, { searchedLocations: potentialLocations });
+                res.statusCode = 404;
                 res.end(JSON.stringify({
                   success: false,
-                  error: gameError.message || 'Failed to launch game'
-                }));
-              }
-            } else if (req.url === '/run-python') {
-              // Run Python script endpoint
-              const scriptPath = parsedBody.scriptPath;
-              
-              if (!scriptPath) {
-                logger.log('error', 'Missing scriptPath parameter');
-                res.statusCode = 400;
-                res.end(JSON.stringify({
-                  success: false,
-                  error: 'Missing scriptPath parameter'
+                  error: errorMsg
                 }));
                 return;
               }
-              
-              logger.log('info', `Received request to run Python script: ${scriptPath}`);
-              
-              try {
-                await runPythonScript(scriptPath);
-                logger.log('info', `Python script launched successfully`);
-                
-                res.statusCode = 200;
-                res.end(JSON.stringify({ success: true }));
-              } catch (pythonError) {
-                logger.log('error', 'Error running Python script', {
-                  error: pythonError.message,
-                  stack: pythonError.stack
-                });
-                
-                res.statusCode = 500;
+
+              const projectFullPath = path.join(ltMakerPath, projectPath);
+              logger.log('info', `Looking for project at: ${projectFullPath}`);
+
+              if (!fs.existsSync(projectFullPath)) {
+                const errorMsg = `Project not found: ${projectPath} (full path: ${projectFullPath})`;
+                logger.log('error', errorMsg);
+                res.statusCode = 404;
                 res.end(JSON.stringify({
                   success: false,
-                  error: pythonError.message || 'Failed to run Python script'
+                  error: errorMsg
                 }));
+                return;
+              }
+
+              // Check metadata.json exists
+              const metadataPath = path.join(projectFullPath, 'metadata.json');
+              if (!fs.existsSync(metadataPath)) {
+                const errorMsg = `metadata.json not found in project: ${projectPath}`;
+                logger.log('error', errorMsg);
+                res.statusCode = 404;
+                res.end(JSON.stringify({
+                  success: false,
+                  error: errorMsg
+                }));
+                return;
+              }
+
+              logger.log('info', `HTTP endpoint received request to run game: ${projectPath}`);
+
+              if (req.url === '/run-game') {
+                try {
+                  await runGame(projectPath);
+                  logger.log('info', `Game launch requested successfully`);
+
+                  res.statusCode = 200;
+                  res.end(JSON.stringify({ success: true }));
+                } catch (gameError) {
+                  logger.log('error', 'Error running game', {
+                    error: gameError.message,
+                    stack: gameError.stack
+                  });
+
+                  res.statusCode = 500;
+                  res.end(JSON.stringify({
+                    success: false,
+                    error: gameError.message || 'Failed to launch game'
+                  }));
+                }
+              } else if (req.url === '/run-python') {
+                // Run Python script endpoint
+                const scriptPath = parsedBody.scriptPath;
+
+                if (!scriptPath) {
+                  logger.log('error', 'Missing scriptPath parameter');
+                  res.statusCode = 400;
+                  res.end(JSON.stringify({
+                    success: false,
+                    error: 'Missing scriptPath parameter'
+                  }));
+                  return;
+                }
+
+                logger.log('info', `Received request to run Python script: ${scriptPath}`);
+
+                try {
+                  await runPythonScript(scriptPath);
+                  logger.log('info', `Python script launched successfully`);
+
+                  res.statusCode = 200;
+                  res.end(JSON.stringify({ success: true }));
+                } catch (pythonError) {
+                  logger.log('error', 'Error running Python script', {
+                    error: pythonError.message,
+                    stack: pythonError.stack
+                  });
+
+                  res.statusCode = 500;
+                  res.end(JSON.stringify({
+                    success: false,
+                    error: pythonError.message || 'Failed to run Python script'
+                  }));
+                }
               }
             }
           } catch (error) {

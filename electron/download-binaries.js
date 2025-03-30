@@ -128,7 +128,7 @@ async function downloadPython() {
     console.log('Python already installed in python_embed directory, skipping...');
     return;
   }
-  
+
   // Also check the legacy location (for backward compatibility)
   if (fs.existsSync(path.join(pythonBaseDir, 'python.exe'))) {
     console.log('Python already installed in legacy location, skipping...');
@@ -180,14 +180,14 @@ async function downloadPython() {
     if (isWindows) {
       // On Windows, we can run Python directly
       console.log('Installing pip for Python embeddable package...');
-      
+
       // Ensure the python.exe exists before trying to execute it
       const pythonExePath = path.join(pythonEmbedDir, 'python.exe');
       if (!fs.existsSync(pythonExePath)) {
         console.error(`ERROR: Python executable not found at ${pythonExePath}`);
         throw new Error(`Python executable not found. Cannot install dependencies.`);
       }
-      
+
       console.log(`Using Python at: ${pythonExePath}`);
       await execCommand(pythonExePath, [getPipPath], { cwd: pythonEmbedDir });
 
@@ -206,7 +206,7 @@ async function downloadPython() {
       // Install required packages
       console.log('Installing required packages...');
       const ltMakerPath = path.resolve(__dirname, '..', 'lt-maker-fork');
-      const requirementsPath = path.join(ltMakerPath, 'requirements_engine.txt');
+      const requirementsPath = path.join(ltMakerPath, 'requirements_editor.txt');
 
       if (fs.existsSync(requirementsPath)) {
         console.log(`Installing packages from requirements file: ${requirementsPath}`);
@@ -218,7 +218,7 @@ async function downloadPython() {
           console.log('Installed required packages using pip module');
         } catch (pipModuleError) {
           console.warn(`Error installing with pip module: ${pipModuleError.message}`);
-          
+
           // Try with Scripts/pip.exe directly
           const pipExePath = path.join(pythonEmbedDir, 'Scripts', 'pip.exe');
           if (fs.existsSync(pipExePath)) {
@@ -231,7 +231,7 @@ async function downloadPython() {
             throw new Error(`Pip executable not found at ${pipExePath}`);
           }
         }
-        
+
         // Verify critical packages were installed
         console.log('Verifying pygame installation...');
         try {
@@ -317,7 +317,7 @@ fi
       fs.writeFileSync(wrapperScriptPath, wrapperScriptContent);
       fs.chmodSync(wrapperScriptPath, 0o755);
       console.log(`Created Python wrapper script at ${wrapperScriptPath}`);
-      
+
       // Create a diagnostic test script
       const testScriptPath = path.join(pythonBaseDir, 'test_python.sh');
       const testScriptContent = `#!/bin/bash
