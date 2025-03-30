@@ -650,8 +650,157 @@ async function preparePythonEnvironment() {
 // Alias for backward compatibility
 const runGameWithWine = runGame;
 
+// Run a Python script with appropriate environment setup
+async function runPythonScript(scriptPath) {
+  return new Promise((resolve, reject) => {
+    try {
+      logger.log('info', `Running Python script: ${scriptPath}`);
+      
+      // Make sure we're using the correct path to lt-maker-fork
+      const ltMakerPath = process.env.NODE_ENV === 'development'
+        ? path.join(app.getAppPath(), '..', 'lt-maker-fork')
+        : getLtMakerPath();
+      
+      // Get the directory of the script
+      const scriptDir = path.dirname(scriptPath);
+      
+      // On macOS or Linux, we need to use Wine
+      if (process.platform === 'darwin' || process.platform === 'linux') {
+        logger.log('info', 'Using Wine to run Python script on macOS/Linux');
+        let winePath;
+        try {
+          winePath = getWinePath();
+          logger.log('info', `Using Wine at: ${winePath}`);
+        } catch (wineError) {
+          logger.log('error', 'Fatal Wine error', { error: wineError.message });
+          reject(wineError);
+          return;
+        }
+        
+        // Get the environment for Python with Wine
+        const pythonEnv = getWinePythonEnv();
+        
+        // Use similar approach as runGame
+        logger.log('info', `Running Python script with Wine: ${scriptPath}`);
+        
+        // Get the script name from the path
+        const scriptName = path.basename(scriptPath);
+        
+        // Launch with shell command
+        const wineProcess = spawn(
+          winePath,
+          ['python', scriptName],
+          {
+            cwd: scriptDir,
+            detached: false,
+            stdio: ['ignore', 'pipe', 'pipe'],
+            env: pythonEnv
+          }
+        );
+        
+        wineProcess.stdout.on('data', (data) => {
+          const output = data.toString().trim();
+          logger.log('info', `Python script stdout: ${output}`);
+        });
+        
+        wineProcess.stderr.on('data', (data) => {
+          const output = data.toString().trim();
+          logger.log('error', `Python script stderr: ${output}`);
+        });
+        
+        wineProcess.on('close', (code) => {
+          logger.log('info', `Python script process closed with code ${code}`);
+          if (code !== 0) {
+            logger.log('error', `Wine process exited with non-zero code: ${code}`);
+            reject(new Error(`Python script exited with code ${code}`));
+          } else {
+            resolve();
+          }
+        });
+        
+        wineProcess.on('error', (err) => {
+          logger.log('error', 'Failed to start Python script process', {
+            error: err.message,
+            code: err.code,
+            path: scriptPath
+          });
+          reject(err);
+        });
+      } else {
+        // On Windows, we run Python directly
+        logger.log('info', 'Running Python script on Windows');
+        
+        // Get the Python path
+        const pythonPath = getBundledPythonPath();
+        logger.log('info', `Using bundled Python on Windows: ${pythonPath}`);
+        
+        // Verify the Python executable exists
+        if (!fs.existsSync(pythonPath)) {
+          const errorMsg = `Python executable not found at ${pythonPath}`;
+          logger.log('error', errorMsg);
+          reject(new Error(errorMsg));
+          return;
+        }
+        
+        // Run the Python script
+        const pythonProcess = spawn(
+          pythonPath,
+          [scriptPath],
+          {
+            cwd: scriptDir,
+            detached: true,
+            stdio: ['ignore', 'pipe', 'pipe'],
+            env: {
+              ...process.env,
+              PYTHONUNBUFFERED: '1'
+            }
+          }
+        );
+        
+        // Unref the child to allow the Node.js event loop to exit
+        pythonProcess.unref();
+        
+        pythonProcess.stdout.on('data', (data) => {
+          const output = data.toString().trim();
+          logger.log('info', `Python script stdout: ${output}`);
+        });
+        
+        pythonProcess.stderr.on('data', (data) => {
+          const output = data.toString().trim();
+          logger.log('error', `Python script stderr: ${output}`);
+        });
+        
+        pythonProcess.on('close', (code) => {
+          logger.log('info', `Python script process closed with code ${code}`);
+          if (code !== 0) {
+            logger.log('error', `Python process exited with non-zero code: ${code}`);
+            reject(new Error(`Python script exited with code ${code}`));
+          } else {
+            resolve();
+          }
+        });
+        
+        pythonProcess.on('error', (err) => {
+          logger.log('error', 'Failed to start Python script process', {
+            error: err.message,
+            stack: err.stack
+          });
+          reject(err);
+        });
+      }
+    } catch (error) {
+      logger.log('error', 'Unexpected error in runPythonScript', {
+        error: error.message,
+        stack: error.stack
+      });
+      reject(error);
+    }
+  });
+}
+
 module.exports = {
   runGame,
   runGameWithWine, // Keeping for backward compatibility
-  preparePythonEnvironment
+  preparePythonEnvironment,
+  runPythonScript
 };

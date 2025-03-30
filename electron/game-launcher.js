@@ -1,5 +1,5 @@
 const http = require('http');
-const { runGame } = require('./game-runner');
+const { runGame, runPythonScript } = require('./game-runner');
 const logger = require('./logger');
 const { app } = require('electron');
 const path = require('path');
@@ -13,8 +13,8 @@ function startGameLauncherServer() {
     logger.log('info', `Starting game launcher HTTP server on port ${PORT}...`);
 
     const server = http.createServer((req, res) => {
-      // Only handle POST requests to /run-game
-      if (req.method === 'POST' && req.url === '/run-game') {
+      // Handle POST requests to /run-game or /run-python
+      if (req.method === 'POST' && (req.url === '/run-game' || req.url === '/run-python')) {
         // Set CORS headers
         res.setHeader('Access-Control-Allow-Origin', '*');
         res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -30,12 +30,11 @@ function startGameLauncherServer() {
         // Process the request
         req.on('end', async () => {
           try {
-            logger.log('info', `Received run-game request`, { body });
+            logger.log('info', `Received request to ${req.url}`, { body });
 
-            let projectPath;
+            let parsedBody;
             try {
-              const parsedBody = JSON.parse(body);
-              projectPath = parsedBody.projectPath;
+              parsedBody = JSON.parse(body);
             } catch (parseError) {
               logger.log('error', 'Failed to parse JSON body', {
                 error: parseError.message,
@@ -49,15 +48,20 @@ function startGameLauncherServer() {
               return;
             }
 
-            if (!projectPath) {
-              logger.log('error', 'Missing projectPath parameter');
-              res.statusCode = 400;
-              res.end(JSON.stringify({
-                success: false,
-                error: 'Missing projectPath parameter'
-              }));
-              return;
-            }
+            // Handle different endpoints
+            if (req.url === '/run-game') {
+              // Run Game endpoint
+              const projectPath = parsedBody.projectPath;
+              
+              if (!projectPath) {
+                logger.log('error', 'Missing projectPath parameter');
+                res.statusCode = 400;
+                res.end(JSON.stringify({
+                  success: false,
+                  error: 'Missing projectPath parameter'
+                }));
+                return;
+              }
 
             // Use improved path resolution logic to find lt-maker-fork directory
             let ltMakerPath;
@@ -124,23 +128,59 @@ function startGameLauncherServer() {
 
             logger.log('info', `HTTP endpoint received request to run game: ${projectPath}`);
 
-            try {
-              await runGame(projectPath);
-              logger.log('info', `Game launch requested successfully`);
+            if (req.url === '/run-game') {
+              try {
+                await runGame(projectPath);
+                logger.log('info', `Game launch requested successfully`);
 
-              res.statusCode = 200;
-              res.end(JSON.stringify({ success: true }));
-            } catch (gameError) {
-              logger.log('error', 'Error running game', {
-                error: gameError.message,
-                stack: gameError.stack
-              });
+                res.statusCode = 200;
+                res.end(JSON.stringify({ success: true }));
+              } catch (gameError) {
+                logger.log('error', 'Error running game', {
+                  error: gameError.message,
+                  stack: gameError.stack
+                });
 
-              res.statusCode = 500;
-              res.end(JSON.stringify({
-                success: false,
-                error: gameError.message || 'Failed to launch game'
-              }));
+                res.statusCode = 500;
+                res.end(JSON.stringify({
+                  success: false,
+                  error: gameError.message || 'Failed to launch game'
+                }));
+              }
+            } else if (req.url === '/run-python') {
+              // Run Python script endpoint
+              const scriptPath = parsedBody.scriptPath;
+              
+              if (!scriptPath) {
+                logger.log('error', 'Missing scriptPath parameter');
+                res.statusCode = 400;
+                res.end(JSON.stringify({
+                  success: false,
+                  error: 'Missing scriptPath parameter'
+                }));
+                return;
+              }
+              
+              logger.log('info', `Received request to run Python script: ${scriptPath}`);
+              
+              try {
+                await runPythonScript(scriptPath);
+                logger.log('info', `Python script launched successfully`);
+                
+                res.statusCode = 200;
+                res.end(JSON.stringify({ success: true }));
+              } catch (pythonError) {
+                logger.log('error', 'Error running Python script', {
+                  error: pythonError.message,
+                  stack: pythonError.stack
+                });
+                
+                res.statusCode = 500;
+                res.end(JSON.stringify({
+                  success: false,
+                  error: pythonError.message || 'Failed to run Python script'
+                }));
+              }
             }
           } catch (error) {
             logger.log('error', 'Unexpected error processing run-game request', {
