@@ -209,13 +209,13 @@ function getWinePythonEnv() {
   return wineEnv;
 }
 
-// Run a game using Wine and Python
-async function runGameWithWine(projectNameEndingInDotLtProj) {
+// Run a game using appropriate Python environment based on platform
+async function runGame(projectNameEndingInDotLtProj) {
   return new Promise((resolve, reject) => {
     try {
       // Add logging for app paths and environment
       const logger = require('./logger');
-      logger.log('info', 'Running game with Wine', {
+      logger.log('info', `Running game on platform: ${process.platform}`, {
         projectPath: projectNameEndingInDotLtProj,
         appPath: app.getAppPath(),
         resourcesPath: process.resourcesPath,
@@ -242,8 +242,12 @@ async function runGameWithWine(projectNameEndingInDotLtProj) {
         return;
       }
 
+      // Enhanced platform detection logging
+      logger.log('info', `Platform detection: process.platform = ${process.platform}`);
+      
       // On macOS or Linux, we always use Wine
       if (process.platform === 'darwin' || process.platform === 'linux') {
+        logger.log('info', 'Using Wine-based execution path for macOS/Linux');
         let winePath;
         try {
           winePath = getWinePath();
@@ -484,6 +488,7 @@ ls -la "${tempBatchPath}"
         }
       } else {
         // On Windows, we run our bundled Python directly
+        logger.log('info', 'Using Windows-native execution path - no Wine needed');
         const pythonPath = getBundledPythonPath();
         logger.log('info', `Using bundled Python on Windows: ${pythonPath}`);
 
@@ -621,7 +626,11 @@ async function preparePythonEnvironment() {
   });
 }
 
+// Alias for backward compatibility
+const runGameWithWine = runGame;
+
 module.exports = {
-  runGameWithWine,
+  runGame,
+  runGameWithWine, // Keeping for backward compatibility
   preparePythonEnvironment
 };

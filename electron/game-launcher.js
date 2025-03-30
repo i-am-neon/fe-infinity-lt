@@ -1,5 +1,5 @@
 const http = require('http');
-const { runGameWithWine } = require('./game-runner');
+const { runGame } = require('./game-runner');
 const logger = require('./logger');
 const { app } = require('electron');
 const path = require('path');
@@ -125,7 +125,7 @@ function startGameLauncherServer() {
             logger.log('info', `HTTP endpoint received request to run game: ${projectPath}`);
 
             try {
-              await runGameWithWine(projectPath);
+              await runGame(projectPath);
               logger.log('info', `Game launch requested successfully`);
 
               res.statusCode = 200;
