@@ -124,43 +124,41 @@ async function downloadPython() {
   }
   
   // Check if Python is already installed
-  if (fs.existsSync(path.join(pythonBaseDir, 'python.exe'))) {
+  if (fs.existsSync(path.join(pythonBaseDir, 'python_embed', 'python.exe'))) {
     console.log('Python already installed, skipping...');
     return;
   }
   
   try {
-    // First, check for pre-bundled Python environment
-    const winPythonBundle = path.join(__dirname, 'win_python_env.zip');
-    if (fs.existsSync(winPythonBundle)) {
-      console.log(`Extracting bundled Python from ${winPythonBundle}...`);
+    // Use Python embeddable package directly
+    console.log('Setting up Python embeddable package...');
       
-      // Extract using extract-zip
-      await extract(winPythonBundle, { dir: pythonBaseDir });
-      console.log('Python environment extracted successfully');
-    } else {
-      // Fallback to downloading the embeddable package
-      console.log('No bundled Python found. Downloading embeddable Python package...');
-      
-      // Download the embeddable package
-      const pythonUrl = 'https://www.python.org/ftp/python/3.11.7/python-3.11.7-embed-amd64.zip';
-      const pythonFileName = 'python-3.11.7-embed-amd64.zip';
-      const downloadPath = path.join(pythonBaseDir, pythonFileName);
-      
-      await downloadFile(pythonUrl, downloadPath);
-      console.log(`Downloaded Python to ${downloadPath}`);
-      
-      // Extract the embeddable package
-      console.log('Extracting Python embeddable package...');
-      await extract(downloadPath, { dir: pythonBaseDir });
-      console.log('Extracted Python embeddable package');
-      
-      // Delete the zip file
-      fs.unlinkSync(downloadPath);
-      
-      // Enable site-packages by uncommenting 'import site' in python311._pth
-      const pthPath = path.join(pythonBaseDir, 'python311._pth');
-      if (fs.existsSync(pthPath)) {
+    // Download the embeddable package
+    const pythonUrl = 'https://www.python.org/ftp/python/3.11.7/python-3.11.7-embed-amd64.zip';
+    const pythonFileName = 'python-3.11.7-embed-amd64.zip';
+    const downloadPath = path.join(pythonBaseDir, pythonFileName);
+    
+    await downloadFile(pythonUrl, downloadPath);
+    console.log(`Downloaded Python to ${downloadPath}`);
+    
+    // Extract the embeddable package
+    console.log('Extracting Python embeddable package...');
+    
+    // Create python_embed subdirectory for a cleaner structure
+    const pythonEmbedDir = path.join(pythonBaseDir, 'python_embed');
+    if (!fs.existsSync(pythonEmbedDir)) {
+      fs.mkdirSync(pythonEmbedDir, { recursive: true });
+    }
+    
+    await extract(downloadPath, { dir: pythonEmbedDir });
+    console.log('Extracted Python embeddable package');
+    
+    // Delete the zip file
+    fs.unlinkSync(downloadPath);
+    
+    // Enable site-packages by uncommenting 'import site' in python311._pth
+    const pthPath = path.join(pythonEmbedDir, 'python311._pth');
+    if (fs.existsSync(pthPath)) {
         let pthContent = fs.readFileSync(pthPath, 'utf8');
         pthContent = pthContent.replace('#import site', 'import site');
         fs.writeFileSync(pthPath, pthContent);
@@ -170,21 +168,21 @@ async function downloadPython() {
       // Download and install pip
       console.log('Installing pip...');
       const getPipUrl = 'https://bootstrap.pypa.io/get-pip.py';
-      const getPipPath = path.join(pythonBaseDir, 'get-pip.py');
+      const getPipPath = path.join(pythonEmbedDir, 'get-pip.py');
       await downloadFile(getPipUrl, getPipPath);
       
       if (isWindows) {
         // On Windows, we can run Python directly
         console.log('Installing pip for Python...');
-        await execCommand(path.join(pythonBaseDir, 'python.exe'), [getPipPath], { cwd: pythonBaseDir });
+        await execCommand(path.join(pythonEmbedDir, 'python.exe'), [getPipPath], { cwd: pythonEmbedDir });
         
         // Create pip batch file for easier access
-        const pipBatchContent = `@echo off\r\n"%~dp0python.exe" "%~dp0Scripts\\pip.exe" %*`;
+        const pipBatchContent = `@echo off\r\n"%~dp0python_embed\\python.exe" "%~dp0python_embed\\Scripts\\pip.exe" %*`;
         fs.writeFileSync(path.join(pythonBaseDir, 'python-pip.bat'), pipBatchContent);
         console.log('Created pip batch file');
         
         // Create site-packages directory if it doesn't exist
-        const sitePackagesDir = path.join(pythonBaseDir, 'Lib', 'site-packages');
+        const sitePackagesDir = path.join(pythonEmbedDir, 'Lib', 'site-packages');
         if (!fs.existsSync(sitePackagesDir)) {
           fs.mkdirSync(sitePackagesDir, { recursive: true });
           console.log('Created site-packages directory');
@@ -196,9 +194,9 @@ async function downloadPython() {
         const requirementsPath = path.join(ltMakerPath, 'requirements_engine.txt');
         
         if (fs.existsSync(requirementsPath)) {
-          await execCommand(path.join(pythonBaseDir, 'python.exe'), 
+          await execCommand(path.join(pythonEmbedDir, 'python.exe'), 
                          ['-m', 'pip', 'install', '-r', requirementsPath, '--no-cache-dir'], 
-                         { cwd: pythonBaseDir });
+                         { cwd: pythonEmbedDir });
           console.log('Installed required packages');
         } else {
           console.warn(`Requirements file not found at ${requirementsPath}`);
@@ -216,8 +214,8 @@ async function downloadPython() {
       // Set execute permissions for all .exe files
       console.log('Setting execute permissions for Python files...');
       const exeFiles = [
-        path.join(pythonBaseDir, 'python.exe'),
-        path.join(pythonBaseDir, 'pythonw.exe')
+        path.join(pythonEmbedDir, 'python.exe'),
+        path.join(pythonEmbedDir, 'pythonw.exe')
       ];
       
       for (const exeFile of exeFiles) {
@@ -228,7 +226,7 @@ async function downloadPython() {
       }
       
       // Find and chmod all .exe files in Scripts directory
-      const scriptsDir = path.join(pythonBaseDir, 'Scripts');
+      const scriptsDir = path.join(pythonEmbedDir, 'Scripts');
       if (fs.existsSync(scriptsDir)) {
         const scriptsFiles = fs.readdirSync(scriptsDir);
         for (const file of scriptsFiles) {
@@ -246,6 +244,7 @@ async function downloadPython() {
 # Test script to verify Python works with Wine
 cd "$(dirname "$0")"
 echo "Testing Python with Wine..."
+cd python_embed
 
 # Check Wine version
 wine --version
