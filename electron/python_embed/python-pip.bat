@@ -1,2 +1,0 @@
-@echo off
-"%~dp0python.exe" "%~dp0Scripts\pip.exe" %*

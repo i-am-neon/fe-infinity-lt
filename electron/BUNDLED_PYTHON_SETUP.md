@@ -73,13 +73,13 @@ Using the Python embeddable package is the most reliable method for creating a p
 1. **Install packages directly using pip module**
    ```powershell
    # Install packages using pip as a module (more reliable than batch scripts)
-   .\python.exe -m pip install -r ..\resources\requirements_engine.txt
+   .\python.exe -m pip install -r ..\resources\requirements_editor.txt
    ```
 
    > **Note:** If you get an error about pip not being found, try:
    > ```powershell
    > .\python.exe -m ensurepip
-   > .\python.exe -m pip install -r ..\resources\requirements_engine.txt
+   > .\python.exe -m pip install -r ..\resources\requirements_editor.txt
    > ```
 
 2. **Verify installation worked**
@@ -115,13 +115,13 @@ If you encounter "No module named pip" after installing pip:
 # Try using ensurepip which is built into Python
 .\python.exe -m ensurepip
 # Then install requirements
-.\python.exe -m pip install -r ..\resources\requirements_engine.txt
+.\python.exe -m pip install -r ..\resources\requirements_editor.txt
 ```
 
 ### Issue: Python package installation fails
 If package installation fails, check:
 1. Your internet connection
-2. That the requirements_engine.txt file exists in the specified path
+2. That the requirements_editor.txt file exists in the specified path
 3. Try installing packages one by one to identify problematic dependencies
 
 ### Issue: Unicode/encoding errors
