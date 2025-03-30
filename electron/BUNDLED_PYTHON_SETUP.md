@@ -22,7 +22,7 @@ Wine is a required dependency for macOS users:
 - macOS users must install Wine using: `brew install --cask --no-quarantine wine-stable`
 - The application will use the Windows Python environment through Wine on macOS
 
-## Setup Process Using Embeddable Python Package
+## Setup Process Using Embeddable Python Package (Windows Instructions)
 
 Using the Python embeddable package is the most reliable method for creating a portable environment because it's specifically designed to be self-contained without hardcoded paths.
 
@@ -32,73 +32,102 @@ Using the Python embeddable package is the most reliable method for creating a p
    - Go to https://www.python.org/downloads/windows/
    - Download "Windows embeddable package (64-bit)" for Python 3.11.7
    - Example: `python-3.11.7-embed-amd64.zip`
+   - Place this file in `electron/resources/` (create this directory if needed)
 
 ### Step 2: Set Up the Environment (Windows Only)
 
-1. **Extract the embeddable package**
-   ```batch
+1. **Create the python_embed directory and extract the package**
+   ```powershell
+   # Create directory
    mkdir python_embed
    cd python_embed
-   :: Extract the downloaded package
-   tar -xf python-3.11.7-embed-amd64.zip
+   
+   # Extract the downloaded package (adjust path as needed)
+   tar -xf ..\resources\python-3.11.7-embed-amd64.zip
+   
+   # Verify extraction worked
+   ls
    ```
 
 2. **Enable pip and site-packages**
-   ```batch
-   :: Edit the python311._pth file to uncomment the import site line
-   :: Change this:
-   :: #import site
-   :: To this:
-   :: import site
+   ```powershell
+   # Check that python311._pth exists and uncomment the import site line if needed
+   # The file should contain "import site" (not "#import site")
+   cat python311._pth
    ```
 
 3. **Install pip**
-   ```batch
-   :: Download get-pip.py
+   ```powershell
+   # Download get-pip.py
    curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
    
-   :: Install pip
-   python.exe get-pip.py
+   # Install pip
+   .\python.exe get-pip.py
    
-   :: Make sure pip is in the PATH by creating a small script
-   echo @echo off > python-pip.bat
-   echo "%~dp0python.exe" "%~dp0Scripts\pip.exe" %* >> python-pip.bat
+   # Create site-packages directory
+   mkdir Lib\site-packages
    ```
 
 ### Step 3: Install Required Packages
 
-1. **Install packages from requirements file**
-   ```batch
-   :: Create a directory for the site-packages if it doesn't exist
-   mkdir Lib\site-packages
-
-   :: Install LT Maker required packages
-   python-pip.bat install -r \path\to\lt-maker-fork\requirements_engine.txt
+1. **Install packages directly using pip module**
+   ```powershell
+   # Install packages using pip as a module (more reliable than batch scripts)
+   .\python.exe -m pip install -r ..\resources\requirements_engine.txt
    ```
 
+   > **Note:** If you get an error about pip not being found, try:
+   > ```powershell
+   > .\python.exe -m ensurepip
+   > .\python.exe -m pip install -r ..\resources\requirements_engine.txt
+   > ```
+
 2. **Verify installation worked**
-   ```batch
-   :: Test that pygame works
-   python.exe -c "import pygame; print(f'Pygame is installed: {pygame.__version__}')"
+   ```powershell
+   # Test that pygame works
+   .\python.exe -c "import pygame; print(f'Pygame is installed: {pygame.__version__}')"
    
-   :: Test that typing_extensions works
-   python.exe -c "import typing_extensions; print('Typing extensions is installed')"
+   # Test that typing_extensions works
+   .\python.exe -c "import typing_extensions; print('Typing extensions is installed')"
    ```
 
 ### Step 4: Package for Distribution
 
 1. **Create a distributable archive**
-   ```batch
-   :: Optional: Clean up unnecessary files to reduce size
+   ```powershell
+   # Optional: Clean up unnecessary files to reduce size
    del get-pip.py
    
-   :: Archive the whole directory
+   # Archive the whole directory using PowerShell (equivalent to 7z)
    cd ..
-   7z a win_python_env.zip python_embed\*
+   Compress-Archive -Path .\python_embed\* -DestinationPath .\win_python_env.zip
    ```
 
 2. **Move the zip to your project**
-   - Move `win_python_env.zip` to your project's `electron/resources/` directory or `electron/` root directory
+   - The zip file should be in `electron/win_python_env.zip` 
+   - Make sure this file is included in your version control
+
+## Troubleshooting Common Issues
+
+### Issue: pip module not found
+If you encounter "No module named pip" after installing pip:
+```powershell
+# Try using ensurepip which is built into Python
+.\python.exe -m ensurepip
+# Then install requirements
+.\python.exe -m pip install -r ..\resources\requirements_engine.txt
+```
+
+### Issue: Python package installation fails
+If package installation fails, check:
+1. Your internet connection
+2. That the requirements_engine.txt file exists in the specified path
+3. Try installing packages one by one to identify problematic dependencies
+
+### Issue: Unicode/encoding errors
+If you see strange characters (like '■o') in command output:
+1. Try running the command in cmd.exe instead of PowerShell
+2. Or use direct Python commands instead of batch files
 
 ### Step 5: Integrate with Electron App
 
