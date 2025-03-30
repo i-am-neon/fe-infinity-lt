@@ -93,16 +93,15 @@ function getBundledPythonPath() {
       logger.log('info', `Found Python at ${pythonPath}`);
       return pythonPath;
     }
-    
+
     // Fallback to older location if not found
     const fallbackPath = path.join(app.getAppPath(), 'bin', 'python', 'python.exe');
     if (fs.existsSync(fallbackPath)) {
       logger.log('info', `Found Python at fallback location: ${fallbackPath}`);
       return fallbackPath;
     }
-    
+
     throw new Error(`Bundled Python not found at: ${pythonPath} or ${fallbackPath}. Please ensure binaries are downloaded correctly.`);
-    }
   } else if (process.platform === 'darwin') {
     // For macOS, we'll use bundled Python with Wine
     // First check for the Python executable in the python_embed directory
@@ -111,7 +110,7 @@ function getBundledPythonPath() {
       logger.log('info', `Using bundled Python.exe with Wine for macOS: ${pythonExePath}`);
       return pythonExePath;
     }
-    
+
     // Also try the legacy location path
     const legacyPythonExePath = path.join(app.getAppPath(), 'bin', 'python', 'python.exe');
     if (fs.existsSync(legacyPythonExePath)) {
@@ -254,7 +253,7 @@ async function runGame(projectNameEndingInDotLtProj) {
 
       // Enhanced platform detection logging
       logger.log('info', `Platform detection: process.platform = ${process.platform}`);
-      
+
       // On macOS or Linux, we always use Wine
       if (process.platform === 'darwin' || process.platform === 'linux') {
         logger.log('info', 'Using Wine-based execution path for macOS/Linux');
@@ -298,7 +297,7 @@ async function runGame(projectNameEndingInDotLtProj) {
 
         // Create a temporary Windows batch file to run the game
         const tempBatchPath = path.join(require('os').tmpdir(), 'run_game.bat');
-        
+
         // Function to convert Unix path to Wine-compatible Windows path
         const toWinePath = (unixPath) => {
           // First try to convert absolute paths that should be accessible via Z: drive
@@ -308,20 +307,20 @@ async function runGame(projectNameEndingInDotLtProj) {
           // Otherwise just convert slashes
           return unixPath.replace(/\//g, '\\');
         };
-        
+
         // Get the Wine-compatible path to the run_engine_for_project.py script
         const ltMakerWinePath = toWinePath(ltMakerPath);
-        
+
         // Get the path to the actual Python executable in the bundled environment
         const bundledPythonExe = path.join(app.getAppPath(), 'bin', 'python', 'python_embed', 'python.exe');
         // Convert Python executable path to Wine path format
         const pythonWineExe = toWinePath(bundledPythonExe);
-        
+
         // Create a simple batch file to run the game without dependency checks
         // Use a different approach with a script file instead of command line
         const pythonScriptPath = path.join(require('os').tmpdir(), 'run_game.py');
         const pythonWineScriptPath = toWinePath(pythonScriptPath);
-        
+
         // Create a Python script file that will run the game
         const pythonScriptContent = `
 import sys
@@ -335,10 +334,10 @@ os.environ['PYTHONPATH'] = r'${ltMakerWinePath}' + os.pathsep + os.environ.get('
 import run_engine_for_project
 run_engine_for_project.main('${normalizedProjectPath}')
 `;
-        
+
         // Write the Python script to a file
         fs.writeFileSync(pythonScriptPath, pythonScriptContent);
-        
+
         // Create a simple batch file that just calls Python with the script file
         const batchContent = `@echo off
 cd /d "${ltMakerWinePath}"
@@ -403,16 +402,16 @@ echo Starting game engine...
         try {
           // Create an improved shell script for running Wine with the batch file
           const tempScriptPath = path.join(app.getPath('temp'), 'run-wine.sh');
-          
+
           // Convert Unix paths to Wine paths
           const wineTempBatchPath = tempBatchPath.replace(/^\//g, 'Z:\\').replace(/\//g, '\\');
-          
+
           // Convert the batch file path to a DOS path that Wine can understand
           // Wine uses Z: drive to map to the Unix root directory
-          const wineBatchPath = tempBatchPath.startsWith('/') 
-            ? `Z:${tempBatchPath.replace(/\//g, '\\')}` 
+          const wineBatchPath = tempBatchPath.startsWith('/')
+            ? `Z:${tempBatchPath.replace(/\//g, '\\')}`
             : tempBatchPath.replace(/\//g, '\\');
-            
+
           let scriptContent = `#!/bin/bash
 # Run Wine with the enhanced batch file that installs dependencies
 cd "${ltMakerPath}"
@@ -442,10 +441,10 @@ ls -la "${tempBatchPath}"
 
           // Launch with shell script - this helps with macOS path issues
           logger.log('info', `Running wine wrapper at: ${tempScriptPath}`);
-          
+
           // Log the command we're about to execute
           logger.log('info', `Executing: /bin/bash ${tempScriptPath}`);
-          
+
           const wineProcess = spawn(
             '/bin/bash',
             [tempScriptPath],
@@ -499,11 +498,11 @@ ls -la "${tempBatchPath}"
       } else {
         // On Windows, we run our bundled Python directly
         logger.log('info', 'Using Windows-native execution path - no Wine needed');
-        
+
         // Get the Python path and verify it exists
         const pythonPath = getBundledPythonPath();
         logger.log('info', `Using bundled Python on Windows: ${pythonPath}`);
-        
+
         // Verify the Python executable exists with explicit check
         if (!fs.existsSync(pythonPath)) {
           const errorMsg = `Critical error: Python executable not found at ${pythonPath}`;
@@ -511,7 +510,7 @@ ls -la "${tempBatchPath}"
           reject(new Error(errorMsg));
           return;
         }
-        
+
         logger.log('info', `Python executable found at ${pythonPath} - verified`);
 
         // Skip dependency checks at runtime - they should be installed during download-binaries
