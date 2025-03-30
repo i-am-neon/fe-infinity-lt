@@ -162,83 +162,82 @@ function startGameLauncherServer() {
               
               logger.log('info', `Received request to run Python script: ${scriptPath}`);
               
-              // For LT editor specifically, use a more direct approach
-              if (scriptPath.endsWith('run_editor.py')) {
-                try {
-                  // Use child_process.spawn directly
-                  const { spawn } = require('child_process');
-                  const cwd = path.dirname(scriptPath);
-                  
-                  logger.log('info', `Attempting to run editor directly with system Python in ${cwd}`);
-                  
-                  const child = spawn('python', [scriptPath], {
-                    cwd: cwd,
-                    detached: true,
-                    stdio: 'ignore',
-                    windowsHide: false
-                  });
-                  
-                  // Unref child to let it run independently
-                  child.unref();
-                  
-                  logger.log('info', `Editor launched successfully with system Python`);
-                  res.statusCode = 200;
-                  res.end(JSON.stringify({ success: true }));
-                  return;
-                } catch (directError) {
-                  logger.log('error', 'Error running editor directly:', {
-                    error: directError.message,
-                    stack: directError.stack
-                  });
-                  
-                  // Fall back to the normal method
-                  try {
-                    await runPythonScript(scriptPath);
-                    logger.log('info', `Python script launched successfully via runPythonScript`);
-                    
-                    res.statusCode = 200;
-                    res.end(JSON.stringify({ success: true }));
-                    return;
-                  } catch (fallbackError) {
-                    logger.log('error', 'Error in fallback Python execution', {
-                      error: fallbackError.message,
-                      stack: fallbackError.stack
-                    });
-                    
-                    res.statusCode = 500;
-                    res.end(JSON.stringify({
-                      success: false,
-                      error: fallbackError.message || 'Failed to run Python script'
-                    }));
-                    return;
-                  }
+              // In Electron, use bundled Python
+              // Try finding bundled Python
+              const possiblePythonPaths = [
+                path.join(app.getAppPath(), 'bin', 'python', 'python_embed', 'python.exe'),
+                path.join(app.getAppPath(), 'bin', 'python', 'python.exe'),
+              ];
+              
+              let pythonPath = null;
+              for (const potentialPath of possiblePythonPaths) {
+                logger.log('info', `Checking for Python at: ${potentialPath}`);
+                if (fs.existsSync(potentialPath)) {
+                  pythonPath = potentialPath;
+                  logger.log('info', `Found bundled Python at: ${pythonPath}`);
+                  break;
                 }
-              } else {
-                // For other Python scripts, use the normal method
+              }
+              
+              if (!pythonPath) {
+                logger.log('warning', `Could not find bundled Python, falling back to system Python`);
+                pythonPath = 'python';
+              }
+              
+              try {
+                // Use child_process.spawn directly with bundled Python
+                const { spawn } = require('child_process');
+                const cwd = path.dirname(scriptPath);
+                
+                logger.log('info', `Attempting to run Python script with: ${pythonPath}`);
+                logger.log('info', `Working directory: ${cwd}`);
+                logger.log('info', `Script: ${scriptPath}`);
+                
+                const child = spawn(pythonPath, [scriptPath], {
+                  cwd: cwd,
+                  detached: true,
+                  stdio: 'ignore',
+                  windowsHide: false
+                });
+                
+                // Unref child to let it run independently
+                child.unref();
+                
+                logger.log('info', `Python script launched successfully`);
+                res.statusCode = 200;
+                res.end(JSON.stringify({ success: true }));
+                return;
+              } catch (directError) {
+                logger.log('error', 'Error running Python script directly:', {
+                  error: directError.message,
+                  stack: directError.stack
+                });
+                
+                // Fall back to the normal method
                 try {
                   await runPythonScript(scriptPath);
-                  logger.log('info', `Python script launched successfully`);
+                  logger.log('info', `Python script launched successfully via runPythonScript`);
                   
                   res.statusCode = 200;
                   res.end(JSON.stringify({ success: true }));
                   return;
-                } catch (pythonError) {
-                  logger.log('error', 'Error running Python script', {
-                    error: pythonError.message,
-                    stack: pythonError.stack
+                } catch (fallbackError) {
+                  logger.log('error', 'Error in fallback Python execution', {
+                    error: fallbackError.message,
+                    stack: fallbackError.stack
                   });
                   
                   res.statusCode = 500;
                   res.end(JSON.stringify({
                     success: false,
-                    error: pythonError.message || 'Failed to run Python script'
+                    error: fallbackError.message || 'Failed to run Python script'
                   }));
                   return;
                 }
               }
             }
           } catch (error) {
-            logger.log('error', 'Unexpected error processing run-game request', {
+            logger.log('error', 'Unexpected error processing request', {
               error: error.message,
               stack: error.stack
             });
