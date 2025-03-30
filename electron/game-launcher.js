@@ -52,7 +52,7 @@ function startGameLauncherServer() {
             if (req.url === '/run-game') {
               // Run Game endpoint
               const projectPath = parsedBody.projectPath;
-
+              
               if (!projectPath) {
                 logger.log('error', 'Missing projectPath parameter');
                 res.statusCode = 400;
@@ -128,58 +128,112 @@ function startGameLauncherServer() {
 
               logger.log('info', `HTTP endpoint received request to run game: ${projectPath}`);
 
-              if (req.url === '/run-game') {
-                try {
-                  await runGame(projectPath);
-                  logger.log('info', `Game launch requested successfully`);
+              try {
+                await runGame(projectPath);
+                logger.log('info', `Game launch requested successfully`);
 
+                res.statusCode = 200;
+                res.end(JSON.stringify({ success: true }));
+              } catch (gameError) {
+                logger.log('error', 'Error running game', {
+                  error: gameError.message,
+                  stack: gameError.stack
+                });
+
+                res.statusCode = 500;
+                res.end(JSON.stringify({
+                  success: false,
+                  error: gameError.message || 'Failed to launch game'
+                }));
+              }
+            } else if (req.url === '/run-python') {
+              // Run Python script endpoint
+              const scriptPath = parsedBody.scriptPath;
+              
+              if (!scriptPath) {
+                logger.log('error', 'Missing scriptPath parameter');
+                res.statusCode = 400;
+                res.end(JSON.stringify({
+                  success: false,
+                  error: 'Missing scriptPath parameter'
+                }));
+                return;
+              }
+              
+              logger.log('info', `Received request to run Python script: ${scriptPath}`);
+              
+              // For LT editor specifically, use a more direct approach
+              if (scriptPath.endsWith('run_editor.py')) {
+                try {
+                  // Use child_process.spawn directly
+                  const { spawn } = require('child_process');
+                  const cwd = path.dirname(scriptPath);
+                  
+                  logger.log('info', `Attempting to run editor directly with system Python in ${cwd}`);
+                  
+                  const child = spawn('python', [scriptPath], {
+                    cwd: cwd,
+                    detached: true,
+                    stdio: 'ignore',
+                    windowsHide: false
+                  });
+                  
+                  // Unref child to let it run independently
+                  child.unref();
+                  
+                  logger.log('info', `Editor launched successfully with system Python`);
                   res.statusCode = 200;
                   res.end(JSON.stringify({ success: true }));
-                } catch (gameError) {
-                  logger.log('error', 'Error running game', {
-                    error: gameError.message,
-                    stack: gameError.stack
-                  });
-
-                  res.statusCode = 500;
-                  res.end(JSON.stringify({
-                    success: false,
-                    error: gameError.message || 'Failed to launch game'
-                  }));
-                }
-              } else if (req.url === '/run-python') {
-                // Run Python script endpoint
-                const scriptPath = parsedBody.scriptPath;
-
-                if (!scriptPath) {
-                  logger.log('error', 'Missing scriptPath parameter');
-                  res.statusCode = 400;
-                  res.end(JSON.stringify({
-                    success: false,
-                    error: 'Missing scriptPath parameter'
-                  }));
                   return;
+                } catch (directError) {
+                  logger.log('error', 'Error running editor directly:', {
+                    error: directError.message,
+                    stack: directError.stack
+                  });
+                  
+                  // Fall back to the normal method
+                  try {
+                    await runPythonScript(scriptPath);
+                    logger.log('info', `Python script launched successfully via runPythonScript`);
+                    
+                    res.statusCode = 200;
+                    res.end(JSON.stringify({ success: true }));
+                    return;
+                  } catch (fallbackError) {
+                    logger.log('error', 'Error in fallback Python execution', {
+                      error: fallbackError.message,
+                      stack: fallbackError.stack
+                    });
+                    
+                    res.statusCode = 500;
+                    res.end(JSON.stringify({
+                      success: false,
+                      error: fallbackError.message || 'Failed to run Python script'
+                    }));
+                    return;
+                  }
                 }
-
-                logger.log('info', `Received request to run Python script: ${scriptPath}`);
-
+              } else {
+                // For other Python scripts, use the normal method
                 try {
                   await runPythonScript(scriptPath);
                   logger.log('info', `Python script launched successfully`);
-
+                  
                   res.statusCode = 200;
                   res.end(JSON.stringify({ success: true }));
+                  return;
                 } catch (pythonError) {
                   logger.log('error', 'Error running Python script', {
                     error: pythonError.message,
                     stack: pythonError.stack
                   });
-
+                  
                   res.statusCode = 500;
                   res.end(JSON.stringify({
                     success: false,
                     error: pythonError.message || 'Failed to run Python script'
                   }));
+                  return;
                 }
               }
             }
