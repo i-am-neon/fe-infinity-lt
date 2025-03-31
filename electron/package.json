@@ -17,10 +17,7 @@
     "verify-client-build": "node -e \"const fs=require('fs');const path=require('path');const distDir=path.join(__dirname,'../client/dist');const indexFile=path.join(distDir,'index.html');const assetsDir=path.join(distDir,'assets');if(!fs.existsSync(distDir)||!fs.existsSync(indexFile)||!fs.existsSync(assetsDir)){console.error('React build not found or incomplete. Run build:client first.');process.exit(1);}console.log('React build verified:');console.log('- dist directory:', fs.existsSync(distDir));console.log('- index.html:', fs.existsSync(indexFile));console.log('- assets directory:', fs.existsSync(assetsDir));\"",
     "package": "npm run build:client && npm run verify-client-build && electron-builder --dir && node -e \"const fs=require('fs');const path=require('path');console.log('Output directory contents:');const outputDir=path.join(__dirname,'release/mac-arm64/FE Infinity.app/Contents/Resources/client/dist');if(fs.existsSync(outputDir)){console.log(fs.readdirSync(outputDir));}else{console.log('Output directory not found:',outputDir);}\" && electron-builder",
     "package:mac": "npm run build:client && npm run verify-client-build && electron-builder --mac",
-    "package:win": "npm run build:client && npm run verify-client-build && electron-builder --win --config.win.signAndEditExecutable=false --config.win.certificateFile=null",
-    "package:win:quick": "npm run build:client && npm run verify-client-build && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --win --config.win.signAndEditExecutable=false --config.win.forceCodeSigning=false",
-    "package:win:bypass": "npm run build:client && npm run verify-client-build && node scripts/bypass-nsis-signing.js && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --win --config.win.signAndEditExecutable=false --config.win.forceCodeSigning=false",
-    "package:win:simple": "node scripts/build-windows.js",
+    "package:win": "npm run build:client && npm run verify-client-build && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --win --config.win.signAndEditExecutable=false --config.win.forceCodeSigning=false",
     "package:linux": "npm run build:client && npm run verify-client-build && electron-builder --linux",
     "clean": "rm -rf bin"
   },
@@ -125,3 +122,4 @@
     }
   }
 }
+
