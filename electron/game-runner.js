@@ -94,11 +94,17 @@ function getBundledPythonPath() {
   if (appPath.includes('app.asar')) {
     // In packaged app, binaries must be in .unpacked directory
     const unpackedPath = appPath.replace('app.asar', 'app.asar.unpacked');
+    
+    // Always prioritize unpacked paths, as binaries like Python cannot be executed from inside asar
+    logger.log('info', `App is packaged. Using app.asar.unpacked paths for binaries: ${unpackedPath}`);
+    
     basePaths = [
       // First try unpacked path (which should be correct in production)
       unpackedPath,
       // Then try resources dir directly
-      process.resourcesPath
+      process.resourcesPath,
+      // Last resort - try extracting from asar at runtime
+      path.join(process.resourcesPath, 'app.asar.unpacked')
     ];
   } else {
     // In dev mode
@@ -440,7 +446,19 @@ async function runGame(projectNameEndingInDotLtProj) {
         const ltMakerWinePath = toWinePath(ltMakerPath);
 
         // Get the path to the actual Python executable in the bundled environment
-        const bundledPythonExe = path.join(app.getAppPath(), 'bin', 'python', 'python_embed', 'python.exe');
+        // IMPORTANT: For packaged apps, this must use app.asar.unpacked
+        let bundledPythonExe;
+        const appPath = app.getAppPath();
+        
+        if (appPath.includes('app.asar')) {
+          // In packaged app, use the unpacked path for binary executables
+          const unpackedPath = appPath.replace('app.asar', 'app.asar.unpacked');
+          bundledPythonExe = path.join(unpackedPath, 'bin', 'python', 'python_embed', 'python.exe');
+          logger.log('info', `Using Python from unpacked path for Wine: ${bundledPythonExe}`);
+        } else {
+          // In dev mode
+          bundledPythonExe = path.join(appPath, 'bin', 'python', 'python_embed', 'python.exe');
+        }
         // Convert Python executable path to Wine path format
         const pythonWineExe = toWinePath(bundledPythonExe);
 
@@ -466,6 +484,14 @@ run_engine_for_project.main('${normalizedProjectPath}')
         // Write the Python script to a file
         fs.writeFileSync(pythonScriptPath, pythonScriptContent);
 
+        // Log additional debug info about paths
+        logger.log('info', `Batch file configuration:
+          Python Wine Exe: ${pythonWineExe}
+          LT Maker Wine Path: ${ltMakerWinePath}
+          Python Wine Script Path: ${pythonWineScriptPath}
+          Is Packaged: ${app.isPackaged}
+        `);
+
         // Create a simple batch file that just calls Python with the script file
         const batchContent = `@echo off
 cd /d "${ltMakerWinePath}"
@@ -481,6 +507,16 @@ if exist "${pythonWineExe}" (
     echo Python executable found
 ) else (
     echo Python executable NOT found
+    echo Searching for Python in alternative locations...
+    
+    REM Check possible alternative locations
+    if exist "${pythonWineExe.replace('app.asar\\', 'app.asar.unpacked\\')}" (
+        echo Found Python at alternative location: ${pythonWineExe.replace('app.asar\\', 'app.asar.unpacked\\')}
+        set PYTHON_EXE=${pythonWineExe.replace('app.asar\\', 'app.asar.unpacked\\')}
+    ) else (
+        echo Could not find Python executable
+        exit /b 1
+    )
 )
 
 REM Check if the Python script exists
@@ -493,14 +529,29 @@ if exist "${pythonWineScriptPath}" (
 REM Create a simplified script inline
 echo import sys > run_game_simple.py
 echo import os >> run_game_simple.py
+echo print("Python version:", sys.version) >> run_game_simple.py
+echo print("Python paths:", sys.path) >> run_game_simple.py
 echo sys.path.insert(0, r'${ltMakerWinePath}') >> run_game_simple.py
 echo os.environ['PYTHONPATH'] = r'${ltMakerWinePath}' + os.pathsep + os.environ.get('PYTHONPATH', '') >> run_game_simple.py
-echo import run_engine_for_project >> run_game_simple.py
-echo run_engine_for_project.main('${normalizedProjectPath}') >> run_game_simple.py
+echo try: >> run_game_simple.py
+echo     import run_engine_for_project >> run_game_simple.py
+echo     print("Successfully imported run_engine_for_project") >> run_game_simple.py
+echo     run_engine_for_project.main('${normalizedProjectPath}') >> run_game_simple.py
+echo except ImportError as e: >> run_game_simple.py
+echo     print("Failed to import run_engine_for_project:", e) >> run_game_simple.py
+echo     sys.exit(1) >> run_game_simple.py
+echo except Exception as e: >> run_game_simple.py
+echo     print("Error running game:", e) >> run_game_simple.py
+echo     sys.exit(1) >> run_game_simple.py
 
 REM Run the game with proper Python configuration
 echo Starting game engine...
-"${pythonWineExe}" run_game_simple.py
+REM If we found an alternative Python path, use that
+if defined PYTHON_EXE (
+    "%PYTHON_EXE%" run_game_simple.py
+) else (
+    "${pythonWineExe}" run_game_simple.py
+)
 `;
         fs.writeFileSync(tempBatchPath, batchContent);
         logger.log('info', `Created temporary batch file: ${tempBatchPath}`);
@@ -539,6 +590,19 @@ echo Starting game engine...
           const wineBatchPath = tempBatchPath.startsWith('/')
             ? `Z:${tempBatchPath.replace(/\//g, '\\')}`
             : tempBatchPath.replace(/\//g, '\\');
+            
+          // For packaged apps, ensure the Python path is using app.asar.unpacked
+          // This is crucial because binaries can't be executed from inside asar archive
+          if (app.isPackaged && pythonWineExe.includes('app.asar\\')) {
+            // Fix the path by replacing app.asar with app.asar.unpacked
+            const fixedPythonPath = pythonWineExe.replace('app.asar\\', 'app.asar.unpacked\\');
+            logger.log('info', `Fixed Python path for packaged app: 
+              Original: ${pythonWineExe} 
+              Fixed: ${fixedPythonPath}`);
+            
+            // Use the fixed path
+            pythonWineExe = fixedPythonPath;
+          }
 
           let scriptContent = `#!/bin/bash
 # Run Wine with the enhanced batch file that installs dependencies

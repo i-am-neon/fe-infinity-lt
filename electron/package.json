@@ -49,7 +49,9 @@
     "asar": true,
     "asarUnpack": [
       "**/*.node",
-      "bin/**/*"
+      "bin/**/*",
+      "**/*.exe",
+      "**/*.dll"
     ],
     "extraResources": [
       {
