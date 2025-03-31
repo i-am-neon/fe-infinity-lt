@@ -202,6 +202,22 @@ async function downloadPython() {
         fs.mkdirSync(sitePackagesDir, { recursive: true });
         console.log('Created site-packages directory');
       }
+      
+      // Verify python311._pth allows importing site packages (double check)
+      const pthPath = path.join(pythonEmbedDir, 'python311._pth');
+      if (fs.existsSync(pthPath)) {
+        let pthContent = fs.readFileSync(pthPath, 'utf8');
+        const importSiteEnabled = !pthContent.includes('#import site');
+        
+        if (!importSiteEnabled) {
+          console.log('Enabling site-packages in python311._pth (additional check)...');
+          pthContent = pthContent.replace('#import site', 'import site');
+          fs.writeFileSync(pthPath, pthContent);
+          console.log('Site-packages enabled in python311._pth');
+        } else {
+          console.log('Site-packages already enabled in python311._pth');
+        }
+      }
 
       // Install required packages
       console.log('Installing required packages...');

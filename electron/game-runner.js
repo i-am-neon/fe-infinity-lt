@@ -122,12 +122,39 @@ function getBundledPythonPath() {
     // Windows - build a list of all possible Python paths
     const possiblePaths = [];
     
-    // Add all combinations of paths
-    for (const basePath of basePaths) {
+    // Add special paths for packaged Windows apps
+    if (app.isPackaged) {
+      // For packaged apps on Windows, we need more sophisticated path handling
+      const resourcesDir = process.resourcesPath;
+      
+      // Try the direct path to the bin directory in resources first
       possiblePaths.push(
-        path.join(basePath, 'bin', 'python', 'python_embed', 'python.exe'),
-        path.join(basePath, 'bin', 'python', 'python.exe')
+        path.join(resourcesDir, 'bin', 'python', 'python_embed', 'python.exe'),
+        path.join(resourcesDir, 'bin', 'python', 'python.exe')
       );
+      
+      // Then try the unpacked version
+      const appUnpackedDir = app.getAppPath().replace('app.asar', 'app.asar.unpacked');
+      possiblePaths.push(
+        path.join(appUnpackedDir, 'bin', 'python', 'python_embed', 'python.exe'),
+        path.join(appUnpackedDir, 'bin', 'python', 'python.exe')
+      );
+      
+      // Also try some alternative locations (just in case)
+      possiblePaths.push(
+        path.join(resourcesDir, 'app.asar.unpacked', 'bin', 'python', 'python_embed', 'python.exe'),
+        path.join(resourcesDir, 'app.asar.unpacked', 'bin', 'python', 'python.exe')
+      );
+      
+      logger.log('info', `Windows packaged app - checking special Python locations: ${JSON.stringify(possiblePaths.slice(0, 4))}`);
+    } else {
+      // For development, use the standard paths
+      for (const basePath of basePaths) {
+        possiblePaths.push(
+          path.join(basePath, 'bin', 'python', 'python_embed', 'python.exe'),
+          path.join(basePath, 'bin', 'python', 'python.exe')
+        );
+      }
     }
     
     // Add system Python as last resort
@@ -141,23 +168,57 @@ function getBundledPythonPath() {
         // For system Python, we can't use fs.existsSync
         if (pythonPath === "python.exe") {
           logger.log('info', `Attempting to use system Python: ${pythonPath}`);
+          
+          // In packaged app, do a final check in a standard Windows Python install location
+          if (app.isPackaged) {
+            try {
+              const programFiles = process.env['ProgramFiles'] || 'C:\\Program Files';
+              const programFilesX86 = process.env['ProgramFiles(x86)'] || 'C:\\Program Files (x86)';
+              
+              const possibleWindowsPaths = [
+                path.join(programFiles, 'Python311', 'python.exe'),
+                path.join(programFilesX86, 'Python311', 'python.exe'),
+                path.join(programFiles, 'Python310', 'python.exe'),
+                path.join(programFilesX86, 'Python310', 'python.exe'),
+                path.join(programFiles, 'Python39', 'python.exe'),
+                path.join(programFilesX86, 'Python39', 'python.exe')
+              ];
+              
+              for (const pyPath of possibleWindowsPaths) {
+                if (fs.existsSync(pyPath)) {
+                  logger.log('info', `Found Python in standard Windows location: ${pyPath}`);
+                  return pyPath;
+                }
+              }
+            } catch (e) {
+              // Ignore errors in extra checks
+            }
+          }
+          
           return pythonPath;
         }
         
         if (fs.existsSync(pythonPath)) {
           logger.log('info', `Found Python at ${pythonPath}`);
-          // Verify it's executable
+          // Verify it's executable (on Windows this is less important)
           try {
-            fs.accessSync(pythonPath, fs.constants.X_OK);
-            logger.log('info', `Python at ${pythonPath} is executable`);
+            fs.accessSync(pythonPath, fs.constants.F_OK);
+            logger.log('info', `Python at ${pythonPath} exists and is readable`);
           } catch (accessErr) {
-            logger.log('warn', `Python at ${pythonPath} exists but may not be executable: ${accessErr.message}`);
+            logger.log('warn', `Python at ${pythonPath} exists but may not be readable: ${accessErr.message}`);
           }
           return pythonPath;
         }
       } catch (error) {
         logger.log('warn', `Error checking Python path ${pythonPath}: ${error.message}`);
       }
+    }
+    
+    // If using packaged app, provide a more informative error
+    if (app.isPackaged) {
+      const errorMsg = `Python not found in bundled application or system. Please ensure Python is installed.`;
+      logger.log('error', errorMsg);
+      throw new Error(errorMsg);
     }
     
     // If we reach here and none of the paths worked, log a detailed error but return system Python
@@ -983,18 +1044,79 @@ fi
 
         // Now run the game with proper PYTHONPATH setup to ensure modules can be found
         logger.log('info', 'Starting game with improved Python environment setup');
+        logger.log('info', `Using Python executable: ${pythonPath}`);
+        
+        // Create a Python script to run the game with better error handling
+        let runScriptPath;
+        if (app.isPackaged) {
+          // In a packaged app, we'll write to a temp file
+          runScriptPath = path.join(require('os').tmpdir(), 'run_fe_game.py');
+        } else {
+          // In dev mode, we can write to the project directory
+          runScriptPath = path.join(app.getAppPath(), 'run_fe_game.py');
+        }
+        
+        // Create a script with more robust error handling and diagnostics
+        const scriptContent = `
+import sys
+import os
+import traceback
 
-        // Use -c to run Python with enhanced environment setup
+# Display information about the Python environment
+print("Python version:", sys.version)
+print("Python executable:", sys.executable)
+print("Running game script from:", os.path.abspath(__file__))
+
+# Add all necessary directories to the Python path
+lt_maker_path = r'${ltMakerPath}'
+print("Using LT Maker path:", lt_maker_path)
+
+# Make sure LT Maker is in path
+if lt_maker_path not in sys.path:
+    sys.path.insert(0, lt_maker_path)
+
+# Set environment variables
+os.environ['PYTHONPATH'] = lt_maker_path + os.pathsep + os.environ.get('PYTHONPATH', '')
+
+# Try to import and run the game
+try:
+    print("Importing run_engine_for_project module")
+    import run_engine_for_project
+    print("Successfully imported run_engine_for_project")
+    
+    # Run the game
+    print("Running game:", r'${projectNameEndingInDotLtProj}')
+    run_engine_for_project.main('${projectNameEndingInDotLtProj}')
+except ImportError as e:
+    print("ERROR: Failed to import run_engine_for_project:", e)
+    print("Python sys.path:", sys.path)
+    print("Traceback:")
+    traceback.print_exc()
+    sys.exit(1)
+except Exception as e:
+    print("ERROR: Failed to run game:", e)
+    print("Traceback:")
+    traceback.print_exc()
+    sys.exit(1)
+`;
+
+        // Write the script to the run script path
+        fs.writeFileSync(runScriptPath, scriptContent);
+        logger.log('info', `Created run script at: ${runScriptPath}`);
+        
+        // Use this script instead of the command line approach for better error handling
         const pythonProcess = spawn(
           pythonPath,
-          [
-            '-c',
-            `import sys, os; sys.path.insert(0, r'${ltMakerPath}'); os.environ['PYTHONPATH'] = r'${ltMakerPath}' + os.pathsep + os.environ.get('PYTHONPATH', ''); import run_engine_for_project; run_engine_for_project.main('${projectNameEndingInDotLtProj}')`
-          ],
+          [runScriptPath],
           {
             cwd: ltMakerPath,
             detached: true,
-            stdio: ['ignore', 'pipe', 'pipe']
+            stdio: ['ignore', 'pipe', 'pipe'],
+            env: {
+              ...process.env,
+              PYTHONPATH: `${ltMakerPath}${path.delimiter}${process.env.PYTHONPATH || ''}`,
+              PYTHONUNBUFFERED: '1'  // Important for immediate logging
+            }
           }
         );
 
