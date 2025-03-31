@@ -87,7 +87,7 @@ try {
 // Step 6: Fix the Windows icon post-build
 console.log('\nStep 6: Applying icon fix post-build...');
 try {
-  execSync('node scripts/fix-windows-icon.js', {
+  execSync('node scripts/fix-windows-icon-rcedit-bin.js', {
     cwd: electronDir,
     stdio: 'inherit'
   });
