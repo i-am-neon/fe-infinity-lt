@@ -20,22 +20,33 @@ if (!fs.existsSync(iconPath)) {
   console.log('Generating icon from source...');
   
   try {
-    // Check if we have electron-icon-builder installed
-    execSync('npx electron-icon-builder --version', { stdio: 'ignore' });
-    
-    // Source SVG
-    const svgSource = path.join(electronDir, '..', 'client', 'public', 'vite.svg');
-    
-    if (fs.existsSync(svgSource)) {
-      console.log(`Generating icons from ${svgSource}...`);
-      execSync(`npx electron-icon-builder --input=${svgSource} --output=icons`, {
+    // First try our custom icon generator (more reliable for Windows)
+    const createWinIconScript = path.join(__dirname, 'create-win-icon.js');
+    if (fs.existsSync(createWinIconScript)) {
+      console.log('Using custom Windows icon generator...');
+      execSync(`node ${createWinIconScript}`, {
         cwd: electronDir,
         stdio: 'inherit'
       });
-      console.log('Icons generated successfully');
     } else {
-      console.error(`Source SVG not found at ${svgSource}`);
-      process.exit(1);
+      // Fallback to electron-icon-builder
+      console.log('Falling back to electron-icon-builder...');
+      execSync('npx electron-icon-builder --version', { stdio: 'ignore' });
+      
+      // Source SVG
+      const svgSource = path.join(electronDir, '..', 'client', 'public', 'vite.svg');
+      
+      if (fs.existsSync(svgSource)) {
+        console.log(`Generating icons from ${svgSource}...`);
+        execSync(`npx electron-icon-builder --input=${svgSource} --output=icons`, {
+          cwd: electronDir,
+          stdio: 'inherit'
+        });
+        console.log('Icons generated successfully');
+      } else {
+        console.error(`Source SVG not found at ${svgSource}`);
+        process.exit(1);
+      }
     }
   } catch (error) {
     console.error('Failed to generate icons:', error.message);

@@ -1,260 +1,150 @@
 /**
- * Script to create a multi-resolution Windows icon file from a source image
- * This is critical for proper icon display in Windows applications
+ * Script to create proper Windows icon files with all required resolutions
+ * This script generates a multi-resolution .ico file suitable for Windows applications
+ * 
+ * Requires:
+ * - sharp or ImageMagick (will attempt to use sharp first, then fall back to ImageMagick)
  */
 
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
-const https = require('https');
-const { createWriteStream } = require('fs');
-const { Extract } = require('unzipper');
 
 // Configuration
 const electronDir = path.resolve(__dirname, '..');
-const sourceImage = path.join(electronDir, 'logo.png'); // Default source image
-const outputIcon = path.join(electronDir, 'icons', 'icons', 'win', 'icon.ico');
-const resourceIcon = path.join(electronDir, 'resources', 'app.ico');
-const tempDir = path.join(electronDir, 'temp');
+const logoPath = path.join(electronDir, 'logo.png');
+const outputIconPath = path.join(electronDir, 'icons', 'icons', 'win', 'icon.ico');
+const tempDir = path.join(electronDir, 'temp_icons');
 
 // Create temp directory if it doesn't exist
 if (!fs.existsSync(tempDir)) {
   fs.mkdirSync(tempDir, { recursive: true });
 }
 
-// Create resources directory if it doesn't exist
-if (!fs.existsSync(path.dirname(resourceIcon))) {
-  fs.mkdirSync(path.dirname(resourceIcon), { recursive: true });
+// Required icon sizes for Windows
+const iconSizes = [16, 24, 32, 48, 64, 128, 256];
+
+console.log('Creating Windows icon with all required resolutions...');
+
+// Ensure source image exists
+if (!fs.existsSync(logoPath)) {
+  console.error(`Source image not found: ${logoPath}`);
+  process.exit(1);
 }
 
-// Find best source image
-function findSourceImage() {
-  const possibleSources = [
-    path.join(electronDir, 'logo.png'),
-    path.join(electronDir, '..', 'client', 'public', 'vite.svg'),
-    path.join(electronDir, '..', 'client', 'public', 'logo.png'),
-    path.join(electronDir, 'icons', 'icons', 'png', '512x512.png'),
-    path.join(electronDir, 'icons', 'icons', 'png', '256x256.png'),
-    path.join(electronDir, 'icons', 'icons', 'png', '128x128.png')
-  ];
-
-  for (const source of possibleSources) {
-    if (fs.existsSync(source)) {
-      console.log(`Found source image: ${source}`);
-      return source;
-    }
-  }
-
-  console.warn('No suitable source image found. Please provide a logo.png file in the electron directory.');
-  return null;
+// Ensure output directories exist
+const outputDir = path.dirname(outputIconPath);
+if (!fs.existsSync(outputDir)) {
+  fs.mkdirSync(outputDir, { recursive: true });
 }
 
-// Download a file from a URL
-function downloadFile(url, destPath) {
-  return new Promise((resolve, reject) => {
-    console.log(`Downloading ${url}...`);
-    const file = createWriteStream(destPath);
-    
-    https.get(url, response => {
-      response.pipe(file);
-      
-      file.on('finish', () => {
-        file.close();
-        console.log(`Downloaded to ${destPath}`);
-        resolve(destPath);
-      });
-      
-      file.on('error', err => {
-        fs.unlinkSync(destPath);
-        reject(err);
-      });
-    }).on('error', err => {
-      fs.unlinkSync(destPath);
-      reject(err);
-    });
-  });
-}
-
-// Extract a zip file
-function extractZip(zipPath, destDir) {
-  return new Promise((resolve, reject) => {
-    console.log(`Extracting ${zipPath} to ${destDir}...`);
-    fs.createReadStream(zipPath)
-      .pipe(Extract({ path: destDir }))
-      .on('close', () => {
-        console.log('Extraction complete');
-        resolve();
-      })
-      .on('error', err => {
-        reject(err);
-      });
-  });
-}
-
-// Create a Windows icon using PowerShell
-async function createWindowsIcon() {
-  const source = findSourceImage();
-  if (!source) {
-    throw new Error('No source image found');
-  }
+// Try to use sharp first (Node.js native image processing)
+function createWithSharp() {
+  console.log('Attempting to create icon using sharp...');
   
-  console.log('Creating multi-resolution Windows icon...');
-  
-  if (process.platform === 'win32') {
-    // On Windows, we can use PowerShell directly
+  try {
+    // Install sharp if not present
     try {
-      const psScript = `
-        # Create multi-resolution Windows icon
-        $sourceImage = "${source.replace(/\\/g, '\\\\')}"
-        $outputIcon = "${outputIcon.replace(/\\/g, '\\\\')}"
-        $tempDir = "${tempDir.replace(/\\/g, '\\\\')}"
-        
-        # Create the temp directory if it doesn't exist
-        if (-not (Test-Path $tempDir)) {
-          New-Item -ItemType Directory -Path $tempDir -Force | Out-Null
-        }
-        
-        # Download the ImageMagick portable version if not installed
-        $magickExe = "$tempDir\\magick.exe"
-        if (-not (Test-Path $magickExe)) {
-          Invoke-WebRequest -Uri "https://imagemagick.org/archive/binaries/ImageMagick-7.1.1-22-portable-Q16-HDRI-x64.zip" -OutFile "$tempDir\\imagemagick.zip"
-          Expand-Archive -Path "$tempDir\\imagemagick.zip" -DestinationPath "$tempDir\\ImageMagick" -Force
-          Copy-Item -Path "$tempDir\\ImageMagick\\magick.exe" -Destination $magickExe
-        }
-        
-        # Create icons of different sizes
-        $sizes = @(16, 32, 48, 64, 128, 256)
-        $iconFiles = @()
-        foreach ($size in $sizes) {
-          $tempIconPath = "$tempDir\\icon_$size.png"
-          & $magickExe convert $sourceImage -resize $size"x"$size $tempIconPath
-          $iconFiles += $tempIconPath
-        }
-        
-        # Combine into multi-resolution icon
-        $iconFilesStr = $iconFiles -join " "
-        & $magickExe convert $iconFilesStr $outputIcon
-        
-        # Copy to resources folder
-        Copy-Item -Path $outputIcon -Destination "${resourceIcon.replace(/\\/g, '\\\\')}" -Force
-        
-        Write-Host "Created multi-resolution icon: $outputIcon"
-      `;
-      
-      // Write the script to a file
-      const psScriptPath = path.join(tempDir, 'create-icon.ps1');
-      fs.writeFileSync(psScriptPath, psScript);
-      
-      // Execute the PowerShell script
-      execSync(`powershell -ExecutionPolicy Bypass -File "${psScriptPath}"`, { stdio: 'inherit' });
-      
-      return true;
-    } catch (error) {
-      console.error('Error creating Windows icon:', error);
-      throw error;
-    }
-  } else {
-    // On non-Windows platforms, provide instructions
-    console.log(`Cannot create Windows icon on ${process.platform}.`);
-    console.log('Please create a multi-resolution Windows icon manually and place it at:');
-    console.log(outputIcon);
-    
-    // Still copy the source image as icon for testing purposes
-    if (fs.existsSync(source)) {
-      try {
-        fs.copyFileSync(source, outputIcon);
-        fs.copyFileSync(source, resourceIcon);
-        console.log(`Copied source image to icon locations for testing.`);
-        console.log('NOTE: This is not a proper Windows icon and will not display correctly in Windows.');
-      } catch (err) {
-        console.error('Error copying source image:', err);
-      }
+      require.resolve('sharp');
+    } catch (e) {
+      console.log('Installing sharp...');
+      execSync('npm install --no-save sharp', { stdio: 'inherit' });
     }
     
-    return false;
+    const sharp = require('sharp');
+    
+    // Generate all required sizes
+    const promises = iconSizes.map(size => {
+      const outputPath = path.join(tempDir, `icon-${size}.png`);
+      return sharp(logoPath)
+        .resize(size, size)
+        .toFile(outputPath)
+        .then(() => outputPath);
+    });
+    
+    // Wait for all resizing operations to complete
+    Promise.all(promises)
+      .then(outputPaths => {
+        console.log('All sizes generated successfully');
+        
+        // Read all the images
+        const imageBuffers = outputPaths.map(path => fs.readFileSync(path));
+        
+        try {
+          // Use to-ico to create the ICO file
+          const toIco = require('to-ico');
+          toIco(imageBuffers).then(buffer => {
+            fs.writeFileSync(outputIconPath, buffer);
+            console.log(`Icon file created successfully at ${outputIconPath}`);
+            
+            // Clean up temp files
+            outputPaths.forEach(filePath => fs.unlinkSync(filePath));
+            fs.rmdirSync(tempDir);
+          }).catch(err => {
+            console.error('Failed to create ICO file:', err);
+            createWithImageMagick(); // Fallback to ImageMagick
+          });
+        } catch (err) {
+          console.error('Error with to-ico:', err);
+          createWithImageMagick(); // Fallback to ImageMagick
+        }
+      })
+      .catch(err => {
+        console.error('Failed to generate icon sizes:', err);
+        createWithImageMagick(); // Fallback to ImageMagick
+      });
+  } catch (error) {
+    console.error('Error using sharp:', error.message);
+    createWithImageMagick(); // Fallback to ImageMagick
   }
 }
 
-// Apply icon to executable using rcedit (Windows only)
-async function applyIconToExecutable(exePath) {
-  if (process.platform !== 'win32') {
-    console.log('Cannot apply icon to executable on non-Windows platforms.');
-    return false;
-  }
+// Fallback to ImageMagick
+function createWithImageMagick() {
+  console.log('Falling back to ImageMagick for icon creation...');
   
   try {
-    // Download rcedit if not available
-    const rceditDir = path.join(tempDir, 'rcedit');
-    const rceditPath = path.join(rceditDir, 'rcedit-x64.exe');
+    // Check if ImageMagick is installed
+    execSync('convert -version', { stdio: 'ignore' });
     
-    if (!fs.existsSync(rceditPath)) {
-      if (!fs.existsSync(rceditDir)) {
-        fs.mkdirSync(rceditDir, { recursive: true });
+    // Generate all required sizes
+    iconSizes.forEach(size => {
+      const outputPath = path.join(tempDir, `icon-${size}.png`);
+      execSync(`convert "${logoPath}" -resize ${size}x${size} "${outputPath}"`, {
+        stdio: 'inherit'
+      });
+    });
+    
+    // Create .ico file with all sizes
+    const sizeArgs = iconSizes.map(size => 
+      `"${path.join(tempDir, `icon-${size}.png`)}"`
+    ).join(' ');
+    
+    execSync(`convert ${sizeArgs} "${outputIconPath}"`, {
+      stdio: 'inherit'
+    });
+    
+    console.log(`Icon file created successfully at ${outputIconPath}`);
+    
+    // Clean up temp files
+    iconSizes.forEach(size => {
+      const tempFile = path.join(tempDir, `icon-${size}.png`);
+      if (fs.existsSync(tempFile)) {
+        fs.unlinkSync(tempFile);
       }
-      
-      await downloadFile(
-        'https://github.com/electron/rcedit/releases/download/v1.1.1/rcedit-x64.exe',
-        rceditPath
-      );
-    }
-    
-    // Apply the icon
-    console.log(`Applying icon to ${exePath}...`);
-    execSync(`"${rceditPath}" "${exePath}" --set-icon "${outputIcon}"`, { stdio: 'inherit' });
-    
-    console.log('Icon applied successfully.');
-    return true;
+    });
+    fs.rmdirSync(tempDir);
   } catch (error) {
-    console.error('Error applying icon to executable:', error);
-    return false;
-  }
-}
-
-// Main function
-async function main() {
-  try {
-    await createWindowsIcon();
-    
-    if (process.argv.includes('--apply') && process.platform === 'win32') {
-      // Check for executable path
-      const exePathArg = process.argv.find(arg => arg.startsWith('--exe='));
-      if (exePathArg) {
-        const exePath = exePathArg.split('=')[1];
-        if (fs.existsSync(exePath)) {
-          await applyIconToExecutable(exePath);
-        } else {
-          console.error(`Executable not found at: ${exePath}`);
-        }
-      } else {
-        console.log('No executable path provided with --exe parameter.');
-      }
-    }
-    
-    return true;
-  } catch (error) {
-    console.error('Error in main function:', error);
-    return false;
-  }
-}
-
-// Run the script if called directly
-if (require.main === module) {
-  main().then(success => {
-    if (success) {
-      console.log('Windows icon creation completed successfully.');
-      process.exit(0);
-    } else {
-      console.error('Windows icon creation failed.');
-      process.exit(1);
-    }
-  }).catch(error => {
-    console.error('Unhandled error:', error);
+    console.error('Error using ImageMagick:', error.message);
+    console.error('Failed to create Windows icon file. Please ensure ImageMagick is installed.');
     process.exit(1);
-  });
+  }
 }
 
-// Export functions
-module.exports = {
-  createWindowsIcon,
-  applyIconToExecutable
-};
+// Start with Sharp and fall back to ImageMagick if needed
+try {
+  createWithSharp();
+} catch (error) {
+  console.error('Failed with Sharp, falling back to ImageMagick:', error.message);
+  createWithImageMagick();
+}
