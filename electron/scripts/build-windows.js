@@ -89,6 +89,20 @@ const config = {
 fs.writeFileSync(tempConfigPath, JSON.stringify(config, null, 2));
 console.log(`✅ Created temporary config at: ${tempConfigPath}`);
 
+// Step 2.5: Prepare Windows icons
+console.log('\n2.5. Preparing Windows icons...');
+try {
+  // Run the icon preparation script
+  const prepareIconsPath = path.join(__dirname, 'prepare-windows-icons.js');
+  if (fs.existsSync(prepareIconsPath)) {
+    require(prepareIconsPath);
+  } else {
+    console.warn('Icon preparation script not found. Icons may not be set correctly.');
+  }
+} catch (error) {
+  console.error('Failed to prepare Windows icons:', error.message);
+}
+
 // Step 3: Run electron-builder with environment variables
 console.log('\n3. Building Windows executable...');
 process.env.CSC_IDENTITY_AUTO_DISCOVERY = 'false';
