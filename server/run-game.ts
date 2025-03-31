@@ -57,21 +57,11 @@ export default async function runGame(
       pythonCommand = "..\\bin\\python\\python.exe";
       pythonArgs = ["run_engine_for_project.py", normalizedProjectPath];
     } else {
-      // macOS/Linux - look for Wine in system locations
-      let systemWinePath = await findSystemWine();
-      if (!systemWinePath) {
-        throw new Error(
-          "Wine not found on your system. Please install Wine to run the game."
-        );
-      }
-
-      console.log(`Using system Wine at: ${systemWinePath}`);
-      pythonCommand = systemWinePath;
-      pythonArgs = [
-        "python",
-        "run_engine_for_project.py",
-        normalizedProjectPath,
-      ];
+      // macOS/Linux - use local Python in dev environments
+      // Using local Python directly when in development
+      console.log("Using local Python for development");
+      pythonCommand = "python";
+      pythonArgs = ["run_engine.py", normalizedProjectPath];
     }
 
     console.log(

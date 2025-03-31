@@ -2,7 +2,7 @@ const { app, BrowserWindow, dialog, ipcMain } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const { startServer, stopServer, isServerReady } = require('./server-manager');
-const { runGameWithWine } = require('./game-runner');
+const { runGameWithWine, preparePythonEnvironment } = require('./game-runner');
 const { startGameLauncherServer } = require('./game-launcher');
 const logger = require('./logger');
 
@@ -309,25 +309,12 @@ app.whenReady().then(async () => {
         }
       }
 
-      // Check for Python on macOS
-      if (process.platform === 'darwin') {
-        try {
-          const pythonVersion = execSync('python3 --version', { encoding: 'utf8' }).trim();
-          pythonInstalled = true;
-          logger.log('info', `Python is installed: ${pythonVersion}`);
-        } catch (e) {
-          logger.log('warn', 'Python not found in PATH');
-          pythonInstalled = false;
-        }
-      } else {
-        // For Linux, we're not using system Python
-        pythonInstalled = true;
-      }
+      // We only use bundled Python now
+      pythonInstalled = true;
 
-      // Show error message if Wine or Python is missing
+      // Show error message if Wine is missing
       const missingComponents = [];
       if (!wineInstalled) missingComponents.push('Wine');
-      if (!pythonInstalled && process.platform === 'darwin') missingComponents.push('Python');
 
       if (missingComponents.length > 0) {
         logger.log('error', `Missing required components: ${missingComponents.join(', ')}`);
@@ -336,10 +323,6 @@ app.whenReady().then(async () => {
 
         if (!wineInstalled) {
           errorMessage += '• Wine: Install via Homebrew with:\n  brew install --cask --no-quarantine wine-stable\n\n';
-        }
-
-        if (!pythonInstalled && process.platform === 'darwin') {
-          errorMessage += '• Python: Install via Homebrew with:\n  brew install python\n\n';
         }
 
         errorMessage += 'Please install the missing components and restart the application.';
@@ -500,6 +483,19 @@ app.whenReady().then(async () => {
         const exists = fs.existsSync(altPath);
         logger.log('info', `Alternative LT Maker path exists: ${exists}`, { path: altPath });
       }
+    }
+
+    // Initialize Python environment for game engine
+    try {
+      logger.log('info', 'Initializing Python environment for game engine...');
+      await preparePythonEnvironment();
+      logger.log('info', 'Python environment initialized');
+    } catch (pythonError) {
+      logger.log('error', 'Failed to initialize Python environment', {
+        error: pythonError.message,
+        stack: pythonError.stack
+      });
+      // Continue anyway - we'll retry during game launch
     }
 
     // Start server components with retries

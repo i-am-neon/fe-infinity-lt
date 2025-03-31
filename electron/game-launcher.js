@@ -1,5 +1,5 @@
 const http = require('http');
-const { runGameWithWine } = require('./game-runner');
+const { runGame, runPythonScript } = require('./game-runner');
 const logger = require('./logger');
 const { app } = require('electron');
 const path = require('path');
@@ -13,8 +13,8 @@ function startGameLauncherServer() {
     logger.log('info', `Starting game launcher HTTP server on port ${PORT}...`);
 
     const server = http.createServer((req, res) => {
-      // Only handle POST requests to /run-game
-      if (req.method === 'POST' && req.url === '/run-game') {
+      // Handle POST requests to /run-game or /run-python
+      if (req.method === 'POST' && (req.url === '/run-game' || req.url === '/run-python')) {
         // Set CORS headers
         res.setHeader('Access-Control-Allow-Origin', '*');
         res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -30,12 +30,11 @@ function startGameLauncherServer() {
         // Process the request
         req.on('end', async () => {
           try {
-            logger.log('info', `Received run-game request`, { body });
+            logger.log('info', `Received request to ${req.url}`, { body });
 
-            let projectPath;
+            let parsedBody;
             try {
-              const parsedBody = JSON.parse(body);
-              projectPath = parsedBody.projectPath;
+              parsedBody = JSON.parse(body);
             } catch (parseError) {
               logger.log('error', 'Failed to parse JSON body', {
                 error: parseError.message,
@@ -49,101 +48,240 @@ function startGameLauncherServer() {
               return;
             }
 
-            if (!projectPath) {
-              logger.log('error', 'Missing projectPath parameter');
-              res.statusCode = 400;
-              res.end(JSON.stringify({
-                success: false,
-                error: 'Missing projectPath parameter'
-              }));
-              return;
-            }
+            // Handle different endpoints
+            if (req.url === '/run-game') {
+              // Run Game endpoint
+              const projectPath = parsedBody.projectPath;
+              
+              if (!projectPath) {
+                logger.log('error', 'Missing projectPath parameter');
+                res.statusCode = 400;
+                res.end(JSON.stringify({
+                  success: false,
+                  error: 'Missing projectPath parameter'
+                }));
+                return;
+              }
 
-            // Use improved path resolution logic to find lt-maker-fork directory
-            let ltMakerPath;
-            // Try multiple potential locations
-            const potentialLocations = [
-              // Development location
-              path.join(app.getAppPath(), '..', 'lt-maker-fork'),
-              // Direct from app path
-              path.join(app.getAppPath(), 'lt-maker-fork'),
-              // From resources
-              path.join(process.resourcesPath || app.getAppPath(), 'lt-maker-fork'),
-              // From resources/app
-              path.join(process.resourcesPath || app.getAppPath(), 'app', 'lt-maker-fork')
-            ];
+              // Use improved path resolution logic to find lt-maker-fork directory
+              let ltMakerPath;
+              // Try multiple potential locations
+              const potentialLocations = [
+                // Development location
+                path.join(app.getAppPath(), '..', 'lt-maker-fork'),
+                // Direct from app path
+                path.join(app.getAppPath(), 'lt-maker-fork'),
+                // From resources
+                path.join(process.resourcesPath || app.getAppPath(), 'lt-maker-fork'),
+                // From resources/app
+                path.join(process.resourcesPath || app.getAppPath(), 'app', 'lt-maker-fork')
+              ];
 
-            // Find the first location that exists
-            let foundPath = false;
-            for (const location of potentialLocations) {
-              if (fs.existsSync(location)) {
-                ltMakerPath = location;
-                foundPath = true;
-                logger.log('info', `Found lt-maker-fork at: ${ltMakerPath}`);
-                break;
+              // Find the first location that exists
+              let foundPath = false;
+              for (const location of potentialLocations) {
+                if (fs.existsSync(location)) {
+                  ltMakerPath = location;
+                  foundPath = true;
+                  logger.log('info', `Found lt-maker-fork at: ${ltMakerPath}`);
+                  break;
+                }
+              }
+
+              if (!foundPath) {
+                const errorMsg = `lt-maker-fork directory not found in any expected location`;
+                logger.log('error', errorMsg, { searchedLocations: potentialLocations });
+                res.statusCode = 404;
+                res.end(JSON.stringify({
+                  success: false,
+                  error: errorMsg
+                }));
+                return;
+              }
+
+              const projectFullPath = path.join(ltMakerPath, projectPath);
+              logger.log('info', `Looking for project at: ${projectFullPath}`);
+
+              if (!fs.existsSync(projectFullPath)) {
+                const errorMsg = `Project not found: ${projectPath} (full path: ${projectFullPath})`;
+                logger.log('error', errorMsg);
+                res.statusCode = 404;
+                res.end(JSON.stringify({
+                  success: false,
+                  error: errorMsg
+                }));
+                return;
+              }
+
+              // Check metadata.json exists
+              const metadataPath = path.join(projectFullPath, 'metadata.json');
+              if (!fs.existsSync(metadataPath)) {
+                const errorMsg = `metadata.json not found in project: ${projectPath}`;
+                logger.log('error', errorMsg);
+                res.statusCode = 404;
+                res.end(JSON.stringify({
+                  success: false,
+                  error: errorMsg
+                }));
+                return;
+              }
+
+              logger.log('info', `HTTP endpoint received request to run game: ${projectPath}`);
+
+              try {
+                await runGame(projectPath);
+                logger.log('info', `Game launch requested successfully`);
+
+                res.statusCode = 200;
+                res.end(JSON.stringify({ success: true }));
+              } catch (gameError) {
+                logger.log('error', 'Error running game', {
+                  error: gameError.message,
+                  stack: gameError.stack
+                });
+
+                res.statusCode = 500;
+                res.end(JSON.stringify({
+                  success: false,
+                  error: gameError.message || 'Failed to launch game'
+                }));
+              }
+            } else if (req.url === '/run-python') {
+              // Run Python script endpoint
+              const scriptPath = parsedBody.scriptPath;
+              
+              if (!scriptPath) {
+                logger.log('error', 'Missing scriptPath parameter');
+                res.statusCode = 400;
+                res.end(JSON.stringify({
+                  success: false,
+                  error: 'Missing scriptPath parameter'
+                }));
+                return;
+              }
+              
+              logger.log('info', `Received request to run Python script: ${scriptPath}`);
+              
+              // In Electron, use bundled Python, properly handling asar vs asar.unpacked paths
+              // Create possible Python paths, accounting for asar packaging
+              const appPath = app.getAppPath();
+              let basePaths = [];
+              
+              if (appPath.includes('app.asar')) {
+                // In packaged app, binaries must be in .unpacked directory
+                const unpackedPath = appPath.replace('app.asar', 'app.asar.unpacked');
+                basePaths = [
+                  // First try unpacked path (which should be correct in production)
+                  unpackedPath,
+                  // Then try resources dir directly
+                  process.resourcesPath
+                ];
+              } else {
+                // In dev mode
+                basePaths = [
+                  // First try the app directory directly
+                  appPath,
+                  // Then try going one level up (common in dev setups)
+                  path.join(appPath, '..')
+                ];
+              }
+              
+              logger.log('info', `Base paths for Python search: ${JSON.stringify(basePaths)}`);
+              
+              // Build the full list of possible Python paths
+              const possiblePythonPaths = [];
+              
+              // Add all combinations of paths
+              for (const basePath of basePaths) {
+                possiblePythonPaths.push(
+                  path.join(basePath, 'bin', 'python', 'python_embed', 'python.exe'),
+                  path.join(basePath, 'bin', 'python', 'python.exe')
+                );
+              }
+              
+              logger.log('info', `Searching for Python in paths: ${JSON.stringify(possiblePythonPaths)}`);
+              
+              // Try each path
+              let pythonPath = null;
+              for (const potentialPath of possiblePythonPaths) {
+                try {
+                  logger.log('info', `Checking for Python at: ${potentialPath}`);
+                  if (fs.existsSync(potentialPath)) {
+                    pythonPath = potentialPath;
+                    logger.log('info', `Found bundled Python at: ${pythonPath}`);
+                    // Also verify we can execute it
+                    try {
+                      fs.accessSync(potentialPath, fs.constants.X_OK);
+                      logger.log('info', `Python at ${pythonPath} is executable`);
+                    } catch (accessErr) {
+                      logger.log('warn', `Python at ${pythonPath} exists but may not be executable: ${accessErr.message}`);
+                    }
+                    break;
+                  }
+                } catch (checkErr) {
+                  logger.log('warn', `Error checking path ${potentialPath}: ${checkErr.message}`);
+                }
+              }
+              
+              if (!pythonPath) {
+                logger.log('warning', `Could not find bundled Python, falling back to system Python`);
+                pythonPath = 'python';
+              }
+              
+              try {
+                // Use child_process.spawn directly with bundled Python
+                const { spawn } = require('child_process');
+                const cwd = path.dirname(scriptPath);
+                
+                logger.log('info', `Attempting to run Python script with: ${pythonPath}`);
+                logger.log('info', `Working directory: ${cwd}`);
+                logger.log('info', `Script: ${scriptPath}`);
+                
+                const child = spawn(pythonPath, [scriptPath], {
+                  cwd: cwd,
+                  detached: true,
+                  stdio: 'ignore',
+                  windowsHide: false
+                });
+                
+                // Unref child to let it run independently
+                child.unref();
+                
+                logger.log('info', `Python script launched successfully`);
+                res.statusCode = 200;
+                res.end(JSON.stringify({ success: true }));
+                return;
+              } catch (directError) {
+                logger.log('error', 'Error running Python script directly:', {
+                  error: directError.message,
+                  stack: directError.stack
+                });
+                
+                // Fall back to the normal method
+                try {
+                  await runPythonScript(scriptPath);
+                  logger.log('info', `Python script launched successfully via runPythonScript`);
+                  
+                  res.statusCode = 200;
+                  res.end(JSON.stringify({ success: true }));
+                  return;
+                } catch (fallbackError) {
+                  logger.log('error', 'Error in fallback Python execution', {
+                    error: fallbackError.message,
+                    stack: fallbackError.stack
+                  });
+                  
+                  res.statusCode = 500;
+                  res.end(JSON.stringify({
+                    success: false,
+                    error: fallbackError.message || 'Failed to run Python script'
+                  }));
+                  return;
+                }
               }
             }
-
-            if (!foundPath) {
-              const errorMsg = `lt-maker-fork directory not found in any expected location`;
-              logger.log('error', errorMsg, { searchedLocations: potentialLocations });
-              res.statusCode = 404;
-              res.end(JSON.stringify({
-                success: false,
-                error: errorMsg
-              }));
-              return;
-            }
-
-            const projectFullPath = path.join(ltMakerPath, projectPath);
-            logger.log('info', `Looking for project at: ${projectFullPath}`);
-
-            if (!fs.existsSync(projectFullPath)) {
-              const errorMsg = `Project not found: ${projectPath} (full path: ${projectFullPath})`;
-              logger.log('error', errorMsg);
-              res.statusCode = 404;
-              res.end(JSON.stringify({
-                success: false,
-                error: errorMsg
-              }));
-              return;
-            }
-
-            // Check metadata.json exists
-            const metadataPath = path.join(projectFullPath, 'metadata.json');
-            if (!fs.existsSync(metadataPath)) {
-              const errorMsg = `metadata.json not found in project: ${projectPath}`;
-              logger.log('error', errorMsg);
-              res.statusCode = 404;
-              res.end(JSON.stringify({
-                success: false,
-                error: errorMsg
-              }));
-              return;
-            }
-
-            logger.log('info', `HTTP endpoint received request to run game: ${projectPath}`);
-
-            try {
-              await runGameWithWine(projectPath);
-              logger.log('info', `Game launch requested successfully`);
-
-              res.statusCode = 200;
-              res.end(JSON.stringify({ success: true }));
-            } catch (gameError) {
-              logger.log('error', 'Error running game', {
-                error: gameError.message,
-                stack: gameError.stack
-              });
-
-              res.statusCode = 500;
-              res.end(JSON.stringify({
-                success: false,
-                error: gameError.message || 'Failed to launch game'
-              }));
-            }
           } catch (error) {
-            logger.log('error', 'Unexpected error processing run-game request', {
+            logger.log('error', 'Unexpected error processing request', {
               error: error.message,
               stack: error.stack
             });

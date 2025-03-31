@@ -1,0 +1,315 @@
+(base) silver@Silver electron % pnpm i
+Lockfile is up to date, resolution step is skipped
+Already up to date
+
+> fe-infinity@1.0.0 postinstall /Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/electron
+> electron-builder install-app-deps && node download-binaries.js --skip-macos-system-deps
+
+  • electron-builder  version=24.13.3
+  • loaded configuration  file=package.json ("build" field)
+Starting binary download process...
+Downloading Deno binary...
+Downloading Deno...
+Downloading https://github.com/denoland/deno/releases/latest/download/deno-aarch64-apple-darwin.zip...
+Downloaded deno-aarch64-apple-darwin.zip
+Extracting deno-aarch64-apple-darwin.zip...
+Extracted deno-aarch64-apple-darwin.zip
+Deno downloaded successfully
+Downloading Python...
+Setting up bundled Python environment...
+Setting up Python embeddable package...
+Downloading https://www.python.org/ftp/python/3.11.7/python-3.11.7-embed-amd64.zip...
+Downloaded Python to /Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/electron/bin/python/python-3.11.7-embed-amd64.zip
+Extracting Python embeddable package...
+Extracted Python embeddable package
+Modified python311._pth to enable site-packages
+Installing pip...
+Downloading https://bootstrap.pypa.io/get-pip.py...
+Setting execute permissions for Python files...
+Added execute permission to python.exe
+Added execute permission to pythonw.exe
+Creating Python wrapper script for macOS/Linux...
+Created Python wrapper script at /Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/electron/bin/python/python
+Created Python test script at /Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/electron/bin/python/test_python.sh
+Python environment setup completed successfully
+Checking Wine availability...
+Wine is available at: /opt/homebrew/bin/wine
+Testing Python with Wine...
+Python test completed successfully
+All binaries downloaded successfully
+Done in 11.7s using pnpm v10.6.1
+(base) silver@Silver electron % pnpm dev
+
+> fe-infinity@1.0.0 dev /Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/electron
+> concurrently "cd ../client && pnpm dev" "wait-on http://localhost:5173 && electron . --dev"
+
+[0] 
+[0] > client@0.0.0 dev /Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/client
+[0] > vite
+[0] 
+[0] 
+[0]   VITE v6.2.1  ready in 218 ms
+[0] 
+[0]   ➜  Local:   http://localhost:5173/
+[0]   ➜  Network: use --host to expose
+[1] Electron app logs initialized at: /Users/silver/Library/Logs/FE Infinity/electron-2025-03-30T23-58-13-663Z.log 
+[1] Application starting {
+[1]   version: '1.0.0',
+[1]   environment: undefined,
+[1]   platform: 'darwin',
+[1]   arch: 'arm64',
+[1]   appPath: '/Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/electron',
+[1]   resourcesPath: '/Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/electron/node_modules/.pnpm/electron@35.0.0/node_modules/electron/dist/Electron.app/Contents/Resources',
+[1]   userDataPath: '/Users/silver/Library/Application Support/FE Infinity'
+[1] }
+[1] Wine is installed and available in PATH 
+[1] Set macOS dock icon from local path 
+[1] Splash window created 
+[1] Set environment variables {
+[1]   ELECTRON_LOG_DIR: '/Users/silver/Library/Logs/FE Infinity',
+[1]   APP_PATH: '/Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/electron',
+[1]   RESOURCES_PATH: '/Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/electron/node_modules/.pnpm/electron@35.0.0/node_modules/electron/dist/Electron.app/Contents/Resources',
+[1]   USER_DATA_PATH: '/Users/silver/Library/Application Support/FE Infinity'
+[1] }
+[1] macOS version: 15.3.2 
+[1] Homebrew path: /opt/homebrew/bin/brew 
+[1] Deno via Homebrew: Not installed 
+[1] Deno in PATH: /Users/silver/.deno/bin/deno 
+[1] Server directory exists: true {
+[1]   path: '/Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/server'
+[1] }
+[1] LT Maker directory exists: true {
+[1]   path: '/Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/lt-maker-fork'
+[1] }
+[1] Initializing Python environment for game engine... 
+[1] Preparing Python environment by pre-installing dependencies... 
+[1] Skipping dependency pre-installation on non-Windows platform 
+[1] Python environment initialized 
+[1] Starting server components... 
+[1] Starting server components { isDev: true, platform: 'darwin' }
+[1] Bundled Python: found {
+[1]   path: '/Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/electron/bin/python/python_embed/python.exe',
+[1]   checkedPaths: [
+[1]     '/Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/electron/bin/python/python_embed/python.exe',
+[1]     '/Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/electron/bin/python/python'
+[1]   ]
+[1] }
+[1] Found Wine in PATH: /opt/homebrew/bin/wine 
+[1] Using bundled Python with Wine: /opt/homebrew/bin/wine and Python at /Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/electron/bin/python/python_embed/python.exe 
+[1] Starting Deno server... 
+[1] Using bundled Deno: /Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/electron/bin/deno 
+[1] Using bundled Deno: /Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/electron/bin/deno
+[1] Starting Deno server with command: /Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/electron/bin/deno 
+[1] Starting Deno server with command: /Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/electron/bin/deno
+[1] Path information {
+[1]   electronAppRoot: '/Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/electron',
+[1]   resourcesPath: '/Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/electron/node_modules/.pnpm/electron@35.0.0/node_modules/electron/dist/Electron.app/Contents/Resources',
+[1]   ltMakerPath: '/Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/lt-maker-fork',
+[1]   serverPath: '/Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/server'
+[1] }
+[1] Electron app root path: /Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/electron
+[1] Resources path: /Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/electron/node_modules/.pnpm/electron@35.0.0/node_modules/electron/dist/Electron.app/Contents/Resources
+[1] LT Maker path: /Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/lt-maker-fork
+[1] Server path: /Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/server
+[1] LT Maker directory exists 
+[1] LT Maker directory exists
+[1] Using log directory for Deno server: /Users/silver/Library/Logs/FE Infinity 
+[1] Deno server command {
+[1]   command: '/Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/electron/bin/deno',
+[1]   args: [ 'run', '--allow-all', 'server.ts' ],
+[1]   cwd: '/Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/server',
+[1]   env: {
+[1]     ELECTRON_APP_ROOT: '/Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/electron',
+[1]     RESOURCES_PATH: '/Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/electron/node_modules/.pnpm/electron@35.0.0/node_modules/electron/dist/Electron.app/Contents/Resources',
+[1]     LT_MAKER_PATH: '/Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/lt-maker-fork',
+[1]     SERVER_DIR: '/Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/server',
+[1]     DENO_ENV: 'development'
+[1]   }
+[1] }
+[1] 2025-03-30 18:58:14.272 Electron[56606:1245166] +[IMKClient subclass]: chose IMKClient_Modern
+[1] 2025-03-30 18:58:14.272 Electron[56606:1245166] +[IMKInputSession subclass]: chose IMKInputSession_Modern
+[1] Deno server output: Running in Electron environment, using SQLite at: /Users/silver/Library/Application Support/FE Infinity/data/sqlite.db
+[1]  
+[1] Deno server: Running in Electron environment, using SQLite at: /Users/silver/Library/Application Support/FE Infinity/data/sqlite.db
+[1] 
+[1] All server components started successfully 
+[1] All server components started successfully
+[1] Server components started successfully 
+[1] Starting game launcher HTTP server on port 8989... 
+[1] Running in development mode
+[1] Main window created 
+[1] Game launcher HTTP server running on port 8989 
+[1] Game launcher HTTP server started successfully
+[1] Deno server output: Starting server - Electron, Development, OS: darwin
+[1] Initializing vector database for Electron environment...
+[1] Initializing vector database for Electron environment...
+[1] Initializing vector database at: /Users/silver/Library/Application Support/FE Infinity/vector-db-data
+[1] Server initialized, starting HTTP server...
+[1] Listening on http://localhost:8000/
+[1]  
+[1] Deno server: Starting server - Electron, Development, OS: darwin
+[1] Initializing vector database for Electron environment...
+[1] Initializing vector database for Electron environment...
+[1] Initializing vector database at: /Users/silver/Library/Application Support/FE Infinity/vector-db-data
+[1] Server initialized, starting HTTP server...
+[1] Listening on http://localhost:8000/
+[1] 
+[1] Deno server output: Loaded 36 vectors for maps
+[1] Loaded 56 vectors for portraits-male
+[1] Loaded 44 vectors for portraits-female
+[1] Loaded 68 vectors for music
+[1] Loaded 151 vectors for items
+[1] Vector database initialized
+[1]  
+[1] Deno server: Loaded 36 vectors for maps
+[1] Loaded 56 vectors for portraits-male
+[1] Loaded 44 vectors for portraits-female
+[1] Loaded 68 vectors for music
+[1] Loaded 151 vectors for items
+[1] Vector database initialized
+[1] 
+[1] Deno server output: Found 36 existing map vectors
+[1] Vectors already exist, skipping seeding
+[1] Vector database initialization complete
+[1] Vector database initialized for Electron
+[1]  
+[1] Deno server: Found 36 existing map vectors
+[1] Vectors already exist, skipping seeding
+[1] Vector database initialization complete
+[1] Vector database initialized for Electron
+[1] 
+[1] [56606:0330/185815.725433:ERROR:CONSOLE(2)] "Uncaught (in promise) Error: Error invoking remote method 'BROWSER_GET_LAST_WEB_PREFERENCES': WebContents was destroyed", source: node:electron/js2c/sandbox_bundle (2)
+[1] [56606:0330/185815.906064:ERROR:CONSOLE(1)] "Request Autofill.enable failed. {"code":-32601,"message":"'Autofill.enable' wasn't found"}", source: devtools://devtools/bundled/core/protocol_client/protocol_client.js (1)
+[1] [56606:0330/185815.906107:ERROR:CONSOLE(1)] "Request Autofill.setAddresses failed. {"code":-32601,"message":"'Autofill.setAddresses' wasn't found"}", source: devtools://devtools/bundled/core/protocol_client/protocol_client.js (1)
+[1] Deno server output: [Path Resolver] Found lt-maker-fork at: /Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/lt-maker-fork
+[1] [Path Resolver] Search path sequence: Current working directory: /Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/server -> Running in Electron environment -> Trying path: /Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/electron/lt-maker-fork -> Trying path: /Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/lt-maker-fork
+[1] [Path Resolver] Accessing: /Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/lt-maker-fork/testing_proj.ltproj/metadata.json
+[1]  
+[1] Deno server: [Path Resolver] Found lt-maker-fork at: /Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/lt-maker-fork
+[1] [Path Resolver] Search path sequence: Current working directory: /Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/server -> Running in Electron environment -> Trying path: /Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/electron/lt-maker-fork -> Trying path: /Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/lt-maker-fork
+[1] [Path Resolver] Accessing: /Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/lt-maker-fork/testing_proj.ltproj/metadata.json
+[1] 
+[1] Deno server output: Found metadata.json at /Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/lt-maker-fork/testing_proj.ltproj/metadata.json
+[1] Running game in Electron environment: testing_proj.ltproj
+[1] Attempting to run game: testing_proj.ltproj
+[1]  
+[1] Deno server: Found metadata.json at /Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/lt-maker-fork/testing_proj.ltproj/metadata.json
+[1] Running game in Electron environment: testing_proj.ltproj
+[1] Attempting to run game: testing_proj.ltproj
+[1] 
+[1] Received request to /run-game { body: '{"projectPath":"testing_proj.ltproj"}' }
+[1] Found lt-maker-fork at: /Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/lt-maker-fork 
+[1] Looking for project at: /Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/lt-maker-fork/testing_proj.ltproj 
+[1] HTTP endpoint received request to run game: testing_proj.ltproj 
+[1] Running game on platform: darwin {
+[1]   projectPath: 'testing_proj.ltproj',
+[1]   appPath: '/Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/electron',
+[1]   resourcesPath: '/Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/electron/node_modules/.pnpm/electron@35.0.0/node_modules/electron/dist/Electron.app/Contents/Resources',
+[1]   platform: 'darwin',
+[1]   arch: 'arm64'
+[1] }
+[1] Path resolution for game launcher {
+[1]   appPath: '/Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/electron',
+[1]   ltMakerPath: '/Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/lt-maker-fork'
+[1] }
+[1] Platform detection: process.platform = darwin 
+[1] Using Wine-based execution path for macOS/Linux 
+[1] Found Wine in PATH: /opt/homebrew/bin/wine
+[1] Using Wine at: /opt/homebrew/bin/wine 
+[1] Running game with normalized path: testing_proj.ltproj 
+[1] Using existing Wine prefix: /Users/silver/.wine
+[1] Python environment variables {
+[1]   PYTHONPATH: '/Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/lt-maker-fork:/Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/electron/bin/python/Lib/site-packages',
+[1]   PYTHONHOME: '/Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/electron/bin/python'
+[1] }
+[1] Using Python executable with Wine: /Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/electron/bin/python/python.exe 
+[1] Created temporary batch file: /var/folders/gb/ptv_xdk90xq4m2qqvqs7bcn00000gn/T/run_game.bat 
+[1] Batch file content: @echo off
+[1] cd /d "Z:\Users\silver\Documents\Dev\personal\Infinit\fe-infinity-lt\lt-maker-fork"
+[1] set PYTHONPATH=Z:\Users\silver\Documents\Dev\personal\Infinit\fe-infinity-lt\lt-maker-fork
+[1] 
+[1] REM Debug information
+[1] echo Python executable: "Z:\Users\silver\Documents\Dev\personal\Infinit\fe-infinity-lt\electron\bin\python\python_embed\python.exe"
+[1] echo Python script: "Z:\var\folders\gb\ptv_xdk90xq4m2qqvqs7bcn00000gn\T\run_game.py"
+[1] echo Current directory: d%
+[1] 
+[1] REM Check if Python executable exists
+[1] if exist "Z:\Users\silver\Documents\Dev\personal\Infinit\fe-infinity-lt\electron\bin\python\python_embed\python.exe" (
+[1]     echo Python executable found
+[1] ) else (
+[1]     echo Python executable NOT found
+[1] )
+[1] 
+[1] REM Check if the Python script exists
+[1] if exist "Z:\var\folders\gb\ptv_xdk90xq4m2qqvqs7bcn00000gn\T\run_game.py" (
+[1]     echo Python script found
+[1] ) else (
+[1]     echo Python script NOT found
+[1] )
+[1] 
+[1] REM Create a simplified script inline
+[1] echo import sys > run_game_simple.py
+[1] echo import os >> run_game_simple.py
+[1] echo sys.path.insert(0, r'Z:\Users\silver\Documents\Dev\personal\Infinit\fe-infinity-lt\lt-maker-fork') >> run_game_simple.py
+[1] echo os.environ['PYTHONPATH'] = r'Z:\Users\silver\Documents\Dev\personal\Infinit\fe-infinity-lt\lt-maker-fork' + os.pathsep + os.environ.get('PYTHONPATH', '') >> run_game_simple.py
+[1] echo import run_engine_for_project >> run_game_simple.py
+[1] echo run_engine_for_project.main('testing_proj.ltproj') >> run_game_simple.py
+[1] 
+[1] REM Run the game with proper Python configuration
+[1] echo Starting game engine...
+[1] "Z:\Users\silver\Documents\Dev\personal\Infinit\fe-infinity-lt\electron\bin\python\python_embed\python.exe" run_game_simple.py
+[1] 
+[1] Executing command: /opt/homebrew/bin/wine cmd /c /var/folders/gb/ptv_xdk90xq4m2qqvqs7bcn00000gn/T/run_game.bat {
+[1]   cwd: '/Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/lt-maker-fork',
+[1]   wineDebug: '-all',
+[1]   winePrefix: '/Users/silver/.wine'
+[1] }
+[1] Created Wine wrapper script at /var/folders/gb/ptv_xdk90xq4m2qqvqs7bcn00000gn/T/run-wine.sh 
+[1] Script content: #!/bin/bash
+[1] # Run Wine with the enhanced batch file that installs dependencies
+[1] cd "/Users/silver/Documents/Dev/personal/Infinit/fe-infinity-lt/lt-maker-fork"
+[1] export WINEDEBUG=-all
+[1] export WINEPREFIX=/Users/silver/.wine
+[1] 
+[1] # Set Python environment variables
+[1] export PYTHONIOENCODING=utf-8
+[1] export PYTHONUNBUFFERED=1
+[1] 
+[1] # Debug info to help diagnose path issues
+[1] echo "Running Wine with batch file at: /var/folders/gb/ptv_xdk90xq4m2qqvqs7bcn00000gn/T/run_game.bat"
+[1] echo "Wine executable: /opt/homebrew/bin/wine"
+[1] echo "Wine batch path: Z:\var\folders\gb\ptv_xdk90xq4m2qqvqs7bcn00000gn\T\run_game.bat"
+[1] 
+[1] # Make sure the batch file is accessible to Wine
+[1] ls -la "/var/folders/gb/ptv_xdk90xq4m2qqvqs7bcn00000gn/T/run_game.bat"
+[1] 
+[1] # Run Wine with cmd to execute the batch file using Wine's Z: drive mapping for absolute paths
+[1] "/opt/homebrew/bin/wine" cmd /c "Z:\var\folders\gb\ptv_xdk90xq4m2qqvqs7bcn00000gn\T\run_game.bat" 2>&1 
+[1] Running wine wrapper at: /var/folders/gb/ptv_xdk90xq4m2qqvqs7bcn00000gn/T/run-wine.sh 
+[1] Executing: /bin/bash /var/folders/gb/ptv_xdk90xq4m2qqvqs7bcn00000gn/T/run-wine.sh 
+[1] Game stdout: Running Wine with batch file at: /var/folders/gb/ptv_xdk90xq4m2qqvqs7bcn00000gn/T/run_game.bat 
+[1] Game stdout: Wine executable: /opt/homebrew/bin/wine
+[1] Wine batch path: Z:\var\folders\gb\ptv_xdk90xq4m2qqvqs7bcn00000gn\T\run_game.bat 
+[1] Game stdout: -rw-r--r--@ 1 silver  staff  1643 Mar 30 18:58 /var/folders/gb/ptv_xdk90xq4m2qqvqs7bcn00000gn/T/run_game.bat 
+[1] Game stdout: 2025-03-30 18:58:18.327 wine-preloader[56648:1245643] +[IMKClient subclass]: chose IMKClient_Modern 
+[1] Game stdout: Python executable: "Z:\Users\silver\Documents\Dev\personal\Infinit\fe-infinity-lt\electron\bin\python\python_embed\python.exe" 
+[1] Game stdout: Python script: "Z:\var\folders\gb\ptv_xdk90xq4m2qqvqs7bcn00000gn\T\run_game.py" 
+[1] Game stdout: Current directory: Z:\Users\silver\Documents\Dev\personal\Infinit\fe-infinity-lt\lt-maker-fork 
+[1] Game stdout: Python executable found 
+[1] Game stdout: Python script found 
+[1] Game stdout: Starting game engine... 
+[1] Game stdout: Traceback (most recent call last): 
+[1] Game stdout: File "Z:\Users\silver\Documents\Dev\personal\Infinit\fe-infinity-lt\lt-maker-fork\run_game_simple.py", line 5, in <module> 
+[1] Game stdout: import run_engine_for_project 
+[1] Game stdout: ^^^^^^^^^^^^^^^^^^^^ 
+[1] Game stdout: ^^^^^^^^^ 
+[1] Game stdout: File "Z:\Users\silver\Documents\Dev\personal\Infinit\fe-infinity-lt\lt-maker-fork\run_engine_for_project.py", line 8, in <module> 
+[1] Game stdout: from app.data.resources.resources import RESOURCES 
+[1] Game stdout: File "Z:\Users\silver\Documents\Dev\personal\Infinit\fe-infinity-lt\lt-maker-fork\app\data\resources\resources.py", line 12, in <module> 
+[1] Game stdout: from app import sprites 
+[1] Game stdout: File "Z:\Users\silver\Documents\Dev\personal\Infinit\fe-infinity-lt\lt-maker-fork\app\sprites.py", line 4, in <module> 
+[1] Game stdout: from app.engine import engine 
+[1] Game stdout: File "Z:\Users\silver\Documents\Dev\personal\Infinit\fe-infinity-lt\lt-maker-fork\app\engine\engine.py", line 5, in <module> 
+[1] Game stdout: import pygame 
+[1] Game stdout: ModuleNotFoundError 
+[1] Game stdout: : No module named 'pygame' 
