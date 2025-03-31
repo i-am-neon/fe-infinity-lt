@@ -580,6 +580,128 @@ async function main() {
                 timeout: 10000 // 10 seconds timeout
               });
               console.log('Python test completed successfully');
+              
+              // On macOS, install Python requirements using Wine
+              if (isMac && !process.argv.includes('--skip-macos-python-deps')) {
+                console.log('Installing Python requirements on macOS...');
+                
+                // Create Python script to install requirements
+                const pythonEmbedDir = path.join(pythonDir, 'python_embed');
+                const installScriptPath = path.join(pythonDir, 'install_requirements.py');
+                const ltMakerPath = path.resolve(__dirname, '..', 'lt-maker-fork');
+                const requirementsPath = path.join(ltMakerPath, 'requirements_editor.txt');
+                
+                const installScriptContent = `
+import os
+import sys
+import subprocess
+
+print(f"Python version: {sys.version}")
+print(f"Executable: {sys.executable}")
+
+# Make sure site-packages is enabled
+try:
+    python_dir = os.path.dirname(sys.executable)
+    pth_file = os.path.join(python_dir, "python311._pth")
+    if os.path.exists(pth_file):
+        with open(pth_file, 'r') as f:
+            content = f.read()
+        
+        if '#import site' in content:
+            content = content.replace('#import site', 'import site')
+            with open(pth_file, 'w') as f:
+                f.write(content)
+            print(f"Enabled site-packages in {pth_file}")
+except Exception as e:
+    print(f"Error enabling site-packages: {e}")
+
+# Install pip if needed
+try:
+    import pip
+    print(f"pip already installed: {pip.__version__}")
+except ImportError:
+    print("pip not found, installing...")
+    try:
+        import urllib.request
+        print("Downloading get-pip.py...")
+        urllib.request.urlretrieve("https://bootstrap.pypa.io/get-pip.py", "get-pip.py")
+        print("Installing pip...")
+        subprocess.check_call([sys.executable, "get-pip.py"])
+        print("pip installed successfully")
+    except Exception as e:
+        print(f"Error installing pip: {e}")
+        sys.exit(1)
+
+# Install packages from requirements file
+requirements_file = r'${requirementsPath.replace(/\\/g, '\\\\')}'
+print(f"Installing packages from {requirements_file}")
+
+try:
+    # First update pip itself
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "pip", "--no-warn-script-location"])
+    print("pip upgraded successfully")
+    
+    # Then install from requirements file
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", requirements_file, "--no-warn-script-location"])
+    print("All packages from requirements file installed successfully")
+except Exception as e:
+    print(f"Error installing packages: {e}")
+    
+    # Try installing critical packages individually
+    try:
+        print("Trying to install packages individually...")
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "pygame-ce==2.3.2", "--no-warn-script-location"])
+        print("pygame-ce installed successfully")
+        
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "typing-extensions==4.8.0", "--no-warn-script-location"])
+        print("typing-extensions installed successfully")
+        
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "PyQt5==5.15.10", "--no-warn-script-location"])
+        print("PyQt5 installed successfully")
+    except Exception as e2:
+        print(f"Error installing individual packages: {e2}")
+        sys.exit(1)
+
+# Verify critical packages
+try:
+    import pygame
+    print(f"pygame installed successfully: {pygame.__version__}")
+except ImportError as e:
+    print(f"Failed to import pygame after installation: {e}")
+    sys.exit(1)
+
+print("All packages installed and verified successfully!")
+`;
+                
+                // Write install script
+                fs.writeFileSync(installScriptPath, installScriptContent);
+                
+                console.log('Running Python requirements installation script with Wine...');
+                try {
+                  // Get Wine path
+                  const winePath = getWinePath();
+                  if (!winePath) {
+                    throw new Error('Wine not found');
+                  }
+                  
+                  // Run the installation script with Wine
+                  const pythonExe = path.join(pythonEmbedDir, 'python.exe');
+                  const installCmd = `${winePath} "${pythonExe}" "${installScriptPath}"`;
+                  
+                  // Execute with visible output so user can see progress
+                  console.log('Installing Python packages. This may take a few minutes...');
+                  execSync(installCmd, { 
+                    stdio: 'inherit',
+                    timeout: 300000 // 5 minute timeout
+                  });
+                  
+                  console.log('Python requirements successfully installed on macOS');
+                } catch (installError) {
+                  console.error('Failed to install Python requirements on macOS:', installError.message);
+                  console.warn('The game may not run properly until requirements are installed.');
+                  console.warn('You can run the application and it will attempt to install requirements at runtime.');
+                }
+              }
             } catch (testError) {
               console.error('Python test failed:', testError);
               console.warn('Wine-based Python may not work correctly. Dependencies will be installed at runtime if needed.');

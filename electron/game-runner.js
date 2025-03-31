@@ -587,9 +587,282 @@ ls -la "${tempBatchPath}"
           // Unref the child to allow the Node.js event loop to exit even if the process is still running
           wineProcess.unref();
 
+          let stdoutBuffer = '';
+          let installInProgress = false;
+          
           wineProcess.stdout.on('data', (data) => {
             const output = data.toString().trim();
+            stdoutBuffer += output + '\n';
             logger.log('info', `Game stdout: ${output}`);
+            
+            // Check if we're seeing the pygame not found error
+            if (output.includes('ModuleNotFoundError') && output.includes('No module named \'pygame\'') && !installInProgress) {
+              installInProgress = true;
+              logger.log('warn', 'Detected missing pygame module, attempting to install it automatically...');
+              
+              // Create a script to install pygame
+              const pythonDir = path.join(app.getAppPath(), 'bin', 'python');
+              const pythonEmbedDir = path.join(pythonDir, 'python_embed');
+              const installScriptPath = path.join(require('os').tmpdir(), 'install_pygame.py');
+              const ltMakerPath = getLtMakerPath();
+              const requirementsPath = path.join(ltMakerPath, 'requirements_editor.txt');
+              
+              // Write a script to install pygame
+              const installScriptContent = `
+import os
+import sys
+import subprocess
+print("Installing pygame and other dependencies...")
+
+# Install pip if needed
+try:
+    import pip
+    print(f"pip is already installed: {pip.__version__}")
+except ImportError:
+    print("pip not found, installing it...")
+    try:
+        import urllib.request
+        print("Downloading get-pip.py...")
+        urllib.request.urlretrieve("https://bootstrap.pypa.io/get-pip.py", "get-pip.py")
+        print("Installing pip...")
+        subprocess.check_call([sys.executable, "get-pip.py"])
+        print("pip installed successfully")
+    except Exception as e:
+        print(f"Error installing pip: {e}")
+        sys.exit(1)
+
+# First try installing pygame directly
+try:
+    print("Installing pygame-ce...")
+    subprocess.check_call([
+        sys.executable, "-m", "pip", "install", "pygame-ce==2.3.2", "--no-warn-script-location"
+    ])
+    print("pygame-ce installed successfully")
+except Exception as e:
+    print(f"Error installing pygame-ce: {e}")
+    sys.exit(1)
+
+# Verify pygame installation
+try:
+    import pygame
+    print(f"pygame installed successfully: {pygame.__version__}")
+except ImportError as e:
+    print(f"Failed to import pygame after installation: {e}")
+    sys.exit(1)
+
+print("Installation completed successfully. Please restart the game.")
+sys.exit(0)
+`;
+              
+              fs.writeFileSync(installScriptPath, installScriptContent);
+              
+              // Run the installation script with Wine
+              try {
+                const { spawn, execSync } = require('child_process');
+                logger.log('info', 'Running pygame installation script...');
+                
+                // Kill the current Wine process first
+                if (wineProcess && !wineProcess.killed) {
+                  wineProcess.kill();
+                }
+                
+                // Get the Wine path
+                const winePath = getWinePath();
+                if (!winePath) {
+                  logger.log('error', 'Wine not found, cannot install pygame');
+                  return;
+                }
+                
+                // Create a better shell script for running in Wine environment
+                const shellPath = path.join(require('os').tmpdir(), 'install_pygame.sh');
+                const shellContent = `#!/bin/bash
+# Enhanced Python dependency installation script for Wine
+set -e
+
+# Set Wine configuration
+export WINEDEBUG=-all
+export WINEDLLOVERRIDES=mscoree,mshtml=
+
+# Get script directory
+PYTHON_DIR="${path.join(app.getAppPath(), 'bin', 'python')}"
+PYTHON_EXE="${path.join(pythonEmbedDir, 'python.exe')}"
+INSTALL_SCRIPT="${installScriptPath}"
+
+echo "=== Python Setup with Wine ==="
+echo "Python directory: $PYTHON_DIR"
+echo "Python executable: $PYTHON_EXE"
+echo "Install script: $INSTALL_SCRIPT"
+
+# Check Wine is available
+if ! command -v wine &> /dev/null; then
+    echo "ERROR: Wine is not installed or not in PATH"
+    echo "Please install Wine using: brew install --cask --no-quarantine wine-stable"
+    exit 1
+fi
+
+echo "Wine version: $(wine --version)"
+
+# Check Python executable exists
+if [ ! -f "$PYTHON_EXE" ]; then
+    echo "ERROR: Python executable not found"
+    exit 1
+fi
+
+echo "Using Python executable: $PYTHON_EXE"
+
+# Create python script directly inline
+TEMP_SCRIPT="${path.join(require('os').tmpdir(), 'install_pygame_inline.py')}"
+cat > "$TEMP_SCRIPT" << 'EOF'
+import os
+import sys
+import subprocess
+print("Installing pygame and other dependencies...")
+
+# Install pip if needed
+try:
+    import pip
+    print(f"pip is already installed: {pip.__version__}")
+except ImportError:
+    print("pip not found, installing it...")
+    try:
+        import urllib.request
+        print("Downloading get-pip.py...")
+        urllib.request.urlretrieve("https://bootstrap.pypa.io/get-pip.py", "get-pip.py")
+        print("Installing pip...")
+        subprocess.check_call([sys.executable, "get-pip.py"])
+        print("pip installed successfully")
+    except Exception as e:
+        print(f"Error installing pip: {e}")
+        sys.exit(1)
+
+try:
+    # First update pip itself
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "pip", "--no-warn-script-location"])
+    print("pip upgraded successfully")
+    
+    # Install pygame directly
+    print("Installing pygame-ce...")
+    subprocess.check_call([
+        sys.executable, "-m", "pip", "install", "pygame-ce==2.3.2", "--no-warn-script-location"
+    ])
+    print("pygame-ce installed successfully")
+    
+    # Install other critical packages
+    print("Installing typing-extensions...")
+    subprocess.check_call([
+        sys.executable, "-m", "pip", "install", "typing-extensions==4.8.0", "--no-warn-script-location"
+    ])
+    print("typing-extensions installed successfully")
+    
+    print("Installing PyQt5...")
+    subprocess.check_call([
+        sys.executable, "-m", "pip", "install", "PyQt5==5.15.10", "--no-warn-script-location"
+    ])
+    print("PyQt5 installed successfully")
+except Exception as e:
+    print(f"Error installing packages: {e}")
+    sys.exit(1)
+
+# Verify installation
+try:
+    import pygame
+    print(f"pygame installed successfully: {pygame.__version__}")
+except ImportError as e:
+    print(f"Failed to import pygame after installation: {e}")
+    sys.exit(1)
+
+print("Installation completed successfully. Please restart the game.")
+sys.exit(0)
+EOF
+
+# Run the Python script with Wine
+echo "Running Python script to install pygame and other dependencies..."
+wine "$PYTHON_EXE" "$TEMP_SCRIPT"
+
+if [ $? -eq 0 ]; then
+    echo "SUCCESS: Python packages installed correctly!"
+    exit 0
+else
+    echo "ERROR: Failed to install Python packages"
+    exit 1
+fi
+`;
+
+                fs.writeFileSync(shellPath, shellContent);
+                fs.chmodSync(shellPath, 0o755);
+                
+                // Execute the shell script
+                logger.log('info', 'Running install_pygame.sh shell script...');
+                
+                try {
+                  // Show output to user so they can see progress
+                  const output = execSync(`/bin/bash ${shellPath}`, {
+                    stdio: 'inherit',  // Show output directly
+                    timeout: 300000    // 5 minute timeout
+                  });
+                  
+                  logger.log('info', 'Python packages installed successfully. Please restart the game.');
+                  
+                  // Display a dialog to the user
+                  const { dialog } = require('electron');
+                  dialog.showMessageBox({
+                    type: 'info',
+                    title: 'Installation Complete',
+                    message: 'Python packages installed successfully.',
+                    detail: 'Please restart the game to apply the changes.',
+                    buttons: ['OK']
+                  });
+                  
+                } catch (execError) {
+                  logger.log('error', `Failed to install Python packages: ${execError.message}`);
+                  
+                  // Try direct spawn as fallback
+                  const installProcess = spawn('/bin/bash', [shellPath], {
+                    stdio: 'pipe'
+                  });
+                
+                  installProcess.stdout.on('data', (data) => {
+                    const output = data.toString().trim();
+                    logger.log('info', `Install stdout: ${output}`);
+                  });
+                  
+                  installProcess.stderr.on('data', (data) => {
+                    const output = data.toString().trim();
+                    logger.log('error', `Install stderr: ${output}`);
+                  });
+                  
+                  installProcess.on('close', (code) => {
+                    if (code === 0) {
+                      logger.log('info', 'Python packages installed successfully. Please restart the game.');
+                      
+                      // Display a dialog to the user
+                      const { dialog } = require('electron');
+                      dialog.showMessageBox({
+                        type: 'info',
+                        title: 'Installation Complete',
+                        message: 'Python packages installed successfully.',
+                        detail: 'Please restart the game to apply the changes.',
+                        buttons: ['OK']
+                      });
+                    } else {
+                      logger.log('error', `Python package installation failed with code ${code}`);
+                      
+                      // Display error dialog to the user
+                      const { dialog } = require('electron');
+                      dialog.showMessageBox({
+                        type: 'error',
+                        title: 'Installation Failed',
+                        message: 'Failed to install required Python packages.',
+                        detail: 'Please check the logs for more information. The game may not run correctly.',
+                        buttons: ['OK']
+                      });
+                    }
+                  });
+                }
+              } catch (installError) {
+                logger.log('error', `Error installing pygame: ${installError.message}`);
+              }
+            }
           });
 
           wineProcess.stderr.on('data', (data) => {
@@ -713,8 +986,8 @@ ls -la "${tempBatchPath}"
 async function preparePythonEnvironment() {
   return new Promise((resolve, reject) => {
     logger.log('info', 'Preparing Python environment by pre-installing dependencies...');
-
-    // Skip on non-Windows platforms for now - we'll handle macOS with Wine at runtime
+    
+    // Skip on non-Windows platforms - we'll detect and handle missing packages at runtime
     if (process.platform !== 'win32') {
       logger.log('info', 'Skipping dependency pre-installation on non-Windows platform');
       resolve();
@@ -791,6 +1064,7 @@ async function runPythonScript(scriptPath) {
 
       // Get the directory of the script
       const scriptDir = path.dirname(scriptPath);
+      const scriptName = path.basename(scriptPath);
 
       // On macOS or Linux, we need to use Wine
       if (process.platform === 'darwin' || process.platform === 'linux') {
@@ -808,41 +1082,164 @@ async function runPythonScript(scriptPath) {
         // Get the environment for Python with Wine
         const pythonEnv = getWinePythonEnv();
 
-        // Use similar approach as runGame
-        logger.log('info', `Running Python script with Wine: ${scriptPath}`);
+        // Get the bundled Python executable path - we want to use our bundled Python not system Python
+        const bundledPythonPath = getBundledPythonPath();
+        logger.log('info', `Using bundled Python with Wine: ${bundledPythonPath}`);
+        
+        // Convert paths for Wine usage
+        const toWinePath = (unixPath) => {
+          if (unixPath.startsWith('/')) {
+            return 'Z:' + unixPath.replace(/\//g, '\\');
+          }
+          return unixPath.replace(/\//g, '\\');
+        };
+        
+        // Create a temporary Python wrapper script to handle the execution
+        const tempScriptPath = path.join(require('os').tmpdir(), `run_${scriptName.replace('.py', '')}_wrapper.py`);
+        
+        // Convert script and ltMaker paths to Wine format
+        const wineScriptPath = toWinePath(scriptPath);
+        const wineLtMakerPath = toWinePath(ltMakerPath);
+        
+        // Create a Python wrapper script that will import and run the target script
+        const pythonWrapperContent = `
+import sys
+import os
+import subprocess
 
-        // Get the script name from the path
-        const scriptName = path.basename(scriptPath);
+# Add LT Maker to Python path
+sys.path.insert(0, r'${wineLtMakerPath}')
+os.environ['PYTHONPATH'] = r'${wineLtMakerPath}' + os.pathsep + os.environ.get('PYTHONPATH', '')
 
-        // Launch with shell command
+# Set working directory to script directory
+os.chdir(r'${toWinePath(scriptDir)}')
+
+# Print environment for debugging
+print(f"Current directory: {os.getcwd()}")
+print(f"Python path: {sys.path}")
+print(f"Running script: {r'${wineScriptPath}'}")
+
+# Try to import and run the module directly
+try:
+    # First try to import the target script as a module
+    script_name = os.path.basename(r'${wineScriptPath}').replace('.py', '')
+    print(f"Trying to import {script_name}")
+    
+    # Add the script directory to path
+    script_dir = os.path.dirname(r'${wineScriptPath}')
+    if script_dir not in sys.path:
+        sys.path.insert(0, script_dir)
+    
+    # Try importing the module
+    module = __import__(script_name)
+    print(f"Successfully imported {script_name}")
+    
+    # Check if it has a main function
+    if hasattr(module, 'main'):
+        print(f"Calling {script_name}.main()")
+        module.main()
+    else:
+        print(f"Module {script_name} has no main() function, executing script directly")
+        exec(open(r'${wineScriptPath}').read())
+        
+except Exception as e:
+    print(f"Error importing module: {e}")
+    print("Falling back to running script directly")
+    try:
+        # If import fails, try executing the script directly
+        exec(open(r'${wineScriptPath}').read())
+    except Exception as e2:
+        print(f"Error executing script directly: {e2}")
+        sys.exit(1)
+        
+print("Script execution completed successfully")
+`;
+
+        // Write the wrapper script to a file
+        fs.writeFileSync(tempScriptPath, pythonWrapperContent);
+        const wineTempScriptPath = toWinePath(tempScriptPath);
+        
+        // Create a bash script to execute Wine with the wrapper script
+        const shellScriptPath = path.join(require('os').tmpdir(), `run_${scriptName.replace('.py', '')}.sh`);
+        const shellScriptContent = `#!/bin/bash
+# Run Wine with Python wrapper script
+cd "${ltMakerPath}"
+export WINEDEBUG=${pythonEnv.WINEDEBUG || '-all'}
+export WINEPREFIX=${pythonEnv.WINEPREFIX || '~/.wine'}
+
+# Set Python environment variables
+export PYTHONIOENCODING=utf-8
+export PYTHONUNBUFFERED=1
+export PYTHONPATH="${ltMakerPath}"
+
+# Debug info to help diagnose path issues
+echo "Running Python script with Wine"
+echo "Wine executable: ${winePath}"
+echo "Python script: ${tempScriptPath}"
+echo "Script directory: ${scriptDir}"
+
+# Check if the bundled Python exists and is accessible
+bundled_python="${bundledPythonPath}"
+if [[ "${bundledPythonPath}" == *"python.exe" ]]; then
+  echo "Using bundled Python executable: ${bundledPythonPath}"
+  "${winePath}" "${bundledPythonPath}" "${wineTempScriptPath}" 2>&1
+else
+  echo "Using system Python with Wine"
+  "${winePath}" python "${wineTempScriptPath}" 2>&1
+fi
+`;
+
+        fs.writeFileSync(shellScriptPath, shellScriptContent);
+        fs.chmodSync(shellScriptPath, 0o755);
+
+        logger.log('info', `Created shell script at ${shellScriptPath}`);
+        logger.log('info', `Shell script content: ${shellScriptContent.substring(0, 500)}...`);
+
+        // Run the shell script
         const wineProcess = spawn(
-          winePath,
-          ['python', scriptName],
+          '/bin/bash',
+          [shellScriptPath],
           {
-            cwd: scriptDir,
+            cwd: ltMakerPath,
             detached: false,
             stdio: ['ignore', 'pipe', 'pipe'],
             env: pythonEnv
           }
         );
 
+        let stdoutData = '';
+        let stderrData = '';
+
         wineProcess.stdout.on('data', (data) => {
           const output = data.toString().trim();
+          stdoutData += output + '\n';
           logger.log('info', `Python script stdout: ${output}`);
         });
 
         wineProcess.stderr.on('data', (data) => {
           const output = data.toString().trim();
+          stderrData += output + '\n';
           logger.log('error', `Python script stderr: ${output}`);
         });
 
         wineProcess.on('close', (code) => {
           logger.log('info', `Python script process closed with code ${code}`);
+          
+          // Clean up temporary files
+          try {
+            fs.unlinkSync(tempScriptPath);
+            fs.unlinkSync(shellScriptPath);
+          } catch (cleanupErr) {
+            logger.log('warn', `Error cleaning up temporary files: ${cleanupErr.message}`);
+          }
+          
           if (code !== 0) {
             logger.log('error', `Wine process exited with non-zero code: ${code}`);
-            reject(new Error(`Python script exited with code ${code}`));
+            logger.log('error', `Wine process stderr: ${stderrData}`);
+            reject(new Error(`Python script exited with code ${code}: ${stderrData}`));
           } else {
-            resolve();
+            logger.log('info', `Python script execution successful: ${stdoutData}`);
+            resolve(stdoutData);
           }
         });
 
@@ -871,6 +1268,12 @@ async function runPythonScript(scriptPath) {
 
         logger.log('info', `Using Python at: ${pythonPath}`);
 
+        // Add LT Maker to PYTHONPATH environment variable
+        const pythonPathEnv = process.env.PYTHONPATH || '';
+        const updatedPythonPath = pythonPathEnv.includes(ltMakerPath) 
+          ? pythonPathEnv 
+          : `${ltMakerPath}${path.delimiter}${pythonPathEnv}`;
+
         // Run the Python script
         const pythonProcess = spawn(
           pythonPath,
@@ -881,6 +1284,7 @@ async function runPythonScript(scriptPath) {
             stdio: ['ignore', 'pipe', 'pipe'],
             env: {
               ...process.env,
+              PYTHONPATH: updatedPythonPath,
               PYTHONUNBUFFERED: '1'
             }
           }
@@ -889,13 +1293,18 @@ async function runPythonScript(scriptPath) {
         // Unref the child to allow the Node.js event loop to exit
         pythonProcess.unref();
 
+        let stdoutData = '';
+        let stderrData = '';
+
         pythonProcess.stdout.on('data', (data) => {
           const output = data.toString().trim();
+          stdoutData += output + '\n';
           logger.log('info', `Python script stdout: ${output}`);
         });
 
         pythonProcess.stderr.on('data', (data) => {
           const output = data.toString().trim();
+          stderrData += output + '\n';
           logger.log('error', `Python script stderr: ${output}`);
         });
 
@@ -903,9 +1312,11 @@ async function runPythonScript(scriptPath) {
           logger.log('info', `Python script process closed with code ${code}`);
           if (code !== 0) {
             logger.log('error', `Python process exited with non-zero code: ${code}`);
-            reject(new Error(`Python script exited with code ${code}`));
+            logger.log('error', `Python process stderr: ${stderrData}`);
+            reject(new Error(`Python script exited with code ${code}: ${stderrData}`));
           } else {
-            resolve();
+            logger.log('info', `Python script execution successful: ${stdoutData}`);
+            resolve(stdoutData);
           }
         });
 

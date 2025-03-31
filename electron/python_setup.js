@@ -301,13 +301,157 @@ exit %ERRORLEVEL%
       
       fs.writeFileSync(batchPath, batchContent);
       
-      // Create a shell script to run the batch file with Wine
+      // Create a more robust shell script to run the batch file with Wine
       const shellPath = path.join(pythonDir, 'install_deps.sh');
+      const ltMakerPath = getLtMakerPath();
+      const requirementsPath = path.join(ltMakerPath, 'requirements_engine.txt');
+      
+      // Create a more comprehensive shell script that handles common errors
       const shellContent = `#!/bin/bash
+# Enhanced Python dependency installation script for Wine
+set -e
+
+# Set Wine configuration
 export WINEDEBUG=-all
-wine cmd /c "${batchPath.replace(/\//g, '\\\\')}"
-exit $?
-`;
+export WINEDLLOVERRIDES=mscoree,mshtml=
+
+# Get script directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PYTHON_DIR="$SCRIPT_DIR"
+PYTHON_EXE="$PYTHON_DIR/python_embed/python.exe"
+REQUIREMENTS_FILE="${requirementsPath.replace(/\\/g, '/')}"
+
+echo "=== Python Setup with Wine ==="
+echo "Python directory: $PYTHON_DIR"
+echo "Python executable: $PYTHON_EXE"
+echo "Requirements file: $REQUIREMENTS_FILE"
+
+# Check Wine is available
+if ! command -v wine &> /dev/null; then
+    echo "ERROR: Wine is not installed or not in PATH"
+    echo "Please install Wine using: brew install --cask --no-quarantine wine-stable"
+    exit 1
+fi
+
+echo "Wine version: $(wine --version)"
+
+# Check Python executable exists
+if [ ! -f "$PYTHON_EXE" ]; then
+    # Fallback to alternate location
+    PYTHON_EXE="$PYTHON_DIR/python.exe"
+    if [ ! -f "$PYTHON_EXE" ]; then
+        echo "ERROR: Python executable not found"
+        exit 1
+    fi
+fi
+
+echo "Using Python executable: $PYTHON_EXE"
+
+# Create or ensure python311._pth allows importing site packages
+PTH_FILE="$PYTHON_DIR/python_embed/python311._pth"
+if [ -f "$PTH_FILE" ]; then
+    # Make backup
+    cp "$PTH_FILE" "$PTH_FILE.bak"
+    # Enable site-packages
+    cat "$PTH_FILE" | sed 's/#import site/import site/g' > "$PTH_FILE.new"
+    mv "$PTH_FILE.new" "$PTH_FILE"
+    echo "Enabled site-packages in $PTH_FILE"
+fi
+
+# Install pip if needed (using a temporary Python script)
+GETPIP_SCRIPT="$PYTHON_DIR/get_pip_wine.py"
+cat > "$GETPIP_SCRIPT" << 'EOF'
+import os
+import sys
+import subprocess
+
+print(f"Python version: {sys.version}")
+print(f"Executable: {sys.executable}")
+print(f"Path: {sys.path}")
+
+try:
+    import pip
+    print(f"pip already installed: {pip.__version__}")
+except ImportError:
+    print("pip not found, installing...")
+    try:
+        import urllib.request
+        urllib.request.urlretrieve("https://bootstrap.pypa.io/get-pip.py", "get-pip.py")
+        subprocess.check_call([sys.executable, "get-pip.py"])
+        print("pip installed successfully")
+    except Exception as e:
+        print(f"Error installing pip: {e}")
+        sys.exit(1)
+
+print("Checking packages:")
+try:
+    import pygame
+    print(f"pygame already installed: {pygame.__version__}")
+except ImportError:
+    print("pygame not found, will be installed later")
+
+sys.exit(0)
+EOF
+
+echo "Installing/verifying pip..."
+wine "$PYTHON_EXE" "$GETPIP_SCRIPT"
+
+# Create requirements installation script
+INSTALL_SCRIPT="$PYTHON_DIR/install_reqs_wine.py"
+cat > "$INSTALL_SCRIPT" << 'EOF'
+import os
+import sys
+import subprocess
+
+requirements_file = sys.argv[1] if len(sys.argv) > 1 else None
+if not requirements_file or not os.path.exists(requirements_file):
+    print(f"ERROR: Requirements file not found: {requirements_file}")
+    sys.exit(1)
+
+print(f"Installing requirements from: {requirements_file}")
+
+try:
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", requirements_file])
+    print("Requirements installed successfully")
+except Exception as e:
+    print(f"Error installing requirements: {e}")
+    
+    # Try specific critical packages directly
+    critical_packages = ["pygame-ce", "typing_extensions", "numpy"]
+    for package in critical_packages:
+        try:
+            print(f"Trying to install {package} directly...")
+            subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+            print(f"{package} installed successfully")
+        except Exception as e:
+            print(f"Error installing {package}: {e}")
+
+# Verify installation
+try:
+    import pygame
+    print(f"SUCCESS: pygame installed correctly: {pygame.__version__}")
+except ImportError as e:
+    print(f"WARNING: Failed to import pygame: {e}")
+    sys.exit(1)
+
+sys.exit(0)
+EOF
+
+echo "Installing Python requirements..."
+wine "$PYTHON_EXE" "$INSTALL_SCRIPT" "$REQUIREMENTS_FILE"
+
+# Test pygame import specifically 
+echo "Final verification of pygame..."
+wine "$PYTHON_EXE" -c "import pygame; print(f'Pygame version: {pygame.__version__}')"
+
+if [ $? -eq 0 ]; then
+    echo "SUCCESS: Python dependencies installed correctly!"
+    exit 0
+else
+    echo "WARNING: Some dependencies may not be installed correctly."
+    echo "Please check the log output above for errors."
+    exit 1
+fi`;
       
       fs.writeFileSync(shellPath, shellContent);
       fs.chmodSync(shellPath, 0o755);
