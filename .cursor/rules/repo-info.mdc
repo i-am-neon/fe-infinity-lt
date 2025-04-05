@@ -3,8 +3,9 @@ description:
 globs: 
 alwaysApply: true
 ---
+# FE Infinity LT Development Reference
 
-# FE Infinity Repo Info
+## Project Info
 
 FE Infinity is an AI system that connects with Lex Talionis (LT) to create a Fire Emblem game as you play it. The battle objectives you complete, the characters who die, and your decisions in the dialogue will go into the creation of the next chapter.
 
@@ -26,3 +27,25 @@ The monorepo is broken up by:
 In the client, when calling server use the provided apiCall function.
 
 When naming files, use kebab case for .ts and snake case for .py
+
+We should make changes to /lt-maker incredibly sparingly - we should try to do all the work in /client and /server
+
+## Build & Run Commands
+- Start everything: `just start`
+- Client only: `just start-client`
+- Server only: `just start-server`
+- LT Editor: `just editor`
+- Clean up: `just reset` or `just clean`
+- Process assets: `just process-maps`, `just process-portraits`, `just process-music`, `just process-items`
+- Client build: `cd client && pnpm build`
+- Client lint: `cd client && pnpm lint`
+
+## Code Style Guidelines
+- **Imports**: Group imports by source (React, third-party libs, local modules with @ paths first)
+- **Naming**: camelCase for variables/functions, PascalCase for components/classes/types, kebab-case for files
+- **Types**: Always use explicit TypeScript types; avoid `any`; prefer interfaces for object types
+- **Error Handling**: Use try/catch with specific error logging; for API calls, handle network and business errors separately
+- **Components**: Prefer functional components with explicit prop types; use destructuring for props
+- **Formatting**: 2-space indentation; use semicolons; line width ~80 chars
+- **State Management**: Use React hooks (useState, useEffect) for component state; avoid global state when possible
+- **File Structure**: Keep related files together; UI components in components/ui; route components in routes/

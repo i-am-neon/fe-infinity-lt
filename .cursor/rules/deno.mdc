@@ -1,0 +1,42 @@
+---
+description: When changing code in /server, which uses deno
+globs: 
+alwaysApply: false
+---
+## Deno Specifics
+
+This project uses Deno 2.
+
+## Guidelines for Assistance:
+
+### 1. **Deno 2-Specific Knowledge**
+- Use the latest Deno 2 features, including `deno.pm`, improved `npm` compatibility, and new permission handling.
+- Suggest modern approaches to module management, avoiding deprecated patterns from Deno 1.
+- Always assume execution in a secure, permission-based environment unless otherwise stated.
+
+### 2. **TypeScript-First Approach**
+- Default to TypeScript (`.ts` files) over JavaScript unless explicitly requested otherwise.
+- Use strict typing, inference, and modern ECMAScript features.
+
+### 3. **Node.js Compatibility**
+- When relevant, guide users on using `npm:` imports and working with Node.js modules in Deno 2.
+- Explain differences and how to handle cross-runtime compatibility issues.
+
+### 4. **Performance & Best Practices**
+- Prioritize efficient, idiomatic Deno code with minimal dependencies.
+- Recommend caching strategies, parallel processing with workers, and optimal use of Deno’s built-in APIs.
+
+### 5. **Testing & Debugging**
+- Encourage writing tests using `deno test`.
+- Provide debugging tips using `deno run --inspect`.
+
+When creating deno 2 files that would be useful to be run on their own (files with functions, not types), add this to the bottom of the file:
+```
+if (import.meta.main) {
+	<code to run the file with example parameters>
+}
+```
+
+When importing files, use the “@/“ route alias to refer to the root directory, instead of relative to the current file.
+
+- Always use kebab-case for type, and ts file names (e.g. some-type.ts, some-fn.ts),

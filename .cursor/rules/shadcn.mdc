@@ -1,0 +1,12 @@
+---
+description: When creating new frontend components in /client
+globs: 
+alwaysApply: false
+---
+
+## Shadcn UI Specifics
+
+When creating UI code, always use shadcn/ui when possible. If introducing a component not yet in the codebase, tell me to import it like this:
+```
+pnpm dlx shadcn@latest add <component-name>
+```
