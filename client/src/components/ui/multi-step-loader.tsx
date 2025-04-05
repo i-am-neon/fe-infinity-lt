@@ -42,49 +42,81 @@ export type LoadingState = {
 const LoaderCore = ({
     loadingStates,
     value = 0,
+    title,
+    description
 }: {
     loadingStates: LoadingState[];
     value?: number;
+    title?: string;
+    description?: string;
 }) => {
     return (
-        <div className="flex relative justify-start max-w-xl mx-auto flex-col mt-40">
-            {loadingStates.map((loadingState, index) => {
-                const distance = Math.abs(index - value);
-                const opacity = Math.max(1 - distance * 0.2, 0); // Minimum opacity is 0, keep it 0.2 if you're sane.
+        <div className="flex relative max-w-4xl mx-auto h-96">
+            {/* Left section with title and description */}
+            {(title || description) && (
+                <div className="flex flex-col justify-center pr-8 w-full max-w-xs">
+                    {title && (
+                        <h2 className="text-2xl font-bold mb-3 text-black dark:text-white">
+                            {title}
+                        </h2>
+                    )}
+                    {description && (
+                        <p className="text-sm text-muted-foreground">
+                            {description}
+                        </p>
+                    )}
+                </div>
+            )}
 
-                return (
-                    <motion.div
-                        key={index}
-                        className={cn("text-left flex gap-2 mb-4")}
-                        initial={{ opacity: 0, y: -(value * 40) }}
-                        animate={{ opacity: opacity, y: -(value * 40) }}
-                        transition={{ duration: 0.5 }}
-                    >
-                        <div>
-                            {index > value && (
-                                <CheckIcon className="text-black dark:text-white" />
-                            )}
-                            {index <= value && (
-                                <CheckFilled
+            {/* Separator line with gradient fade */}
+            {(title || description) && (
+                <div className="relative h-full flex items-center mx-8">
+                    <div className="h-full w-px bg-gradient-to-b from-transparent via-border to-transparent" />
+                </div>
+            )}
+
+            {/* Checklist */}
+            <div className="flex-1">
+                <div className="flex relative justify-start max-w-xl flex-col mt-40">
+                    {loadingStates.map((loadingState, index) => {
+                        const distance = Math.abs(index - value);
+                        const opacity = Math.max(1 - distance * 0.2, 0); // Minimum opacity is 0, keep it 0.2 if you're sane.
+
+                        return (
+                            <motion.div
+                                key={index}
+                                className={cn("text-left flex gap-2 mb-4")}
+                                initial={{ opacity: 0, y: -(value * 40) }}
+                                animate={{ opacity: opacity, y: -(value * 40) }}
+                                transition={{ duration: 0.5 }}
+                            >
+                                <div>
+                                    {index > value && (
+                                        <CheckIcon className="text-black dark:text-white" />
+                                    )}
+                                    {index <= value && (
+                                        <CheckFilled
+                                            className={cn(
+                                                "text-black dark:text-white",
+                                                value === index &&
+                                                "text-black dark:text-lime-500 opacity-100"
+                                            )}
+                                        />
+                                    )}
+                                </div>
+                                <span
                                     className={cn(
                                         "text-black dark:text-white",
-                                        value === index &&
-                                        "text-black dark:text-lime-500 opacity-100"
+                                        value === index && "text-black dark:text-lime-500 opacity-100"
                                     )}
-                                />
-                            )}
-                        </div>
-                        <span
-                            className={cn(
-                                "text-black dark:text-white",
-                                value === index && "text-black dark:text-lime-500 opacity-100"
-                            )}
-                        >
-                            {loadingState.text}
-                        </span>
-                    </motion.div>
-                );
-            })}
+                                >
+                                    {loadingState.text}
+                                </span>
+                            </motion.div>
+                        );
+                    })}
+                </div>
+            </div>
         </div>
     );
 };
@@ -95,12 +127,16 @@ export const MultiStepLoader = ({
     duration = 2000,
     loop = true,
     value,
+    title,
+    description
 }: {
     loadingStates: LoadingState[];
     loading?: boolean;
     duration?: number;
     loop?: boolean;
     value?: number;
+    title?: string;
+    description?: string;
 }) => {
     const [currentState, setCurrentState] = useState(value || 0);
 
@@ -142,8 +178,13 @@ export const MultiStepLoader = ({
                     }}
                     className="w-full h-full fixed inset-0 z-[100] flex items-center justify-center backdrop-blur-2xl"
                 >
-                    <div className="h-96  relative">
-                        <LoaderCore value={currentState} loadingStates={loadingStates} />
+                    <div className="relative w-full max-w-4xl">
+                        <LoaderCore
+                            value={currentState}
+                            loadingStates={loadingStates}
+                            title={title}
+                            description={description}
+                        />
                     </div>
 
                     <div className="bg-gradient-to-t inset-x-0 z-20 bottom-0 bg-white dark:bg-black h-full absolute [mask-image:radial-gradient(900px_at_center,transparent_30%,white)]" />

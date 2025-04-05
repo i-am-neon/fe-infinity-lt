@@ -1,5 +1,5 @@
 import apiCall from "@/lib/api-call";
-import { AlertCircle, ChevronLeft, Loader2 } from "lucide-react";
+import { AlertCircle, ChevronLeft, Loader2, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
@@ -25,6 +25,7 @@ import {
 import { Game } from "../types/game";
 import { ChapterGeneratorLoader } from "@/components/ui/chapter-generator-loader";
 import useGenerationProgress from "@/lib/use-generation-progress";
+import { AnimatePresence, motion } from "framer-motion";
 
 export default function GameDetailPage() {
   const { nid } = useParams<{ nid: string }>();
@@ -282,35 +283,41 @@ export default function GameDetailPage() {
 
   return (
     <>
-      {/* Test Loader Dialog */}
-      <NonClosableDialog
-        open={testLoaderOpen}
-        onOpenChange={(open) => {
-          if (!open) {
-            setTestLoaderOpen(false);
-          }
-        }}
-      >
-        <NonClosableDialogContent allowClosing={true}>
-          <NonClosableDialogHeader>
-            <NonClosableDialogTitle>
-              Testing Chapter Generation Loader
-            </NonClosableDialogTitle>
-          </NonClosableDialogHeader>
-          <div className="space-y-6">
-            <ChapterGeneratorLoader
-              progress={{
-                isGenerating: testLoaderOpen,
-                currentStep: testLoaderStep,
-                message: `Test step ${testLoaderStep} message`,
-              }}
-            />
-            <p className="text-center text-sm text-muted-foreground mt-4">
-              This is a debug view of the chapter generation loader.
-            </p>
-          </div>
-        </NonClosableDialogContent>
-      </NonClosableDialog>
+      {/* Full-screen loader rendered directly in DOM instead of inside dialog */}
+      <AnimatePresence>
+        {testLoaderOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-background/80 backdrop-blur-sm"
+          >
+            <div className="relative w-full max-w-lg">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-4 top-4 z-[110]"
+                onClick={() => setTestLoaderOpen(false)}
+              >
+                <X className="h-5 w-5" />
+              </Button>
+
+              <div className="text-center mb-8">
+                <h3 className="text-lg font-semibold">Testing Chapter Generation Loader</h3>
+                <p className="text-sm text-muted-foreground">This is a debug view of the chapter generation loader</p>
+              </div>
+
+              <ChapterGeneratorLoader
+                progress={{
+                  isGenerating: testLoaderOpen,
+                  currentStep: testLoaderStep,
+                  message: `Test step ${testLoaderStep} message`,
+                }}
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {newGameModalOpen && (
         <NonClosableDialog
@@ -392,65 +399,68 @@ export default function GameDetailPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Next Chapter Generation Loading/Error Dialog */}
-      <NonClosableDialog
-        open={generatingChapterModalOpen}
-        onOpenChange={(open) => {
-          // Only allow closing if there's an error
-          if (generationError || !open) {
-            setGeneratingChapterModalOpen(open);
-          }
-        }}
-      >
-        <NonClosableDialogContent allowClosing={!!generationError}>
-          <NonClosableDialogHeader>
-            <NonClosableDialogTitle>
-              {generationError
-                ? "Chapter Generation Failed"
-                : "Generating Next Chapter"}
-            </NonClosableDialogTitle>
-            {generationError && (
-              <NonClosableDialogDescription className="text-destructive">
-                An error occurred while generating the next chapter
-              </NonClosableDialogDescription>
-            )}
-          </NonClosableDialogHeader>
-
-          {generationError ? (
-            <div className="flex flex-col gap-4">
-              <div className="flex items-start gap-2 p-3 bg-destructive/10 rounded-md text-destructive border border-destructive">
-                <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
-                <p>{generationError}</p>
-              </div>
-              <NonClosableDialogFooter>
+      {/* Next Chapter Generation Loading/Error - Direct DOM implementation */}
+      <AnimatePresence>
+        {generatingChapterModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-background/80 backdrop-blur-sm"
+          >
+            <div className="relative w-full max-w-lg">
+              {generationError && (
                 <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-4 top-4 z-[110]"
                   onClick={() => {
                     setGenerationError(null);
                     setGeneratingChapterModalOpen(false);
                   }}
                 >
-                  Close
+                  <X className="h-5 w-5" />
                 </Button>
-              </NonClosableDialogFooter>
+              )}
+
+              {generationError ? (
+                <div className="flex flex-col gap-4">
+                  <div className="text-center mb-8">
+                    <h3 className="text-lg font-semibold">
+                      Chapter Generation Failed
+                    </h3>
+                    <p className="text-sm text-destructive">
+                      An error occurred while generating the next chapter
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-2 p-3 bg-destructive/10 rounded-md text-destructive border border-destructive mx-6">
+                    <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
+                    <p>{generationError}</p>
+                  </div>
+                  <div className="flex justify-end mt-6 mx-6">
+                    <Button
+                      onClick={() => {
+                        setGenerationError(null);
+                        setGeneratingChapterModalOpen(false);
+                      }}
+                    >
+                      Close
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <ChapterGeneratorLoader
+                  progress={{
+                    isGenerating: loadingAction === "generate",
+                    currentStep: generationProgress.progress.currentStep,
+                    message: generationProgress.progress.message,
+                  }}
+                />
+              )}
             </div>
-          ) : (
-            <div className="space-y-6">
-              <ChapterGeneratorLoader
-                progress={{
-                  isGenerating: loadingAction === "generate",
-                  currentStep: generationProgress.progress.currentStep,
-                  message: generationProgress.progress.message,
-                }}
-              />
-              <p className="text-center text-sm text-muted-foreground mt-4">
-                The next chapter is being generated based on your gameplay
-                choices. This will take about five minutes, and the game will
-                launch automatically when ready.
-              </p>
-            </div>
-          )}
-        </NonClosableDialogContent>
-      </NonClosableDialog>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="p-6 space-y-4">
         <Button

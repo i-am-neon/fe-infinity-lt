@@ -36,6 +36,8 @@ export function ChapterGeneratorLoader({ progress }: ChapterGeneratorLoaderProps
             duration={3000}
             loop={false}
             value={progress.currentStep}
+            title="Generating Next Chapter"
+            description="The AI is creating your next chapter based on your gameplay. This typically takes around five minutes, and the game will launch automatically when complete."
         />
     );
 } 
