@@ -180,28 +180,30 @@ export default function HomePage() {
     setShowTestResults(true);
 
     try {
-      // First check if we have an API key
-      let hasKey = false;
-      if (window.electron?.apiKeys?.has) {
-        hasKey = await window.electron.apiKeys.has();
+      // Check if we're in Electron
+      const isElectron = !!window.electron?.apiKeys?.has;
+
+      // If in Electron, check if we have an API key
+      if (isElectron) {
+        const hasKey = await window.electron.apiKeys.has();
+        // If no key in Electron, display a message
+        if (!hasKey) {
+          setTestResults({
+            success: false,
+            error: "No API key found. Please add your OpenAI API key in Settings."
+          });
+          setTestingApiKey(false);
+          return;
+        }
       }
 
-      // If no key, add a note to the test results
-      if (!hasKey) {
-        setTestResults({
-          success: false,
-          error: "No API key found. Please add your OpenAI API key in Settings."
-        });
-        setTestingApiKey(false);
-        return;
-      }
-
-      // Proceed with API key test
+      // Proceed with API key test (works in both Electron and development)
       const res = await apiCall<{
         success: boolean;
         message?: string;
         error?: string;
         model?: string;
+        source?: string;
         usage?: {
           prompt_tokens: number;
           completion_tokens: number;

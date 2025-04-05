@@ -10,7 +10,7 @@ export default function ApiKeyNotice() {
         async function checkKeys() {
             try {
                 // Check if we're in Electron
-                if (window.electron) {
+                if (window.electron && window.electron.apiKeys) {
                     setIsElectron(true);
                     // Check if API key is set
                     const hasKey = await window.electron.apiKeys.has();
@@ -36,7 +36,7 @@ export default function ApiKeyNotice() {
         return null;
     }
 
-    // If API key is missing, show a notice
+    // If API key is missing in Electron, show a notice
     return (
         <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
             <h3 className="text-lg font-medium text-yellow-800 mb-2">

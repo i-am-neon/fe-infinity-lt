@@ -1,3 +1,5 @@
+import { isElectronEnvironment } from "@/lib/env-detector.ts";
+
 // API key manager for handling keys from both environment variables and client requests
 
 /**
@@ -26,12 +28,15 @@ export function setApiKey(key: string): void {
  * @returns The API key or null if not set
  */
 export function getApiKey(): string | null {
-    // If we have a client-provided key, use it
-    if (currentOpenAIKey) {
+    const isElectron = isElectronEnvironment();
+
+    // In Electron environment, prioritize user-provided key, then fall back to env
+    // In dev environment, always use env key
+    if (isElectron && currentOpenAIKey) {
         return currentOpenAIKey;
     }
 
-    // Otherwise, fall back to environment variable
+    // Get key from environment
     const envKey = Deno.env.get('OPENAI_API_KEY');
 
     // Don't return empty strings as keys
