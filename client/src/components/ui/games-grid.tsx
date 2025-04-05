@@ -1,9 +1,9 @@
 import {
-  Card,
   CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { GlowCard } from "@/components/ui/glow-card";
 import apiCall from "@/lib/api-call";
 import { Game } from "@/types/game";
 import { useEffect, useState } from "react";
@@ -65,12 +65,12 @@ export default function GamesGrid() {
           to={`/games/${game.nid}`}
           className="relative block"
         >
-          <Card className="h-full hover:bg-accent/50 transition-colors duration-200">
+          <GlowCard className="hover:bg-accent/50 transition-colors duration-200">
             <CardHeader>
               <CardTitle>{game.title}</CardTitle>
               <CardDescription>{game.description}</CardDescription>
             </CardHeader>
-          </Card>
+          </GlowCard>
         </Link>
       ))}
     </div>
