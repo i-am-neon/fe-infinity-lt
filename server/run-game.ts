@@ -35,7 +35,7 @@ export default async function runGame(
   if (isElectronEnvironment()) {
     console.log(`Running game in Electron environment: ${normalizedProjectPath}`);
     const result = await sendToElectron(normalizedProjectPath);
-    
+
     if (!result.success) {
       throw new Error(`Failed to run game: ${result.error || 'Unknown error'}`);
     }
@@ -61,7 +61,7 @@ export default async function runGame(
       // Using local Python directly when in development
       console.log("Using local Python for development");
       pythonCommand = "python";
-      pythonArgs = ["run_engine.py", normalizedProjectPath];
+      pythonArgs = ["run_engine_for_project.py", normalizedProjectPath];
     }
 
     console.log(
