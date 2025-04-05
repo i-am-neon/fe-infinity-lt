@@ -23,6 +23,8 @@ import {
   NonClosableDialogTitle,
 } from "../components/ui/non-closable-dialog";
 import { Game } from "../types/game";
+import { ChapterGeneratorLoader } from "@/components/ui/chapter-generator-loader";
+import useGenerationProgress from "@/lib/use-generation-progress";
 
 export default function GameDetailPage() {
   const { nid } = useParams<{ nid: string }>();
@@ -51,6 +53,39 @@ export default function GameDetailPage() {
     useState(false);
   const [generationError, setGenerationError] = useState<string | null>(null);
   const [oldChapterCount, setOldChapterCount] = useState<number | null>(null);
+
+  // Debug state for loader testing
+  const [testLoaderOpen, setTestLoaderOpen] = useState(false);
+  const [testLoaderStep, setTestLoaderStep] = useState(0);
+
+  const generationProgress = useGenerationProgress(
+    nid,
+    loadingAction === "generate"
+  );
+
+  // Debug function to test the loader
+  const handleTestLoader = useCallback(() => {
+    setTestLoaderOpen(true);
+    setTestLoaderStep(0);
+
+    // Simulate progress through the loader steps
+    const interval = setInterval(() => {
+      setTestLoaderStep(prev => {
+        // Max steps is 13 (0-indexed array)
+        if (prev >= 12) {
+          clearInterval(interval);
+          return prev;
+        }
+        return prev + 1;
+      });
+    }, 2000);
+
+    // Auto-close after completion
+    setTimeout(() => {
+      clearInterval(interval);
+      setTestLoaderOpen(false);
+    }, 30000);
+  }, []);
 
   // Poll for newly created game if "new" query param is present
   useEffect(() => {
@@ -247,6 +282,36 @@ export default function GameDetailPage() {
 
   return (
     <>
+      {/* Test Loader Dialog */}
+      <NonClosableDialog
+        open={testLoaderOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            setTestLoaderOpen(false);
+          }
+        }}
+      >
+        <NonClosableDialogContent allowClosing={true}>
+          <NonClosableDialogHeader>
+            <NonClosableDialogTitle>
+              Testing Chapter Generation Loader
+            </NonClosableDialogTitle>
+          </NonClosableDialogHeader>
+          <div className="space-y-6">
+            <ChapterGeneratorLoader
+              progress={{
+                isGenerating: testLoaderOpen,
+                currentStep: testLoaderStep,
+                message: `Test step ${testLoaderStep} message`,
+              }}
+            />
+            <p className="text-center text-sm text-muted-foreground mt-4">
+              This is a debug view of the chapter generation loader.
+            </p>
+          </div>
+        </NonClosableDialogContent>
+      </NonClosableDialog>
+
       {newGameModalOpen && (
         <NonClosableDialog
           open={newGameModalOpen}
@@ -369,9 +434,15 @@ export default function GameDetailPage() {
               </NonClosableDialogFooter>
             </div>
           ) : (
-            <div className="flex items-center gap-2">
-              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-              <p>
+            <div className="space-y-6">
+              <ChapterGeneratorLoader
+                progress={{
+                  isGenerating: loadingAction === "generate",
+                  currentStep: generationProgress.progress.currentStep,
+                  message: generationProgress.progress.message,
+                }}
+              />
+              <p className="text-center text-sm text-muted-foreground mt-4">
                 The next chapter is being generated based on your gameplay
                 choices. This will take about five minutes, and the game will
                 launch automatically when ready.
@@ -457,6 +528,17 @@ export default function GameDetailPage() {
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
+
+              {/* Debug Button */}
+              {process.env.NODE_ENV === "development" && (
+                <Button
+                  variant="outline"
+                  onClick={handleTestLoader}
+                  className="ml-auto"
+                >
+                  Test Loader
+                </Button>
+              )}
             </div>
           </>
         )}

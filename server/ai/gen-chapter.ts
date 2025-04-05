@@ -38,6 +38,15 @@ import { Tilemap } from "@/types/maps/tilemap.ts";
  * to writing it out (with writeChapter) and do any additional steps (like stub next chapter).
  */
 
+// Event type for progress tracking
+export type ChapterGenerationProgressEvent = {
+  step: number;
+  message: string;
+};
+
+// Progress callback type
+export type ProgressCallback = (progress: ChapterGenerationProgressEvent) => void;
+
 export default async function genChapter({
   worldSummary,
   initialGameIdea,
@@ -50,6 +59,7 @@ export default async function genChapter({
   newlyDeadThisChapter = [],
   choiceQuestion,
   playerChoice,
+  onProgress,
 }: {
   worldSummary: WorldSummary;
   initialGameIdea: InitialGameIdea;
@@ -62,6 +72,7 @@ export default async function genChapter({
   newlyDeadThisChapter?: DeadCharacterRecord[];
   choiceQuestion?: string;
   playerChoice?: string;
+  onProgress?: ProgressCallback;
 }): Promise<{
   chapter: Chapter;
   usedPortraits: string[];
@@ -69,6 +80,16 @@ export default async function genChapter({
 }> {
   const logger = getCurrentLogger();
 
+  // Helper function to report progress
+  const reportProgress = (step: number, message: string) => {
+    if (onProgress) {
+      onProgress({ step, message });
+    }
+    logger.info(`Chapter generation progress: ${message}`, { step });
+  };
+
+  // Step 1: Generate chapter idea
+  reportProgress(0, "Generating chapter idea and storyline...");
   const chapterIdea = await genChapterIdea({
     worldSummary,
     initialGameIdea,
@@ -82,6 +103,7 @@ export default async function genChapter({
   });
 
   // Build array of new characters from initialGameIdea (if prologue) plus boss + new units
+  reportProgress(1, "Creating new characters and assigning traits...");
   const newCharacterIdeas: CharacterIdea[] = [
     ...(initialGameIdea && chapterNumber === 0
       ? initialGameIdea.characterIdeas
@@ -95,16 +117,9 @@ export default async function genChapter({
   const usedSoFar = usedPortraitsSoFar ?? [];
   logger.debug("Used portraits so far", { usedSoFar });
 
-  // Create the new unit datas
-  const [
-    portraitMap,
-    newCharacterUnitDatas,
-    [playerPhaseMusic, enemyPhaseMusic],
-    introAIEvent,
-    outroAIEvent,
-    introMusic,
-    outroMusic,
-  ] = await Promise.all([
+  // Step 2: Create the new unit datas and select assets
+  reportProgress(2, "Selecting portraits for characters...");
+  const [portraitMap, newCharacterUnitDatas] = await Promise.all([
     choosePortraits({
       characterIdeas: newCharacterIdeas,
       usedPortraits: usedSoFar,
@@ -113,34 +128,43 @@ export default async function genChapter({
       characterIdeas: newCharacterIdeas,
       chapterNumber,
     }),
-    Promise.all([
-      chooseMusic(`exciting, intense, heroic ${chapterIdea.battle}`),
-      chooseMusic(`ominous, menacing, villainous ${chapterIdea.battle}`),
-    ]),
-    genIntroEvent({
-      worldSummary,
-      chapterIdea,
-      tone,
-      initialGameIdea: chapterNumber === 0 ? initialGameIdea : undefined,
-      existingChapters,
-      existingCharacterIdeas: existingCharacters.map((c) => c.characterIdea),
-      allDeadCharacters,
-      newlyDeadThisChapter,
-    }),
-    genOutroEvent({
-      worldSummary,
-      initialGameIdea,
-      chapterIdea,
-      tone,
-    }),
-    chooseMusic(chapterIdea.intro),
-    chooseMusic(`Reflective conclusion for chapter: ${chapterIdea.outro}`),
   ]);
 
-  // Choose backgrounds for intro/outro
-  const [introBackgroundChoice, outroBackgroundChoice] = await Promise.all([
+  // Step 3: Choose music
+  reportProgress(3, "Composing battle music...");
+  const [playerPhaseMusic, enemyPhaseMusic] = await Promise.all([
+    chooseMusic(`exciting, intense, heroic ${chapterIdea.battle}`),
+    chooseMusic(`ominous, menacing, villainous ${chapterIdea.battle}`),
+  ]);
+
+  // Step 4: Generate events
+  reportProgress(4, "Writing dialogue for intro event...");
+  const introAIEvent = await genIntroEvent({
+    worldSummary,
+    chapterIdea,
+    tone,
+    initialGameIdea: chapterNumber === 0 ? initialGameIdea : undefined,
+    existingChapters,
+    existingCharacterIdeas: existingCharacters.map((c) => c.characterIdea),
+    allDeadCharacters,
+    newlyDeadThisChapter,
+  });
+
+  reportProgress(5, "Writing dialogue for outro event...");
+  const outroAIEvent = await genOutroEvent({
+    worldSummary,
+    initialGameIdea,
+    chapterIdea,
+    tone,
+  });
+
+  // Step 5: Choose backgrounds and music for events
+  reportProgress(6, "Selecting background scenes...");
+  const [introBackgroundChoice, outroBackgroundChoice, introMusic, outroMusic] = await Promise.all([
     chooseBackground(introAIEvent),
     chooseBackground(outroAIEvent),
+    chooseMusic(chapterIdea.intro),
+    chooseMusic(`Reflective conclusion for chapter: ${chapterIdea.outro}`),
   ]);
 
   const introEvent = convertAIEventToEvent({
@@ -212,7 +236,8 @@ export default async function genChapter({
     allLivingPlayerCharacterIdeas,
   });
 
-  // Finally pick map
+  // Step 6: Choose and set up map
+  reportProgress(7, "Creating the map layout...");
   const usedMapNames = existingChapters.map((c) => c.tilemap.nid);
   const chosenMapName = await chooseMap(chapterIdea, usedMapNames);
 
@@ -233,7 +258,8 @@ export default async function genChapter({
     );
   }
 
-  // Place units
+  // Step 7: Place units on map
+  reportProgress(8, "Placing units on the battlefield...");
   const { units: levelUnits, formationRegions } = await getLevelUnits({
     chosenMapName,
     chapterIdea,
@@ -244,6 +270,8 @@ export default async function genChapter({
     )!,
   });
 
+  // Step 8: Set up map interactions
+  reportProgress(9, "Setting up special map interactions...");
   // Collect region and event info from environment
   const chestEventsAndRegions = getChestEventsAndRegions({
     mapName: chosenMapName,
@@ -335,6 +363,8 @@ export default async function genChapter({
     introEvent._source.push("give_money;1000;no_banner");
   }
 
+  // Step 9: Handle mid-battle recruitment
+  reportProgress(10, "Writing recruitment conversations...");
   // Mid-battle recruitment logic
   const allPreviousNonBattleChars = new Set<string>();
   for (const ch of existingChapters) {
@@ -371,21 +401,8 @@ export default async function genChapter({
     recruitmentEvents = recResults.recruitmentEvents;
   }
 
-  // Build level events
-  const newChapter: Chapter = {
-    title: chapterIdea.title,
-    number: chapterNumber,
-    level,
-    events: [introEvent, outroEvent, defeatBossEvent, ...interactableEvents],
-    newCharacters,
-    tilemap,
-    enemyFaction: chapterIdea.enemyFaction,
-    idea: chapterIdea,
-  };
-
-  // add mid-battle recruitment events
-  newChapter.events.push(...recruitmentEvents);
-
+  // Step 10: Generate boss dialogue
+  reportProgress(11, "Creating boss battle dialogues...");
   // Generate boss fight events for all living player units
   const bossFightEvents = await genBossFightEvents({
     boss: chapterIdea.boss,
@@ -400,6 +417,23 @@ export default async function genChapter({
         unit.firstSeenAs === "allied NPC"
     ),
   });
+
+  // Step 11: Final chapter assembly
+  reportProgress(12, "Finalizing chapter assembly...");
+  // Build level events
+  const newChapter: Chapter = {
+    title: chapterIdea.title,
+    number: chapterNumber,
+    level,
+    events: [introEvent, outroEvent, defeatBossEvent, ...interactableEvents],
+    newCharacters,
+    tilemap,
+    enemyFaction: chapterIdea.enemyFaction,
+    idea: chapterIdea,
+  };
+
+  // add mid-battle recruitment events
+  newChapter.events.push(...recruitmentEvents);
 
   // Add boss fight events to chapter
   newChapter.events.push(...bossFightEvents);
@@ -464,6 +498,9 @@ export default async function genChapter({
     introMusic,
   ];
 
+  // Chapter generation complete!
+  reportProgress(13, "Chapter generation complete!");
+
   return {
     chapter: newChapter,
     usedPortraits: updatedUsedPortraits,
@@ -494,6 +531,9 @@ if (import.meta.main) {
       initialGameIdea: mockInitialGameIdea,
       tone: "Neutral",
       chapterNumber: 0,
+      onProgress: (progress) => {
+        console.log(`Progress: Step ${progress.step} - ${progress.message}`);
+      },
     });
     console.log(JSON.stringify(result, null, 2));
   })();

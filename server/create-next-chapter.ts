@@ -1,4 +1,4 @@
-import genChapter from "./ai/gen-chapter.ts";
+import genChapter, { ChapterGenerationProgressEvent } from "./ai/gen-chapter.ts";
 
 import { deleteSuspendSave } from "@/game-engine-io/delete-suspend-save.ts";
 import getChapterResults from "@/game-engine-io/get-chapter-results.ts";
@@ -10,6 +10,14 @@ import { getCurrentLogger, setCurrentLogger } from "@/lib/current-logger.ts";
 import { determineRoleForDeadUnit } from "@/lib/determine-role-for-dead-unit.ts";
 import { DeadCharacterRecord } from "@/types/dead-character-record.ts";
 import { getGameByNid } from "./db/games.ts";
+
+// Global store for chapter generation progress
+const chapterGenerationProgress = new Map<string, ChapterGenerationProgressEvent>();
+
+// Get the current progress for a specific game
+export function getChapterGenerationProgress(gameNid: string): ChapterGenerationProgressEvent | undefined {
+  return chapterGenerationProgress.get(gameNid);
+}
 
 export default async function createNextChapter({
   projectNameEndingInDotLtProj,
@@ -31,6 +39,9 @@ export default async function createNextChapter({
     chapterNumber: nextChapterNumber,
   });
   const logger = getCurrentLogger();
+
+  // Set initial progress
+  chapterGenerationProgress.set(gameNid, { step: 0, message: "Starting chapter generation..." });
 
   const { lastChoice, deadCharacters } = await getChapterResults({
     // Take out the leading underscore
@@ -93,6 +104,11 @@ export default async function createNextChapter({
     newlyDeadThisChapter,
     choiceQuestion: lastChapterChoiceOptions.displayText,
     playerChoice: lastChoice,
+    onProgress: (progress) => {
+      // Update the global progress map
+      chapterGenerationProgress.set(gameNid, progress);
+      logger.info(`Chapter generation progress for ${gameNid}:`, progress);
+    },
   });
 
   logger.debug("created chapter", { chapter });
@@ -113,6 +129,12 @@ export default async function createNextChapter({
     projectNameEndingInDotLtProj,
     chapterNumber: nextChapterNumber + 1,
     previousTilemapNid: chapter.tilemap.nid,
+  });
+
+  // Set final progress state
+  chapterGenerationProgress.set(gameNid, {
+    step: 14,
+    message: "Chapter generation complete - ready to play!"
   });
 }
 
