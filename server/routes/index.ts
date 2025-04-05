@@ -148,6 +148,9 @@ export async function handleRequest(req: Request): Promise<Response> {
   } else if (req.method === "POST" && url.pathname === "/run-editor") {
     const { handleRunEditor } = await import("./run-editor.ts");
     response = await handleRunEditor(req);
+  } else if (req.method === "GET" && url.pathname === "/generation-progress") {
+    const { handleGetChapterGenerationProgress } = await import("./generation-progress.ts");
+    response = await handleGetChapterGenerationProgress(req);
   } else {
     // Default route
     response = new Response("Not Found", { status: 404 });

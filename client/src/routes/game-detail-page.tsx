@@ -1,5 +1,5 @@
 import apiCall from "@/lib/api-call";
-import { AlertCircle, ChevronLeft, Loader2 } from "lucide-react";
+import { AlertCircle, ChevronLeft, Loader2, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
@@ -14,15 +14,10 @@ import {
   AlertDialogTrigger,
 } from "../components/ui/alert-dialog";
 import { Button } from "../components/ui/button";
-import {
-  NonClosableDialog,
-  NonClosableDialogContent,
-  NonClosableDialogDescription,
-  NonClosableDialogFooter,
-  NonClosableDialogHeader,
-  NonClosableDialogTitle,
-} from "../components/ui/non-closable-dialog";
 import { Game } from "../types/game";
+import { ChapterGeneratorLoader } from "@/components/ui/chapter-generator-loader";
+import useGenerationProgress from "@/lib/use-generation-progress";
+import { AnimatePresence, motion } from "framer-motion";
 
 export default function GameDetailPage() {
   const { nid } = useParams<{ nid: string }>();
@@ -51,6 +46,11 @@ export default function GameDetailPage() {
     useState(false);
   const [generationError, setGenerationError] = useState<string | null>(null);
   const [oldChapterCount, setOldChapterCount] = useState<number | null>(null);
+
+  const generationProgress = useGenerationProgress(
+    nid,
+    loadingAction === "generate"
+  );
 
   // Poll for newly created game if "new" query param is present
   useEffect(() => {
@@ -247,62 +247,76 @@ export default function GameDetailPage() {
 
   return (
     <>
-      {newGameModalOpen && (
-        <NonClosableDialog
-          open={newGameModalOpen}
-          onOpenChange={(open) => {
-            // Only allow closing if there's an error
-            if (creationError || !open) {
-              setNewGameModalOpen(open);
-            }
-          }}
-        >
-          <NonClosableDialogContent allowClosing={!!creationError}>
-            <NonClosableDialogHeader>
-              <NonClosableDialogTitle>
-                {creationError
-                  ? "Game Creation Failed"
-                  : "Game is being created"}
-              </NonClosableDialogTitle>
+      {/* New Game Creation - Direct DOM implementation */}
+      <AnimatePresence>
+        {newGameModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-background/80 backdrop-blur-sm"
+          >
+            <div className="relative w-full max-w-lg">
               {creationError && (
-                <NonClosableDialogDescription className="text-destructive">
-                  An error occurred while creating your game
-                </NonClosableDialogDescription>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-4 top-4 z-[110]"
+                  onClick={() => {
+                    setCreationError(null);
+                    setNewGameModalOpen(false);
+                  }}
+                >
+                  <X className="h-5 w-5" />
+                </Button>
               )}
-            </NonClosableDialogHeader>
 
-            {creationError ? (
-              <div className="flex flex-col gap-4">
-                <div className="flex items-start gap-2 p-3 bg-destructive/10 rounded-md text-destructive border border-destructive">
-                  <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
-                  <p>{creationError}</p>
+              {creationError ? (
+                <div className="flex flex-col gap-4">
+                  <div className="text-center mb-8">
+                    <h3 className="text-lg font-semibold">
+                      Game Creation Failed
+                    </h3>
+                    <p className="text-sm text-destructive">
+                      An error occurred while creating your game
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-2 p-3 bg-destructive/10 rounded-md text-destructive border border-destructive mx-6">
+                    <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
+                    <p>{creationError}</p>
+                  </div>
+                  <div className="flex justify-end mt-6 mx-6 gap-2">
+                    <Button
+                      onClick={() => navigate("/")}
+                      variant="secondary"
+                    >
+                      Return to Home
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setCreationError(null);
+                        setNewGameModalOpen(false);
+                      }}
+                    >
+                      Close
+                    </Button>
+                  </div>
                 </div>
-                <NonClosableDialogFooter>
-                  <Button onClick={() => navigate("/")} variant="secondary">
-                    Return to Home
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      setCreationError(null);
-                      setNewGameModalOpen(false);
-                    }}
-                  >
-                    Close
-                  </Button>
-                </NonClosableDialogFooter>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                <p>
-                  Your game is being created and will open automatically when
-                  finished. This will take about five minutes.
-                </p>
-              </div>
-            )}
-          </NonClosableDialogContent>
-        </NonClosableDialog>
-      )}
+              ) : (
+                <ChapterGeneratorLoader
+                  progress={{
+                    isGenerating: true,
+                    currentStep: 0, // Start at step 0 for new game creation
+                    message: "Creating your new game..."
+                  }}
+                  title="Creating New Game"
+                  description="The AI is generating your new game world, characters, and first chapter. This typically takes around five minutes, and will open automatically when complete."
+                />
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Next Chapter Confirmation Dialog */}
       <AlertDialog
@@ -327,59 +341,68 @@ export default function GameDetailPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Next Chapter Generation Loading/Error Dialog */}
-      <NonClosableDialog
-        open={generatingChapterModalOpen}
-        onOpenChange={(open) => {
-          // Only allow closing if there's an error
-          if (generationError || !open) {
-            setGeneratingChapterModalOpen(open);
-          }
-        }}
-      >
-        <NonClosableDialogContent allowClosing={!!generationError}>
-          <NonClosableDialogHeader>
-            <NonClosableDialogTitle>
-              {generationError
-                ? "Chapter Generation Failed"
-                : "Generating Next Chapter"}
-            </NonClosableDialogTitle>
-            {generationError && (
-              <NonClosableDialogDescription className="text-destructive">
-                An error occurred while generating the next chapter
-              </NonClosableDialogDescription>
-            )}
-          </NonClosableDialogHeader>
-
-          {generationError ? (
-            <div className="flex flex-col gap-4">
-              <div className="flex items-start gap-2 p-3 bg-destructive/10 rounded-md text-destructive border border-destructive">
-                <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
-                <p>{generationError}</p>
-              </div>
-              <NonClosableDialogFooter>
+      {/* Next Chapter Generation Loading/Error - Direct DOM implementation */}
+      <AnimatePresence>
+        {generatingChapterModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-background/80 backdrop-blur-sm"
+          >
+            <div className="relative w-full max-w-lg">
+              {generationError && (
                 <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-4 top-4 z-[110]"
                   onClick={() => {
                     setGenerationError(null);
                     setGeneratingChapterModalOpen(false);
                   }}
                 >
-                  Close
+                  <X className="h-5 w-5" />
                 </Button>
-              </NonClosableDialogFooter>
+              )}
+
+              {generationError ? (
+                <div className="flex flex-col gap-4">
+                  <div className="text-center mb-8">
+                    <h3 className="text-lg font-semibold">
+                      Chapter Generation Failed
+                    </h3>
+                    <p className="text-sm text-destructive">
+                      An error occurred while generating the next chapter
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-2 p-3 bg-destructive/10 rounded-md text-destructive border border-destructive mx-6">
+                    <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
+                    <p>{generationError}</p>
+                  </div>
+                  <div className="flex justify-end mt-6 mx-6">
+                    <Button
+                      onClick={() => {
+                        setGenerationError(null);
+                        setGeneratingChapterModalOpen(false);
+                      }}
+                    >
+                      Close
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <ChapterGeneratorLoader
+                  progress={{
+                    isGenerating: loadingAction === "generate",
+                    currentStep: generationProgress.progress.currentStep,
+                    message: generationProgress.progress.message,
+                  }}
+                />
+              )}
             </div>
-          ) : (
-            <div className="flex items-center gap-2">
-              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-              <p>
-                The next chapter is being generated based on your gameplay
-                choices. This will take about five minutes, and the game will
-                launch automatically when ready.
-              </p>
-            </div>
-          )}
-        </NonClosableDialogContent>
-      </NonClosableDialog>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="p-6 space-y-4">
         <Button
