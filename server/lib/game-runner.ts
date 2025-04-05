@@ -15,7 +15,7 @@ class GameRunner {
   ): Promise<{ success: boolean; error?: string }> {
     try {
       console.log(`Attempting to run game: ${projectPath}`);
-      
+
       // In Electron, use HTTP to communicate with game launcher service
       const response = await fetch("http://localhost:8989/run-game", {
         method: "POST",
@@ -27,7 +27,7 @@ class GameRunner {
 
       // Parse the response
       const result = await response.json();
-      
+
       return {
         success: result.success === true,
         error: result.error,
@@ -44,8 +44,9 @@ class GameRunner {
   /**
    * Run a Python script using the appropriate method based on environment
    * @param scriptPath The path to the Python script to run
+   * @param args Optional arguments to pass to the Python script
    */
-  async runPythonScript(scriptPath: string): Promise<void> {
+  async runPythonScript(scriptPath: string, args: string[] = []): Promise<void> {
     // In Electron environment, use HTTP to communicate with main process
     if (isElectronEnvironment()) {
       const response = await fetch("http://localhost:8989/run-python", {
@@ -53,17 +54,17 @@ class GameRunner {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ scriptPath }),
+        body: JSON.stringify({ scriptPath, args }),
       });
-      
+
       if (!response.ok) {
         const error = await response.text();
         throw new Error(`Failed to run Python script: ${error}`);
       }
-      
+
       return;
     }
-    
+
     // Direct execution for non-Electron environments
     // Save the current directory
     const originalDir = Deno.cwd();
@@ -73,7 +74,7 @@ class GameRunner {
         // Windows
         const pythonCommand = "python";
         const runCommand = new Deno.Command(pythonCommand, {
-          args: [scriptPath],
+          args: [scriptPath, ...args],
           stdout: "inherit",
           stderr: "inherit",
         });
@@ -83,7 +84,7 @@ class GameRunner {
         console.log("Using local Python for development");
         const pythonCommand = "python";
         const runCommand = new Deno.Command(pythonCommand, {
-          args: [scriptPath],
+          args: [scriptPath, ...args],
           stdout: "inherit",
           stderr: "inherit",
           cwd: dirname(scriptPath), // Run in the same directory as the script

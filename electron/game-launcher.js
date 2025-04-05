@@ -52,7 +52,7 @@ function startGameLauncherServer() {
             if (req.url === '/run-game') {
               // Run Game endpoint
               const projectPath = parsedBody.projectPath;
-              
+
               if (!projectPath) {
                 logger.log('error', 'Missing projectPath parameter');
                 res.statusCode = 400;
@@ -149,7 +149,8 @@ function startGameLauncherServer() {
             } else if (req.url === '/run-python') {
               // Run Python script endpoint
               const scriptPath = parsedBody.scriptPath;
-              
+              const args = parsedBody.args || [];
+
               if (!scriptPath) {
                 logger.log('error', 'Missing scriptPath parameter');
                 res.statusCode = 400;
@@ -159,14 +160,14 @@ function startGameLauncherServer() {
                 }));
                 return;
               }
-              
-              logger.log('info', `Received request to run Python script: ${scriptPath}`);
-              
+
+              logger.log('info', `Received request to run Python script: ${scriptPath} with args:`, args);
+
               // In Electron, use bundled Python, properly handling asar vs asar.unpacked paths
               // Create possible Python paths, accounting for asar packaging
               const appPath = app.getAppPath();
               let basePaths = [];
-              
+
               if (appPath.includes('app.asar')) {
                 // In packaged app, binaries must be in .unpacked directory
                 const unpackedPath = appPath.replace('app.asar', 'app.asar.unpacked');
@@ -185,12 +186,12 @@ function startGameLauncherServer() {
                   path.join(appPath, '..')
                 ];
               }
-              
+
               logger.log('info', `Base paths for Python search: ${JSON.stringify(basePaths)}`);
-              
+
               // Build the full list of possible Python paths
               const possiblePythonPaths = [];
-              
+
               // Add all combinations of paths
               for (const basePath of basePaths) {
                 possiblePythonPaths.push(
@@ -198,9 +199,9 @@ function startGameLauncherServer() {
                   path.join(basePath, 'bin', 'python', 'python.exe')
                 );
               }
-              
+
               logger.log('info', `Searching for Python in paths: ${JSON.stringify(possiblePythonPaths)}`);
-              
+
               // Try each path
               let pythonPath = null;
               for (const potentialPath of possiblePythonPaths) {
@@ -222,31 +223,32 @@ function startGameLauncherServer() {
                   logger.log('warn', `Error checking path ${potentialPath}: ${checkErr.message}`);
                 }
               }
-              
+
               if (!pythonPath) {
                 logger.log('warning', `Could not find bundled Python, falling back to system Python`);
                 pythonPath = 'python';
               }
-              
+
               try {
                 // Use child_process.spawn directly with bundled Python
                 const { spawn } = require('child_process');
                 const cwd = path.dirname(scriptPath);
-                
+
                 logger.log('info', `Attempting to run Python script with: ${pythonPath}`);
                 logger.log('info', `Working directory: ${cwd}`);
                 logger.log('info', `Script: ${scriptPath}`);
-                
-                const child = spawn(pythonPath, [scriptPath], {
+                logger.log('info', `Arguments: ${JSON.stringify(args)}`);
+
+                const child = spawn(pythonPath, [scriptPath, ...args], {
                   cwd: cwd,
                   detached: true,
                   stdio: 'ignore',
                   windowsHide: false
                 });
-                
+
                 // Unref child to let it run independently
                 child.unref();
-                
+
                 logger.log('info', `Python script launched successfully`);
                 res.statusCode = 200;
                 res.end(JSON.stringify({ success: true }));
@@ -256,12 +258,12 @@ function startGameLauncherServer() {
                   error: directError.message,
                   stack: directError.stack
                 });
-                
+
                 // Fall back to the normal method
                 try {
-                  await runPythonScript(scriptPath);
+                  await runPythonScript(scriptPath, args);
                   logger.log('info', `Python script launched successfully via runPythonScript`);
-                  
+
                   res.statusCode = 200;
                   res.end(JSON.stringify({ success: true }));
                   return;
@@ -270,7 +272,7 @@ function startGameLauncherServer() {
                     error: fallbackError.message,
                     stack: fallbackError.stack
                   });
-                  
+
                   res.statusCode = 500;
                   res.end(JSON.stringify({
                     success: false,

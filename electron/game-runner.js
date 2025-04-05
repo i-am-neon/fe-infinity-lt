@@ -90,14 +90,14 @@ function getBundledPythonPath() {
   // Create possible Python paths, accounting for asar packaging
   const appPath = app.getAppPath();
   let basePaths = [];
-  
+
   if (appPath.includes('app.asar')) {
     // In packaged app, binaries must be in .unpacked directory
     const unpackedPath = appPath.replace('app.asar', 'app.asar.unpacked');
-    
+
     // Always prioritize unpacked paths, as binaries like Python cannot be executed from inside asar
     logger.log('info', `App is packaged. Using app.asar.unpacked paths for binaries: ${unpackedPath}`);
-    
+
     basePaths = [
       // First try unpacked path (which should be correct in production)
       unpackedPath,
@@ -115,37 +115,37 @@ function getBundledPythonPath() {
       path.join(appPath, '..')
     ];
   }
-  
+
   logger.log('info', `Base paths for Python search: ${JSON.stringify(basePaths)}`);
-  
+
   if (process.platform === 'win32') {
     // Windows - build a list of all possible Python paths
     const possiblePaths = [];
-    
+
     // Add special paths for packaged Windows apps
     if (app.isPackaged) {
       // For packaged apps on Windows, we need more sophisticated path handling
       const resourcesDir = process.resourcesPath;
-      
+
       // Try the direct path to the bin directory in resources first
       possiblePaths.push(
         path.join(resourcesDir, 'bin', 'python', 'python_embed', 'python.exe'),
         path.join(resourcesDir, 'bin', 'python', 'python.exe')
       );
-      
+
       // Then try the unpacked version
       const appUnpackedDir = app.getAppPath().replace('app.asar', 'app.asar.unpacked');
       possiblePaths.push(
         path.join(appUnpackedDir, 'bin', 'python', 'python_embed', 'python.exe'),
         path.join(appUnpackedDir, 'bin', 'python', 'python.exe')
       );
-      
+
       // Also try some alternative locations (just in case)
       possiblePaths.push(
         path.join(resourcesDir, 'app.asar.unpacked', 'bin', 'python', 'python_embed', 'python.exe'),
         path.join(resourcesDir, 'app.asar.unpacked', 'bin', 'python', 'python.exe')
       );
-      
+
       logger.log('info', `Windows packaged app - checking special Python locations: ${JSON.stringify(possiblePaths.slice(0, 4))}`);
     } else {
       // For development, use the standard paths
@@ -156,25 +156,25 @@ function getBundledPythonPath() {
         );
       }
     }
-    
+
     // Add system Python as last resort
     possiblePaths.push("python.exe");
-    
+
     logger.log('info', `Searching for Python in paths: ${JSON.stringify(possiblePaths)}`);
-    
+
     // Try each path
     for (const pythonPath of possiblePaths) {
       try {
         // For system Python, we can't use fs.existsSync
         if (pythonPath === "python.exe") {
           logger.log('info', `Attempting to use system Python: ${pythonPath}`);
-          
+
           // In packaged app, do a final check in a standard Windows Python install location
           if (app.isPackaged) {
             try {
               const programFiles = process.env['ProgramFiles'] || 'C:\\Program Files';
               const programFilesX86 = process.env['ProgramFiles(x86)'] || 'C:\\Program Files (x86)';
-              
+
               const possibleWindowsPaths = [
                 path.join(programFiles, 'Python311', 'python.exe'),
                 path.join(programFilesX86, 'Python311', 'python.exe'),
@@ -183,7 +183,7 @@ function getBundledPythonPath() {
                 path.join(programFiles, 'Python39', 'python.exe'),
                 path.join(programFilesX86, 'Python39', 'python.exe')
               ];
-              
+
               for (const pyPath of possibleWindowsPaths) {
                 if (fs.existsSync(pyPath)) {
                   logger.log('info', `Found Python in standard Windows location: ${pyPath}`);
@@ -194,10 +194,10 @@ function getBundledPythonPath() {
               // Ignore errors in extra checks
             }
           }
-          
+
           return pythonPath;
         }
-        
+
         if (fs.existsSync(pythonPath)) {
           logger.log('info', `Found Python at ${pythonPath}`);
           // Verify it's executable (on Windows this is less important)
@@ -213,14 +213,14 @@ function getBundledPythonPath() {
         logger.log('warn', `Error checking Python path ${pythonPath}: ${error.message}`);
       }
     }
-    
+
     // If using packaged app, provide a more informative error
     if (app.isPackaged) {
       const errorMsg = `Python not found in bundled application or system. Please ensure Python is installed.`;
       logger.log('error', errorMsg);
       throw new Error(errorMsg);
     }
-    
+
     // If we reach here and none of the paths worked, log a detailed error but return system Python
     logger.log('warn', `Bundled Python not found at expected locations. Attempting to use system Python.`);
     return "python.exe";
@@ -229,7 +229,7 @@ function getBundledPythonPath() {
     // For macOS, we'll use bundled Python with Wine
     // Build a list of all possible Python paths
     const possiblePaths = [];
-    
+
     // Add all combinations of paths
     for (const basePath of basePaths) {
       possiblePaths.push(
@@ -238,12 +238,12 @@ function getBundledPythonPath() {
         path.join(basePath, 'bin', 'python', 'python')
       );
     }
-    
+
     // Add system Python as last resort
     possiblePaths.push("python");
-    
+
     logger.log('info', `Searching for Python in paths: ${JSON.stringify(possiblePaths)}`);
-    
+
     // Try each path
     for (const pythonPath of possiblePaths) {
       try {
@@ -252,7 +252,7 @@ function getBundledPythonPath() {
           logger.log('info', `Attempting to use system Python: ${pythonPath}`);
           return pythonPath;
         }
-        
+
         if (fs.existsSync(pythonPath)) {
           logger.log('info', `Found Python at ${pythonPath}`);
           // Verify it's executable for non-system paths
@@ -270,15 +270,15 @@ function getBundledPythonPath() {
         logger.log('warn', `Error checking Python path ${pythonPath}: ${error.message}`);
       }
     }
-    
+
     // If we reach here, log a warning but return system python
     logger.log('warn', `Bundled Python not found at expected locations. Attempting to use system Python.`);
     return "python";
-    
+
   } else {
     // Linux - build a list of all possible Python paths
     const possiblePaths = [];
-    
+
     // Add all combinations of paths
     for (const basePath of basePaths) {
       possiblePaths.push(
@@ -287,12 +287,12 @@ function getBundledPythonPath() {
         path.join(basePath, 'bin', 'python', 'python')
       );
     }
-    
+
     // Add system Python as last resort
     possiblePaths.push("python");
-    
+
     logger.log('info', `Searching for Python in paths: ${JSON.stringify(possiblePaths)}`);
-    
+
     // Try each path
     for (const pythonPath of possiblePaths) {
       try {
@@ -301,7 +301,7 @@ function getBundledPythonPath() {
           logger.log('info', `Attempting to use system Python: ${pythonPath}`);
           return pythonPath;
         }
-        
+
         if (fs.existsSync(pythonPath)) {
           logger.log('info', `Found Python at ${pythonPath}`);
           // Verify it's executable for non-system paths
@@ -319,7 +319,7 @@ function getBundledPythonPath() {
         logger.log('warn', `Error checking Python path ${pythonPath}: ${error.message}`);
       }
     }
-    
+
     // Fallback to system python
     logger.log('warn', `Bundled Python not found at expected locations. Falling back to system Python.`);
     return 'python';
@@ -510,7 +510,7 @@ async function runGame(projectNameEndingInDotLtProj) {
         // IMPORTANT: For packaged apps, this must use app.asar.unpacked
         let bundledPythonExe;
         const appPath = app.getAppPath();
-        
+
         if (appPath.includes('app.asar')) {
           // In packaged app, use the unpacked path for binary executables
           const unpackedPath = appPath.replace('app.asar', 'app.asar.unpacked');
@@ -651,7 +651,7 @@ if defined PYTHON_EXE (
           const wineBatchPath = tempBatchPath.startsWith('/')
             ? `Z:${tempBatchPath.replace(/\//g, '\\')}`
             : tempBatchPath.replace(/\//g, '\\');
-            
+
           // For packaged apps, ensure the Python path is using app.asar.unpacked
           // This is crucial because binaries can't be executed from inside asar archive
           if (app.isPackaged && pythonWineExe.includes('app.asar\\')) {
@@ -660,7 +660,7 @@ if defined PYTHON_EXE (
             logger.log('info', `Fixed Python path for packaged app: 
               Original: ${pythonWineExe} 
               Fixed: ${fixedPythonPath}`);
-            
+
             // Use the fixed path
             pythonWineExe = fixedPythonPath;
           }
@@ -714,24 +714,24 @@ ls -la "${tempBatchPath}"
 
           let stdoutBuffer = '';
           let installInProgress = false;
-          
+
           wineProcess.stdout.on('data', (data) => {
             const output = data.toString().trim();
             stdoutBuffer += output + '\n';
             logger.log('info', `Game stdout: ${output}`);
-            
+
             // Check if we're seeing the pygame not found error
             if (output.includes('ModuleNotFoundError') && output.includes('No module named \'pygame\'') && !installInProgress) {
               installInProgress = true;
               logger.log('warn', 'Detected missing pygame module, attempting to install it automatically...');
-              
+
               // Create a script to install pygame
               const pythonDir = path.join(app.getAppPath(), 'bin', 'python');
               const pythonEmbedDir = path.join(pythonDir, 'python_embed');
               const installScriptPath = path.join(require('os').tmpdir(), 'install_pygame.py');
               const ltMakerPath = getLtMakerPath();
               const requirementsPath = path.join(ltMakerPath, 'requirements_editor.txt');
-              
+
               // Write a script to install pygame
               const installScriptContent = `
 import os
@@ -778,26 +778,26 @@ except ImportError as e:
 print("Installation completed successfully. Please restart the game.")
 sys.exit(0)
 `;
-              
+
               fs.writeFileSync(installScriptPath, installScriptContent);
-              
+
               // Run the installation script with Wine
               try {
                 const { spawn, execSync } = require('child_process');
                 logger.log('info', 'Running pygame installation script...');
-                
+
                 // Kill the current Wine process first
                 if (wineProcess && !wineProcess.killed) {
                   wineProcess.kill();
                 }
-                
+
                 // Get the Wine path
                 const winePath = getWinePath();
                 if (!winePath) {
                   logger.log('error', 'Wine not found, cannot install pygame');
                   return;
                 }
-                
+
                 // Create a better shell script for running in Wine environment
                 const shellPath = path.join(require('os').tmpdir(), 'install_pygame.sh');
                 const shellContent = `#!/bin/bash
@@ -915,19 +915,19 @@ fi
 
                 fs.writeFileSync(shellPath, shellContent);
                 fs.chmodSync(shellPath, 0o755);
-                
+
                 // Execute the shell script
                 logger.log('info', 'Running install_pygame.sh shell script...');
-                
+
                 try {
                   // Show output to user so they can see progress
                   const output = execSync(`/bin/bash ${shellPath}`, {
                     stdio: 'inherit',  // Show output directly
                     timeout: 300000    // 5 minute timeout
                   });
-                  
+
                   logger.log('info', 'Python packages installed successfully. Please restart the game.');
-                  
+
                   // Display a dialog to the user
                   const { dialog } = require('electron');
                   dialog.showMessageBox({
@@ -937,29 +937,29 @@ fi
                     detail: 'Please restart the game to apply the changes.',
                     buttons: ['OK']
                   });
-                  
+
                 } catch (execError) {
                   logger.log('error', `Failed to install Python packages: ${execError.message}`);
-                  
+
                   // Try direct spawn as fallback
                   const installProcess = spawn('/bin/bash', [shellPath], {
                     stdio: 'pipe'
                   });
-                
+
                   installProcess.stdout.on('data', (data) => {
                     const output = data.toString().trim();
                     logger.log('info', `Install stdout: ${output}`);
                   });
-                  
+
                   installProcess.stderr.on('data', (data) => {
                     const output = data.toString().trim();
                     logger.log('error', `Install stderr: ${output}`);
                   });
-                  
+
                   installProcess.on('close', (code) => {
                     if (code === 0) {
                       logger.log('info', 'Python packages installed successfully. Please restart the game.');
-                      
+
                       // Display a dialog to the user
                       const { dialog } = require('electron');
                       dialog.showMessageBox({
@@ -971,7 +971,7 @@ fi
                       });
                     } else {
                       logger.log('error', `Python package installation failed with code ${code}`);
-                      
+
                       // Display error dialog to the user
                       const { dialog } = require('electron');
                       dialog.showMessageBox({
@@ -1045,7 +1045,7 @@ fi
         // Now run the game with proper PYTHONPATH setup to ensure modules can be found
         logger.log('info', 'Starting game with improved Python environment setup');
         logger.log('info', `Using Python executable: ${pythonPath}`);
-        
+
         // Create a Python script to run the game with better error handling
         let runScriptPath;
         if (app.isPackaged) {
@@ -1055,7 +1055,7 @@ fi
           // In dev mode, we can write to the project directory
           runScriptPath = path.join(app.getAppPath(), 'run_fe_game.py');
         }
-        
+
         // Create a script with more robust error handling and diagnostics
         const scriptContent = `
 import sys
@@ -1103,7 +1103,7 @@ except Exception as e:
         // Write the script to the run script path
         fs.writeFileSync(runScriptPath, scriptContent);
         logger.log('info', `Created run script at: ${runScriptPath}`);
-        
+
         // Use this script instead of the command line approach for better error handling
         const pythonProcess = spawn(
           pythonPath,
@@ -1172,7 +1172,7 @@ except Exception as e:
 async function preparePythonEnvironment() {
   return new Promise((resolve, reject) => {
     logger.log('info', 'Preparing Python environment by pre-installing dependencies...');
-    
+
     // Skip on non-Windows platforms - we'll detect and handle missing packages at runtime
     if (process.platform !== 'win32') {
       logger.log('info', 'Skipping dependency pre-installation on non-Windows platform');
@@ -1238,10 +1238,10 @@ async function preparePythonEnvironment() {
 const runGameWithWine = runGame;
 
 // Run a Python script with appropriate environment setup
-async function runPythonScript(scriptPath) {
+async function runPythonScript(scriptPath, args = []) {
   return new Promise((resolve, reject) => {
     try {
-      logger.log('info', `Running Python script: ${scriptPath}`);
+      logger.log('info', `Running Python script: ${scriptPath} with args:`, args);
 
       // Make sure we're using the correct path to lt-maker-fork
       const ltMakerPath = process.env.NODE_ENV === 'development'
@@ -1271,7 +1271,7 @@ async function runPythonScript(scriptPath) {
         // Get the bundled Python executable path - we want to use our bundled Python not system Python
         const bundledPythonPath = getBundledPythonPath();
         logger.log('info', `Using bundled Python with Wine: ${bundledPythonPath}`);
-        
+
         // Convert paths for Wine usage
         const toWinePath = (unixPath) => {
           if (unixPath.startsWith('/')) {
@@ -1279,15 +1279,25 @@ async function runPythonScript(scriptPath) {
           }
           return unixPath.replace(/\//g, '\\');
         };
-        
+
         // Create a temporary Python wrapper script to handle the execution
         const tempScriptPath = path.join(require('os').tmpdir(), `run_${scriptName.replace('.py', '')}_wrapper.py`);
-        
+
         // Convert script and ltMaker paths to Wine format
         const wineScriptPath = toWinePath(scriptPath);
         const wineLtMakerPath = toWinePath(ltMakerPath);
-        
-        // Create a Python wrapper script that will import and run the target script
+
+        // Convert arguments to proper format for Python script
+        // Escape any special characters and wrap in quotes if needed
+        const formattedArgs = args.map(arg => {
+          // If arg contains spaces, wrap in quotes
+          if (arg.includes(' ')) {
+            return `"${arg.replace(/"/g, '\\"')}"`;
+          }
+          return arg;
+        });
+
+        // Create a Python wrapper script that will import and run the target script with arguments
         const pythonWrapperContent = `
 import sys
 import os
@@ -1300,10 +1310,15 @@ os.environ['PYTHONPATH'] = r'${wineLtMakerPath}' + os.pathsep + os.environ.get('
 # Set working directory to script directory
 os.chdir(r'${toWinePath(scriptDir)}')
 
+# Prepare the command line arguments
+script_args = ${JSON.stringify(formattedArgs)}
+sys.argv = [r'${wineScriptPath}'] + script_args
+
 # Print environment for debugging
 print(f"Current directory: {os.getcwd()}")
 print(f"Python path: {sys.path}")
 print(f"Running script: {r'${wineScriptPath}'}")
+print(f"Arguments: {script_args}")
 
 # Try to import and run the module directly
 try:
@@ -1320,10 +1335,13 @@ try:
     module = __import__(script_name)
     print(f"Successfully imported {script_name}")
     
-    # Check if it has a main function
+    # Check if it has a main function and call it with arguments if applicable
     if hasattr(module, 'main'):
-        print(f"Calling {script_name}.main()")
-        module.main()
+        print(f"Calling {script_name}.main({', '.join(repr(arg) for arg in script_args)})")
+        if script_args:
+            module.main(*script_args)
+        else:
+            module.main()
     else:
         print(f"Module {script_name} has no main() function, executing script directly")
         exec(open(r'${wineScriptPath}').read())
@@ -1344,7 +1362,7 @@ print("Script execution completed successfully")
         // Write the wrapper script to a file
         fs.writeFileSync(tempScriptPath, pythonWrapperContent);
         const wineTempScriptPath = toWinePath(tempScriptPath);
-        
+
         // Create a bash script to execute Wine with the wrapper script
         const shellScriptPath = path.join(require('os').tmpdir(), `run_${scriptName.replace('.py', '')}.sh`);
         const shellScriptContent = `#!/bin/bash
@@ -1363,6 +1381,7 @@ echo "Running Python script with Wine"
 echo "Wine executable: ${winePath}"
 echo "Python script: ${tempScriptPath}"
 echo "Script directory: ${scriptDir}"
+echo "Arguments: ${args.join(' ')}"
 
 # Check if the bundled Python exists and is accessible
 bundled_python="${bundledPythonPath}"
@@ -1410,7 +1429,7 @@ fi
 
         wineProcess.on('close', (code) => {
           logger.log('info', `Python script process closed with code ${code}`);
-          
+
           // Clean up temporary files
           try {
             fs.unlinkSync(tempScriptPath);
@@ -1418,7 +1437,7 @@ fi
           } catch (cleanupErr) {
             logger.log('warn', `Error cleaning up temporary files: ${cleanupErr.message}`);
           }
-          
+
           if (code !== 0) {
             logger.log('error', `Wine process exited with non-zero code: ${code}`);
             logger.log('error', `Wine process stderr: ${stderrData}`);
@@ -1444,7 +1463,7 @@ fi
         // Get the Python path using our improved function
         logger.log('info', 'Getting Python path for running script');
         const pythonPath = getBundledPythonPath();
-        
+
         if (!pythonPath) {
           const errorMsg = `Python executable not found at any expected location`;
           logger.log('error', errorMsg);
@@ -1456,14 +1475,14 @@ fi
 
         // Add LT Maker to PYTHONPATH environment variable
         const pythonPathEnv = process.env.PYTHONPATH || '';
-        const updatedPythonPath = pythonPathEnv.includes(ltMakerPath) 
-          ? pythonPathEnv 
+        const updatedPythonPath = pythonPathEnv.includes(ltMakerPath)
+          ? pythonPathEnv
           : `${ltMakerPath}${path.delimiter}${pythonPathEnv}`;
 
-        // Run the Python script
+        // Run the Python script with arguments
         const pythonProcess = spawn(
           pythonPath,
-          [scriptPath],
+          [scriptPath, ...args],
           {
             cwd: scriptDir,
             detached: true,
