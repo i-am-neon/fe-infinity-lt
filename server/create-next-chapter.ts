@@ -13,6 +13,7 @@ import { getGameByNid } from "./db/games.ts";
 
 // Global store for chapter generation progress
 const chapterGenerationProgress = new Map<string, ChapterGenerationProgressEvent>();
+export { chapterGenerationProgress };
 
 // Get the current progress for a specific game
 export function getChapterGenerationProgress(gameNid: string): ChapterGenerationProgressEvent | undefined {

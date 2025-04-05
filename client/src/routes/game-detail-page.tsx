@@ -52,6 +52,15 @@ export default function GameDetailPage() {
     loadingAction === "generate"
   );
 
+  // Watch for generation errors
+  useEffect(() => {
+    if (generationProgress.error) {
+      setGenerationError(generationProgress.error);
+      setLoadingAction(null);
+      // Keep the modal open to show the error
+    }
+  }, [generationProgress.error]);
+
   // Poll for newly created game if "new" query param is present
   useEffect(() => {
     if (!loading && newGameModalOpen && nid) {
@@ -163,10 +172,21 @@ export default function GameDetailPage() {
     setLoadingAction("generate");
 
     try {
-      await apiCall("generate-next-chapter", {
+      const response = await apiCall<{
+        success: boolean;
+        error?: string;
+        message?: string;
+      }>("generate-next-chapter", {
         method: "POST",
         body: { directory: data.game.directory, gameNid: data.game.nid },
       });
+
+      // Check if the response indicates failure
+      if (!response.success) {
+        setGenerationError(response.error || "Failed to generate next chapter");
+        setLoadingAction(null);
+        return;
+      }
       // We'll rely on the polling to detect completion
     } catch (err) {
       setGenerationError(err instanceof Error ? err.message : String(err));

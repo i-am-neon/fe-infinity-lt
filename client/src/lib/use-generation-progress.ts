@@ -61,6 +61,19 @@ export default function useGenerationProgress(
                         },
                         error: null,
                     });
+
+                    // Check for error flag in progress
+                    if (response.progress.error) {
+                        setState({
+                            isLoading: false,
+                            progress: {
+                                isGenerating: false,
+                                currentStep: response.progress.step,
+                                message: response.progress.message,
+                            },
+                            error: response.progress.message,
+                        });
+                    }
                 } else if (response.error) {
                     setState({
                         isLoading: false,

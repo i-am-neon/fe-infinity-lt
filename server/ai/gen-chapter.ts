@@ -42,6 +42,7 @@ import { Tilemap } from "@/types/maps/tilemap.ts";
 export type ChapterGenerationProgressEvent = {
   step: number;
   message: string;
+  error?: boolean;
 };
 
 // Progress callback type
