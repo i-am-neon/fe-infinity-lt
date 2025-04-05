@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
+import ApiKeySettings from "@/components/settings/api-key-settings";
 
 export default function SettingsPage() {
     const { theme } = useTheme();
@@ -41,6 +42,18 @@ export default function SettingsPage() {
                                 <ModeToggle />
                             </div>
                         </div>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle>AI Provider Settings</CardTitle>
+                        <CardDescription>
+                            Configure your AI provider API keys for OpenAI and Anthropic.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <ApiKeySettings />
                     </CardContent>
                 </Card>
             </div>

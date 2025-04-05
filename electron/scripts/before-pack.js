@@ -6,43 +6,47 @@
 const fs = require('fs');
 const path = require('path');
 
-exports.default = async function(context) {
-  const { appOutDir, packager, electronPlatformName, arch } = context;
-  const platform = electronPlatformName;
-  
-  console.log(`Running beforePack hook for ${platform}-${arch}`);
-  
-  // Ensure the Python embedded directory is properly included
-  if (platform === 'win32') {
-    console.log('Running on Windows, ensuring Python binaries are properly handled');
-    
-    try {
-      // List any cleanup or verification tasks here
-      console.log('Preparing Windows package for distribution');
-    } catch (error) {
-      console.error('Error in beforePack script:', error);
-    }
-  } else if (platform === 'darwin') {
-    console.log('Running on macOS, ensuring Python binaries are properly handled');
-    
-    try {
-      // Verify Python exists in the right location
-      const pythonPath = path.join(appOutDir, 'bin', 'python', 'python_embed');
-      if (fs.existsSync(pythonPath)) {
-        console.log(`Python directory exists at: ${pythonPath}`);
-        
-        // Print out some files to verify
-        const pythonFiles = fs.readdirSync(pythonPath);
-        console.log(`Python directory contains: ${pythonFiles.length} files`);
-        console.log('Sample files:', pythonFiles.slice(0, 5));
-      } else {
-        console.warn(`Python directory not found at expected location: ${pythonPath}`);
+/**
+ * This script runs before electron-builder packs the application
+ * It handles preparation tasks like setting up empty/example API keys instead of real ones
+ */
+module.exports = async function (context) {
+  console.log('Running before-pack.js script...');
+
+  try {
+    // Copy .env.example to .env for the build
+    const serverDir = path.join(__dirname, '../../server');
+    const envExamplePath = path.join(serverDir, '.env.example');
+    const envBuildPath = path.join(serverDir, '.env.build');
+
+    // First check if the example file exists
+    if (fs.existsSync(envExamplePath)) {
+      console.log(`Copying ${envExamplePath} to ${envBuildPath}`);
+      fs.copyFileSync(envExamplePath, envBuildPath);
+
+      // Rename .env.build to .env for the build process
+      const envPath = path.join(serverDir, '.env');
+
+      // If there's an existing .env, back it up
+      if (fs.existsSync(envPath)) {
+        const envBackupPath = path.join(serverDir, '.env.bak');
+        console.log(`Backing up ${envPath} to ${envBackupPath}`);
+        fs.copyFileSync(envPath, envBackupPath);
       }
-    } catch (error) {
-      console.error('Error in beforePack script:', error);
+
+      // Now copy our build env to .env
+      console.log(`Copying ${envBuildPath} to ${envPath}`);
+      fs.copyFileSync(envBuildPath, envPath);
+
+      console.log('Environment setup complete.');
+    } else {
+      console.warn(`Warning: ${envExamplePath} doesn't exist!`);
     }
+
+    // Add any other preparation steps here
+
+  } catch (error) {
+    console.error('Error in before-pack script:', error);
+    throw error;
   }
-  
-  console.log('beforePack script completed successfully');
-  return true;
 };

@@ -10,20 +10,22 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "dev": "concurrently \"cd ../client && pnpm dev\" \"wait-on http://localhost:5173 && electron . --dev\"",
+    "dev": "concurrently \"cd ../client && npm run dev\" \"wait-on http://localhost:5173 && electron . --dev\"",
+    "install-only": "npm i --ignore-scripts",
     "postinstall": "electron-builder install-app-deps && node download-binaries.js --skip-macos-system-deps",
     "generate-icons": "electron-icon-builder --input=./logo.png --output=icons",
     "regenerate-icons": "node scripts/regenerate-all-icons.js",
-    "build:client": "cd ../client && pnpm build",
+    "build:client": "cd ../client && npm run build",
     "verify-client-build": "node -e \"const fs=require('fs');const path=require('path');const distDir=path.join(__dirname,'../client/dist');const indexFile=path.join(distDir,'index.html');const assetsDir=path.join(distDir,'assets');if(!fs.existsSync(distDir)||!fs.existsSync(indexFile)||!fs.existsSync(assetsDir)){console.error('React build not found or incomplete. Run build:client first.');process.exit(1);}console.log('React build verified:');console.log('- dist directory:', fs.existsSync(distDir));console.log('- index.html:', fs.existsSync(indexFile));console.log('- assets directory:', fs.existsSync(assetsDir));\"",
     "package": "npm run build:client && npm run verify-client-build && electron-builder --dir && node -e \"const fs=require('fs');const path=require('path');console.log('Output directory contents:');const outputDir=path.join(__dirname,'release/mac-arm64/FE Infinity.app/Contents/Resources/client/dist');if(fs.existsSync(outputDir)){console.log(fs.readdirSync(outputDir));}else{console.log('Output directory not found:',outputDir);}\" && electron-builder",
-    "package:mac": "npm run build:client && npm run verify-client-build && electron-builder --mac",
+    "package:mac": "npm run clean:release && npm run build:client && npm run verify-client-build && electron-builder --mac",
     "package:win": "npm run build:client && npm run verify-client-build && node scripts/prepare-windows-icons.js && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --win --config.win.signAndEditExecutable=false --config.win.forceCodeSigning=false && node scripts/fix-windows-icon-rcedit-bin.js",
     "package:win:full": "node scripts/build-windows.js",
     "package:linux": "npm run build:client && npm run verify-client-build && electron-builder --linux",
     "fix-win-icon": "node scripts/fix-windows-icon.js",
     "fix-win-icon:direct": "node scripts/fix-windows-icon-rcedit-bin.js",
-    "clean": "rm -rf bin"
+    "clean": "rm -rf bin",
+    "clean:release": "rm -rf release/* && mkdir -p release"
   },
   "devDependencies": {
     "axios": "^1.6.7",
@@ -39,8 +41,23 @@
     "wait-on": "^7.2.0"
   },
   "dependencies": {
+    "ajv": "^8.17.1",
+    "conf": "^10.2.0",
+    "dot-prop": "^9.0.0",
+    "electron-store": "^8.2.0",
+    "find-up": "^7.0.0",
     "fs-extra": "^11.3.0",
-    "node-fetch": "^3.3.2"
+    "is-obj": "^3.0.0",
+    "json-schema-traverse": "^1.0.0",
+    "locate-path": "^7.2.0",
+    "node-fetch": "^3.3.2",
+    "node-machine-id": "^1.1.12",
+    "p-locate": "^6.0.0",
+    "path-exists": "^5.0.0",
+    "path-type": "^6.0.0",
+    "pkg-up": "^5.0.0",
+    "read-pkg-up": "^11.0.0",
+    "type-fest": "^4.39.1"
   },
   "build": {
     "appId": "com.fe-infinity.app",
@@ -50,6 +67,10 @@
       "*.html",
       "*.png",
       "node_modules/**/*",
+      "!node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
+      "!node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
+      "!node_modules/*.d.ts",
+      "!node_modules/.bin",
       "bin/**/*",
       "!bin/python/prefix/**/*"
     ],
@@ -66,13 +87,16 @@
       "**/*.pyd"
     ],
     "beforePack": "./scripts/before-pack.js",
+    "afterPack": "./scripts/after-pack.js",
     "extraResources": [
       {
         "from": "../server",
         "to": "server",
         "filter": [
           "**/*",
-          "!node_modules/**/*"
+          "!node_modules/**/*",
+          "!.env",
+          "!.env.*"
         ]
       },
       {

@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import { isElectronEnvironment } from "@/lib/env-detector.ts";
+import { getOpenAIApiKey } from "@/lib/api-key-manager.ts";
 
 export interface CreateEmbeddingOptions {
   text: string;
@@ -10,20 +11,20 @@ export default async function createEmbedding({
   text,
   model = "text-embedding-3-small",
 }: CreateEmbeddingOptions): Promise<number[]> {
-  let apiKey: string | undefined;
-  
-  // Handle API key differently in Electron vs standalone
-  if (isElectronEnvironment()) {
-    apiKey = Deno.env.get("OPENAI_API_KEY");
-    if (!apiKey) {
-      console.warn("No OpenAI API key found in Electron environment. Using default API key initialization.");
-    }
+  // Get API key from our manager which prioritizes user-provided keys
+  const apiKey = getOpenAIApiKey();
+
+  // If no key is available, throw an error
+  if (!apiKey) {
+    const error = "No OpenAI API key found. Please provide an API key in the settings.";
+    console.error(error);
+    throw new Error(error);
   }
 
   const openai = new OpenAI({
-    apiKey: apiKey, // If undefined, OpenAI will use OPENAI_API_KEY env var or ~/.openai/config.json
+    apiKey: apiKey,
   });
-  
+
   try {
     const response = await openai.embeddings.create({
       model,

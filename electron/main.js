@@ -5,6 +5,7 @@ const { startServer, stopServer, isServerReady } = require('./server-manager');
 const { runGameWithWine, preparePythonEnvironment } = require('./game-runner');
 const { startGameLauncherServer } = require('./game-launcher');
 const logger = require('./logger');
+const apiKeyManager = require('./api-key-manager');
 
 // Set application name before anything else
 app.setName("FE Infinity");
@@ -636,19 +637,65 @@ ipcMain.handle('runGame', async (_, projectPath) => {
   }
 });
 
-// IPC handler for API calls
-ipcMain.handle('api-call', async (_, args) => {
-  const { endpoint, method, body } = args;
+// Handle API key management IPC calls
+ipcMain.handle('getApiKey', async (event) => {
+  logger.log('info', 'Retrieving OpenAI API key');
+  return apiKeyManager.getApiKey();
+});
 
+ipcMain.handle('setApiKey', async (event, { key }) => {
+  logger.log('info', 'Setting OpenAI API key');
+  return apiKeyManager.setApiKey(key);
+});
+
+ipcMain.handle('deleteApiKey', async (event) => {
+  logger.log('info', 'Deleting OpenAI API key');
+  return apiKeyManager.deleteApiKey();
+});
+
+ipcMain.handle('hasApiKey', async (event) => {
+  return apiKeyManager.hasApiKey();
+});
+
+// Modify the api-call handler to include API keys from storage
+ipcMain.handle('api-call', async (event, { endpoint, method, body }) => {
   try {
-    // Connect to the local server
-    const url = `http://localhost:8000/${endpoint}`;
+    logger.log('info', `API call to ${endpoint}`);
 
+    // Get API key from storage to pass to the server
+    const openaiKey = apiKeyManager.getApiKey();
+
+    // Build the URL with API key as query parameter for GET requests
+    let url = `http://localhost:8000/${endpoint}`;
+    const isGetOrHead = method === 'GET' || method === 'HEAD';
+
+    // For GET/HEAD requests, add API key as query parameter if it exists
+    if (isGetOrHead && openaiKey) {
+      const params = new URLSearchParams();
+      if (openaiKey) params.append('openaiApiKey', openaiKey);
+
+      // Append query parameters if we have any
+      if (params.toString()) {
+        url += `?${params.toString()}`;
+      }
+    }
+
+    // Configure request options based on HTTP method
     const options = {
       method,
-      headers: body ? { 'Content-Type': 'application/json' } : undefined,
-      body: body ? JSON.stringify(body) : undefined
+      headers: {},
     };
+
+    // Only add content-type and body for non-GET/HEAD requests
+    if (!isGetOrHead && body) {
+      options.headers['Content-Type'] = 'application/json';
+
+      // Add API key to the body for POST/PUT/etc requests
+      const requestBody = { ...body };
+      if (openaiKey) requestBody.openaiApiKey = openaiKey;
+
+      options.body = JSON.stringify(requestBody);
+    }
 
     const response = await fetch(url, options);
     const data = await response.json();
@@ -660,16 +707,10 @@ ipcMain.handle('api-call', async (_, args) => {
       };
     }
 
-    return {
-      success: true,
-      data
-    };
+    return { success: true, data };
   } catch (error) {
-    console.error('Error in API call:', error);
-    return {
-      success: false,
-      error: error.message
-    };
+    logger.log('error', `API call to ${endpoint} failed`, { error: error.message });
+    return { success: false, error: error.message };
   }
 });
 

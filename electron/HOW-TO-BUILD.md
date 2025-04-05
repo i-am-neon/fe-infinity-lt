@@ -135,3 +135,15 @@ If you encounter issues with the packaged app:
 2. Verify Python paths in the logs
 3. Ensure all binaries were correctly downloaded
 4. Check that paths in the code handle the `app.asar` vs `app.asar.unpacked` distinction correctly
+
+### Electron Failed to Install Correctly
+
+For error:
+```
+Error: Electron failed to install correctly, please delete node_modules/electron and try installing again
+```
+
+Run:
+```
+node node_modules/electron/install.js
+```

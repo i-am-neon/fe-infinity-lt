@@ -28,7 +28,7 @@ contextBridge.exposeInMainWorld('electron', {
       }
     },
     invoke: (channel, data) => {
-      const validChannels = ['isServerReady', 'runGame', 'api-call'];
+      const validChannels = ['isServerReady', 'runGame', 'api-call', 'getApiKey', 'setApiKey', 'deleteApiKey', 'hasApiKey'];
       if (validChannels.includes(channel)) {
         return ipcRenderer.invoke(channel, data);
       }
@@ -43,6 +43,13 @@ contextBridge.exposeInMainWorld('electron', {
   // Add a simple test method to verify IPC is working
   test: {
     ping: () => 'pong'
+  },
+  // Add API key management
+  apiKeys: {
+    get: () => ipcRenderer.invoke('getApiKey'),
+    set: (key) => ipcRenderer.invoke('setApiKey', { key }),
+    delete: () => ipcRenderer.invoke('deleteApiKey'),
+    has: () => ipcRenderer.invoke('hasApiKey')
   }
 });
 

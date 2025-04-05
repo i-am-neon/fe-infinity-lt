@@ -1,4 +1,3 @@
-import { ModeToggle } from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -17,9 +16,10 @@ import {
   NonClosableDialogTitle,
 } from "@/components/ui/non-closable-dialog";
 import apiCall from "@/lib/api-call";
-import { Loader2, Settings } from "lucide-react";
+import { Loader2, Settings, KeyIcon } from "lucide-react";
 import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import ApiKeyNotice from "@/components/api-key-notice";
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -33,6 +33,7 @@ export default function HomePage() {
   const [testingMockGame, setTestingMockGame] = useState(false);
   const [testingSimilarity, setTestingSimilarity] = useState(false);
   const [runningDefault, setRunningDefault] = useState(false);
+  const [testingApiKey, setTestingApiKey] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [testResults, setTestResults] = useState<any>(null);
   const [showTestResults, setShowTestResults] = useState(false);
@@ -171,18 +172,74 @@ export default function HomePage() {
     }
   }, []);
 
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <div className="flex justify-between w-full">
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" onClick={() => navigate('/settings')}>
-              <Settings className="h-5 w-5" />
-              <span className="sr-only">Settings</span>
-            </Button>
-          </div>
-        </div>
+  // Handler for testing API key
+  const handleTestApiKey = useCallback(async () => {
+    setTestingApiKey(true);
+    setTestResults(null);
+    setError(null);
+    setShowTestResults(true);
 
+    try {
+      // First check if we have an API key
+      let hasKey = false;
+      if (window.electron?.apiKeys?.has) {
+        hasKey = await window.electron.apiKeys.has();
+      }
+
+      // If no key, add a note to the test results
+      if (!hasKey) {
+        setTestResults({
+          success: false,
+          error: "No API key found. Please add your OpenAI API key in Settings."
+        });
+        setTestingApiKey(false);
+        return;
+      }
+
+      // Proceed with API key test
+      const res = await apiCall<{
+        success: boolean;
+        message?: string;
+        error?: string;
+        model?: string;
+        usage?: {
+          prompt_tokens: number;
+          completion_tokens: number;
+          total_tokens: number;
+        };
+      }>("test-api-key", {
+        method: "POST",
+      });
+
+      setTestResults(res);
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Unknown error occurred";
+      setTestResults({
+        success: false,
+        error: errorMessage
+      });
+    } finally {
+      setTestingApiKey(false);
+    }
+  }, []);
+
+  return (
+    <div className="container mx-auto">
+      {/* Header with settings icon */}
+      <div className="flex justify-between items-center mb-6 mt-4">
+        <h1 className="text-3xl font-bold">FE Infinity</h1>
+        <Button variant="ghost" size="icon" onClick={() => navigate('/settings')}>
+          <Settings className="h-5 w-5" />
+          <span className="sr-only">Settings</span>
+        </Button>
+      </div>
+
+      {/* API Key Notice */}
+      <ApiKeyNotice />
+
+      {/* Main Content */}
+      <div className="flex flex-col items-center gap-8">
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button disabled={isCreating}>
@@ -277,6 +334,19 @@ export default function HomePage() {
           >
             Open LT Editor
           </Button>
+          <Button
+            onClick={handleTestApiKey}
+            disabled={testingApiKey}
+            variant="outline"
+            className="gap-1"
+          >
+            {testingApiKey ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <KeyIcon className="h-4 w-4" />
+            )}
+            Test API Key
+          </Button>
         </div>
 
         {/* Test Results */}
@@ -299,7 +369,7 @@ export default function HomePage() {
         )}
 
         <GamesGrid />
-      </main>
+      </div>
     </div>
   );
 }
