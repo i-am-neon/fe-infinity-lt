@@ -1,0 +1,28 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# FE Infinity Repo Info
+
+FE Infinity is an AI system that connects with Lex Talionis (LT) to create a Fire Emblem game as you play it. The battle objectives you complete, the characters who die, and your decisions in the dialogue will go into the creation of the next chapter.
+
+The Lex Talionis Fire Emblem Engine is a custom-built engine designed for creating fan games inspired by the Fire Emblem series. It is a Python-based engine that emulates the mechanics of traditional Fire Emblem games while providing creators with powerful tools to build their own custom campaigns.
+
+I’m editing this project to generate each chapter on the fly using LLMs.
+
+Because Lex Talionis was meant for Windows and I’m developing on a mac, I’m using wine to run it.
+
+I’m trying to make as few changes to lt-maker as possible, which is the game engine, I have a separate Deno 2 server in /server that will modify game files within the lt-maker repo. However sometimes I have to call python scripts directly in the game engine directory.
+
+If you need to call a python script from the server, use runPythonScript in a .ts file.
+
+The monorepo is broken up by:
+/client : This has a next.js app, its server actions call the deno server
+/server : deno server to manipulate files within the game engine
+/lt-maker : the game engine
+
+In the client, when calling server use the provided apiCall function.
+
+When naming files, use kebab case for .ts and snake case for .py
