@@ -26,8 +26,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body className={`${metamorphous.variable} ${montserrat.variable} font-sans dark bg-black text-white`}>
+    <html lang="en" className="dark bg-black min-h-screen" style={{ backgroundColor: "#000000" }}>
+      <body
+        className={`${metamorphous.variable} ${montserrat.variable} font-sans dark text-white min-h-screen`}
+        style={{
+          background: "linear-gradient(135deg, #231558 0%, #15092a 25%, #0d0821 50%, #000000 100%)",
+          backgroundAttachment: "fixed"
+        }}
+      >
         {children}
       </body>
     </html>

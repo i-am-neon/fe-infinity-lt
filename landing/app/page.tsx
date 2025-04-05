@@ -28,8 +28,8 @@ export default function Home() {
         <h1 className="text-5xl font-bold mb-6 text-center" style={{ fontFamily: 'var(--font-metamorphous)' }}>
           FE Infinity
         </h1>
-        <h2 className="text-3xl font-bold text-center mb-10">
-          Create a Fire Emblem game as you play it
+        <h2 className="text-2xl text-center mb-10">
+          AI Creates a Fire Emblem game as you play it
         </h2>
       </div>
 
