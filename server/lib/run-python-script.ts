@@ -22,7 +22,7 @@ export default async function runPythonScript({
 
   // Get the appropriate Python command based on environment
   let pythonCommand;
-  
+
   if (isElectron) {
     // In Electron, always use bundled Python
     if (Deno.build.os === "windows") {
@@ -39,7 +39,7 @@ export default async function runPythonScript({
           throw new Error("Bundled Python wrapper script not found");
         }
       } catch (e) {
-        logger.error("Bundled Python wrapper script not found", { error: e.message });
+        logger.error("Bundled Python wrapper script not found", { error: (e as Error).message });
         throw new Error("Bundled Python wrapper script not found. Please run the download-binaries.js script first.");
       }
     }
@@ -48,7 +48,7 @@ export default async function runPythonScript({
     pythonCommand = Deno.build.os === "windows" ? "python" : "python3";
     logger.debug("Using system Python (not in Electron environment)", { pythonCommand });
   }
-      
+
   if (!pythonCommand) {
     throw new Error("Wine not found on your system. Please install Wine to run Python scripts.");
   }
@@ -86,7 +86,7 @@ export default async function runPythonScript({
   const isWineDebugOnly = error && error.trim().split('\n').every(line =>
     line.includes('fixme:') || line.includes('err:') || line.includes('warn:')
   );
-  
+
   // Check if output contains a success indicator
   const hasSuccessIndicator = output && (
     output.includes("Project initialized at") ||
@@ -113,7 +113,7 @@ async function findSystemWine(): Promise<string> {
       stderr: "piped",
     });
     const whichResult = await whichCommand.output();
-    
+
     if (whichResult.code === 0) {
       const winePath = new TextDecoder().decode(whichResult.stdout).trim();
       console.log(`Found Wine in PATH: ${winePath}`);
