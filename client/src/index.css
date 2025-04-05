@@ -5,6 +5,9 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
+  --font-montserrat: 'Montserrat', sans-serif;
+  --font-metamorphous: 'Metamorphous', serif;
+  
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -114,11 +117,26 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+html {
+  background-color: #000000;
+  height: 100%;
+  overflow-x: hidden;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-montserrat);
+    min-height: 100%;
+    overflow-x: hidden;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-montserrat);
+  }
+  .font-metamorphous {
+    font-family: var(--font-metamorphous);
   }
 }

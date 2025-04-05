@@ -1,11 +1,10 @@
 "use client";
 
+import { CopyButton } from "@/components/ui/copy-button";
+import { GlowCard } from "@/components/ui/glow-card";
+import { Apple, Grid2x2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { GlowCard } from "@/components/ui/glow-card";
-import { Button } from "@/components/ui/button";
-import { CopyButton } from "@/components/ui/copy-button";
-import { Grid2x2, Apple } from "lucide-react";
 
 export default function DownloadsPage() {
     return (
@@ -62,7 +61,7 @@ export default function DownloadsPage() {
                     {/* Mac prerequisites */}
                     <div className="mt-12">
                         <h3 className="text-2xl font-bold mb-6">Mac Prerequisites</h3>
-                        <p className="mb-4">Before installing FE Infinity on Mac, you'll need to install:</p>
+                        <p className="mb-4">Before installing FE Infinity on Mac, you&apos;ll need to install:</p>
 
                         <ol className="list-decimal pl-6 mb-6 space-y-2">
                             <li>Homebrew: <a href="https://brew.sh" className="text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer">https://brew.sh</a></li>

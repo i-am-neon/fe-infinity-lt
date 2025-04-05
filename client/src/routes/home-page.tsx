@@ -19,6 +19,7 @@ import apiCall from "@/lib/api-call";
 import { KeyIcon, Loader2, Settings } from "lucide-react";
 import { useCallback, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { FeInfinityTitle } from "@/components/ui/fe-infinity-title";
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -258,7 +259,7 @@ export default function HomePage() {
         {/* Centered title with logo */}
         <div className="flex items-center justify-center w-full">
           <img src="/logo.png" alt="FE Infinity Logo" className="h-10 mr-3" />
-          <h1 className="text-3xl font-bold">FE Infinity</h1>
+          <FeInfinityTitle size="lg" />
         </div>
       </div>
 
