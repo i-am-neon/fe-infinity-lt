@@ -15,14 +15,14 @@ async function processApiKeys(ctx: Context, next: () => Promise<unknown>) {
       if (body && typeof body === "object") {
         // Handle OpenAI API key
         if (body.openaiApiKey && typeof body.openaiApiKey === "string") {
-          setApiKey("openai", body.openaiApiKey);
+          setApiKey(body.openaiApiKey);
           // Remove the API key from the request body to prevent logging
           delete body.openaiApiKey;
         }
 
         // Handle Anthropic API key
         if (body.anthropicApiKey && typeof body.anthropicApiKey === "string") {
-          setApiKey("anthropic", body.anthropicApiKey);
+          setApiKey(body.anthropicApiKey);
           // Remove the API key from the request body to prevent logging
           delete body.anthropicApiKey;
         }
@@ -151,6 +151,9 @@ export async function handleRequest(req: Request): Promise<Response> {
   } else if (req.method === "GET" && url.pathname === "/generation-progress") {
     const { handleGetChapterGenerationProgress } = await import("./generation-progress.ts");
     response = await handleGetChapterGenerationProgress(req);
+  } else if (req.method === "GET" && url.pathname === "/game-creation-progress") {
+    const { handleGetGameCreationProgress } = await import("./generation-progress.ts");
+    response = await handleGetGameCreationProgress(req);
   } else {
     // Default route
     response = new Response("Not Found", { status: 404 });

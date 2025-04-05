@@ -1,5 +1,5 @@
 import { getGameByNid } from "@/db/games.ts";
-import { getGameCreationError } from "./create-game.ts";
+import { getGameCreationError, getGameCreationProgress } from "./create-game.ts";
 
 export async function handleGetGame(req: Request): Promise<Response> {
   try {
@@ -32,11 +32,15 @@ export async function handleGetGame(req: Request): Promise<Response> {
     // Check if there was an error during game creation
     const creationError = getGameCreationError(nid);
 
+    // Check if there is creation progress to report
+    const creationProgress = getGameCreationProgress(nid);
+
     return new Response(
       JSON.stringify({
         success: true,
         game,
         creationError,
+        creationProgress,
       }),
       {
         headers: { "Content-Type": "application/json" },

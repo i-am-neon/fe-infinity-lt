@@ -1,5 +1,5 @@
 import chooseTopLevelMusic from "@/ai/choose-top-level-music.ts";
-import genChapter from "@/ai/gen-chapter.ts";
+import genChapter, { ChapterGenerationProgressEvent } from "@/ai/gen-chapter.ts";
 import genInitialGameIdea from "@/ai/gen-initial-game-idea.ts";
 import genWorldSummary from "@/ai/gen-world-summary.ts";
 import initializeProject from "@/game-engine-io/initialize-project.ts";
@@ -14,9 +14,17 @@ import { insertGame } from "../db/games.ts";
 // In-memory store for game creation errors
 const gameCreationErrors = new Map<string, string>();
 
+// In-memory store for game creation progress
+const gameCreationProgress = new Map<string, ChapterGenerationProgressEvent>();
+
 // Expose method to get creation errors for other endpoints
 export function getGameCreationError(gameNid: string): string | undefined {
   return gameCreationErrors.get(gameNid);
+}
+
+// Expose method to get creation progress for other endpoints
+export function getGameCreationProgress(gameNid: string): ChapterGenerationProgressEvent | undefined {
+  return gameCreationProgress.get(gameNid);
 }
 
 export async function handleCreateGame(req: Request): Promise<Response> {
@@ -109,6 +117,11 @@ export async function handleCreateGame(req: Request): Promise<Response> {
           initialGameIdea,
           tone,
           chapterNumber: 0,
+          onProgress: (progress) => {
+            // Update the global progress map
+            gameCreationProgress.set(gameNid, progress);
+            logger.info(`Game creation progress for ${gameNid}:`, progress);
+          },
         });
 
         // write the prologue to LT
