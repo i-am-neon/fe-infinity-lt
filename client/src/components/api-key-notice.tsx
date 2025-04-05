@@ -1,10 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from 'react-router-dom';
 
 export default function ApiKeyNotice() {
     const [isElectron, setIsElectron] = useState(false);
     const [hasApiKey, setHasApiKey] = useState(false);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
     useEffect(() => {
         async function checkKeys() {
@@ -38,19 +42,15 @@ export default function ApiKeyNotice() {
 
     // If API key is missing in Electron, show a notice
     return (
-        <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <h3 className="text-lg font-medium text-yellow-800 mb-2">
-                OpenAI API Key Required
-            </h3>
-            <p className="text-yellow-700 mb-3">
-                You need to provide an OpenAI API key to use this application.
-            </p>
-            <Link
-                to="/settings"
-                className="inline-block px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700"
-            >
-                Add API Key in Settings
-            </Link>
-        </div>
+        <Alert variant="destructive" className="mb-6">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>OpenAI API Key Required</AlertTitle>
+            <AlertDescription className="flex flex-col">
+                <span className="mb-3">You need to provide an OpenAI API key to use this application.</span>
+                <Button variant="outline" onClick={() => navigate('/settings')} className="w-fit">
+                    Add API Key in Settings
+                </Button>
+            </AlertDescription>
+        </Alert>
     );
 } 

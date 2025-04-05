@@ -3,7 +3,9 @@
     "editor.formatOnSave": false
   },
   "search.exclude": {
-    "**/electron/bin": true
+    "**/electron/bin": true,
+    "**/dist": true,
+    "electron/rlease": true,
   },
   "files.watcherExclude": {
     "**/electron/bin": true

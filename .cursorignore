@@ -5,6 +5,7 @@ server/vector-db/seed-vectors/*
 server/ai/test-data/*
 server/ai/map-processing/*
 server/assets/*
+dist/*
 
 client/out/*
 client/.next/*

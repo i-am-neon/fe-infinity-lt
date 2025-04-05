@@ -22,7 +22,7 @@ export default function SettingsPage() {
                 Back
             </Button>
 
-            <h1 className="text-3xl font-bold mb-6">Settings</h1>
+            <h1 className="text-3xl font-bold my-6">Settings</h1>
 
             <div className="grid gap-6">
                 <Card>
@@ -49,7 +49,7 @@ export default function SettingsPage() {
                     <CardHeader>
                         <CardTitle>AI Provider Settings</CardTitle>
                         <CardDescription>
-                            Configure your AI provider API keys for OpenAI and Anthropic.
+                            Configure your AI provider API keys for OpenAI.
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
