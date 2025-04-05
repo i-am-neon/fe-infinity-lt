@@ -40,10 +40,12 @@ function Button({
   variant,
   size,
   asChild = false,
+  noGlow = false,
   ...props
 }: React.ComponentProps<"button"> &
   VariantProps<typeof buttonVariants> & {
     asChild?: boolean;
+    noGlow?: boolean;
   }) {
   const Comp = asChild ? Slot : "button";
 
@@ -53,14 +55,16 @@ function Button({
       className={cn(buttonVariants({ variant, size, className }))}
       {...props}
     >
-      <GlowingEffect
-        spread={40}
-        glow={true}
-        disabled={false}
-        proximity={64}
-        inactiveZone={0.01}
-        borderWidth={1}
-      />
+      {!noGlow && (
+        <GlowingEffect
+          spread={40}
+          glow={true}
+          disabled={false}
+          proximity={64}
+          inactiveZone={0.01}
+          borderWidth={1}
+        />
+      )}
       {props.children}
     </Comp>
   );

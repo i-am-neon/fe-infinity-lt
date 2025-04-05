@@ -449,7 +449,7 @@ export default function GameDetailPage() {
 
               <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <AlertDialogTrigger asChild>
-                  <Button variant="destructive" disabled={disabled}>
+                  <Button variant="destructive" noGlow disabled={disabled}>
                     {loadingAction === "delete" && (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     )}
