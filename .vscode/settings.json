@@ -6,6 +6,7 @@
     "**/electron/bin": true,
     "**/dist": true,
     "electron/rlease": true,
+    "landing/.next": true,
   },
   "files.watcherExclude": {
     "**/electron/bin": true
