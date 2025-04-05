@@ -88,7 +88,7 @@ const GlowingEffect = memo(
                     animate(currentAngle, newAngle, {
                         duration: movementDuration,
                         ease: [0.16, 1, 0.3, 1],
-                        onUpdate: (value) => {
+                        onUpdate: (value: number) => {
                             element.style.setProperty("--start", String(value));
                         },
                     });
