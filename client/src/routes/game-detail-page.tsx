@@ -298,20 +298,6 @@ export default function GameDetailPage() {
             className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-background/80 backdrop-blur-sm"
           >
             <div className="relative w-full max-w-lg">
-              {creationError && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-4 top-4 z-[110]"
-                  onClick={() => {
-                    setCreationError(null);
-                    setNewGameModalOpen(false);
-                  }}
-                >
-                  <X className="h-5 w-5" />
-                </Button>
-              )}
-
               {creationError ? (
                 <div className="flex flex-col gap-4">
                   <div className="text-center mb-8">

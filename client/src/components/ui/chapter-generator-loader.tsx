@@ -21,6 +21,7 @@ export type ChapterGenerationProgress = {
     isGenerating: boolean;
     currentStep: number;
     message?: string;
+    error?: string;
 };
 
 interface ChapterGeneratorLoaderProps {

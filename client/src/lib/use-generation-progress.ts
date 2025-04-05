@@ -47,6 +47,7 @@ export default function useGenerationProgress(
                     progress?: {
                         step: number;
                         message: string;
+                        error?: string;
                     };
                     error?: string;
                 }>(`generation-progress?gameNid=${encodeURIComponent(gameNid)}`);
