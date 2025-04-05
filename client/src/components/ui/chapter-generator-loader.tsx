@@ -25,9 +25,15 @@ export type ChapterGenerationProgress = {
 
 interface ChapterGeneratorLoaderProps {
     progress: ChapterGenerationProgress;
+    title?: string;
+    description?: string;
 }
 
-export function ChapterGeneratorLoader({ progress }: ChapterGeneratorLoaderProps) {
+export function ChapterGeneratorLoader({
+    progress,
+    title = "Generating Next Chapter",
+    description = "The AI is creating your next chapter based on your gameplay. This typically takes around five minutes, and the game will launch automatically when complete."
+}: ChapterGeneratorLoaderProps) {
     // Use non-looping mode for chapter generation, as we want to show real progress
     return (
         <MultiStepLoader
@@ -36,8 +42,8 @@ export function ChapterGeneratorLoader({ progress }: ChapterGeneratorLoaderProps
             duration={3000}
             loop={false}
             value={progress.currentStep}
-            title="Generating Next Chapter"
-            description="The AI is creating your next chapter based on your gameplay. This typically takes around five minutes, and the game will launch automatically when complete."
+            title={title}
+            description={description}
         />
     );
 } 
