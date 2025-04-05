@@ -3,9 +3,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { DashedBorderCard } from "@/components/ui/dashed-border-card";
 import { GlowCard } from "@/components/ui/glow-card";
 import apiCall from "@/lib/api-call";
 import { Game } from "@/types/game";
+import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -73,6 +75,21 @@ export default function GamesGrid() {
           </GlowCard>
         </Link>
       ))}
+
+      {/* Create New Game Card */}
+      <div
+        onClick={() => window.dispatchEvent(new CustomEvent('openCreateGameDialog'))}
+        className="cursor-pointer"
+      >
+        <DashedBorderCard className="hover:bg-accent/20 transition-colors duration-200 flex items-center justify-center h-full">
+          <div className="flex flex-col items-center justify-center py-8">
+            <div className="rounded-full bg-primary/10 p-3 mb-2">
+              <Plus className="h-8 w-8 text-primary" />
+            </div>
+            <CardTitle className="text-center">Create New</CardTitle>
+          </div>
+        </DashedBorderCard>
+      </div>
     </div>
   );
 }

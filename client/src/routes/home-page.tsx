@@ -6,7 +6,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import GameIdeaSelector from "@/components/ui/game-idea-selector";
 import GamesGrid from "@/components/ui/games-grid";
@@ -18,7 +17,7 @@ import {
 } from "@/components/ui/non-closable-dialog";
 import apiCall from "@/lib/api-call";
 import { KeyIcon, Loader2, Settings } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function HomePage() {
@@ -39,6 +38,19 @@ export default function HomePage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [testResults, setTestResults] = useState<any>(null);
   const [showTestResults, setShowTestResults] = useState(false);
+
+  // Add useEffect to listen for custom event
+  useEffect(() => {
+    const handleOpenDialog = () => {
+      setDialogOpen(true);
+    };
+
+    window.addEventListener('openCreateGameDialog', handleOpenDialog);
+
+    return () => {
+      window.removeEventListener('openCreateGameDialog', handleOpenDialog);
+    };
+  }, []);
 
   const handleCreateGame = useCallback(async () => {
     if (!gameIdea) {
@@ -230,13 +242,24 @@ export default function HomePage() {
 
   return (
     <div className="container mx-auto">
-      {/* Header with settings icon */}
-      <div className="flex justify-between items-center mb-6 mt-4">
-        <h1 className="text-3xl font-bold">FE Infinity</h1>
-        <Button variant="ghost" size="icon" onClick={() => navigate('/settings')}>
-          <Settings className="h-5 w-5" />
+      {/* Header with title and settings */}
+      <div className="flex items-center mb-6 mt-4 relative">
+        {/* Settings button moved to the left */}
+        <Button
+          variant="ghost"
+          size="lg"
+          className="absolute left-0"
+          onClick={() => navigate('/settings')}
+        >
+          <Settings className="h-7 w-7" />
           <span className="sr-only">Settings</span>
         </Button>
+
+        {/* Centered title with logo */}
+        <div className="flex items-center justify-center w-full">
+          <img src="/logo.png" alt="FE Infinity Logo" className="h-10 mr-3" />
+          <h1 className="text-3xl font-bold">FE Infinity</h1>
+        </div>
       </div>
 
       {/* API Key Notice */}
@@ -245,12 +268,6 @@ export default function HomePage() {
       {/* Main Content */}
       <div className="flex flex-col items-center gap-8">
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button disabled={isCreating}>
-              {isCreating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Create New Game
-            </Button>
-          </DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Select a Game Idea</DialogTitle>
@@ -374,7 +391,10 @@ export default function HomePage() {
           </div>
         )}
 
-        <GamesGrid />
+        <div className="max-w-5xl">
+          <h2 className="text-2xl font-semibold mb-4">Your Games</h2>
+          <GamesGrid />
+        </div>
       </div>
     </div>
   );
