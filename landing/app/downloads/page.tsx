@@ -43,7 +43,7 @@ export default function DownloadsPage() {
                                     <Grid2x2 size={64} />
                                 </div>
                                 <h3 className="text-xl font-bold mb-4">Windows</h3>
-                                <p>Download FE Infinity for Windows</p>
+                                <p>Works out of the box!</p>
                             </GlowCard>
                         </Link>
 
@@ -54,7 +54,7 @@ export default function DownloadsPage() {
                                     <Apple size={64} />
                                 </div>
                                 <h3 className="text-xl font-bold mb-4">Mac</h3>
-                                <p>Download FE Infinity for Mac</p>
+                                <p>See below installation instructions</p>
                             </GlowCard>
                         </Link>
                     </div>
