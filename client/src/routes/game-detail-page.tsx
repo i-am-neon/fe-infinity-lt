@@ -47,38 +47,10 @@ export default function GameDetailPage() {
   const [generationError, setGenerationError] = useState<string | null>(null);
   const [oldChapterCount, setOldChapterCount] = useState<number | null>(null);
 
-  // Debug state for loader testing
-  const [testLoaderOpen, setTestLoaderOpen] = useState(false);
-  const [testLoaderStep, setTestLoaderStep] = useState(0);
-
   const generationProgress = useGenerationProgress(
     nid,
     loadingAction === "generate"
   );
-
-  // Debug function to test the loader
-  const handleTestLoader = useCallback(() => {
-    setTestLoaderOpen(true);
-    setTestLoaderStep(0);
-
-    // Simulate progress through the loader steps
-    const interval = setInterval(() => {
-      setTestLoaderStep(prev => {
-        // Max steps is 13 (0-indexed array)
-        if (prev >= 12) {
-          clearInterval(interval);
-          return prev;
-        }
-        return prev + 1;
-      });
-    }, 2000);
-
-    // Auto-close after completion
-    setTimeout(() => {
-      clearInterval(interval);
-      setTestLoaderOpen(false);
-    }, 30000);
-  }, []);
 
   // Poll for newly created game if "new" query param is present
   useEffect(() => {
@@ -275,42 +247,6 @@ export default function GameDetailPage() {
 
   return (
     <>
-      {/* Full-screen loader rendered directly in DOM instead of inside dialog */}
-      <AnimatePresence>
-        {testLoaderOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-background/80 backdrop-blur-sm"
-          >
-            <div className="relative w-full max-w-lg">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute right-4 top-4 z-[110]"
-                onClick={() => setTestLoaderOpen(false)}
-              >
-                <X className="h-5 w-5" />
-              </Button>
-
-              <div className="text-center mb-8">
-                <h3 className="text-lg font-semibold">Testing Chapter Generation Loader</h3>
-                <p className="text-sm text-muted-foreground">This is a debug view of the chapter generation loader</p>
-              </div>
-
-              <ChapterGeneratorLoader
-                progress={{
-                  isGenerating: testLoaderOpen,
-                  currentStep: testLoaderStep,
-                  message: `Test step ${testLoaderStep} message`,
-                }}
-              />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* New Game Creation - Direct DOM implementation */}
       <AnimatePresence>
         {newGameModalOpen && (
@@ -544,17 +480,6 @@ export default function GameDetailPage() {
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
-
-              {/* Debug Button */}
-              {process.env.NODE_ENV === "development" && (
-                <Button
-                  variant="outline"
-                  onClick={handleTestLoader}
-                  className="ml-auto"
-                >
-                  Test Loader
-                </Button>
-              )}
             </div>
           </>
         )}
