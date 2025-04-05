@@ -242,7 +242,7 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="container mx-auto">
+    <div className="max-w-3xl mx-auto">
       {/* Header with title and settings */}
       <div className="flex items-center mb-6 mt-4 relative">
         {/* Settings button moved to the left */}
