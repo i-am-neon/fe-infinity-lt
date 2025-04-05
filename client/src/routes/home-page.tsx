@@ -1,3 +1,4 @@
+import ApiKeyNotice from "@/components/api-key-notice";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -16,10 +17,9 @@ import {
   NonClosableDialogTitle,
 } from "@/components/ui/non-closable-dialog";
 import apiCall from "@/lib/api-call";
-import { Loader2, Settings, KeyIcon } from "lucide-react";
+import { KeyIcon, Loader2, Settings } from "lucide-react";
 import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import ApiKeyNotice from "@/components/api-key-notice";
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -28,6 +28,8 @@ export default function HomePage() {
   const [creatingGameModalOpen, setCreatingGameModalOpen] = useState(false);
   const [gameIdea, setGameIdea] = useState("");
   const [error, setError] = useState<string | null>(null);
+
+  const showDebugButtons = false;
 
   // Test function states
   const [testingMockGame, setTestingMockGame] = useState(false);
@@ -298,61 +300,63 @@ export default function HomePage() {
           </NonClosableDialogContent>
         </NonClosableDialog>
 
-        {/* Test Buttons */}
-        <div className="flex flex-col sm:flex-row gap-2 w-full max-w-[600px] mb-4">
-          <Button
-            onClick={handleAddMockGame}
-            disabled={testingMockGame}
-            variant="outline"
-          >
-            {testingMockGame && (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            )}
-            Add Mock Game
-          </Button>
-          <Button
-            onClick={handleTestSimilaritySearch}
-            disabled={testingSimilarity}
-            variant="outline"
-          >
-            {testingSimilarity && (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            )}
-            Test Similarity Search
-          </Button>
-          <Button
-            onClick={handleRunDefaultProject}
-            disabled={runningDefault}
-            variant="outline"
-          >
-            {runningDefault && (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            )}
-            Run Default Project
-          </Button>
-          <Button
-            onClick={handleRunEditor}
-            variant="outline"
-          >
-            Open LT Editor
-          </Button>
-          <Button
-            onClick={handleTestApiKey}
-            disabled={testingApiKey}
-            variant="outline"
-            className="gap-1"
-          >
-            {testingApiKey ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <KeyIcon className="h-4 w-4" />
-            )}
-            Test API Key
-          </Button>
-        </div>
+        {/* Test Buttons - only shown when showDebugButtons is true */}
+        {showDebugButtons && (
+          <div className="flex flex-col sm:flex-row gap-2 w-full max-w-[600px] mb-4">
+            <Button
+              onClick={handleAddMockGame}
+              disabled={testingMockGame}
+              variant="outline"
+            >
+              {testingMockGame && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              Add Mock Game
+            </Button>
+            <Button
+              onClick={handleTestSimilaritySearch}
+              disabled={testingSimilarity}
+              variant="outline"
+            >
+              {testingSimilarity && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              Test Similarity Search
+            </Button>
+            <Button
+              onClick={handleRunDefaultProject}
+              disabled={runningDefault}
+              variant="outline"
+            >
+              {runningDefault && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              Run Default Project
+            </Button>
+            <Button
+              onClick={handleRunEditor}
+              variant="outline"
+            >
+              Open LT Editor
+            </Button>
+            <Button
+              onClick={handleTestApiKey}
+              disabled={testingApiKey}
+              variant="outline"
+              className="gap-1"
+            >
+              {testingApiKey ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <KeyIcon className="h-4 w-4" />
+              )}
+              Test API Key
+            </Button>
+          </div>
+        )}
 
-        {/* Test Results */}
-        {showTestResults && testResults && (
+        {/* Test Results - only shown when showDebugButtons is true and there are results */}
+        {showDebugButtons && showTestResults && testResults && (
           <div className="w-full max-w-[600px] mb-4 p-4 bg-secondary/50 rounded-md overflow-auto">
             <div className="flex justify-between items-center mb-2">
               <h3 className="font-semibold">Test Results</h3>
