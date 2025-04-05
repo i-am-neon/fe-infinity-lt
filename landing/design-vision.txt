@@ -5,13 +5,21 @@ Pages
 - home
 - downloads
 
+Everything is all in dark mode only
+use shadcn components when possible
+
 --------
 Home Page
 
-use the logo in landing/public/logo.png along with "FE Infinity" as the name in the top center
+nav bar that links to downloads page
+use the logo in landing/public/logo.png along with "FE Infinity" as the name in the top center, with the metamorphous font
+Have 3 glow cards (not clickable) with titles and descriptions about the project
+Button to go to downloads page
 
 -----
 Downloads Page
 
 use glow cards and icons for mac and windows for the download buttons
 add a "mac" section below giving install prereqs: first homebrew then using homebrew; python  wine. make a pretty code block that includes a copy button that copies the code to the clipboard and shows a check mark when copied
+
+nav bar that links back to home page

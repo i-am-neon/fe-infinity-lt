@@ -1,131 +1,71 @@
 import Image from "next/image";
+import Link from "next/link";
 import { GlowCard } from "@/components/ui/glow-card";
 import { Button } from "@/components/ui/button";
+import { Download } from "lucide-react";
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-montserrat)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <h1 className="text-5xl font-bold font-[family-name:var(--font-metamorphous)]">FE Infinity</h1>
+    <main className="flex min-h-screen flex-col items-center">
+      {/* Nav bar */}
+      <nav className="flex w-full items-center justify-center px-6 py-4">
+        <div className="ml-auto">
+          <Link href="/downloads">
+            <Button variant="ghost">Downloads</Button>
+          </Link>
+        </div>
+      </nav>
+
+      {/* Hero section */}
+      <div className="flex flex-col items-center justify-center py-16">
         <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
+          src="/logo.png"
+          alt="FE Infinity Logo"
+          width={120}
+          height={120}
+          className="mb-6"
         />
+        <h1 className="text-5xl font-bold mb-6 text-center" style={{ fontFamily: 'var(--font-metamorphous)' }}>
+          FE Infinity
+        </h1>
+        <h2 className="text-3xl font-bold text-center mb-10">
+          Create a Fire Emblem game as you play it
+        </h2>
+      </div>
 
-        {/* Test Section for Glow Components */}
-        <div className="w-full flex flex-col md:flex-row gap-6 my-8">
-          <GlowCard className="w-full md:w-1/2 bg-black/5 dark:bg-white/5">
-            <h2 className="text-xl font-bold mb-2">Glow Card Test</h2>
-            <p>This is a test of the GlowCard component from the client directory.</p>
-            <p className="mt-4">Hover around the card to see the glow effect!</p>
-          </GlowCard>
+      {/* Main content */}
+      <div className="flex flex-1 flex-col items-center justify-center px-6 pt-0 pb-12">
+        <div className="max-w-5xl w-full">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            {/* Card 1 */}
+            <GlowCard>
+              <h3 className="text-xl font-bold mb-2">Dynamic Storytelling</h3>
+              <p>Complete battle objectives, make decisions in dialogue, and watch as AI creates the next chapter based on your choices.</p>
+            </GlowCard>
 
-          <div className="w-full md:w-1/2 flex flex-col gap-4">
-            <h2 className="text-xl font-bold">Button Tests</h2>
-            <div className="flex flex-wrap gap-3">
-              <Button>Default</Button>
-              <Button variant="destructive">Destructive</Button>
-              <Button variant="outline">Outline</Button>
-              <Button variant="secondary">Secondary</Button>
-              <Button variant="ghost">Ghost</Button>
-              <Button variant="link">Link</Button>
-              <Button size="sm">Small</Button>
-              <Button size="lg">Large</Button>
-              <Button noGlow>No Glow</Button>
-            </div>
+            {/* Card 2 */}
+            <GlowCard>
+              <h3 className="text-xl font-bold mb-2">Infinite Possibilities</h3>
+              <p>No two playthroughs are alike. Your decisions shape unique stories, characters, and challenges each time you play.</p>
+            </GlowCard>
+
+            {/* Card 3 */}
+            <GlowCard>
+              <h3 className="text-xl font-bold mb-2">Classic Gameplay</h3>
+              <p>Experience the tactical depth of Fire Emblem with the powerful Lex Talionis engine, enhanced with modern AI generation.</p>
+            </GlowCard>
+          </div>
+
+          <div className="flex justify-center">
+            <Link href="/downloads" className="inline-flex">
+              <Button size="lg" className="text-lg gap-2">
+                <Download size={24} />
+                Download Now
+              </Button>
+            </Link>
           </div>
         </div>
-
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      </div>
+    </main>
   );
 }
