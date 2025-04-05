@@ -84,6 +84,7 @@ export async function handleCreateGame(req: Request): Promise<Response> {
           chapterNumber: 0,
         });
         const logger = getCurrentLogger();
+        throw new Error("Test error");
 
         // generate world summary & top-level music
         const worldSummary = await genWorldSummary({

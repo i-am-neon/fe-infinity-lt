@@ -46,6 +46,7 @@ export default function GameDetailPage() {
     useState(false);
   const [generationError, setGenerationError] = useState<string | null>(null);
   const [oldChapterCount, setOldChapterCount] = useState<number | null>(null);
+  const [deletingFailedGame, setDeletingFailedGame] = useState(false);
 
   const generationProgress = useGenerationProgress(
     nid,
@@ -263,7 +264,27 @@ export default function GameDetailPage() {
     }
   }, [data, navigate]);
 
-  const disabled = loadingAction !== null;
+  const handleReturnHomeAndDeleteGame = useCallback(async () => {
+    if (!nid) return;
+
+    setDeletingFailedGame(true);
+
+    try {
+      // Delete the failed game
+      await apiCall("delete-game", {
+        method: "POST",
+        body: { nid, directory: data?.game?.directory },
+      });
+    } catch (error) {
+      console.error("Error deleting failed game:", error);
+    } finally {
+      setDeletingFailedGame(false);
+      // Navigate home regardless of delete success
+      navigate("/", { replace: true });
+    }
+  }, [nid, data, navigate]);
+
+  const disabled = loadingAction !== null || deletingFailedGame;
 
   return (
     <>
@@ -307,17 +328,13 @@ export default function GameDetailPage() {
                   </div>
                   <div className="flex justify-end mt-6 mx-6 gap-2">
                     <Button
-                      onClick={() => navigate("/")}
+                      onClick={handleReturnHomeAndDeleteGame}
                       variant="secondary"
+                      disabled={deletingFailedGame}
                     >
-                      Return to Home
-                    </Button>
-                    <Button
-                      onClick={() => {
-                        setCreationError(null);
-                        setNewGameModalOpen(false);
-                      }}
-                    >
+                      {deletingFailedGame ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : null}
                       Close
                     </Button>
                   </div>
