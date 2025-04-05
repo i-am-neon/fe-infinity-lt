@@ -1,0 +1,17 @@
+
+Design vision
+
+Pages
+- home
+- downloads
+
+--------
+Home Page
+
+use the logo in landing/public/logo.png along with "FE Infinity" as the name in the top center
+
+-----
+Downloads Page
+
+use glow cards and icons for mac and windows for the download buttons
+add a "mac" section below giving install prereqs: first homebrew then using homebrew; python  wine. make a pretty code block that includes a copy button that copies the code to the clipboard and shows a check mark when copied
