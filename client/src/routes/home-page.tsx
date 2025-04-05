@@ -17,7 +17,7 @@ import {
   NonClosableDialogTitle,
 } from "@/components/ui/non-closable-dialog";
 import apiCall from "@/lib/api-call";
-import { Loader2 } from "lucide-react";
+import { Loader2, Settings } from "lucide-react";
 import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -175,7 +175,12 @@ export default function HomePage() {
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
         <div className="flex justify-between w-full">
-          <ModeToggle />
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" onClick={() => navigate('/settings')}>
+              <Settings className="h-5 w-5" />
+              <span className="sr-only">Settings</span>
+            </Button>
+          </div>
         </div>
 
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>

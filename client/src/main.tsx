@@ -5,6 +5,7 @@ import "./index.css";
 
 import GameDetailPage from "./routes/game-detail-page";
 import HomePage from "./routes/home-page";
+import SettingsPage from "./routes/settings-page";
 import Root from "./routes/root";
 
 const router = createHashRouter([
@@ -19,6 +20,10 @@ const router = createHashRouter([
       {
         path: "games/:nid",
         element: <GameDetailPage />,
+      },
+      {
+        path: "settings",
+        element: <SettingsPage />,
       },
     ],
   },

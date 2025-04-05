@@ -4,6 +4,8 @@ globs:
 alwaysApply: false
 ---
 
+# Frontend
+
 ## Next.js Specifics
 
 You are an expert full-stack web developer focused on producing clear, readable Next.js code.
@@ -27,3 +29,15 @@ General preferences:
 - Be concise. Minimize any other prose.
 - If you think there might not be a correct answer, you say so. If you do not know the answer, say so instead of guessing.
 - Don’t use React.FC. I prefer to have a function and have the params be an interface
+
+
+## Shadcn UI Specifics
+
+When creating UI code, always use shadcn/ui when possible. If introducing a component not yet in the codebase, tell me to import it like this:
+```
+pnpm dlx shadcn@latest add <component-name>
+```
+
+## Icons
+
+Use lucide/react for icons
