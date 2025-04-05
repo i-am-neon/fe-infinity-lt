@@ -65,8 +65,6 @@ export async function handleGenerateNextChapter(
           gameNid,
           duration,
         });
-
-        // Removed: runGame(directory) - Avoiding double game run
       } catch (err) {
         console.error("Error in background next chapter creation:", err);
       }
