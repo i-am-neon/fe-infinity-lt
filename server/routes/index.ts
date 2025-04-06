@@ -154,6 +154,9 @@ export async function handleRequest(req: Request): Promise<Response> {
   } else if (req.method === "GET" && url.pathname === "/game-creation-progress") {
     const { handleGetGameCreationProgress } = await import("./generation-progress.ts");
     response = await handleGetGameCreationProgress(req);
+  } else if (req.method === "POST" && url.pathname === "/test-chapter-generation") {
+    const { handleTestChapterGeneration } = await import("./test-chapter-generation.ts");
+    response = await handleTestChapterGeneration(req);
   } else {
     // Default route
     response = new Response("Not Found", { status: 404 });

@@ -35,7 +35,7 @@ export default function GameDetailPage() {
   const [creationError, setCreationError] = useState<string | null>(null);
 
   const [loadingAction, setLoadingAction] = useState<
-    "play" | "generate" | "delete" | null
+    "play" | "generate" | "delete" | "test" | null
   >(null);
 
   const isNew = searchParams.get("new") === "true";
@@ -50,7 +50,7 @@ export default function GameDetailPage() {
 
   const generationProgress = useGenerationProgress(
     nid,
-    loadingAction === "generate"
+    loadingAction === "generate" || loadingAction === "test"
   );
 
   // Watch for generation errors
@@ -244,7 +244,44 @@ export default function GameDetailPage() {
 
       return () => clearInterval(pollId);
     }
-  }, [loadingAction, oldChapterCount, nid]);
+  }, [loadingAction, oldChapterCount, nid, data]);
+
+  // Handle test generation completion
+  useEffect(() => {
+    if (loadingAction === "test" && !generationProgress.progress.isGenerating && generationProgress.progress.currentStep === 0) {
+      // Test generation is complete when progress is reset to initial state
+      setLoadingAction(null);
+      setGeneratingChapterModalOpen(false);
+    }
+  }, [loadingAction, generationProgress.progress]);
+
+  const handleTestGeneration = useCallback(async () => {
+    if (!data?.game || !nid) return;
+
+    setOldChapterCount(data.game.chapters.length);
+    setGeneratingChapterModalOpen(true);
+    setLoadingAction("test");
+
+    try {
+      const response = await apiCall<{
+        success: boolean;
+        error?: string;
+        message?: string;
+      }>("test-chapter-generation", {
+        method: "POST",
+        body: { gameNid: data.game.nid },
+      });
+
+      if (!response.success) {
+        setGenerationError(response.error || "Failed to start test generation");
+        setLoadingAction(null);
+      }
+      // The modal will stay open to show progress
+    } catch (err) {
+      setGenerationError(err instanceof Error ? err.message : String(err));
+      setLoadingAction(null);
+    }
+  }, [data, nid]);
 
   const handleConfirmDelete = useCallback(async () => {
     if (!data?.game) return;
@@ -416,10 +453,14 @@ export default function GameDetailPage() {
               ) : (
                 <ChapterGeneratorLoader
                   progress={{
-                    isGenerating: loadingAction === "generate",
+                    isGenerating: loadingAction === "generate" || loadingAction === "test",
                     currentStep: generationProgress.progress.currentStep,
                     message: generationProgress.progress.message,
                   }}
+                  title={loadingAction === "test" ? "Testing Chapter Generation" : "Generating Next Chapter"}
+                  description={loadingAction === "test"
+                    ? "This is a test simulation showing the chapter generation process with 3-second intervals between steps."
+                    : "The AI is creating your next chapter based on your gameplay. This typically takes around five minutes, and the game will launch automatically when complete."}
                 />
               )}
             </div>
@@ -469,6 +510,22 @@ export default function GameDetailPage() {
                 )}
                 Generate Next Chapter
               </Button>
+
+              {/* Debug button for testing chapter generation */}
+              {process.env.NODE_ENV !== "production" && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleTestGeneration}
+                  disabled={disabled}
+                  className="ml-2"
+                >
+                  {loadingAction === "test" && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  Test Generation
+                </Button>
+              )}
 
               <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <AlertDialogTrigger asChild>

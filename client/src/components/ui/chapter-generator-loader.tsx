@@ -2,6 +2,12 @@
 import { MultiStepLoader, LoadingState } from "@/components/ui/multi-step-loader";
 
 const chapterGenerationSteps: LoadingState[] = [
+    // Initializing phase
+    { text: "Initializing game engine..." },
+    { text: "Loading game data..." },
+    { text: "Analyzing previous chapter..." },
+    { text: "Processing player choices..." },
+    // Generation phase
     { text: "Generating chapter idea and storyline..." },
     { text: "Creating new characters and assigning traits..." },
     { text: "Selecting portraits for characters..." },
@@ -16,6 +22,12 @@ const chapterGenerationSteps: LoadingState[] = [
     { text: "Creating boss battle dialogues..." },
     { text: "Finalizing chapter assembly..." }
 ];
+
+// Define the step indexes where each phase begins
+export const GENERATION_PHASES = {
+    INITIALIZING: 0,
+    GENERATION: 4, // Index of the first generation step
+};
 
 export type ChapterGenerationProgress = {
     isGenerating: boolean;

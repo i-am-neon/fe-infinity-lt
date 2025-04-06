@@ -1,5 +1,6 @@
 import { getChapterGenerationProgress } from "@/create-next-chapter.ts";
 import { getGameCreationProgress } from "@/routes/create-game.ts";
+import { getTestGenerationProgress } from "@/routes/test-chapter-generation.ts";
 import { getCurrentLogger } from "@/lib/current-logger.ts";
 
 /**
@@ -25,6 +26,21 @@ export async function handleGetChapterGenerationProgress(
             );
         }
 
+        // First check if there's test progress
+        const testProgress = getTestGenerationProgress(gameNid);
+        if (testProgress) {
+            return new Response(
+                JSON.stringify({
+                    success: true,
+                    progress: testProgress,
+                }),
+                {
+                    headers: { "Content-Type": "application/json" },
+                }
+            );
+        }
+
+        // If no test progress, check for real progress
         const progress = getChapterGenerationProgress(gameNid);
 
         return new Response(

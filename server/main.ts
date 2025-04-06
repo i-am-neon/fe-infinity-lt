@@ -3,6 +3,9 @@ import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
 import { db } from "@/db/connection.ts";
 import { getVectorStore } from "@/vector-db/init.ts";
 import { initVectorDbForElectron } from "@/vector-db/init-electron.ts";
+import { handleGenerateNextChapter } from "@/routes/generate-next-chapter.ts";
+import { handleGetChapterGenerationProgress, handleGetGameCreationProgress } from "@/routes/generation-progress.ts";
+import { handleTestChapterGeneration } from "@/routes/test-chapter-generation.ts";
 
 async function checkEnvironment() {
   console.log("=== Environment Verification ===");
@@ -31,7 +34,7 @@ async function checkEnvironment() {
     "RESOURCES_PATH",
     "OPENAI_API_KEY"
   ];
-  
+
   for (const varName of envVars) {
     const value = Deno.env.get(varName);
     console.log(`${varName}: ${value || "not set"}`);

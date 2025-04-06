@@ -53,6 +53,20 @@ export default function useGenerationProgress(
                 }>(`generation-progress?gameNid=${encodeURIComponent(gameNid)}`);
 
                 if (response.success && response.progress) {
+                    // If progress is null/undefined, it means generation is complete
+                    if (!response.progress) {
+                        setState({
+                            isLoading: false,
+                            progress: {
+                                isGenerating: false,
+                                currentStep: 0,
+                                message: "",
+                            },
+                            error: null,
+                        });
+                        return;
+                    }
+
                     setState({
                         isLoading: false,
                         progress: {

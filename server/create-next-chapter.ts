@@ -11,6 +11,15 @@ import { determineRoleForDeadUnit } from "@/lib/determine-role-for-dead-unit.ts"
 import { DeadCharacterRecord } from "@/types/dead-character-record.ts";
 import { getGameByNid } from "./db/games.ts";
 
+// Step indexes for the initializing phase
+const INITIALIZING_STEPS = {
+  GAME_ENGINE: 0,     // Initializing game engine
+  LOADING_DATA: 1,    // Loading game data
+  ANALYZING: 2,       // Analyzing previous chapter
+  PROCESSING: 3,      // Processing player choices
+  GENERATION_START: 4 // Start of the actual AI generation
+};
+
 // Global store for chapter generation progress
 const chapterGenerationProgress = new Map<string, ChapterGenerationProgressEvent>();
 export { chapterGenerationProgress };
@@ -41,8 +50,17 @@ export default async function createNextChapter({
   });
   const logger = getCurrentLogger();
 
-  // Set initial progress
-  chapterGenerationProgress.set(gameNid, { step: 0, message: "Starting chapter generation..." });
+  // Set initial progress - Initializing game engine
+  chapterGenerationProgress.set(gameNid, {
+    step: INITIALIZING_STEPS.GAME_ENGINE,
+    message: "Initializing game engine..."
+  });
+
+  // Loading game data
+  chapterGenerationProgress.set(gameNid, {
+    step: INITIALIZING_STEPS.LOADING_DATA,
+    message: "Loading game data..."
+  });
 
   const { lastChoice, deadCharacters } = await getChapterResults({
     // Take out the leading underscore
@@ -55,6 +73,12 @@ export default async function createNextChapter({
     finishedChapterNumber: existingGame.chapters.length,
   });
 
+  // Analyzing previous chapter
+  chapterGenerationProgress.set(gameNid, {
+    step: INITIALIZING_STEPS.ANALYZING,
+    message: "Analyzing previous chapter..."
+  });
+
   // Generate the new chapter idea using all context
   existingGame.deadCharacters = existingGame.deadCharacters || [];
   const lastChapterIndex = existingGame.chapters.length - 1;
@@ -65,6 +89,12 @@ export default async function createNextChapter({
   logger.debug("previous choice context", {
     lastChoice,
     choiceOptions: lastChapterChoiceOptions,
+  });
+
+  // Processing player choices
+  chapterGenerationProgress.set(gameNid, {
+    step: INITIALIZING_STEPS.PROCESSING,
+    message: "Processing player choices..."
   });
 
   const newlyDeadThisChapter: DeadCharacterRecord[] = [];
@@ -92,6 +122,12 @@ export default async function createNextChapter({
   await removeStubEvent(projectNameEndingInDotLtProj);
   deleteSuspendSave();
 
+  // Moving to the generation phase
+  chapterGenerationProgress.set(gameNid, {
+    step: INITIALIZING_STEPS.GENERATION_START,
+    message: "Starting chapter generation..."
+  });
+
   // Create the actual next chapter
   const { chapter, musicToCopy, usedPortraits } = await genChapter({
     worldSummary: existingGame.worldSummary!,
@@ -106,9 +142,13 @@ export default async function createNextChapter({
     choiceQuestion: lastChapterChoiceOptions.displayText,
     playerChoice: lastChoice,
     onProgress: (progress) => {
-      // Update the global progress map
-      chapterGenerationProgress.set(gameNid, progress);
-      logger.info(`Chapter generation progress for ${gameNid}:`, progress);
+      // Update the global progress map - adjust step numbers to account for initializing steps
+      const adjustedProgress = {
+        ...progress,
+        step: progress.step + INITIALIZING_STEPS.GENERATION_START
+      };
+      chapterGenerationProgress.set(gameNid, adjustedProgress);
+      logger.info(`Chapter generation progress for ${gameNid}:`, adjustedProgress);
     },
   });
 
@@ -134,7 +174,7 @@ export default async function createNextChapter({
 
   // Set final progress state
   chapterGenerationProgress.set(gameNid, {
-    step: 14,
+    step: 16, // Final step including initialization steps
     message: "Chapter generation complete - ready to play!"
   });
 }
