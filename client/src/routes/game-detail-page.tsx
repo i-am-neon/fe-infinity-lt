@@ -248,16 +248,22 @@ export default function GameDetailPage() {
 
   // Handle test generation completion
   useEffect(() => {
-    if (loadingAction === "test" && !generationProgress.progress.isGenerating && generationProgress.progress.currentStep === 0) {
-      // Test generation is complete when progress is reset to initial state
-      setLoadingAction(null);
-      setGeneratingChapterModalOpen(false);
+    if (loadingAction === "test" && generationProgress.progress.currentStep === 16) {
+      // When we reach the final step (index 16), we consider the test generation complete
+      // Use setTimeout to allow the user to see the final step briefly
+      const completionTimer = setTimeout(() => {
+        setLoadingAction(null);
+        setGeneratingChapterModalOpen(false);
+      }, 3000);
+
+      return () => clearTimeout(completionTimer);
     }
   }, [loadingAction, generationProgress.progress]);
 
   const handleTestGeneration = useCallback(async () => {
     if (!data?.game || !nid) return;
 
+    setGenerationError(null); // Clear any previous errors
     setOldChapterCount(data.game.chapters.length);
     setGeneratingChapterModalOpen(true);
     setLoadingAction("test");
@@ -276,8 +282,9 @@ export default function GameDetailPage() {
         setGenerationError(response.error || "Failed to start test generation");
         setLoadingAction(null);
       }
-      // The modal will stay open to show progress
+      // The modal will stay open to show progress until completion is detected in the useEffect
     } catch (err) {
+      console.error("Error starting test generation:", err);
       setGenerationError(err instanceof Error ? err.message : String(err));
       setLoadingAction(null);
     }

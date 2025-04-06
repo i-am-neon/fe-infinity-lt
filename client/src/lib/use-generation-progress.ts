@@ -47,26 +47,12 @@ export default function useGenerationProgress(
                     progress?: {
                         step: number;
                         message: string;
-                        error?: string;
+                        error?: boolean;
                     };
                     error?: string;
                 }>(`generation-progress?gameNid=${encodeURIComponent(gameNid)}`);
 
                 if (response.success && response.progress) {
-                    // If progress is null/undefined, it means generation is complete
-                    if (!response.progress) {
-                        setState({
-                            isLoading: false,
-                            progress: {
-                                isGenerating: false,
-                                currentStep: 0,
-                                message: "",
-                            },
-                            error: null,
-                        });
-                        return;
-                    }
-
                     setState({
                         isLoading: false,
                         progress: {
@@ -98,6 +84,17 @@ export default function useGenerationProgress(
                             message: "",
                         },
                         error: response.error,
+                    });
+                } else {
+                    // No progress returned means generation is complete
+                    setState({
+                        isLoading: false,
+                        progress: {
+                            isGenerating: false,
+                            currentStep: 0,
+                            message: "",
+                        },
+                        error: null,
                     });
                 }
             } catch (error) {
