@@ -16,10 +16,12 @@ import {
   NonClosableDialogTitle,
 } from "@/components/ui/non-closable-dialog";
 import apiCall from "@/lib/api-call";
-import { KeyIcon, Loader2, Settings } from "lucide-react";
+import { KeyIcon, Loader2, Map, Settings } from "lucide-react";
 import { useCallback, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FeInfinityTitle } from "@/components/ui/fe-infinity-title";
+
+const showDebugButtons = true;
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -28,8 +30,6 @@ export default function HomePage() {
   const [creatingGameModalOpen, setCreatingGameModalOpen] = useState(false);
   const [gameIdea, setGameIdea] = useState("");
   const [error, setError] = useState<string | null>(null);
-
-  const showDebugButtons = false;
 
   // Test function states
   const [testingMockGame, setTestingMockGame] = useState(false);
@@ -369,6 +369,14 @@ export default function HomePage() {
                 <KeyIcon className="h-4 w-4" />
               )}
               Test API Key
+            </Button>
+            <Button
+              onClick={() => navigate('/unit-placement-test')}
+              variant="outline"
+              className="gap-1"
+            >
+              <Map className="h-4 w-4" />
+              Unit Placement Test
             </Button>
           </div>
         )}

@@ -6,6 +6,7 @@ import "./index.css";
 import GameDetailPage from "./routes/game-detail-page";
 import HomePage from "./routes/home-page";
 import SettingsPage from "./routes/settings-page";
+import UnitPlacementTestPage from "./routes/unit-placement-test";
 import Root from "./routes/root";
 
 const router = createHashRouter([
@@ -24,6 +25,10 @@ const router = createHashRouter([
       {
         path: "settings",
         element: <SettingsPage />,
+      },
+      {
+        path: "unit-placement-test",
+        element: <UnitPlacementTestPage />,
       },
     ],
   },

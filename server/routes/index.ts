@@ -3,6 +3,7 @@ import { handleCreateGame } from "@/routes/create-game.ts";
 import { Context } from "https://deno.land/x/oak@v12.6.1/context.ts";
 import { Status } from "https://deno.land/std@0.192.0/http/http_status.ts";
 import { setApiKey } from "@/lib/api-key-manager.ts";
+import { handleGetMapsList, handleGetTerrainGrid, handleUnitPlacement } from "@/routes/test-unit-placement.ts";
 
 // Process API keys from the request
 async function processApiKeys(ctx: Context, next: () => Promise<unknown>) {
@@ -109,7 +110,14 @@ export async function handleRequest(req: Request): Promise<Response> {
   // Process the request and get the response
   let response: Response;
 
-  if (req.method === "GET" && url.pathname === "/ping") {
+  // Handle unit placement test routes
+  if (req.method === "GET" && url.pathname === "/test-unit-placement/maps") {
+    response = await handleGetMapsList(req);
+  } else if (req.method === "GET" && url.pathname.startsWith("/test-unit-placement/terrain/")) {
+    response = await handleGetTerrainGrid(req);
+  } else if (req.method === "POST" && url.pathname === "/test-unit-placement/unit-placement") {
+    response = await handleUnitPlacement(req);
+  } else if (req.method === "GET" && url.pathname === "/ping") {
     // "Ping" route
     response = await handlePing();
   } else if (req.method === "GET" && url.pathname === "/games") {
