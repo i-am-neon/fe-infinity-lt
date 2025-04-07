@@ -1,6 +1,7 @@
 "use client";
 import { MultiStepLoader, LoadingState } from "@/components/ui/multi-step-loader";
 
+// Steps for next chapter generation
 const chapterGenerationSteps: LoadingState[] = [
     // Initializing phase
     { text: "Initializing game engine..." },
@@ -23,6 +24,20 @@ const chapterGenerationSteps: LoadingState[] = [
     { text: "Finalizing chapter assembly..." }
 ];
 
+// Steps for new game creation
+const gameCreationSteps: LoadingState[] = [
+    { text: "Initializing project..." },
+    { text: "Creating game world..." },
+    { text: "Generating main characters..." },
+    { text: "Designing world map..." },
+    { text: "Creating player army..." },
+    { text: "Setting up initial conditions..." },
+    { text: "Generating storyline..." },
+    { text: "Creating first chapter..." },
+    { text: "Setting up game files..." },
+    { text: "Finalizing game creation..." }
+];
+
 // Define the step indexes where each phase begins
 export const GENERATION_PHASES = {
     INITIALIZING: 0,
@@ -40,17 +55,22 @@ interface ChapterGeneratorLoaderProps {
     progress: ChapterGenerationProgress;
     title?: string;
     description?: string;
+    mode?: 'chapter' | 'game'; // New prop to determine which steps to use
 }
 
 export function ChapterGeneratorLoader({
     progress,
     title = "Generating Next Chapter",
-    description = "The AI is creating your next chapter based on your gameplay. This typically takes around five minutes, and the game will launch automatically when complete."
+    description = "The AI is creating your next chapter based on your gameplay. This typically takes around five minutes, and the game will launch automatically when complete.",
+    mode = 'chapter' // Default to chapter generation mode
 }: ChapterGeneratorLoaderProps) {
-    // Use non-looping mode for chapter generation, as we want to show real progress
+    // Choose which steps to use based on mode
+    const steps = mode === 'game' ? gameCreationSteps : chapterGenerationSteps;
+
+    // Use non-looping mode for generation, as we want to show real progress
     return (
         <MultiStepLoader
-            loadingStates={chapterGenerationSteps}
+            loadingStates={steps}
             loading={progress.isGenerating}
             duration={3000}
             loop={false}

@@ -56,11 +56,16 @@ export default async function createNextChapter({
     message: "Initializing game engine..."
   });
 
+  // Add 2-second timeouts for testing the progress updates
+  await new Promise(resolve => setTimeout(resolve, 2000));
+
   // Loading game data
   chapterGenerationProgress.set(gameNid, {
     step: INITIALIZING_STEPS.LOADING_DATA,
     message: "Loading game data..."
   });
+
+  await new Promise(resolve => setTimeout(resolve, 2000));
 
   const { lastChoice, deadCharacters } = await getChapterResults({
     // Take out the leading underscore
@@ -79,6 +84,8 @@ export default async function createNextChapter({
     message: "Analyzing previous chapter..."
   });
 
+  await new Promise(resolve => setTimeout(resolve, 2000));
+
   // Generate the new chapter idea using all context
   existingGame.deadCharacters = existingGame.deadCharacters || [];
   const lastChapterIndex = existingGame.chapters.length - 1;
@@ -96,6 +103,8 @@ export default async function createNextChapter({
     step: INITIALIZING_STEPS.PROCESSING,
     message: "Processing player choices..."
   });
+
+  await new Promise(resolve => setTimeout(resolve, 2000));
 
   const newlyDeadThisChapter: DeadCharacterRecord[] = [];
   for (const newlyDead of deadCharacters) {
@@ -127,6 +136,8 @@ export default async function createNextChapter({
     step: INITIALIZING_STEPS.GENERATION_START,
     message: "Starting chapter generation..."
   });
+
+  await new Promise(resolve => setTimeout(resolve, 2000));
 
   // Create the actual next chapter
   const { chapter, musicToCopy, usedPortraits } = await genChapter({

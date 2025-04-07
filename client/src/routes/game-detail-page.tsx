@@ -16,7 +16,7 @@ import {
 import { Button } from "../components/ui/button";
 import { Game } from "../types/game";
 import { ChapterGeneratorLoader } from "@/components/ui/chapter-generator-loader";
-import useGenerationProgress from "@/lib/use-generation-progress";
+import useGenerationProgress, { useGameCreationProgress } from "@/lib/use-generation-progress";
 import { AnimatePresence, motion } from "framer-motion";
 
 export default function GameDetailPage() {
@@ -51,6 +51,11 @@ export default function GameDetailPage() {
   const generationProgress = useGenerationProgress(
     nid,
     loadingAction === "generate" || loadingAction === "test"
+  );
+
+  const gameCreationProgress = useGameCreationProgress(
+    nid,
+    isNew && newGameModalOpen
   );
 
   // Watch for generation errors
@@ -373,11 +378,12 @@ export default function GameDetailPage() {
                 <ChapterGeneratorLoader
                   progress={{
                     isGenerating: true,
-                    currentStep: 0, // Start at step 0 for new game creation
-                    message: "Creating your new game..."
+                    currentStep: gameCreationProgress.progress.currentStep,
+                    message: gameCreationProgress.progress.message || "Creating your new game..."
                   }}
                   title="Creating New Game"
                   description="The AI is generating your new game world, characters, and first chapter. This typically takes around five minutes, and will open automatically when complete."
+                  mode="game"
                 />
               )}
             </div>
@@ -468,6 +474,7 @@ export default function GameDetailPage() {
                   description={loadingAction === "test"
                     ? "This is a test simulation showing the chapter generation process with 3-second intervals between steps."
                     : "The AI is creating your next chapter based on your gameplay. This typically takes around five minutes, and the game will launch automatically when complete."}
+                  mode="chapter"
                 />
               )}
             </div>

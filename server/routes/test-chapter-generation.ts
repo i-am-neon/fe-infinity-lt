@@ -1,17 +1,16 @@
 import { ChapterGenerationProgressEvent } from "@/ai/gen-chapter.ts";
 import { getCurrentLogger } from "@/lib/current-logger.ts";
-
-// Store progress for each game
-const testGenerationProgress = new Map<string, ChapterGenerationProgressEvent>();
+import { chapterGenerationProgress } from "@/create-next-chapter.ts";
 
 // Expose method to get test progress for other endpoints
 export function getTestGenerationProgress(gameNid: string): ChapterGenerationProgressEvent | undefined {
-    return testGenerationProgress.get(gameNid);
+    // Use the shared progress map from create-next-chapter.ts
+    return chapterGenerationProgress.get(gameNid);
 }
 
 // Clear progress when done or on error
 export function clearTestGenerationProgress(gameNid: string): void {
-    testGenerationProgress.delete(gameNid);
+    chapterGenerationProgress.delete(gameNid);
 }
 
 export async function handleTestChapterGeneration(
@@ -36,12 +35,12 @@ export async function handleTestChapterGeneration(
         logger.info(`Starting test chapter generation simulation for ${gameNid}`);
 
         // Start the test generation process in the background
-        testGenerationProgress.set(gameNid, {
+        chapterGenerationProgress.set(gameNid, {
             step: 0,
             message: "Initializing game engine..."
         });
 
-        // Simulate progress with 3-second delays
+        // Simulate progress with 2-second delays
         simulateProgress(gameNid);
 
         return new Response(
@@ -109,11 +108,11 @@ async function simulateProgress(gameNid: string) {
     try {
         for (let i = 0; i < steps.length; i++) {
             // Update progress
-            testGenerationProgress.set(gameNid, steps[i]);
+            chapterGenerationProgress.set(gameNid, steps[i]);
             logger.info(`Test generation progress: ${steps[i].message}`, { step: steps[i].step });
 
-            // Wait 3 seconds between updates
-            await new Promise(resolve => setTimeout(resolve, 3000));
+            // Wait 2 seconds between updates (faster than original 3 seconds)
+            await new Promise(resolve => setTimeout(resolve, 2000));
         }
 
         // Mark as complete
@@ -125,7 +124,7 @@ async function simulateProgress(gameNid: string) {
         }, 5000);
     } catch (error) {
         logger.error(`Error in simulateProgress for ${gameNid}`, { error });
-        testGenerationProgress.set(gameNid, {
+        chapterGenerationProgress.set(gameNid, {
             step: 0,
             message: "Error in test simulation",
             error: true

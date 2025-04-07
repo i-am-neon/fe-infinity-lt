@@ -111,4 +111,111 @@ export default function useGenerationProgress(
     }, [gameNid, isGenerating]);
 
     return state;
+}
+
+/**
+ * Custom hook to poll and track game creation progress
+ */
+export function useGameCreationProgress(
+    gameNid: string | undefined,
+    isGenerating: boolean
+): GenerationProgressState {
+    const [state, setState] = useState<GenerationProgressState>({
+        isLoading: false,
+        progress: {
+            isGenerating: false,
+            currentStep: 0,
+            message: "",
+        },
+        error: null,
+    });
+
+    useEffect(() => {
+        if (!gameNid || !isGenerating) {
+            setState((prev) => ({
+                ...prev,
+                progress: {
+                    isGenerating: false,
+                    currentStep: 0,
+                    message: "",
+                },
+            }));
+            return;
+        }
+
+        setState((prev) => ({ ...prev, isLoading: true }));
+
+        const pollId = setInterval(async () => {
+            try {
+                const response = await apiCall<{
+                    success: boolean;
+                    progress?: {
+                        step: number;
+                        message: string;
+                        error?: boolean;
+                    };
+                    error?: string;
+                }>(`game-creation-progress?gameNid=${encodeURIComponent(gameNid)}`);
+
+                console.log("Game creation progress response:", response);
+
+                if (response.success && response.progress) {
+                    setState({
+                        isLoading: false,
+                        progress: {
+                            isGenerating: true,
+                            currentStep: response.progress.step,
+                            message: response.progress.message,
+                        },
+                        error: null,
+                    });
+
+                    // Check for error flag in progress
+                    if (response.progress.error) {
+                        setState({
+                            isLoading: false,
+                            progress: {
+                                isGenerating: false,
+                                currentStep: response.progress.step,
+                                message: response.progress.message,
+                            },
+                            error: response.progress.message,
+                        });
+                    }
+                } else if (response.error) {
+                    setState({
+                        isLoading: false,
+                        progress: {
+                            isGenerating: false,
+                            currentStep: 0,
+                            message: "",
+                        },
+                        error: response.error,
+                    });
+                } else {
+                    // No progress returned means generation is complete
+                    setState({
+                        isLoading: false,
+                        progress: {
+                            isGenerating: false,
+                            currentStep: 0,
+                            message: "",
+                        },
+                        error: null,
+                    });
+                }
+            } catch (error) {
+                console.error("Error fetching game creation progress:", error);
+                setState((prev) => ({
+                    ...prev,
+                    isLoading: false,
+                    error: error instanceof Error ? error.message : "Unknown error",
+                }));
+            }
+        }, 1000);
+
+        return () => clearInterval(pollId);
+    }, [gameNid, isGenerating]);
+
+    return state;
 } 

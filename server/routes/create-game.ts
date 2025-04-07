@@ -11,6 +11,20 @@ import runGame from "@/run-game.ts";
 import { Game } from "@/types/game.ts";
 import { insertGame } from "../db/games.ts";
 
+// Game creation steps indices (matching the UI steps)
+const GAME_CREATION_STEPS = {
+  INITIALIZE_PROJECT: 0,
+  CREATE_WORLD: 1,
+  GENERATE_CHARACTERS: 2,
+  DESIGN_WORLD_MAP: 3,
+  CREATE_PLAYER_ARMY: 4,
+  SETUP_CONDITIONS: 5,
+  GENERATE_STORYLINE: 6,
+  CREATE_FIRST_CHAPTER: 7,
+  SETUP_GAME_FILES: 8,
+  FINALIZE: 9
+};
+
 // In-memory store for game creation errors
 const gameCreationErrors = new Map<string, string>();
 
@@ -57,6 +71,20 @@ export async function handleCreateGame(req: Request): Promise<Response> {
       projectName
     );
 
+    // Setup logger first so we can log progress
+    setCurrentLogger({
+      projectName: projectNameEndingInDotLtProj,
+      chapterNumber: 0,
+    });
+    const logger = getCurrentLogger();
+
+    // Set initial progress
+    gameCreationProgress.set(gameNid, {
+      step: GAME_CREATION_STEPS.INITIALIZE_PROJECT,
+      message: "Initializing project..."
+    });
+    logger.info(`Game creation progress: Initializing project (step ${GAME_CREATION_STEPS.INITIALIZE_PROJECT})`);
+
     // Insert a minimal game record so that the DB definitely has the game
     const partialGame: Game = {
       nid: gameNid,
@@ -87,42 +115,82 @@ export async function handleCreateGame(req: Request): Promise<Response> {
     (async () => {
       const startTime = Date.now();
       try {
-        setCurrentLogger({
-          projectName: projectNameEndingInDotLtProj,
-          chapterNumber: 0,
+        // Generate world summary
+        gameCreationProgress.set(gameNid, {
+          step: GAME_CREATION_STEPS.CREATE_WORLD,
+          message: "Creating game world..."
         });
-        const logger = getCurrentLogger();
+        logger.info(`Game creation progress: Creating game world (step ${GAME_CREATION_STEPS.CREATE_WORLD})`);
 
-        // generate world summary & top-level music
         const worldSummary = await genWorldSummary({
           gameName: projectName,
           gameDescription: description,
           tone,
         });
+
+        // Design world map / select music
+        gameCreationProgress.set(gameNid, {
+          step: GAME_CREATION_STEPS.DESIGN_WORLD_MAP,
+          message: "Designing world map..."
+        });
+        logger.info(`Game creation progress: Designing world map (step ${GAME_CREATION_STEPS.DESIGN_WORLD_MAP})`);
+
         const topLevelMusics = await chooseTopLevelMusic({
           projectNameEndingInDotLtProj,
           gameDescription: description,
           tone,
         });
 
-        // generate the initial game idea
+        // Generate storyline / initial game idea
+        gameCreationProgress.set(gameNid, {
+          step: GAME_CREATION_STEPS.GENERATE_STORYLINE,
+          message: "Generating storyline..."
+        });
+        logger.info(`Game creation progress: Generating storyline (step ${GAME_CREATION_STEPS.GENERATE_STORYLINE})`);
+
         const initialGameIdea = await genInitialGameIdea({
           worldSummary,
           tone,
         });
 
-        // create the prologue
+        // Setup initial conditions before chapter creation
+        gameCreationProgress.set(gameNid, {
+          step: GAME_CREATION_STEPS.SETUP_CONDITIONS,
+          message: "Setting up initial conditions..."
+        });
+        logger.info(`Game creation progress: Setting up initial conditions (step ${GAME_CREATION_STEPS.SETUP_CONDITIONS})`);
+
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // Create the first chapter (prologue)
+        gameCreationProgress.set(gameNid, {
+          step: GAME_CREATION_STEPS.CREATE_FIRST_CHAPTER,
+          message: "Creating first chapter..."
+        });
+        logger.info(`Game creation progress: Creating first chapter (step ${GAME_CREATION_STEPS.CREATE_FIRST_CHAPTER})`);
+
         const { chapter, usedPortraits, musicToCopy } = await genChapter({
           worldSummary,
           initialGameIdea,
           tone,
           chapterNumber: 0,
           onProgress: (progress) => {
-            // Update the global progress map
-            gameCreationProgress.set(gameNid, progress);
-            logger.info(`Game creation progress for ${gameNid}:`, progress);
+            // For chapter generation, we're still in the CREATE_FIRST_CHAPTER step
+            // but we can update the message to reflect the sub-step progress
+            gameCreationProgress.set(gameNid, {
+              step: GAME_CREATION_STEPS.CREATE_FIRST_CHAPTER,
+              message: progress.message || "Creating first chapter..."
+            });
+            logger.info(`Game creation progress: Still creating first chapter - ${progress.message} (step ${GAME_CREATION_STEPS.CREATE_FIRST_CHAPTER})`);
           },
         });
+
+        // Set up game files
+        gameCreationProgress.set(gameNid, {
+          step: GAME_CREATION_STEPS.SETUP_GAME_FILES,
+          message: "Setting up game files..."
+        });
+        logger.info(`Game creation progress: Setting up game files (step ${GAME_CREATION_STEPS.SETUP_GAME_FILES})`);
 
         // write the prologue to LT
         await writeChapter({
@@ -137,6 +205,13 @@ export async function handleCreateGame(req: Request): Promise<Response> {
           chapterNumber: 1,
           previousTilemapNid: chapter.tilemap.nid,
         });
+
+        // Finalize game creation
+        gameCreationProgress.set(gameNid, {
+          step: GAME_CREATION_STEPS.FINALIZE,
+          message: "Finalizing game creation..."
+        });
+        logger.info(`Game creation progress: Finalizing game creation (step ${GAME_CREATION_STEPS.FINALIZE})`);
 
         // The minimal record is already inserted. Let's update it now that we have full data.
         const updatedGame: Game = {
@@ -156,11 +231,25 @@ export async function handleCreateGame(req: Request): Promise<Response> {
         const duration = Date.now() - startTime;
         logger.info("New Game Created", { newGame: updatedGame, duration });
 
+        // Wait a moment before clearing progress to ensure UI captures completion
+        setTimeout(() => {
+          // Clear the progress to indicate completion
+          gameCreationProgress.delete(gameNid);
+          logger.info(`Game creation progress cleared for ${gameNid}`);
+        }, 5000);
+
         runGame(projectNameEndingInDotLtProj);
       } catch (err) {
         const logger = getCurrentLogger();
         const errorMsg = err instanceof Error ? err.message : String(err);
         logger.error("Error creating game", { error: errorMsg });
+
+        // Set error flag in progress
+        gameCreationProgress.set(gameNid, {
+          step: 0,
+          message: errorMsg,
+          error: true
+        });
 
         // Store error in memory map for retrieval
         gameCreationErrors.set(gameNid, errorMsg);
