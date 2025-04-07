@@ -1,14 +1,8 @@
 "use client";
 import { MultiStepLoader, LoadingState } from "@/components/ui/multi-step-loader";
 
-// Steps for next chapter generation
-const chapterGenerationSteps: LoadingState[] = [
-    // Initializing phase
-    { text: "Initializing game engine..." },
-    { text: "Loading game data..." },
-    { text: "Analyzing previous chapter..." },
-    { text: "Processing player choices..." },
-    // Generation phase
+// Shared generation phase steps (used by both chapter and game creation)
+const generationPhaseSteps: LoadingState[] = [
     { text: "Generating chapter idea and storyline..." },
     { text: "Creating new characters and assigning traits..." },
     { text: "Selecting portraits for characters..." },
@@ -24,16 +18,30 @@ const chapterGenerationSteps: LoadingState[] = [
     { text: "Finalizing chapter assembly..." }
 ];
 
-// Steps for new game creation
-const gameCreationSteps: LoadingState[] = [
+// Steps for chapter generation - initializing phase + generation phase
+const chapterGenerationSteps: LoadingState[] = [
+    // Initializing phase
+    { text: "Initializing game engine..." },
+    { text: "Loading game data..." },
+    { text: "Analyzing previous chapter..." },
+    { text: "Processing player choices..." },
+    // Generation phase steps are added dynamically in the component
+];
+
+// Steps specific to game creation (pre-generation)
+const gameCreationPreSteps: LoadingState[] = [
     { text: "Initializing project..." },
     { text: "Creating game world..." },
     { text: "Generating main characters..." },
     { text: "Designing world map..." },
-    { text: "Creating player army..." },
     { text: "Setting up initial conditions..." },
     { text: "Generating storyline..." },
-    { text: "Creating first chapter..." },
+    // After these steps, the CREATE_FIRST_CHAPTER step begins
+    // and gen-chapter.ts takes over with generationPhaseSteps
+];
+
+// Steps specific to game creation (post-generation)
+const gameCreationPostSteps: LoadingState[] = [
     { text: "Setting up game files..." },
     { text: "Finalizing game creation..." }
 ];
@@ -42,6 +50,11 @@ const gameCreationSteps: LoadingState[] = [
 export const GENERATION_PHASES = {
     INITIALIZING: 0,
     GENERATION: 4, // Index of the first generation step
+};
+
+// This must match the CREATE_FIRST_CHAPTER value in server/routes/create-game.ts
+export const GAME_CREATION_STEPS = {
+    CREATE_FIRST_CHAPTER: 7
 };
 
 export type ChapterGenerationProgress = {
@@ -64,8 +77,39 @@ export function ChapterGeneratorLoader({
     description = "The AI is creating your next chapter based on your gameplay. This typically takes around five minutes, and the game will launch automatically when complete.",
     mode = 'chapter' // Default to chapter generation mode
 }: ChapterGeneratorLoaderProps) {
-    // Choose which steps to use based on mode
-    const steps = mode === 'game' ? gameCreationSteps : chapterGenerationSteps;
+    // Combine the appropriate steps based on mode
+    const steps = mode === 'game'
+        ? [...gameCreationPreSteps, ...generationPhaseSteps, ...gameCreationPostSteps]
+        : [...chapterGenerationSteps, ...generationPhaseSteps];
+
+    // Adjust the current step index if needed based on mode
+    let adjustedCurrentStep = progress.currentStep;
+
+    // Map the progress step to the appropriate step in our combined array
+    if (mode === 'game') {
+        // For game creation, if we're in the generation phase, we need to adjust the mapping
+        // In create-game.ts, the first generation phase step is CREATE_FIRST_CHAPTER + 0
+        if (progress.currentStep >= GAME_CREATION_STEPS.CREATE_FIRST_CHAPTER) {
+            // Calculate offset within the generation phase
+            const generationPhaseIndex = progress.currentStep - GAME_CREATION_STEPS.CREATE_FIRST_CHAPTER;
+
+            // Map to the correct position in our combined array
+            // Generation phase steps start after the pre-steps
+            if (generationPhaseIndex < generationPhaseSteps.length) {
+                adjustedCurrentStep = gameCreationPreSteps.length + generationPhaseIndex;
+            } else {
+                // We've moved to post-generation steps
+                adjustedCurrentStep = gameCreationPreSteps.length + generationPhaseSteps.length;
+            }
+        }
+    } else if (mode === 'chapter') {
+        // For chapter generation, we need to handle the transition from initialization to generation
+        // In create-next-chapter.ts, generation phase steps are offset by INITIALIZING_STEPS.GENERATION_START (4) 
+        if (progress.currentStep >= GENERATION_PHASES.GENERATION) {
+            // We're in the generation phase
+            // No change needed as our array is already structured this way
+        }
+    }
 
     // Use non-looping mode for generation, as we want to show real progress
     return (
@@ -74,7 +118,7 @@ export function ChapterGeneratorLoader({
             loading={progress.isGenerating}
             duration={3000}
             loop={false}
-            value={progress.currentStep}
+            value={adjustedCurrentStep}
             title={title}
             description={description}
         />

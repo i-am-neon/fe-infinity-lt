@@ -175,13 +175,16 @@ export async function handleCreateGame(req: Request): Promise<Response> {
           tone,
           chapterNumber: 0,
           onProgress: (progress) => {
-            // For chapter generation, we're still in the CREATE_FIRST_CHAPTER step
-            // but we can update the message to reflect the sub-step progress
+            // Map the gen-chapter steps to our UI steps
+            // We need to use the generation phase steps that are shared between
+            // chapter generation and game creation in the UI
+            const step = progress.step + GAME_CREATION_STEPS.CREATE_FIRST_CHAPTER;
+
             gameCreationProgress.set(gameNid, {
-              step: GAME_CREATION_STEPS.CREATE_FIRST_CHAPTER,
+              step: step,
               message: progress.message || "Creating first chapter..."
             });
-            logger.info(`Game creation progress: Still creating first chapter - ${progress.message} (step ${GAME_CREATION_STEPS.CREATE_FIRST_CHAPTER})`);
+            logger.info(`Game creation progress: ${progress.message} (step ${step})`);
           },
         });
 
