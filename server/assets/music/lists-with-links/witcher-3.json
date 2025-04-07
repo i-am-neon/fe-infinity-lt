@@ -1,0 +1,73 @@
+[
+  {
+    "songName": "The Trail",
+    "feel": "Epic and urgent, blending haunting vocals and pounding percussion for a sense of impending adventure.",
+    "instrumentsUsed": "choir vocals, orchestral strings, brass, heavy drums",
+    "situationUsedInGame": "Featured in the game's launch cinematic/trailer and sets the epic tone of the Wild Hunt's pursuit.",
+    "youTubeLink": "https://www.youtube.com/watch?v=i1qjKo6Ts60"
+  },
+  {
+    "songName": "Geralt of Rivia",
+    "feel": "Brooding and heroic, starting softly but building into a triumphant, epic hero's theme.",
+    "instrumentsUsed": "solo cello, orchestral strings, brass, percussion",
+    "situationUsedInGame": "Plays at the game's start/main menu, introducing Geralt's theme and the world's grand adventure.",
+    "youTubeLink": "https://www.youtube.com/watch?v=j940HnlMM8k"
+  },
+  {
+    "songName": "Ladies of the Woods",
+    "feel": "Eerie and otherworldly, with a pagan, haunting atmosphere that instills unease.",
+    "instrumentsUsed": "droning ancient strings (hurdy-gurdy, kemenche), deep percussion, guttural female vocals",
+    "situationUsedInGame": "Heard in Velen's swamps during the Ladies of the Wood quest, representing the Crones' creepy presence.",
+    "youTubeLink": "https://www.youtube.com/watch?v=9FeZYagK4BQ"
+  },
+  {
+    "songName": "Silver for Monsters...",
+    "feel": "High-energy and ferocious, a raw folk battle anthem that pumps adrenaline during fights.",
+    "instrumentsUsed": "pounding war drums, saz lute, fiddle, and chanting Slavic vocals",
+    "situationUsedInGame": "The iconic combat music (the lelele song) that kicks in during monster battles throughout the game.",
+    "youTubeLink": "https://www.youtube.com/watch?v=jRG0gyVFP60"
+  },
+  {
+    "songName": "Kaer Morhen",
+    "feel": "Calm and nostalgic, evoking a bittersweet sense of homecoming and fading glory.",
+    "instrumentsUsed": "soft recorder (flute), gentle strings, hammered dulcimer",
+    "situationUsedInGame": "Plays at the Witcher stronghold Kaer Morhen, underscoring Geralt's peaceful yet melancholic return home.",
+    "youTubeLink": "https://www.youtube.com/watch?v=vY-1DTTSjeA"
+  },
+  {
+    "songName": "Farewell, Old Friend",
+    "feel": "Somber and mournful, a deeply emotional piece conveying sorrow and loss.",
+    "instrumentsUsed": "soulful kemenche (bowed fiddle) lead with soft string orchestration",
+    "situationUsedInGame": "Plays during a funeral scene for a fallen mentor, adding heartfelt gravitas to a tragic moment.",
+    "youTubeLink": "https://www.youtube.com/watch?v=AJ5yvhAk_EU"
+  },
+  {
+    "songName": "The Fields of Ard Skellig",
+    "feel": "Hauntingly beautiful and majestic, with a windswept Celtic melody that feels both uplifting and wistful.",
+    "instrumentsUsed": "soaring bagpipes, violins, and distant vocal hums",
+    "situationUsedInGame": "Plays while exploring the Skellige Isles (Ard Skellig), capturing the grandeur and loneliness of the northern isles.",
+    "youTubeLink": "https://www.youtube.com/watch?v=NknjE2SBPxw"
+  },
+  {
+    "songName": "You're... Immortal?",
+    "feel": "Chaotic and intense, shifting from ominous to frenzied to match a surreal, high-stakes duel.",
+    "instrumentsUsed": "fast percussion, electric saz, frantic strings, aggressive vocals",
+    "situationUsedInGame": "Heard during a boss fight in the Hearts of Stone expansion when a foe's shocking immortality is revealed.",
+    "youTubeLink": "https://www.youtube.com/watch?v=Ies6sP0gqoo"
+  },
+  {
+    "songName": "The Slopes of the Blessure",
+    "feel": "Upbeat and pastoral, an optimistic tune that feels like a joyous dance through sunny vineyards.",
+    "instrumentsUsed": "accordion, violins, hurdy-gurdy, tambourine",
+    "situationUsedInGame": "Plays while roaming Toussaint's countryside in the Blood and Wine expansion, reflecting its fairytale beauty and wine-festival cheer.",
+    "youTubeLink": "https://www.youtube.com/watch?v=824CHpd7Ax8"
+  },
+  {
+    "songName": "The Beast of Beauclair",
+    "feel": "Dark and dramatic, an urgent orchestral piece that underscores the terror of a climactic battle.",
+    "instrumentsUsed": "dramatic strings, brass, choral chanting, thunderous drums",
+    "situationUsedInGame": "Plays during the final boss fight against the vampire Dettlaff (the Beast of Beauclair) in the Blood and Wine expansion.",
+    "youTubeLink": "https://www.youtube.com/watch?v=UQbYZFfDm0M"
+  }
+]
+
