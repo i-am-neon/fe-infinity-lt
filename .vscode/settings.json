@@ -5,7 +5,8 @@
   "search.exclude": {
     "**/electron/bin": true,
     "**/dist": true,
-    "electron/rlease": true,
+    "electron/release": true,
+    "electron/python_embed": true,
     "landing/.next": true,
   },
   "files.watcherExclude": {
