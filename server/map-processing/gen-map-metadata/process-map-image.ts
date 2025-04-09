@@ -39,7 +39,7 @@ export default function processMapImage({
 
 if (import.meta.main) {
   processMapImage({
-    imagePath: getPathWithinServer("assets/test/Chpt5.png"),
+    imagePath: getPathWithinServer("assets/test/maps/(7)Ch3BandofMercenaries_Diff_Tileset__by_Shin19.png"),
     mapSetting: "outdoor",
   }).then((res) => {
     console.log(res);
