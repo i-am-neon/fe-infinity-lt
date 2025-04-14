@@ -50,8 +50,8 @@ export default async function generateStructuredData<T>({
   try {
     // Select the appropriate model based on type
     const _model = model === "fast"
-      ? openai("gpt-4o-mini")
-      : openai("gpt-4o");
+      ? openai("gpt-4.1-mini")
+      : openai("gpt-4.1");
 
     for (let attempt = 1; attempt <= 3; attempt++) {
       try {
