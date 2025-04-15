@@ -6,17 +6,36 @@ import getMapSetting from "@/map-processing/gen-map-metadata/get-map-setting.ts"
 import processMapImage from "@/map-processing/gen-map-metadata/process-map-image.ts";
 import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
 import genMapMetadata from "./gen-map-metadata.ts";
+import {
+    getMapVisualSummaryFromCheckpoint,
+    saveMapVisualSummaryToCheckpoint
+} from "./map-visual-summary-checkpoint.ts";
+import getTerrainGridFromMapName from "@/ai/level/unit-placement/get-terrain-grid-from-tilemap.ts";
 
 export default async function assembleMapMetadata({
     mapQuadrants,
     imagePath,
+    forceRefresh = false,
 }: {
     mapQuadrants: SubGrid[];
     imagePath: string;
+    forceRefresh?: boolean;
 }): Promise<MapMetadata> {
     const mapSetting = getMapSetting(mapQuadrants);
 
-    const mapVisualSummary = await processMapImage({ imagePath, mapSetting });
+    // Try to get the map visual summary from checkpoint (unless forced refresh)
+    let mapVisualSummary = forceRefresh ? null : await getMapVisualSummaryFromCheckpoint(imagePath, mapSetting);
+
+    // If not found in checkpoint or forced refresh, process the image and save to checkpoint
+    if (!mapVisualSummary) {
+        console.log(`${forceRefresh ? "Force refreshing" : "Not found in checkpoint"}, processing image: ${imagePath}`);
+        mapVisualSummary = await processMapImage({ imagePath, mapSetting });
+
+        // Save to checkpoint for future use
+        await saveMapVisualSummaryToCheckpoint(imagePath, mapSetting, mapVisualSummary);
+    } else {
+        console.log(`Using cached map visual summary for: ${imagePath}`);
+    }
 
     const mapMetadata = await genMapMetadata({
         mapQuadrants,
@@ -45,8 +64,10 @@ export default async function assembleMapMetadata({
 if (import.meta.main) {
     console.time("Map Metadata Generation");
     assembleMapMetadata({
-        mapQuadrants: chunkGridIntoQuadrants(ch5TerrainGrid),
-        imagePath: getPathWithinServer("assets/test/Chpt5.png"),
+        mapQuadrants: chunkGridIntoQuadrants(getTerrainGridFromMapName("(7)Ch3BandofMercenaries_Diff_Tileset__by_Shin19")),
+        imagePath: getPathWithinServer("assets/test/maps/(7)Ch3BandofMercenaries_Diff_Tileset__by_Shin19.png"),
+        // Uncomment to force refresh:
+        // forceRefresh: true,
     })
         .then((res) => {
             console.timeEnd("Map Metadata Generation");
