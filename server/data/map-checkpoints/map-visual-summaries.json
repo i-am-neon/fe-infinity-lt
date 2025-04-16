@@ -60,5 +60,1144 @@
         "location": "top center"
       }
     ]
+  },
+  "Nobles_Evil_Doers_8_(6C_00_A3_6E)__by_Aura_Wolf.png__indoor": {
+    "name": "Ancient Aqueduct",
+    "description": "A complex indoor structure featuring waterways, bridges, and chambers, suggesting an ancient aqueduct system.",
+    "regions": [
+      {
+        "name": "Northern Chambers",
+        "description": "A series of enclosed rooms with narrow passages.",
+        "location": "top left"
+      },
+      {
+        "name": "Central Waterway",
+        "description": "A wide water channel running through the center, crossed by bridges.",
+        "location": "center"
+      },
+      {
+        "name": "Southern Bridge",
+        "description": "A prominent bridge connecting the southern parts of the map.",
+        "location": "bottom center"
+      },
+      {
+        "name": "Eastern Passage",
+        "description": "A narrow corridor leading to the eastern exit.",
+        "location": "center right"
+      },
+      {
+        "name": "Western Alcove",
+        "description": "A small, secluded area with limited access.",
+        "location": "top center left"
+      }
+    ]
+  },
+  "Nobles_Evil_Doers_9_(5F_00_60_61)__by_Aura_Wolf.png__indoor": {
+    "name": "Ancient Ruins",
+    "description": "A mysterious indoor map featuring stone pathways, overgrown vegetation, and hidden treasures.",
+    "regions": [
+      {
+        "name": "Treasure Chamber",
+        "description": "A secluded room containing a valuable chest.",
+        "location": "top left"
+      },
+      {
+        "name": "Overgrown Hallway",
+        "description": "A corridor with creeping vegetation and stone statues.",
+        "location": "center"
+      },
+      {
+        "name": "Mossy Path",
+        "description": "A narrow path lined with moss and ancient tiles.",
+        "location": "bottom center right"
+      },
+      {
+        "name": "Entrance Archway",
+        "description": "The grand entrance with a large arch and intricate designs.",
+        "location": "bottom right"
+      }
+    ]
+  },
+  "Knights_Villagers_Bandits_10_(3C_00_CE_3E)__by_Aura_Wolf.png__outdoor": {
+    "name": "Fortress Courtyard",
+    "description": "A fortified outdoor area surrounded by stone structures, featuring a central open space with scattered trees and pathways.",
+    "regions": [
+      {
+        "name": "Northern Fortress",
+        "description": "A large stone structure with a red carpet, likely a command center or throne room.",
+        "location": "top center"
+      },
+      {
+        "name": "Central Courtyard",
+        "description": "An open grassy area with scattered trees, serving as the main outdoor space.",
+        "location": "center"
+      },
+      {
+        "name": "Eastern Barracks",
+        "description": "A stone building with a treasure chest, possibly used for storage or housing troops.",
+        "location": "center right"
+      },
+      {
+        "name": "Western Barracks",
+        "description": "A stone building with multiple entrances, likely used for troop accommodation.",
+        "location": "center left"
+      }
+    ]
+  },
+  "Nobles_Evil_Doers_6_(6C_00_A3_6E)__by_Aura_Wolf.png__indoor": {
+    "name": "Ancient Ruins",
+    "description": "A complex indoor map featuring multiple rooms and corridors, with a mix of open spaces and narrow passages.",
+    "regions": [
+      {
+        "name": "Central Chamber",
+        "description": "A large, open room with multiple entrances, serving as the main hub of the map.",
+        "location": "center"
+      },
+      {
+        "name": "Left Wing",
+        "description": "A series of interconnected rooms and corridors on the left side, offering strategic cover and movement options.",
+        "location": "top left"
+      },
+      {
+        "name": "Right Wing",
+        "description": "A mirrored layout of the Left Wing, providing similar strategic opportunities on the right side.",
+        "location": "top right"
+      },
+      {
+        "name": "Lower Passage",
+        "description": "A narrow corridor leading to smaller rooms, offering a tactical approach from the bottom.",
+        "location": "bottom center"
+      },
+      {
+        "name": "Upper Balcony",
+        "description": "An elevated area providing a vantage point over the central chamber.",
+        "location": "top center"
+      }
+    ]
+  },
+  "Mages_Mercenaries_2_(01_00_38_03)__by_Aura_Wolf.png__outdoor": {
+    "name": "Mountain Pass Ambush",
+    "description": "A rugged outdoor map featuring a mix of forests, mountains, and a fortified structure, ideal for strategic ambushes and defensive maneuvers.",
+    "regions": [
+      {
+        "name": "Western Village",
+        "description": "A small village located in the top left, providing resources and shelter.",
+        "location": "top left"
+      },
+      {
+        "name": "Mountain Range",
+        "description": "A series of impassable mountains dominating the center left, creating natural barriers.",
+        "location": "center left"
+      },
+      {
+        "name": "Central Forest",
+        "description": "Dense forest area offering cover and strategic movement options.",
+        "location": "center"
+      },
+      {
+        "name": "Eastern Fort",
+        "description": "A fortified structure in the center right, serving as a defensive stronghold.",
+        "location": "center right"
+      },
+      {
+        "name": "Southern Plains",
+        "description": "Open grassy area in the bottom center, allowing for fast movement.",
+        "location": "bottom center"
+      }
+    ]
+  },
+  "Knights_Villagers_Bandits_11_(0E_00_72_10)__by_Aura_Wolf.png__outdoor": {
+    "name": "Twin Bridges Crossing",
+    "description": "A strategic outdoor map featuring two parallel bridges over a wide river, with villages and a fort nearby.",
+    "regions": [
+      {
+        "name": "Northern Village",
+        "description": "A small village with a few buildings, including a burning house.",
+        "location": "top center"
+      },
+      {
+        "name": "Western Bridge",
+        "description": "A stone bridge crossing the river, providing a strategic point for movement.",
+        "location": "center left"
+      },
+      {
+        "name": "Eastern Bridge",
+        "description": "Another stone bridge parallel to the western one, offering an alternative crossing.",
+        "location": "center right"
+      },
+      {
+        "name": "Southern Fort",
+        "description": "A fortified area at the bottom, likely used for defense and control of the bridges.",
+        "location": "bottom center"
+      },
+      {
+        "name": "Central River",
+        "description": "A wide river running horizontally, separating the northern and southern parts of the map.",
+        "location": "center"
+      }
+    ]
+  },
+  "Nobles_Evil_Doers_5_(6C_00_A3_6E)__by_Aura_Wolf.png__indoor": {
+    "name": "Ruined Temple",
+    "description": "An ancient, crumbling temple with multiple chambers and corridors, filled with debris and overgrown with moss.",
+    "regions": [
+      {
+        "name": "Entrance Hall",
+        "description": "The main entryway with wide stairs leading into the temple.",
+        "location": "top left"
+      },
+      {
+        "name": "Central Chamber",
+        "description": "A large, open area with broken pillars and scattered debris.",
+        "location": "center"
+      },
+      {
+        "name": "Left Corridor",
+        "description": "A narrow passage leading to smaller rooms, partially collapsed.",
+        "location": "center left"
+      },
+      {
+        "name": "Right Corridor",
+        "description": "A winding path with overgrown vegetation and broken walls.",
+        "location": "center right"
+      },
+      {
+        "name": "Lower Sanctuary",
+        "description": "A secluded area with remnants of ancient altars and statues.",
+        "location": "bottom center"
+      }
+    ]
+  },
+  "Knights_Villagers_Bandits_2_(01_00_02_03)__by_Aura_Wolf.png__outdoor": {
+    "name": "River Crossing",
+    "description": "A strategic map featuring a central river with a bridge, surrounded by villages and a castle.",
+    "regions": [
+      {
+        "name": "Northern Village",
+        "description": "A small village with several houses, providing a strategic point for gathering resources.",
+        "location": "top right"
+      },
+      {
+        "name": "Southern Village",
+        "description": "A bustling village with multiple buildings, ideal for recruitment and supplies.",
+        "location": "bottom right"
+      },
+      {
+        "name": "Central Bridge",
+        "description": "A vital crossing point over the river, connecting the northern and southern parts of the map.",
+        "location": "center"
+      },
+      {
+        "name": "Western Castle",
+        "description": "A fortified castle offering strong defensive capabilities and a commanding view of the surroundings.",
+        "location": "center left"
+      },
+      {
+        "name": "Eastern Shoreline",
+        "description": "A scenic coastline providing a natural boundary and strategic vantage point.",
+        "location": "top center right"
+      },
+      {
+        "name": "Southern Outpost",
+        "description": "A small outpost near the southern village, useful for defense and observation.",
+        "location": "bottom center left"
+      }
+    ]
+  },
+  "Nobles_Evil_Doers_11_(3C_00_68_3E)__by_Aura_Wolf.png__mixed indoor and outdoor": {
+    "name": "Fortress Courtyard",
+    "description": "A fortified structure with a central courtyard surrounded by walls and buildings, featuring both indoor and outdoor areas.",
+    "regions": [
+      {
+        "name": "Central Courtyard",
+        "description": "An open area with paths and sparse trees, surrounded by walls.",
+        "location": "center"
+      },
+      {
+        "name": "Northern Gatehouse",
+        "description": "A fortified entrance with a prominent red door, leading into the courtyard.",
+        "location": "top center"
+      },
+      {
+        "name": "Western Chambers",
+        "description": "A series of indoor rooms with narrow corridors, located to the west of the courtyard.",
+        "location": "center left"
+      },
+      {
+        "name": "Eastern Chambers",
+        "description": "A series of indoor rooms with narrow corridors, located to the east of the courtyard.",
+        "location": "center right"
+      },
+      {
+        "name": "Southern Hallway",
+        "description": "A long corridor with multiple doorways, connecting to the courtyard from the south.",
+        "location": "bottom center"
+      }
+    ]
+  },
+  "Knights_Villagers_Bandits_7_(18_00_48_1A)__by_Aura_Wolf.png__indoor": {
+    "name": "Fortress Entrance",
+    "description": "A fortified indoor area with multiple rooms and corridors, featuring a central entrance and various strategic points.",
+    "regions": [
+      {
+        "name": "Main Hallway",
+        "description": "A wide corridor leading through the center of the fortress, providing access to various rooms.",
+        "location": "center"
+      },
+      {
+        "name": "Treasure Room",
+        "description": "A secure room containing valuable items, located at the top left of the map.",
+        "location": "top left"
+      },
+      {
+        "name": "Guard Chambers",
+        "description": "Rooms likely used by guards, positioned near the entrance for quick access.",
+        "location": "bottom center"
+      },
+      {
+        "name": "Stairway Access",
+        "description": "Staircases leading to different levels of the fortress, providing strategic movement options.",
+        "location": "center right"
+      },
+      {
+        "name": "Outer Courtyard",
+        "description": "An open area outside the main fortress structure, surrounded by greenery.",
+        "location": "bottom right"
+      }
+    ]
+  },
+  "Knights_Villagers_Bandits_9_(18_00_48_1A)__by_Aura_Wolf.png__indoor": {
+    "name": "Fortress Interior",
+    "description": "A complex indoor map featuring narrow corridors, a central chamber, and multiple staircases leading to different levels.",
+    "regions": [
+      {
+        "name": "Treasure Room",
+        "description": "A small, enclosed room containing a treasure chest.",
+        "location": "top left"
+      },
+      {
+        "name": "Main Corridor",
+        "description": "A winding corridor connecting various parts of the fortress.",
+        "location": "center left"
+      },
+      {
+        "name": "Staircase Junction",
+        "description": "An area with multiple staircases leading to different levels.",
+        "location": "center right"
+      },
+      {
+        "name": "Entrance Hall",
+        "description": "The main entrance area with access to the outside.",
+        "location": "bottom left"
+      },
+      {
+        "name": "Royal Chamber",
+        "description": "A large, ornate room with a distinct floor pattern.",
+        "location": "bottom right"
+      }
+    ]
+  },
+  "Mages_Mercenaries_3_(42_00_43_44)__by_Aura_Wolf.png__outdoor": {
+    "name": "Desert Fortress",
+    "description": "A sprawling desert map featuring a mix of sandy dunes, a central fortress, and scattered ruins. The map is divided by a river, with a fortified area and several villages.",
+    "regions": [
+      {
+        "name": "Central Fortress",
+        "description": "A fortified area with walls and a central building, providing strategic defense.",
+        "location": "center left"
+      },
+      {
+        "name": "Sandy Dunes",
+        "description": "Expansive desert area with scattered ruins and impassable terrain.",
+        "location": "top right"
+      },
+      {
+        "name": "River Crossing",
+        "description": "A narrow river with bridges, dividing the map into two main sections.",
+        "location": "bottom left"
+      },
+      {
+        "name": "Village Outskirts",
+        "description": "A small village area with a few buildings, offering resources and shelter.",
+        "location": "top center left"
+      },
+      {
+        "name": "Desert Ruins",
+        "description": "Ancient ruins scattered across the desert, providing cover and obstacles.",
+        "location": "top center"
+      }
+    ]
+  },
+  "Knights_Villagers_Bandits_4_(01_00_38_03)__by_Aura_Wolf.png__outdoor": {
+    "name": "Mountain Pass Siege",
+    "description": "A strategic map featuring a central mountain range dividing a village and a castle, with various paths and structures scattered around.",
+    "regions": [
+      {
+        "name": "Village Outskirts",
+        "description": "A small village with several buildings, likely housing civilians.",
+        "location": "bottom left"
+      },
+      {
+        "name": "Mountain Range",
+        "description": "A large, impassable mountain range dominating the center of the map.",
+        "location": "center"
+      },
+      {
+        "name": "Castle Grounds",
+        "description": "A fortified castle area, likely the main objective or stronghold.",
+        "location": "top right"
+      },
+      {
+        "name": "Southern Pathway",
+        "description": "A winding path leading through the southern part of the map, connecting various regions.",
+        "location": "bottom center"
+      },
+      {
+        "name": "Northern Forest",
+        "description": "A dense forest area providing cover and strategic advantage.",
+        "location": "top center left"
+      },
+      {
+        "name": "Western Fort",
+        "description": "A small fortification providing defense and strategic positioning.",
+        "location": "top left"
+      },
+      {
+        "name": "Eastern Village",
+        "description": "A small village area with a few buildings, possibly for trade or rest.",
+        "location": "center right"
+      }
+    ]
+  },
+  "Alusq_FE8_0A009B0C_in_the_dark__by_FEU.png__indoor": {
+    "name": "Labyrinthine Chambers",
+    "description": "A complex indoor map with winding corridors and multiple rooms, featuring a mix of open spaces and narrow passages.",
+    "regions": [
+      {
+        "name": "Entrance Hall",
+        "description": "The starting area with wide stairs leading into the main complex.",
+        "location": "bottom left"
+      },
+      {
+        "name": "Central Corridor",
+        "description": "A long hallway connecting various rooms, featuring decorative pillars.",
+        "location": "center"
+      },
+      {
+        "name": "Treasure Room",
+        "description": "A secluded room containing a valuable chest, accessible through a narrow passage.",
+        "location": "top right"
+      },
+      {
+        "name": "Pillar Room",
+        "description": "A room with multiple decorative pillars, providing cover and strategic positioning.",
+        "location": "center left"
+      },
+      {
+        "name": "Narrow Passage",
+        "description": "A tight corridor leading to the Treasure Room, requiring careful navigation.",
+        "location": "top center right"
+      }
+    ]
+  },
+  "Nobles_Evil_Doers_1_(18_00_19_1A)__by_Aura_Wolf.png__indoor": {
+    "name": "Aquatic Fortress",
+    "description": "A complex indoor fortress with multiple water channels and treasure rooms, featuring a central throne room and intricate pathways.",
+    "regions": [
+      {
+        "name": "Throne Room",
+        "description": "A central room with a throne, surrounded by ornate pillars.",
+        "location": "top right"
+      },
+      {
+        "name": "Treasure Chamber",
+        "description": "A small room containing a treasure chest, accessible via narrow pathways.",
+        "location": "top left"
+      },
+      {
+        "name": "Waterway Passages",
+        "description": "Narrow pathways interwoven with water channels, connecting different parts of the fortress.",
+        "location": "center left"
+      },
+      {
+        "name": "Lower Treasure Chamber",
+        "description": "A secluded room with a treasure chest, surrounded by water.",
+        "location": "bottom left"
+      },
+      {
+        "name": "Entrance Hall",
+        "description": "The main entrance area with wide pathways leading into the fortress.",
+        "location": "bottom center"
+      }
+    ]
+  },
+  "Knights_Villagers_Bandits_5_(01_00_38_03)__by_Aura_Wolf.png__outdoor": {
+    "name": "Mountain Crossroads",
+    "description": "A rugged outdoor map featuring a central crossroads surrounded by mountains and villages.",
+    "regions": [
+      {
+        "name": "Northern Pass",
+        "description": "A mountainous area with narrow paths leading through the peaks.",
+        "location": "top center"
+      },
+      {
+        "name": "Central Crossroads",
+        "description": "The main intersection of paths, providing access to various regions.",
+        "location": "center"
+      },
+      {
+        "name": "Western Village",
+        "description": "A small village nestled near the mountains, offering refuge and resources.",
+        "location": "center left"
+      },
+      {
+        "name": "Eastern Village",
+        "description": "A quaint village located near the edge of the map, providing supplies.",
+        "location": "center right"
+      },
+      {
+        "name": "Southern Cliffs",
+        "description": "Steep cliffs overlooking the sea, forming a natural boundary.",
+        "location": "bottom center"
+      }
+    ]
+  },
+  "Alusq_FE8_3C00CE3E_afro_comb_fort__by_FEU.png__mixed indoor and outdoor": {
+    "name": "Fortress Entrance",
+    "description": "A fortified structure with a grand entrance, featuring both indoor and outdoor areas. The map is dominated by a large central gate and flanked by symmetrical towers.",
+    "regions": [
+      {
+        "name": "Grand Gate",
+        "description": "The central entrance to the fortress, heavily fortified and imposing.",
+        "location": "top center"
+      },
+      {
+        "name": "Left Tower",
+        "description": "A symmetrical tower providing defense and vantage points.",
+        "location": "top left"
+      },
+      {
+        "name": "Right Tower",
+        "description": "A symmetrical tower providing defense and vantage points.",
+        "location": "top right"
+      },
+      {
+        "name": "Outer Courtyard",
+        "description": "The grassy area surrounding the fortress, offering open space for movement.",
+        "location": "bottom center"
+      }
+    ]
+  },
+  "Knights_Villagers_Bandits_3_(0E_00_72_10)__by_Aura_Wolf.png__outdoor": {
+    "name": "Village Outskirts",
+    "description": "A rural map featuring a cluster of buildings surrounded by open fields and a fortified area to the south.",
+    "regions": [
+      {
+        "name": "Northern Village",
+        "description": "A cluster of buildings including a vendor and a house, surrounded by sparse trees.",
+        "location": "top left"
+      },
+      {
+        "name": "Central Market",
+        "description": "A central area with multiple buildings, likely serving as shops or homes.",
+        "location": "center"
+      },
+      {
+        "name": "Eastern Homestead",
+        "description": "A solitary building, possibly a house, with a small yard.",
+        "location": "top right"
+      },
+      {
+        "name": "Southern Fortifications",
+        "description": "A fortified area with walls and gates, providing a defensive position.",
+        "location": "bottom center"
+      },
+      {
+        "name": "Western Pathway",
+        "description": "A path leading from the northern village to the central market, lined with trees.",
+        "location": "center left"
+      }
+    ]
+  },
+  "Knights_Villagers_Bandits_8_(18_00_19_1A)__by_Aura_Wolf.png__indoor": {
+    "name": "Royal Throne Room",
+    "description": "An ornate indoor map featuring a throne room, treasure chamber, and various corridors.",
+    "regions": [
+      {
+        "name": "Throne Room",
+        "description": "A grand room with a throne, symbolizing power and authority.",
+        "location": "top right"
+      },
+      {
+        "name": "Treasure Chamber",
+        "description": "A secure room containing a valuable chest.",
+        "location": "center left"
+      },
+      {
+        "name": "Main Corridor",
+        "description": "A wide corridor connecting different parts of the map.",
+        "location": "center"
+      },
+      {
+        "name": "Entrance Hall",
+        "description": "The initial area leading into the main sections of the map.",
+        "location": "bottom center"
+      },
+      {
+        "name": "Side Chambers",
+        "description": "Various small rooms and alcoves branching off the main corridor.",
+        "location": "top left"
+      }
+    ]
+  },
+  "(7)Ch01_Diff_Tileset__by_Shin19.png__outdoor": {
+    "name": "Forest Crossing",
+    "description": "A lush outdoor map featuring a castle, dense forests, and a river with bridges.",
+    "regions": [
+      {
+        "name": "Castle Entrance",
+        "description": "A fortified castle entrance with stone walls.",
+        "location": "top left"
+      },
+      {
+        "name": "Central Forest",
+        "description": "A dense forest area providing cover and strategic movement options.",
+        "location": "center left"
+      },
+      {
+        "name": "River Bridges",
+        "description": "Two wooden bridges crossing a flowing river, crucial for movement across the map.",
+        "location": "center right"
+      },
+      {
+        "name": "Northern Hills",
+        "description": "A small hilly area providing elevation and a strategic vantage point.",
+        "location": "top center right"
+      },
+      {
+        "name": "Southern Riverbank",
+        "description": "A grassy area along the southern edge of the river, leading to the water's edge.",
+        "location": "bottom center right"
+      }
+    ]
+  },
+  "Mages_Mercenaries_1_(0E_00_72_10)__by_Aura_Wolf.png__outdoor": {
+    "name": "Fortress Approach",
+    "description": "A strategic map featuring a central fortress surrounded by various buildings and pathways, ideal for tactical maneuvers.",
+    "regions": [
+      {
+        "name": "Northern Village",
+        "description": "A small village with a few houses, providing a strategic vantage point.",
+        "location": "top center"
+      },
+      {
+        "name": "Western Armory",
+        "description": "A fortified armory, essential for resupplying troops.",
+        "location": "center left"
+      },
+      {
+        "name": "Central Fortress",
+        "description": "A large, well-defended fortress, the focal point of the map.",
+        "location": "center right"
+      },
+      {
+        "name": "Southern Market",
+        "description": "A bustling market area with shops and vendors.",
+        "location": "bottom center"
+      },
+      {
+        "name": "Eastern Outpost",
+        "description": "A small outpost providing additional defense and resources.",
+        "location": "top right"
+      }
+    ]
+  },
+  "Chapter7OstiasRebellion_Diff_Tileset__by_Shin19.png__outdoor": {
+    "name": "Fortress Approach",
+    "description": "A strategic map featuring a fortified castle entrance, surrounded by villages and a central arena. The layout encourages tactical movement through narrow paths and open areas.",
+    "regions": [
+      {
+        "name": "Castle Gate",
+        "description": "The fortified entrance to the castle, guarded by water and walls.",
+        "location": "top center"
+      },
+      {
+        "name": "Treasure Alcove",
+        "description": "A small area with treasure chests, accessible by stairs.",
+        "location": "top right"
+      },
+      {
+        "name": "Village Row",
+        "description": "A series of small houses lined up neatly, providing cover and strategic positioning.",
+        "location": "center right"
+      },
+      {
+        "name": "Central Arena",
+        "description": "An open circular area surrounded by trees, ideal for battles.",
+        "location": "center left"
+      },
+      {
+        "name": "Southern Pathway",
+        "description": "A narrow path leading from the bottom of the map towards the central areas.",
+        "location": "bottom center"
+      }
+    ]
+  },
+  "Nobles_Evil_Doers_7_(6C_00_A3_6E)__by_Aura_Wolf.png__outdoor": {
+    "name": "Fortress by the Lake",
+    "description": "A strategic fortress surrounded by rugged terrain and a serene lake, offering both defensive advantages and challenges for attackers.",
+    "regions": [
+      {
+        "name": "Fortress Entrance",
+        "description": "The main entrance to the fortress, heavily fortified and guarded.",
+        "location": "bottom center"
+      },
+      {
+        "name": "Central Courtyard",
+        "description": "The heart of the fortress, open and spacious, allowing for troop movement.",
+        "location": "center"
+      },
+      {
+        "name": "Northern Lake",
+        "description": "A tranquil lake providing a natural barrier and scenic view.",
+        "location": "top right"
+      },
+      {
+        "name": "Western Cliffs",
+        "description": "Rugged cliffs offering a natural defense and vantage point.",
+        "location": "top left"
+      },
+      {
+        "name": "Eastern Forest",
+        "description": "Dense forest area providing cover and concealment.",
+        "location": "center right"
+      },
+      {
+        "name": "Southern Barracks",
+        "description": "Living quarters for soldiers, located within the fortress walls.",
+        "location": "bottom left"
+      }
+    ]
+  },
+  "Nobles_Evil_Doers_3_(01_00_02_03)__by_Aura_Wolf.png__outdoor": {
+    "name": "River Crossing Clash",
+    "description": "A strategic map featuring a central river with a bridge, surrounded by castles and villages. Ideal for tactical maneuvers and control of key points.",
+    "regions": [
+      {
+        "name": "Western Castle",
+        "description": "A large castle with red roofs, serving as a stronghold.",
+        "location": "bottom left"
+      },
+      {
+        "name": "Central River",
+        "description": "A river running vertically through the map, with a bridge crossing it.",
+        "location": "center"
+      },
+      {
+        "name": "Eastern Fortress",
+        "description": "A fortified structure with high walls, located near the mountains.",
+        "location": "top right"
+      },
+      {
+        "name": "Northern Villages",
+        "description": "A cluster of small villages scattered across the northern area.",
+        "location": "top center"
+      },
+      {
+        "name": "Southern Plains",
+        "description": "Open plains with sparse vegetation, ideal for cavalry movement.",
+        "location": "bottom center"
+      },
+      {
+        "name": "Mountain Pass",
+        "description": "A narrow path through the mountains, providing strategic high ground.",
+        "location": "top right"
+      },
+      {
+        "name": "Bridge Crossing",
+        "description": "A crucial bridge over the river, key for controlling movement across the map.",
+        "location": "center"
+      }
+    ]
+  },
+  "Nobles_Evil_Doers_4_(6C_00_A3_6E)__by_Aura_Wolf.png__outdoor": {
+    "name": "Fortress Riverfront",
+    "description": "A strategic map featuring a fortress by a river, with a village and a bridge crossing.",
+    "regions": [
+      {
+        "name": "Fortress Entrance",
+        "description": "The main entrance to the fortress, heavily fortified.",
+        "location": "top right"
+      },
+      {
+        "name": "River Crossing",
+        "description": "A bridge over the river, crucial for movement between areas.",
+        "location": "center left"
+      },
+      {
+        "name": "Village Outskirts",
+        "description": "A small village area, providing resources and shelter.",
+        "location": "bottom left"
+      },
+      {
+        "name": "Fortress Courtyard",
+        "description": "An open area within the fortress walls, leading to various sections.",
+        "location": "top center right"
+      },
+      {
+        "name": "Riverbank",
+        "description": "The riverbank area, providing a natural barrier and strategic advantage.",
+        "location": "center left"
+      },
+      {
+        "name": "Fortress Walls",
+        "description": "The outer walls of the fortress, providing defense and elevation.",
+        "location": "top right"
+      },
+      {
+        "name": "Open Plains",
+        "description": "A stretch of open land, offering little cover but easy movement.",
+        "location": "bottom center right"
+      }
+    ]
+  },
+  "Aegris.png__outdoor": {
+    "name": "Coastal Village",
+    "description": "A quaint village by the sea, featuring a mix of residential areas, a marketplace, and a dock. The map is characterized by its coastal setting and strategic layout.",
+    "regions": [
+      {
+        "name": "Village Square",
+        "description": "The central hub of the village with several houses and a vendor.",
+        "location": "center"
+      },
+      {
+        "name": "Seaside Dock",
+        "description": "A wooden dock extending into the sea, ideal for trade and travel.",
+        "location": "bottom right"
+      },
+      {
+        "name": "Northern Residences",
+        "description": "A cluster of homes providing shelter for the villagers.",
+        "location": "top center"
+      },
+      {
+        "name": "Marketplace",
+        "description": "A bustling area with shops and vendors, perfect for trading goods.",
+        "location": "center right"
+      },
+      {
+        "name": "Western Pathway",
+        "description": "A path leading to the village, surrounded by trees and natural barriers.",
+        "location": "bottom left"
+      }
+    ]
+  },
+  "Knights_Villagers_Bandits_1_(01_00_02_03)__by_Aura_Wolf.png__outdoor": {
+    "name": "Twin Villages Crossroad",
+    "description": "A strategic outdoor map featuring two villages connected by roads, surrounded by forests and mountains, with a central castle and a cave entrance.",
+    "regions": [
+      {
+        "name": "Northern Castle",
+        "description": "A large, fortified castle dominating the northern area.",
+        "location": "top center"
+      },
+      {
+        "name": "Western Village",
+        "description": "A small village with a few buildings, located to the west.",
+        "location": "center left"
+      },
+      {
+        "name": "Eastern Village",
+        "description": "A bustling village with several buildings, located to the east.",
+        "location": "center right"
+      },
+      {
+        "name": "Central Crossroad",
+        "description": "The main road connecting the two villages, with paths leading to the castle and cave.",
+        "location": "center"
+      },
+      {
+        "name": "Southern Cave Entrance",
+        "description": "A mysterious cave entrance nestled in the mountains to the south.",
+        "location": "bottom right"
+      },
+      {
+        "name": "Forest Outskirts",
+        "description": "Dense forests surrounding the villages and roads, providing cover and obstacles.",
+        "location": "various around the map"
+      },
+      {
+        "name": "Mountain Range",
+        "description": "Impassable mountains forming natural barriers, especially to the south and east.",
+        "location": "bottom and right edges"
+      }
+    ]
+  },
+  "Chapter6TheTrapIsSprung_More_Carpet__by_Shin19.png__indoor": {
+    "name": "Fortress of Trials",
+    "description": "A symmetrical indoor fortress with a central throne room and surrounding chambers, designed for strategic battles.",
+    "regions": [
+      {
+        "name": "Throne Room",
+        "description": "A grand room with a throne, central to the fortress.",
+        "location": "top center"
+      },
+      {
+        "name": "Central Corridor",
+        "description": "A long, red-carpeted corridor connecting the throne room to the rest of the fortress.",
+        "location": "center"
+      },
+      {
+        "name": "Left Chambers",
+        "description": "A series of rooms on the left side, providing strategic cover and pathways.",
+        "location": "center left"
+      },
+      {
+        "name": "Right Chambers",
+        "description": "A series of rooms on the right side, mirroring the left chambers.",
+        "location": "center right"
+      },
+      {
+        "name": "Entrance Hall",
+        "description": "The main entrance area leading into the fortress.",
+        "location": "bottom center"
+      }
+    ]
+  },
+  "Mages_Mercenaries_4_(01_00_02_03)__by_Aura_Wolf.png__outdoor": {
+    "name": "River Crossing Battle",
+    "description": "A strategic map featuring multiple river crossings and fortified positions. The map is divided by rivers, with key structures like castles and villages scattered throughout.",
+    "regions": [
+      {
+        "name": "Central Castle",
+        "description": "A fortified castle at the center of the map, serving as a strategic stronghold.",
+        "location": "center"
+      },
+      {
+        "name": "Northern Village",
+        "description": "A small village located at the top center, providing resources and shelter.",
+        "location": "top center"
+      },
+      {
+        "name": "Western Bridge",
+        "description": "A crucial bridge connecting the western part of the map, allowing passage over the river.",
+        "location": "center left"
+      },
+      {
+        "name": "Eastern Bridge",
+        "description": "A bridge on the right side, facilitating movement across the river.",
+        "location": "center right"
+      },
+      {
+        "name": "Southern Village",
+        "description": "A village at the bottom center, offering supplies and refuge.",
+        "location": "bottom center"
+      },
+      {
+        "name": "Northwestern Fort",
+        "description": "A fortified position in the top left, providing defense and control over the area.",
+        "location": "top left"
+      },
+      {
+        "name": "Northeastern Fort",
+        "description": "A fort in the top right, overseeing the surrounding region.",
+        "location": "top right"
+      }
+    ]
+  },
+  "Nobles_Evil_Doers_2_(01_00_4C_03)__by_Aura_Wolf.png__outdoor": {
+    "name": "Mountain Pass Clash",
+    "description": "A rugged outdoor map featuring a winding path through mountainous terrain, with strategic forts and villages scattered throughout.",
+    "regions": [
+      {
+        "name": "Northern Fortress",
+        "description": "A fortified structure located at the top center, providing a strategic vantage point.",
+        "location": "top center"
+      },
+      {
+        "name": "Mountain Range",
+        "description": "A large impassable mountain area dominating the top left, serving as a natural barrier.",
+        "location": "top left"
+      },
+      {
+        "name": "Central Pathway",
+        "description": "A winding path that cuts through the center of the map, connecting various regions.",
+        "location": "center"
+      },
+      {
+        "name": "Eastern Village",
+        "description": "A small village located at the top right, offering resources and shelter.",
+        "location": "top right"
+      },
+      {
+        "name": "Western Bridge",
+        "description": "A bridge crossing a river at the center left, crucial for movement across the map.",
+        "location": "center left"
+      },
+      {
+        "name": "Southern Castle",
+        "description": "A large castle at the bottom left, serving as a key strategic point.",
+        "location": "bottom left"
+      },
+      {
+        "name": "Eastern Fort",
+        "description": "A fortified position at the bottom right, providing defense and control over the area.",
+        "location": "bottom right"
+      }
+    ]
+  },
+  "Chapter12TheTrueEnemy_Fire_tileset_Minor_Changes__by_Shin19.png__indoor": {
+    "name": "Fortress Maze",
+    "description": "A complex indoor fortress with winding corridors and multiple treasure rooms.",
+    "regions": [
+      {
+        "name": "Throne Room",
+        "description": "A grand room with a throne, indicating the main objective area.",
+        "location": "top center"
+      },
+      {
+        "name": "Dining Hall",
+        "description": "A room with tables and chairs, likely used for gatherings.",
+        "location": "top center right"
+      },
+      {
+        "name": "Treasure Corridor",
+        "description": "A narrow corridor with several treasure chests.",
+        "location": "center right"
+      },
+      {
+        "name": "Maze of Halls",
+        "description": "A series of winding corridors creating a maze-like structure.",
+        "location": "center"
+      },
+      {
+        "name": "Left Treasure Room",
+        "description": "A small room containing treasure chests.",
+        "location": "center left"
+      },
+      {
+        "name": "Entrance Hall",
+        "description": "The main entrance to the fortress, leading into the maze.",
+        "location": "bottom center"
+      }
+    ]
+  },
+  "Snakey1_FE8_01003803_Many_Castles__by_FEU.png__outdoor": {
+    "name": "Riverland Convergence",
+    "description": "A strategic map featuring a central river with multiple bridges, surrounded by villages and castles. The terrain includes mountains, forests, and plains, offering diverse tactical opportunities.",
+    "regions": [
+      {
+        "name": "Northern Village Cluster",
+        "description": "A group of villages surrounded by forests and mountains, providing resources and strategic vantage points.",
+        "location": "top center left"
+      },
+      {
+        "name": "Central River Crossing",
+        "description": "A wide river with multiple bridges, serving as a crucial point for movement and control.",
+        "location": "center"
+      },
+      {
+        "name": "Eastern Castle Grounds",
+        "description": "A fortified castle area with surrounding plains, offering defensive advantages.",
+        "location": "center right"
+      },
+      {
+        "name": "Southern Fortress Approach",
+        "description": "A path leading to a southern fortress, flanked by mountains and open fields.",
+        "location": "bottom center left"
+      },
+      {
+        "name": "Western Mountain Pass",
+        "description": "A narrow passage through the mountains, providing a strategic route for flanking maneuvers.",
+        "location": "top left"
+      },
+      {
+        "name": "Island Stronghold",
+        "description": "A castle situated on an island in the river, accessible by bridges, offering a strong defensive position.",
+        "location": "center right"
+      },
+      {
+        "name": "Southern Village Outskirts",
+        "description": "A small village area surrounded by open fields and forests, providing resources and cover.",
+        "location": "bottom right"
+      }
+    ]
+  },
+  "Knights_Villagers_Bandits_13_(01_00_02_03)__by_Aura_Wolf.png__outdoor": {
+    "name": "River Crossing Battle",
+    "description": "A strategic map featuring a central river with multiple bridges, surrounded by villages and a castle.",
+    "regions": [
+      {
+        "name": "Northern Castle",
+        "description": "A fortified castle at the top, serving as a strategic stronghold.",
+        "location": "top center"
+      },
+      {
+        "name": "Mountain Pass",
+        "description": "A rugged area with mountains providing natural defense.",
+        "location": "top right"
+      },
+      {
+        "name": "Central River",
+        "description": "A wide river running through the center, crossed by several bridges.",
+        "location": "center"
+      },
+      {
+        "name": "Western Village",
+        "description": "A small village providing resources and shelter.",
+        "location": "top left"
+      },
+      {
+        "name": "Eastern Village",
+        "description": "A village offering supplies and strategic positioning.",
+        "location": "center right"
+      },
+      {
+        "name": "Southern Lake",
+        "description": "A large lake dominating the southern part of the map.",
+        "location": "bottom center"
+      },
+      {
+        "name": "Southern Fort",
+        "description": "A fortified area near the southern lake, offering defense and control.",
+        "location": "bottom center left"
+      },
+      {
+        "name": "Eastern Settlement",
+        "description": "A settlement with multiple buildings, providing resources and strategic advantage.",
+        "location": "bottom right"
+      }
+    ]
+  },
+  "Knights_Villagers_Bandits_6_(0E_00_72_10)__by_Aura_Wolf.png__outdoor": {
+    "name": "Village Outskirts",
+    "description": "A rural map featuring a mix of villages, open fields, and scattered trees, surrounded by stone walls and buildings.",
+    "regions": [
+      {
+        "name": "Northern Village",
+        "description": "A small cluster of houses surrounded by trees and open space.",
+        "location": "top right"
+      },
+      {
+        "name": "Central Pathway",
+        "description": "A wide open path leading through the center of the map, flanked by stone walls and buildings.",
+        "location": "center"
+      },
+      {
+        "name": "Southern Homestead",
+        "description": "A pair of houses with a fenced area, nestled among trees and grass.",
+        "location": "bottom center"
+      },
+      {
+        "name": "Western Fortifications",
+        "description": "Stone walls and buildings forming a defensive structure on the left side of the map.",
+        "location": "top left"
+      },
+      {
+        "name": "Eastern Grove",
+        "description": "A small area with dense trees and grass, providing cover and natural beauty.",
+        "location": "center right"
+      }
+    ]
   }
 }
