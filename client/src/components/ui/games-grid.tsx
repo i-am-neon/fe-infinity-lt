@@ -53,8 +53,24 @@ export default function GamesGrid() {
 
   if (games.length === 0) {
     return (
-      <div className="w-full text-center py-4">
-        No games found. Create your first game!
+      <div className="grid w-full max-w-[600px] grid-cols-1 gap-4 mx-auto">
+        {/* Create New Game Card */}
+        <div
+          onClick={() => window.dispatchEvent(new CustomEvent('openCreateGameDialog'))}
+          className="cursor-pointer"
+        >
+          <DashedBorderCard className="hover:bg-accent/20 transition-colors duration-200 flex items-center justify-center h-full">
+            <div className="flex flex-col items-center justify-center py-8">
+              <div className="rounded-full bg-primary/10 p-3 mb-2">
+                <Plus className="h-8 w-8 text-primary" />
+              </div>
+              <CardTitle className="text-center">Create New</CardTitle>
+              <CardDescription className="text-center mt-2">
+                Start your first game adventure
+              </CardDescription>
+            </div>
+          </DashedBorderCard>
+        </div>
       </div>
     );
   }
