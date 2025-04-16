@@ -14,6 +14,7 @@ const systemMessage = `Generate metadata for a portrait of this character.
 Guidelines:
 - "vibe" should be a three-word description of the character's vibe separated by commas.
 - "accessories" should include any eye wear, jewelry, etc.
+- If you do not know the character's gender, default to "male"
 
 If the thing does not exist, simply do not include it in the return value. For example if there is no facial hair or accessories, simply don't include the "facialHair" or "accessories" field in the return value.`;
 
