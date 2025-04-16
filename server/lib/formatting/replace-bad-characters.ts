@@ -4,6 +4,7 @@ export default function replaceBadCharacters(input: string): string {
     "’": "'",
     "‘": "'",
     ";": ":",
+    "…": "..."
   };
 
   let result = input;
@@ -15,6 +16,6 @@ export default function replaceBadCharacters(input: string): string {
 }
 
 if (import.meta.main) {
-  console.log(replaceBadCharacters("’Hello—world;"));
+  console.log(replaceBadCharacters("’Hello—world;…"));
 }
 

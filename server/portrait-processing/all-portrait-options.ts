@@ -1,6 +1,6 @@
 import { PortraitMetadata } from "@/types/portraits/portrait-metadata.ts";
 
-  export const allPortraitOptions: PortraitMetadata[] = [
+export const allPortraitOptions: PortraitMetadata[] = [
   {
     "gender": "female",
     "age": "young adult",
@@ -1029,23 +1029,6 @@ import { PortraitMetadata } from "@/types/portraits/portrait-metadata.ts";
     "smilingOffset": [
       16,
       48
-    ]
-  },
-  {
-    "gender": "male",
-    "age": "young adult",
-    "hairColor": "blue",
-    "eyeColor": "blue",
-    "vibe": "calm, determined, heroic",
-    "clothing": "armor with cloak",
-    "originalName": "Bodyguard Male (Smug_Mug)",
-    "blinkingOffset": [
-      16,
-      16
-    ],
-    "smilingOffset": [
-      32,
-      32
     ]
   },
   {

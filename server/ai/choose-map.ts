@@ -30,7 +30,7 @@ export default async function chooseMap(
   // For chest map testing
   // return "Knights_Villagers_Bandits_3_(0E_00_72_10)__by_Aura_Wolf";
   // For Avenir map testing
-  return "Aegris";
+  // return "Aegris";
 
   // 1) Generate search query
   const systemMessageForQuery = `You are a query generator for an advanced map search system.
