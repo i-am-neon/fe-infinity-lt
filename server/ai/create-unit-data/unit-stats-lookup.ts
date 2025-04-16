@@ -1034,7 +1034,7 @@ export const unitStatsLookup: Record<
     },
     growth: {
       HP: 45,
-      STR: 0,
+      STR: 40,
       MAG: 40,
       SKL: 30,
       SPD: 40,
