@@ -4,6 +4,7 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
 import { TerrainGrid } from "@/types/maps/terrain-grid.ts";
 import genBossAndPlayerAndRecruitableUnitCoords from "./gen-boss-and-player-and-recruitable-unit-coords.ts";
 import getGenericEnemies from "./get-generic-enemies.ts";
+import getPlayerUnitPlacement from "@/ai/level/unit-placement/get-player-unit-placement.ts";
 
 export default async function assembleUnitPlacement({
   terrainGrid,
@@ -44,11 +45,27 @@ export default async function assembleUnitPlacement({
     existingPositions,
   });
 
+  const playerRegion = mapMetadata.distinctRegions.find(
+    (region) =>
+      region.name === nonGenericUnitPlacementResult.playerUnits.regions[0]
+  );
+  if (!playerRegion) {
+    throw new Error("Player region not found in map metadata");
+  }
+
+  const playerUnitCoords = getPlayerUnitPlacement({
+    terrainGrid,
+    // TODO: don't hardcode
+    numUnits: 8,
+    startX: playerRegion.fromX,
+    startY: playerRegion.fromY,
+  })
+
   return {
-    bossCoords,
-    playerUnitsCoords,
+    bossCoords: nonGenericUnitPlacementResult.boss.coords,
+    playerUnitCoords,
     genericEnemies,
-    recruitableUnits,
+    recruitableUnits: nonGenericUnitPlacementResult.recruitableUnits,
   };
 }
 

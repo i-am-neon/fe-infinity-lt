@@ -143,7 +143,7 @@ export default function correctUnitPlacement<
   );
 
   return units.reduce((processedUnits, unit) => {
-    const mg = movementGroupByClass[unit.class ?? "Citizen"] || "Regular";
+    const mg = movementGroupByClass[unit.class ?? "Brigand"] || "Regular";
     const key = `${unit.x},${unit.y}`;
     const terrain = terrainGrid[key];
 
@@ -250,7 +250,7 @@ if (import.meta.main) {
   const sampleUnits: EnemyGenericUnit[] = [
     { x: 100, y: 100, class: "Brigand", aiGroup: "None" }, // out of bounds
     { x: 7, y: 0, class: "Pegasus Knight", aiGroup: "None" }, // wall
-    { x: 10, y: 0, class: "Citizen", aiGroup: "None" }, // cliff
+    { x: 10, y: 0, class: "Cavalier", aiGroup: "None" }, // cliff
     { x: 8, y: 7, class: "Archer", aiGroup: "None" }, // river
     { x: 0, y: 7, class: "Cavalier", aiGroup: "None" }, // hill
     { x: 0, y: 0, class: "Berserker", aiGroup: "None" }, // forest, no change needed
