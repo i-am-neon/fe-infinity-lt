@@ -5,58 +5,6 @@ export const unitStatsLookup: Record<
   FE8Class,
   { base: StatValues; growth: StatValues }
 > = {
-  Citizen: {
-    base: {
-      HP: 10,
-      STR: 0,
-      MAG: 0,
-      SKL: 0,
-      SPD: 0,
-      LCK: 0,
-      DEF: 0,
-      RES: 0,
-      CON: 5,
-      MOV: 5,
-    },
-    growth: {
-      HP: 10,
-      STR: 0,
-      MAG: 0,
-      SKL: 0,
-      SPD: 0,
-      LCK: 0,
-      DEF: 0,
-      RES: 0,
-      CON: 0,
-      MOV: 0,
-    },
-  },
-  Dancer: {
-    base: {
-      HP: 14,
-      STR: 1,
-      MAG: 0,
-      SKL: 2,
-      SPD: 7,
-      LCK: 0,
-      DEF: 0,
-      RES: 1,
-      CON: 4,
-      MOV: 5,
-    },
-    growth: {
-      HP: 45,
-      STR: 45,
-      MAG: 0,
-      SKL: 30,
-      SPD: 60,
-      LCK: 70,
-      DEF: 0,
-      RES: 13,
-      CON: 0,
-      MOV: 0,
-    },
-  },
   Myrmidon: {
     base: {
       HP: 16,

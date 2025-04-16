@@ -14,7 +14,7 @@ export default function decideStats({
   baseStats: StatValues;
   growthRates: StatValues;
 } {
-  const data = unitStatsLookup[fe8Class] || unitStatsLookup["Citizen"];
+  const data = unitStatsLookup[fe8Class] || unitStatsLookup["Cavalier"];
 
   const baseStats = { ...data.base };
   const growthRates = { ...data.growth };
@@ -40,12 +40,11 @@ if (import.meta.main) {
     level: number;
     isPromoted: boolean;
   }[] = [
-    { fe8Class: "Myrmidon", level: 20, isPromoted: false },
-    { fe8Class: "Knight", level: 20, isPromoted: false },
-    { fe8Class: "Dancer", level: 20, isPromoted: false },
-    { fe8Class: "Wyvern Lord", level: 20, isPromoted: true },
-    { fe8Class: "Paladin", level: 20, isPromoted: true },
-  ];
+      { fe8Class: "Myrmidon", level: 20, isPromoted: false },
+      { fe8Class: "Knight", level: 20, isPromoted: false },
+      { fe8Class: "Wyvern Lord", level: 20, isPromoted: true },
+      { fe8Class: "Paladin", level: 20, isPromoted: true },
+    ];
   const results = testInputs.map((input) => {
     const stats = decideStats({
       fe8Class: input.fe8Class,
