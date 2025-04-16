@@ -16,28 +16,25 @@ export default async function assembleUnitPlacement({
   mapMetadata: MapMetadata;
   chapterNumber: number;
 }) {
-  const [
-    originalGenericEnemies,
-    { bossCoords, playerUnitsCoords, recruitableUnits },
-  ] = await Promise.all([
-    getGenericEnemies({
-      terrainGrid,
-      chapterIdea,
-      mapMetadata,
-      chapterNumber,
-    }),
-    genBossAndPlayerAndRecruitableUnitCoords({
-      terrainGrid,
-      chapterIdea,
-      mapMetadata,
-    }),
-  ]);
+  const nonGenericUnitPlacementResult = await genBossAndPlayerAndRecruitableUnitCoords({
+    terrainGrid,
+    chapterIdea,
+    mapMetadata,
+  })
+  const originalGenericEnemies = await getGenericEnemies({
+    terrainGrid,
+    chapterIdea,
+    mapMetadata,
+    chapterNumber,
+    nonGenericUnitPlacementResult,
+  })
 
   // Collect existing positions (boss, player, and recruitable units)
   const existingPositions = [
-    { x: bossCoords.x, y: bossCoords.y },
-    ...playerUnitsCoords.map((unit) => ({ x: unit.x, y: unit.y })),
-    ...recruitableUnits.map((unit) => ({ x: unit.coords.x, y: unit.coords.y })),
+    // boss
+    nonGenericUnitPlacementResult.boss.coords,
+    // enemy generics
+    ...originalGenericEnemies.map((unit) => ({ x: unit.x, y: unit.y })),
   ];
 
   // Correct enemy positions to avoid overlap with player units and boss

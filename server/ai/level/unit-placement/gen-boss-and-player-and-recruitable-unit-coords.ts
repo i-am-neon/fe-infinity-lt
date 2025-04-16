@@ -13,6 +13,24 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
 import { TerrainGrid } from "@/types/maps/terrain-grid.ts";
 import { z } from "zod";
 import generateStructuredData from "../../lib/generate-structured-data.ts";
+import getTerrainGridFromMapName from "@/ai/level/unit-placement/get-terrain-grid-from-tilemap.ts";
+import { allMapOptions } from "@/map-processing/all-map-options.ts";
+
+export type NonGenericUnitPlacementResult = {
+  boss: {
+    region: string;
+    coords: UnitCoords;
+  };
+  playerUnits: {
+    regions: string[];
+  };
+  recruitableUnits: Array<{
+    nid: string;
+    firstSeenAs: string;
+    region: string;
+    coords: UnitCoords;
+  }>;
+};
 
 export default async function genBossAndPlayerAndRecruitableUnitCoords({
   terrainGrid,
@@ -22,11 +40,7 @@ export default async function genBossAndPlayerAndRecruitableUnitCoords({
   terrainGrid: TerrainGrid;
   chapterIdea: ChapterIdea;
   mapMetadata: MapMetadata;
-}): Promise<{
-  bossCoords: UnitCoords;
-  playerUnitsCoords: UnitCoords[];
-  recruitableUnits: RecruitableUnit[];
-}> {
+}): Promise<NonGenericUnitPlacementResult> {
   const systemMessage = `
 You are a Fire Emblem Tactician. Choose exactly one region from mapMetadata.distinctRegions for the boss, and one or more regions for the player units to start. Base your choice on the sceneOverview:
 - If there's a throne or gate and the story implies a castle boss, place the boss on that region that contains a throne or gate.
@@ -126,9 +140,15 @@ Coordinates must lie within their chosen region(s). The sceneOverview might indi
     existingPositions: [correctedBoss],
   });
 
-  const correctedRecruitables: RecruitableUnit[] = [];
+  const correctedRecruitableUnits: Array<{
+    nid: string;
+    firstSeenAs: string;
+    region: string;
+    coords: UnitCoords;
+  }> = [];
+
   if (recruitableUnits.length > 0) {
-    recruitableUnits.forEach((ru) => {
+    recruitableUnits.forEach((ru, index) => {
       if (
         !chapterIdea.newPlayableUnits?.some((unit) => unit.firstName === ru.nid)
       ) {
@@ -141,31 +161,39 @@ Coordinates must lie within their chosen region(s). The sceneOverview might indi
         units: [{ x: ru.coords.x, y: ru.coords.y }],
         existingPositions: correctedPlayers,
       })[0];
-      correctedRecruitables.push({
+
+      correctedRecruitableUnits.push({
         nid: ru.nid,
         firstSeenAs: ru.firstSeenAs,
+        region: recruitableUnitRegions[index % recruitableUnitRegions.length], // Use mod to handle if there are more units than regions
         coords: { x: correctedRecruitable.x, y: correctedRecruitable.y },
       });
     });
   }
 
   return {
-    bossCoords: {
-      x: correctedBoss.x,
-      y: correctedBoss.y,
+    boss: {
+      region: bossRegion,
+      coords: {
+        x: correctedBoss.x,
+        y: correctedBoss.y,
+      },
     },
-    playerUnitsCoords: correctedPlayers.map((u) => ({ x: u.x, y: u.y })),
-    recruitableUnits: correctedRecruitables,
+    playerUnits: {
+      regions: playerRegions,
+    },
+    recruitableUnits: correctedRecruitableUnits,
   };
 }
 
 if (import.meta.main) {
   (async () => {
-    // ch4 has green units
     const result = await genBossAndPlayerAndRecruitableUnitCoords({
-      terrainGrid: ch4TerrainGrid,
+      terrainGrid: getTerrainGridFromMapName("(7)Ch3BandofMercenaries_Diff_Tileset__by_Shin19"),
       chapterIdea: testPrologueChapter.idea,
-      mapMetadata: testMapMetadata,
+      mapMetadata: allMapOptions.find(
+        (map) => map.originalName === "(7)Ch3BandofMercenaries_Diff_Tileset__by_Shin19"
+      ) as MapMetadata,
     });
     console.log("Boss and Player coords:", result);
   })();
