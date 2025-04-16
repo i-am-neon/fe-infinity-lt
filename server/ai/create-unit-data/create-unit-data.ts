@@ -33,7 +33,8 @@ export default async function createUnitData({
   const klass = await decideClass({ isPromoted, level, characterIdea });
   const { baseStats, growthRates } = decideStats({
     fe8Class: klass,
-    level,
+    // Give player units higher stats
+    level: characterIdea.firstSeenAs !== "boss" ? level + 2 : level,
     isPromoted,
   });
   // Combine all starting items

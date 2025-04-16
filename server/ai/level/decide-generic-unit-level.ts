@@ -7,6 +7,9 @@ export default function decideGenericUnitLevel({
   chapter: number;
   fe8Class: FE8Class;
 }): number {
+  if (chapter === 0) {
+    return 1;
+  }
   function randomInRange(min: number, max: number): number {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
@@ -34,7 +37,7 @@ export default function decideGenericUnitLevel({
 
 if (import.meta.main) {
   // Example usage
-  const testChapters = [1, 3, 5, 7, 10, 12, 15, 18, 20, 25, 30];
+  const testChapters = [0, 1, 3, 5, 7, 10, 12, 15, 18, 20, 25, 30];
   for (const ch of testChapters) {
     const lvl = decideGenericUnitLevel({ chapter: ch, fe8Class: "Fighter" });
     console.log(`Chapter ${ch} => generic Fighter level=${lvl}`);
