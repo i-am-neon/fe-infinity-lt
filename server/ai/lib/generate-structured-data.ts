@@ -5,7 +5,7 @@ import "jsr:@std/dotenv/load";
 import { z, ZodSchema } from "zod";
 import { getOpenAIApiKey } from "@/lib/api-key-manager.ts";
 
-export type ModelType = "fast" | "strong";
+export type ModelType = "nano" | "fast" | "strong";
 const LLM_PROVIDER = "openai";
 
 export default async function generateStructuredData<T>({
@@ -49,9 +49,10 @@ export default async function generateStructuredData<T>({
 
   try {
     // Select the appropriate model based on type
-    const _model = model === "fast"
-      ? openai("gpt-4o-mini")
-      : openai("gpt-4o");
+    const _model = model === "nano"
+      ? openai("gpt-4.1-nano") : model === "fast"
+        ? openai("gpt-4.1-mini")
+        : openai("gpt-4.1");
 
     for (let attempt = 1; attempt <= 3; attempt++) {
       try {

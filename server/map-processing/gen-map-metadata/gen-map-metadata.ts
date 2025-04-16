@@ -1,20 +1,18 @@
-import { MapMetadata, MapMetadataSchema } from "@/types/maps/map-metadata.ts";
+import { MapMetadataSchema } from "@/types/maps/map-metadata.ts";
 import { SubGrid } from "@/types/maps/sub-grid.ts";
-import chunkGridIntoQuadrants from "../lib/chunk-grid-into-quadrants.ts";
-import { MAP_METADATA_EXAMPLES } from "./map-metadata-examples.ts";
-import { ch5TerrainGrid } from "@/map-processing/test-data/terrain-grid.ts";
 import generateStructuredData from "../../ai/lib/generate-structured-data.ts";
-import getMapSetting from "@/map-processing/gen-map-metadata/get-map-setting.ts";
-import processMapImage from "@/map-processing/gen-map-metadata/process-map-image.ts";
-import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
+import { MAP_METADATA_EXAMPLES } from "./map-metadata-examples.ts";
+import { MapVisualSummary } from "@/types/maps/map-visual-summary.ts";
+import chunkGridIntoQuadrants from "@/map-processing/lib/chunk-grid-into-quadrants.ts";
+import getTerrainGridFromMapName from "@/ai/level/unit-placement/get-terrain-grid-from-tilemap.ts";
 
-const systemMessage = `You are an advanced Fire Emblem Tactician. The map data you receive might be split into multiple “chunks” or “quadrants” for convenience, but these chunks do NOT represent true boundaries within the map. They are purely for data transmission.
+const systemMessage = `You are an advanced Fire Emblem Tactician. The map data you receive might be split into multiple "chunks" or "quadrants" for convenience, but these chunks do NOT represent true boundaries within the map. They are purely for data transmission.
 
 Your goal is to treat the map as a continuous whole and identify distinct regions based on passable terrain that is continuously connected. Impassable terrain such as walls, cliffs, or mountains (if present) should always be respected as boundaries between regions. If two areas of passable terrain are separated by walls or other impassable obstacles, they must be considered separate regions. Conversely, if two areas of passable terrain connect (without crossing impassable tiles), they should belong to the same region—unless a door or gate is intentionally treated as a choke point to consider separately.
 
 Specific Requirements:
 1. **No Overlapping Regions**: Each passable tile belongs to exactly one region.
-2. **Use Meaningful Names**: Do not label any region as “Northwest,” “Northeast,” etc. Instead, choose descriptive names that reflect the layout (e.g., “Main Hall,” “Castle Courtyard,” “Merchant Road”).
+2. **Use Meaningful Names**: Do not label any region as "Northwest," "Northeast," etc. Instead, choose descriptive names that reflect the layout (e.g., "Main Hall," "Castle Courtyard," "Merchant Road").
 3. **Single Region per Continuous Area**: If a region spans multiple chunks, unify it into one region. Do not split a continuous passable area just because it appears in multiple chunks.
 4. **Impassable Terrain as Boundaries**: Treat walls, cliffs, mountains, or similar terrain as strict boundaries. Do not merge two areas if they are separated by any impassable tiles.
 5. **Heuristics**:
@@ -48,62 +46,74 @@ Using the Map Visual Summary:
 ${MAP_METADATA_EXAMPLES}`;
 
 export default async function genMapMetadata({
-  mapQuadrants,
-  imagePath,
+    mapQuadrants,
+    mapVisualSummary,
 }: {
-  mapQuadrants: SubGrid[];
-  imagePath: string;
-}): Promise<MapMetadata> {
-  const mapSetting = getMapSetting(mapQuadrants);
-
-  const mapVisualSummary = await processMapImage({ imagePath, mapSetting });
-
-  const mapMetadata = await generateStructuredData({
-    fnName: "genMapMetadata",
-    systemMessage,
-    prompt: `Map Quadrants: ${JSON.stringify(
-      mapQuadrants
-    )}\nMap Visual Summary: ${JSON.stringify(mapVisualSummary)}`,
-    schema: MapMetadataSchema.omit({
-      givenName: true,
-      originalName: true,
-      description: true,
-      setting: true,
-    }),
-    model: "strong",
-  });
-
-  const originalName = imagePath
-    .split("/")
-    .pop()
-    ?.replace(/\.png$/, "");
-  if (!originalName) {
-    throw new Error(
-      "Failed to extract original name from image path: " + imagePath
-    );
-  }
-
-  return {
-    ...mapMetadata,
-    givenName: mapVisualSummary.name,
-    originalName,
-    description: mapVisualSummary.description,
-    setting: mapSetting,
-  };
-}
-
-if (import.meta.main) {
-  console.time("Map Metadata Generation");
-  genMapMetadata({
-    mapQuadrants: chunkGridIntoQuadrants(ch5TerrainGrid),
-    imagePath: getPathWithinServer("assets/test/Chpt5.png"),
-  })
-    .then((res) => {
-      console.timeEnd("Map Metadata Generation");
-      console.log(res);
-    })
-    .catch((err) => {
-      console.error(err);
+    mapQuadrants: SubGrid[];
+    mapVisualSummary: MapVisualSummary;
+}) {
+    return generateStructuredData({
+        fnName: "genMapMetadata",
+        systemMessage,
+        prompt: `Map Quadrants: ${JSON.stringify(
+            mapQuadrants
+        )}\nMap Visual Summary: ${JSON.stringify(mapVisualSummary)}`,
+        schema: MapMetadataSchema.omit({
+            givenName: true,
+            originalName: true,
+            description: true,
+            setting: true,
+        }),
+        model: "strong",
     });
 }
 
+if (import.meta.main) {
+
+    const testMap1Quadrants = chunkGridIntoQuadrants(getTerrainGridFromMapName("(7)Ch3BandofMercenaries_Diff_Tileset__by_Shin19"));
+    const testMap2Quadrants = chunkGridIntoQuadrants(getTerrainGridFromMapName("Knights_Villagers_Bandits_1_(01_00_02_03)__by_Aura_Wolf"));
+    const testMap3Quadrants = chunkGridIntoQuadrants(getTerrainGridFromMapName("Knights_Villagers_Bandits_8_(18_00_19_1A)__by_Aura_Wolf"));
+
+    const testMap1VisualSummary = {
+        name: "Crossroads of Commerce",
+        description: "A bustling outdoor map featuring a network of roads connecting key locations such as villages, a castle, and a vendor. The map is characterized by its strategic pathways and surrounding natural terrain.",
+        regions: [
+            {
+                name: "Western Village",
+                description: "A quaint village located near a body of water, providing a peaceful retreat.",
+                location: "top left"
+            },
+            {
+                name: "Central Crossroads",
+                description: "The main intersection of roads, serving as a hub for movement across the map.",
+                location: "center"
+            },
+            {
+                name: "Eastern Castle",
+                description: "A fortified castle, offering strategic advantage and protection.",
+                location: "top right"
+            },
+            {
+                name: "Southern Vendor",
+                description: "A small vendor area, ideal for purchasing supplies and equipment.",
+                location: "bottom center right"
+            },
+            {
+                name: "Northern Pathway",
+                description: "A narrow path leading north, surrounded by trees and natural terrain.",
+                location: "top center"
+            }
+        ]
+    }
+
+    genMapMetadata({
+        mapQuadrants: testMap1Quadrants,
+        mapVisualSummary: testMap1VisualSummary,
+    })
+        .then((res) => {
+            console.log("Test Map Metadata:", res);
+        })
+        .catch((err) => {
+            console.error("Error generating Test Map metadata:", err);
+        });
+}

@@ -37,7 +37,7 @@ export default async function getLevelUnits({
   if (!mapMetadata) {
     throw new Error(`No metadata found for map ${chosenMapName}`);
   }
-  const { bossCoords, genericEnemies, playerUnitsCoords, recruitableUnits } =
+  const { bossCoords, genericEnemies, playerUnitCoords, recruitableUnits } =
     await assembleUnitPlacement({
       terrainGrid: getTerrainGridFromMapName(chosenMapName),
       chapterIdea,
@@ -125,7 +125,7 @@ export default async function getLevelUnits({
   // TODO: green units
 
   // Create formation regions for player units
-  const formationRegions: Level["regions"] = playerUnitsCoords.map(
+  const formationRegions: Level["regions"] = playerUnitCoords.map(
     (pos, index) => ({
       nid: (index + 1).toString(),
       region_type: "formation",

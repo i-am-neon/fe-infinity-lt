@@ -84,7 +84,7 @@ export default function UnitPlacementTestPage() {
                 terrainGrid: Record<string, TerrainType>;
                 unitPlacement: {
                     bossCoords: { x: number; y: number };
-                    playerUnitsCoords: { x: number; y: number }[];
+                    playerUnitCoords: { x: number; y: number }[];
                     genericEnemies: Unit[];
                     recruitableUnits: Unit[];
                 };
@@ -93,6 +93,8 @@ export default function UnitPlacementTestPage() {
                 method: "POST",
                 body: { mapName: selectedMap },
             });
+
+            console.log('response :>> ', response);
 
             const endTime = performance.now();
             setTimeElapsed(endTime - startTime);
@@ -106,7 +108,7 @@ export default function UnitPlacementTestPage() {
                     class: "General"
                 },
                 // Player units
-                ...response.unitPlacement.playerUnitsCoords.map(coords => ({
+                ...response.unitPlacement.playerUnitCoords.map(coords => ({
                     ...coords,
                     isPlayer: true
                 })),

@@ -4,6 +4,7 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
 import { TerrainGrid } from "@/types/maps/terrain-grid.ts";
 import genBossAndPlayerAndRecruitableUnitCoords from "./gen-boss-and-player-and-recruitable-unit-coords.ts";
 import getGenericEnemies from "./get-generic-enemies.ts";
+import getPlayerUnitPlacement from "@/ai/level/unit-placement/get-player-unit-placement.ts";
 
 export default async function assembleUnitPlacement({
   terrainGrid,
@@ -16,28 +17,25 @@ export default async function assembleUnitPlacement({
   mapMetadata: MapMetadata;
   chapterNumber: number;
 }) {
-  const [
-    originalGenericEnemies,
-    { bossCoords, playerUnitsCoords, recruitableUnits },
-  ] = await Promise.all([
-    getGenericEnemies({
-      terrainGrid,
-      chapterIdea,
-      mapMetadata,
-      chapterNumber,
-    }),
-    genBossAndPlayerAndRecruitableUnitCoords({
-      terrainGrid,
-      chapterIdea,
-      mapMetadata,
-    }),
-  ]);
+  const nonGenericUnitPlacementResult = await genBossAndPlayerAndRecruitableUnitCoords({
+    terrainGrid,
+    chapterIdea,
+    mapMetadata,
+  })
+  const originalGenericEnemies = await getGenericEnemies({
+    terrainGrid,
+    chapterIdea,
+    mapMetadata,
+    chapterNumber,
+    nonGenericUnitPlacementResult,
+  })
 
   // Collect existing positions (boss, player, and recruitable units)
   const existingPositions = [
-    { x: bossCoords.x, y: bossCoords.y },
-    ...playerUnitsCoords.map((unit) => ({ x: unit.x, y: unit.y })),
-    ...recruitableUnits.map((unit) => ({ x: unit.coords.x, y: unit.coords.y })),
+    // boss
+    nonGenericUnitPlacementResult.boss.coords,
+    // enemy generics
+    ...originalGenericEnemies.map((unit) => ({ x: unit.x, y: unit.y })),
   ];
 
   // Correct enemy positions to avoid overlap with player units and boss
@@ -47,11 +45,29 @@ export default async function assembleUnitPlacement({
     existingPositions,
   });
 
+  const playerRegion = mapMetadata.distinctRegions.find(
+    (region) =>
+      region.name === nonGenericUnitPlacementResult.playerUnits.regions[0]
+  );
+  if (!playerRegion) {
+    throw new Error("Player region not found in map metadata");
+  }
+
+  const playerUnitCoords = getPlayerUnitPlacement({
+    terrainGrid,
+    // TODO: don't hardcode
+    numUnits: 8,
+    fromX: playerRegion.fromX,
+    fromY: playerRegion.fromY,
+    toX: playerRegion.toX,
+    toY: playerRegion.toY,
+  })
+
   return {
-    bossCoords,
-    playerUnitsCoords,
+    bossCoords: nonGenericUnitPlacementResult.boss.coords,
+    playerUnitCoords,
     genericEnemies,
-    recruitableUnits,
+    recruitableUnits: nonGenericUnitPlacementResult.recruitableUnits,
   };
 }
 
