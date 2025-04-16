@@ -9,6 +9,7 @@ import { FE8ClassToLTNidMap } from "@/types/fe8-class.ts";
 import decideUnitWeapons from "../../item-options/decide-unit-weapons.ts";
 import decideStartingNonWeaponItems from "../../item-options/decide-starting-non-weapon-items.ts";
 import hasLockpick from "@/item-options/has-lockpick.ts";
+import replaceBadCharacters from "@/lib/formatting/replace-bad-characters.ts";
 
 export default async function createUnitData({
   characterIdea,
@@ -82,7 +83,7 @@ export default async function createUnitData({
   return {
     nid: characterIdea.firstName,
     name: characterIdea.firstName,
-    desc: characterIdea.inGameDescription,
+    desc: replaceBadCharacters(characterIdea.inGameDescription),
     variant: characterIdea.gender === "female" ? "Female" : null,
     level,
     klass: FE8ClassToLTNidMap[klass],
