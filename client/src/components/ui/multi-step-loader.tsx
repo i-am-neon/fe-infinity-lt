@@ -85,13 +85,19 @@ const LoaderCore = ({
                         const opacity = Math.max(1 - distance * 0.15, 0); // More gradual fade (0.15 instead of 0.2)
                         const visible = distance <= 6; // Show more steps at once (6 instead of 5)
 
+                        // Calculate position so current step remains centered
+                        // This is the key change: instead of shifting all items by the same amount,
+                        // we shift each item based on its position relative to the current item
+                        const stepPosition = (index - value) * 40;
+
                         return (
                             <motion.div
                                 key={index}
                                 className={cn("text-left flex gap-2 mb-4", !visible && "hidden")}
-                                initial={{ opacity: 0, y: -(value * 40) }}
-                                animate={{ opacity: opacity, y: -(value * 40) }}
+                                initial={{ opacity: 0, y: stepPosition }}
+                                animate={{ opacity: opacity, y: stepPosition }}
                                 transition={{ duration: 0.5 }}
+                                style={{ position: "absolute", width: "100%" }}
                             >
                                 <div>
                                     {index > value && (
