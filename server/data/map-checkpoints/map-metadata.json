@@ -1,0 +1,77 @@
+{
+  "Chpt5.png__outdoor": {
+    "distinctRegions": [
+      {
+        "name": "Northern Residential Block",
+        "description": "A fortified cluster of houses and an armory, surrounded by walls. This area is defensible and contains important buildings for resupply and healing.",
+        "terrainTypes": ["House", "Armory", "Wall", "Plain", "Road"],
+        "fromX": 0,
+        "fromY": 0,
+        "toX": 6,
+        "toY": 1
+      },
+      {
+        "name": "Central Main Roadway",
+        "description": "A wide, continuous road network running north-south and east-west through the map, connecting all major regions. It is the main thoroughfare for movement and skirmishes, with some forest patches for cover.",
+        "terrainTypes": ["Road", "Plain", "Forest"],
+        "fromX": 0,
+        "fromY": 2,
+        "toX": 14,
+        "toY": 15
+      },
+      {
+        "name": "Eastern Residential Block",
+        "description": "A line of houses and walls on the eastern edge, providing defensive positions and access to the main road.",
+        "terrainTypes": ["House", "Wall", "Plain", "Road", "Forest"],
+        "fromX": 5,
+        "fromY": 0,
+        "toX": 14,
+        "toY": 1
+      },
+      {
+        "name": "Southern Outskirts",
+        "description": "The southernmost part of the map, featuring open roads and some forest cover. This area is less fortified and can be used for flanking or retreat.",
+        "terrainTypes": ["Road", "Forest"],
+        "fromX": 0,
+        "fromY": 16,
+        "toX": 14,
+        "toY": 20
+      },
+      {
+        "name": "Inner Courtyard",
+        "description": "A semi-enclosed courtyard surrounded by walls and buildings, with vendors and houses. This area is a key strategic point for controlling access between north and south.",
+        "terrainTypes": ["Road", "Forest", "Wall", "Vendor", "House", "Plain"],
+        "fromX": 4,
+        "fromY": 5,
+        "toX": 12,
+        "toY": 12
+      }
+    ],
+    "keyPointsOfInterest": [
+      "Armory at (2,1)",
+      "Vendor at (6,10)",
+      "Vendor at (10,6)",
+      "Multiple Houses at (5,1), (5,6), (12,10), (12,6), (12,19)",
+      "Stairs at (1,14), (3,14), (9,14), (10,14), (9,14), (10,14)",
+      "Forest patches at (1,8), (1,9), (5,12), (9,11), (13,8), (10,16), (11,16), (12,16)"
+    ],
+    "chokePoints": [
+      "Narrow road at (3,2)-(4,2) between Northern Residential Block and Central Main Roadway",
+      "Wall gaps at (9,4)-(10,4) and (9,5)-(10,5) between Central Main Roadway and Inner Courtyard",
+      "Stairs at (1,14), (3,14), (9,14), (10,14) restrict vertical movement between levels",
+      "Wall gaps at (9,13)-(10,13) and (13,9)-(14,9) on east and west sides"
+    ],
+    "strategicConsiderations": [
+      "The Northern Residential Block is highly defensible but can be isolated if the main road is blocked.",
+      "The Central Main Roadway is the primary route for both offense and defense; controlling it allows rapid response to threats.",
+      "The Inner Courtyard is a critical area for controlling movement between north and south, and for accessing vendors and houses.",
+      "The Southern Outskirts provide opportunities for flanking and retreat, but are less protected.",
+      "Choke points at wall gaps and stairs should be guarded to prevent enemy breakthroughs.",
+      "Forest patches offer cover for ambushes or defensive stands."
+    ],
+    "givenName": "Fortified Village",
+    "originalName": "Chpt5",
+    "description": "A fortified village with multiple buildings, surrounded by walls and natural barriers. The map features a mix of open areas and enclosed spaces, providing strategic opportunities for both defense and offense.",
+    "setting": "outdoor"
+  }
+}

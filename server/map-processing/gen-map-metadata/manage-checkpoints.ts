@@ -2,10 +2,26 @@ import {
     listCheckpointEntries,
     deleteMapVisualSummaryFromCheckpoint
 } from "./map-visual-summary-checkpoint.ts";
+import {
+    listMapMetadataCheckpointEntries,
+    deleteMapMetadataFromCheckpoint
+} from "./map-metadata-checkpoint.ts";
 
-async function listCheckpoints() {
-    const entries = await listCheckpointEntries();
-    console.log("Current checkpoint entries:");
+enum CheckpointType {
+    VisualSummary = "visual-summary",
+    MapMetadata = "map-metadata"
+}
+
+async function listCheckpoints(type: CheckpointType = CheckpointType.VisualSummary) {
+    let entries: string[];
+
+    if (type === CheckpointType.VisualSummary) {
+        entries = await listCheckpointEntries();
+        console.log("Current visual summary checkpoint entries:");
+    } else {
+        entries = await listMapMetadataCheckpointEntries();
+        console.log("Current map metadata checkpoint entries:");
+    }
 
     if (entries.length === 0) {
         console.log("  No entries found.");
@@ -17,7 +33,7 @@ async function listCheckpoints() {
     });
 }
 
-async function deleteCheckpoint(mapKey: string) {
+async function deleteCheckpoint(mapKey: string, type: CheckpointType = CheckpointType.VisualSummary) {
     // Parse the key format fileName__mapSetting
     const parts = mapKey.split("__");
     if (parts.length !== 2) {
@@ -26,12 +42,22 @@ async function deleteCheckpoint(mapKey: string) {
     }
 
     const [fileName, mapSetting] = parts;
-    const deleted = await deleteMapVisualSummaryFromCheckpoint(fileName, mapSetting);
+    let deleted: boolean;
 
-    if (deleted) {
-        console.log(`Successfully deleted checkpoint for: ${mapKey}`);
+    if (type === CheckpointType.VisualSummary) {
+        deleted = await deleteMapVisualSummaryFromCheckpoint(fileName, mapSetting);
+        if (deleted) {
+            console.log(`Successfully deleted visual summary checkpoint for: ${mapKey}`);
+        } else {
+            console.log(`Visual summary checkpoint not found for: ${mapKey}`);
+        }
     } else {
-        console.log(`Checkpoint not found for: ${mapKey}`);
+        deleted = await deleteMapMetadataFromCheckpoint(fileName, mapSetting);
+        if (deleted) {
+            console.log(`Successfully deleted map metadata checkpoint for: ${mapKey}`);
+        } else {
+            console.log(`Map metadata checkpoint not found for: ${mapKey}`);
+        }
     }
 }
 
@@ -40,7 +66,11 @@ async function main() {
     const command = args[0]?.toLowerCase();
 
     if (!command || command === "list") {
-        await listCheckpoints();
+        const type = args[1]?.toLowerCase() === "metadata"
+            ? CheckpointType.MapMetadata
+            : CheckpointType.VisualSummary;
+
+        await listCheckpoints(type);
         return;
     }
 
@@ -48,20 +78,28 @@ async function main() {
         const mapKey = args[1];
         if (!mapKey) {
             console.error("Please provide a map key to delete.");
-            console.log("Usage: deno run -A manage-checkpoints.ts delete <mapKey>");
+            console.log("Usage: deno run -A manage-checkpoints.ts delete <mapKey> [checkpoint-type]");
             return;
         }
 
-        await deleteCheckpoint(mapKey);
+        const type = args[2]?.toLowerCase() === "metadata"
+            ? CheckpointType.MapMetadata
+            : CheckpointType.VisualSummary;
+
+        await deleteCheckpoint(mapKey, type);
         return;
     }
 
     if (command === "help") {
         console.log("Checkpoint Management Utility");
         console.log("Commands:");
-        console.log("  list              - List all checkpoint entries");
-        console.log("  delete <mapKey>   - Delete a specific checkpoint entry");
-        console.log("  help              - Show this help message");
+        console.log("  list [checkpoint-type]       - List all checkpoint entries");
+        console.log("  delete <mapKey> [checkpoint-type] - Delete a specific checkpoint entry");
+        console.log("  help                         - Show this help message");
+        console.log("");
+        console.log("Checkpoint Types:");
+        console.log("  visual-summary (default)     - Manage visual summary checkpoints");
+        console.log("  metadata                     - Manage map metadata checkpoints");
         return;
     }
 

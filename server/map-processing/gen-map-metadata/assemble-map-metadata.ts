@@ -10,6 +10,10 @@ import {
     getMapVisualSummaryFromCheckpoint,
     saveMapVisualSummaryToCheckpoint
 } from "./map-visual-summary-checkpoint.ts";
+import {
+    getMapMetadataFromCheckpoint,
+    saveMapMetadataToCheckpoint
+} from "./map-metadata-checkpoint.ts";
 import getTerrainGridFromMapName from "@/ai/level/unit-placement/get-terrain-grid-from-tilemap.ts";
 
 export default async function assembleMapMetadata({
@@ -22,6 +26,15 @@ export default async function assembleMapMetadata({
     forceRefresh?: boolean;
 }): Promise<MapMetadata> {
     const mapSetting = getMapSetting(mapQuadrants);
+
+    // Check if map metadata already exists in checkpoint (unless forced refresh)
+    if (!forceRefresh) {
+        const cachedMetadata = await getMapMetadataFromCheckpoint(imagePath, mapSetting);
+        if (cachedMetadata) {
+            console.log(`Using cached map metadata for: ${imagePath}`);
+            return cachedMetadata;
+        }
+    }
 
     // Try to get the map visual summary from checkpoint (unless forced refresh)
     let mapVisualSummary = forceRefresh ? null : await getMapVisualSummaryFromCheckpoint(imagePath, mapSetting);
@@ -37,7 +50,7 @@ export default async function assembleMapMetadata({
         console.log(`Using cached map visual summary for: ${imagePath}`);
     }
 
-    const mapMetadata = await genMapMetadata({
+    const generatedMetadata = await genMapMetadata({
         mapQuadrants,
         mapVisualSummary,
     });
@@ -52,13 +65,19 @@ export default async function assembleMapMetadata({
         );
     }
 
-    return {
-        ...mapMetadata,
+    const mapMetadata: MapMetadata = {
+        ...generatedMetadata,
         givenName: mapVisualSummary.name,
         originalName,
         description: mapVisualSummary.description,
         setting: mapSetting,
     };
+
+    // Save map metadata to checkpoint for future use
+    await saveMapMetadataToCheckpoint(imagePath, mapSetting, mapMetadata);
+    console.log(`Saved map metadata to checkpoint for: ${imagePath}`);
+
+    return mapMetadata;
 }
 
 if (import.meta.main) {

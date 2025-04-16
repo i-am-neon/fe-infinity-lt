@@ -1,35 +1,4 @@
 {
-  "Chpt5.png__outdoor": {
-    "name": "Fortified Village",
-    "description": "A village surrounded by stone walls with various buildings and a central arena, providing strategic defensive positions.",
-    "regions": [
-      {
-        "name": "Northern Residential Area",
-        "description": "A cluster of houses surrounded by trees, providing cover and strategic positioning.",
-        "location": "top center"
-      },
-      {
-        "name": "Central Arena",
-        "description": "A circular arena structure, likely used for training or entertainment.",
-        "location": "center right"
-      },
-      {
-        "name": "Village Square",
-        "description": "An open area with a single house, serving as a focal point for the village.",
-        "location": "center"
-      },
-      {
-        "name": "Southern Residential Area",
-        "description": "A group of houses enclosed by walls, offering protection and strategic vantage points.",
-        "location": "bottom center"
-      },
-      {
-        "name": "Western Wall",
-        "description": "A long stone wall providing a defensive barrier along the western edge.",
-        "location": "center left"
-      }
-    ]
-  },
   "(7)Ch3BandofMercenaries_Diff_Tileset__by_Shin19.png__outdoor": {
     "name": "Crossroads of Commerce",
     "description": "An outdoor map featuring a network of roads connecting various key locations, including villages, a fort, and a castle. The map is characterized by its strategic layout, with roads intersecting at a central point, surrounded by natural barriers like forests and water.",
