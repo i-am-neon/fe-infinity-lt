@@ -1,20 +1,17 @@
 import correctUnitPlacement from "@/ai/level/unit-placement/correct-unit-placement.ts";
+import getTerrainGridFromMapName from "@/ai/level/unit-placement/get-terrain-grid-from-tilemap.ts";
 import { testPrologueChapter } from "@/ai/test-data/prologueTestData.ts";
-import { testMapMetadata } from "@/ai/test-data/unit-placement.ts";
 import { ChapterIdea } from "@/ai/types/chapter-idea.ts";
 import {
-  RecruitableUnit,
   RecruitableUnitSchema,
   UnitCoords,
-  UnitCoordsSchema,
+  UnitCoordsSchema
 } from "@/ai/types/unit-placement.ts";
-import { ch4TerrainGrid } from "@/map-processing/test-data/terrain-grid.ts";
+import { allMapOptions } from "@/map-processing/all-map-options.ts";
 import { MapMetadata } from "@/types/maps/map-metadata.ts";
 import { TerrainGrid } from "@/types/maps/terrain-grid.ts";
 import { z } from "zod";
 import generateStructuredData from "../../lib/generate-structured-data.ts";
-import getTerrainGridFromMapName from "@/ai/level/unit-placement/get-terrain-grid-from-tilemap.ts";
-import { allMapOptions } from "@/map-processing/all-map-options.ts";
 
 export type NonGenericUnitPlacementResult = {
   boss: {
@@ -132,6 +129,7 @@ Coordinates must lie within their chosen region(s). The sceneOverview might indi
     schema: coordsSchema,
     systemMessage: systemMessage2,
     prompt: prompt2,
+    model: "strong"
   });
 
   const correctedBoss = correctUnitPlacement({
