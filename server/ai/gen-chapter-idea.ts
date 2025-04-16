@@ -9,8 +9,9 @@ import { InitialGameIdea } from "@/ai/types/initial-game-idea.ts";
 import { WorldSummary } from "@/ai/types/world-summary.ts";
 import { validateCharacterMentions } from "@/ai/validators/validate-character-mentions.ts";
 import { DeadCharacterRecord } from "@/types/dead-character-record.ts";
+import replaceBadCharacters from "@/lib/formatting/replace-bad-characters.ts";
 
-export default function genChapterIdea({
+export default async function genChapterIdea({
   worldSummary,
   chapterNumber,
   tone,
@@ -134,7 +135,7 @@ Themes of resurrection, undead, etc. are perfectly fine in the story - only chec
 Dramatically, language in death quotes (like "I'll rise again") is completely acceptable.
 Return { fixText: "None", fixObject: {} } if good; else fix instructions. Only JSON.`;
 
-  return genAndCheck<ChapterIdea>({
+  const chIdea = await genAndCheck<ChapterIdea>({
     fnBaseName: "genChapterIdea",
     generatorModel: "strong",
     generatorSystemMessage,
@@ -159,6 +160,13 @@ If all good => fixText="None". Otherwise => fix instructions.`;
     },
     validators: [validateCharacterMentions],
   });
+  return {
+    ...chIdea,
+    enemyFaction: {
+      ...chIdea.enemyFaction,
+      desc: replaceBadCharacters(chIdea.enemyFaction.desc),
+    }
+  }
 }
 if (import.meta.main) {
   genChapterIdea({
