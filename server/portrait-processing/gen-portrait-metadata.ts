@@ -5,6 +5,10 @@ import {
 import generateStructuredDataWithImage from "../ai/lib/generate-structured-data-with-image.ts";
 import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
 import autoFramePortrait from "@/portrait-processing/auto-frame-portrait.ts";
+import {
+  getPortraitMetadataFromCheckpoint,
+  savePortraitMetadataToCheckpoint
+} from "./portrait-metadata-checkpoint.ts";
 
 const systemMessage = `Generate metadata for a portrait of this character.
 Guidelines:
@@ -14,8 +18,20 @@ Guidelines:
 If the thing does not exist, simply do not include it in the return value. For example if there is no facial hair or accessories, simply don't include the "facialHair" or "accessories" field in the return value.`;
 
 export default async function genPortraitMetadata(
-  imagePath: string
+  imagePath: string,
+  forceRefresh = false,
 ): Promise<PortraitMetadata> {
+  // Check if portrait metadata already exists in checkpoint (unless forced refresh)
+  if (!forceRefresh) {
+    const cachedMetadata = await getPortraitMetadataFromCheckpoint(imagePath);
+    if (cachedMetadata) {
+      console.log(`Using cached portrait metadata for: ${imagePath}`);
+      return cachedMetadata;
+    }
+  }
+
+  console.log(`${forceRefresh ? "Force refreshing" : "Not found in checkpoint"}, processing portrait: ${imagePath}`);
+
   const metadata = await generateStructuredDataWithImage({
     systemMessage,
     imagePath,
@@ -38,12 +54,18 @@ export default async function genPortraitMetadata(
 
   const { blinkingOffset, smilingOffset } = await autoFramePortrait(imagePath);
 
-  return {
+  const portraitMetadata: PortraitMetadata = {
     ...metadata,
     originalName,
     blinkingOffset,
     smilingOffset,
   };
+
+  // Save portrait metadata to checkpoint for future use
+  await savePortraitMetadataToCheckpoint(imagePath, portraitMetadata);
+  console.log(`Saved portrait metadata to checkpoint for: ${imagePath}`);
+
+  return portraitMetadata;
 }
 
 if (import.meta.main) {

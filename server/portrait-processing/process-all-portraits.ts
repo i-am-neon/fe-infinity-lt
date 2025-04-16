@@ -5,7 +5,7 @@ import replaceBackgroundColorInPortraits from "@/portrait-processing/replace-bac
 import saveVectorsForAllPortraits from "@/portrait-processing/save-vectors-for-all-portraits.ts";
 import writeAllPortraitOptions from "@/portrait-processing/write-all-portrait-options.ts";
 
-export default async function processAllPortraits(): Promise<void> {
+export default async function processAllPortraits(forceRefresh = false): Promise<void> {
   await replaceBackgroundColorInPortraits();
   console.log(
     "✅🎨 Completed replacing background color in all portrait images"
@@ -15,7 +15,8 @@ export default async function processAllPortraits(): Promise<void> {
   const portraitMetadatas = await Promise.all(
     portraitFileNames.map((portraitFileName) =>
       genPortraitMetadata(
-        getPathWithinServer(`assets/portraits/${portraitFileName}`)
+        getPathWithinServer(`assets/portraits/${portraitFileName}`),
+        forceRefresh
       )
     )
   );
@@ -35,6 +36,12 @@ export default async function processAllPortraits(): Promise<void> {
 }
 
 if (import.meta.main) {
-  processAllPortraits();
+  // Check if --force-refresh flag is provided
+  const forceRefresh = Deno.args.includes("--force-refresh");
+  if (forceRefresh) {
+    console.log("Force refresh flag detected, will regenerate all portrait metadata");
+  }
+
+  processAllPortraits(forceRefresh);
 }
 
