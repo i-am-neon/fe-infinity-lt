@@ -154,8 +154,8 @@ export default function decideUnitWeapons({
 
   // If no special weapons or they weren't chosen to be droppable, check normal weapons for generics
   if (!isBoss) {
-    // 30% chance for a normal weapon to be droppable for generics
-    if (Math.random() < 0.3) {
+    // 10% chance for a normal weapon to be droppable for generics
+    if (Math.random() < 0.1) {
       // Randomly choose one weapon to be droppable
       const randomIndex = Math.floor(Math.random() * weapons.length);
       weapons[randomIndex] = [weapons[randomIndex][0], true];

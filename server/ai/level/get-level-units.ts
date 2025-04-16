@@ -91,13 +91,17 @@ export default async function getLevelUnits({
     if (!ge.class) {
       throw new Error(`No class found for generic enemy ${ge}`);
     }
+    const level = decideGenericUnitLevel({
+      chapter: chapterNumber,
+      fe8Class: ge.class,
+    });
     // For now just hard code items
     ge.startingItems = ge.startingItems ?? [];
     // insert items at beginning of array before special items
     ge.startingItems.unshift(
       ...decideUnitWeapons({
         fe8Class: ge.class,
-        level: 1,
+        level,
         isPromoted: isPromotedClass(ge.class),
         isBoss: false,
       })
@@ -106,11 +110,7 @@ export default async function getLevelUnits({
       nid: shortUuid(),
       team: "enemy",
       ai: ge.aiGroup,
-      level: decideGenericUnitLevel({
-        chapter: chapterNumber,
-        fe8Class: ge.class,
-      }),
-      // TODO: factions
+      level,
       faction: chapterIdea.enemyFaction.nid,
       klass: FE8ClassToLTNidMap[ge.class],
       roam_ai: null,
