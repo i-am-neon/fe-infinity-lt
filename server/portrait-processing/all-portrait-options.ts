@@ -2962,24 +2962,6 @@ export const allPortraitOptions: PortraitMetadata[] = [
   {
     "gender": "female",
     "age": "young adult",
-    "hairColor": "silver",
-    "eyeColor": "yellow",
-    "vibe": "calm, wise, serene",
-    "clothing": "brown cloak",
-    "accessories": "headband",
-    "originalName": "Lord (Smug_Mug)",
-    "blinkingOffset": [
-      32,
-      16
-    ],
-    "smilingOffset": [
-      32,
-      32
-    ]
-  },
-  {
-    "gender": "female",
-    "age": "young adult",
     "hairColor": "green",
     "eyeColor": "green",
     "vibe": "calm, confident, composed",
@@ -4039,7 +4021,7 @@ export const allPortraitOptions: PortraitMetadata[] = [
       24
     ],
     "smilingOffset": [
-      24,
+      32,
       32
     ]
   },
