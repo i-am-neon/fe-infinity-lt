@@ -4,7 +4,13 @@
       {
         "name": "Northern Residential Block",
         "description": "A fortified cluster of houses and an armory, surrounded by walls. This area is defensible and contains important buildings for resupply and healing.",
-        "terrainTypes": ["House", "Armory", "Wall", "Plain", "Road"],
+        "terrainTypes": [
+          "House",
+          "Armory",
+          "Wall",
+          "Plain",
+          "Road"
+        ],
         "fromX": 0,
         "fromY": 0,
         "toX": 6,
@@ -13,7 +19,11 @@
       {
         "name": "Central Main Roadway",
         "description": "A wide, continuous road network running north-south and east-west through the map, connecting all major regions. It is the main thoroughfare for movement and skirmishes, with some forest patches for cover.",
-        "terrainTypes": ["Road", "Plain", "Forest"],
+        "terrainTypes": [
+          "Road",
+          "Plain",
+          "Forest"
+        ],
         "fromX": 0,
         "fromY": 2,
         "toX": 14,
@@ -22,7 +32,13 @@
       {
         "name": "Eastern Residential Block",
         "description": "A line of houses and walls on the eastern edge, providing defensive positions and access to the main road.",
-        "terrainTypes": ["House", "Wall", "Plain", "Road", "Forest"],
+        "terrainTypes": [
+          "House",
+          "Wall",
+          "Plain",
+          "Road",
+          "Forest"
+        ],
         "fromX": 5,
         "fromY": 0,
         "toX": 14,
@@ -31,7 +47,10 @@
       {
         "name": "Southern Outskirts",
         "description": "The southernmost part of the map, featuring open roads and some forest cover. This area is less fortified and can be used for flanking or retreat.",
-        "terrainTypes": ["Road", "Forest"],
+        "terrainTypes": [
+          "Road",
+          "Forest"
+        ],
         "fromX": 0,
         "fromY": 16,
         "toX": 14,
@@ -40,7 +59,14 @@
       {
         "name": "Inner Courtyard",
         "description": "A semi-enclosed courtyard surrounded by walls and buildings, with vendors and houses. This area is a key strategic point for controlling access between north and south.",
-        "terrainTypes": ["Road", "Forest", "Wall", "Vendor", "House", "Plain"],
+        "terrainTypes": [
+          "Road",
+          "Forest",
+          "Wall",
+          "Vendor",
+          "House",
+          "Plain"
+        ],
         "fromX": 4,
         "fromY": 5,
         "toX": 12,
@@ -72,6 +98,1670 @@
     "givenName": "Fortified Village",
     "originalName": "Chpt5",
     "description": "A fortified village with multiple buildings, surrounded by walls and natural barriers. The map features a mix of open areas and enclosed spaces, providing strategic opportunities for both defense and offense.",
+    "setting": "outdoor"
+  },
+  "BorderFort.png__mixed indoor and outdoor": {
+    "distinctRegions": [
+      {
+        "name": "Northern Plains Approach",
+        "description": "A wide open field with scattered forests and a hill, providing approach routes to the fortress. Offers little cover except for a few forest tiles and a hill in the northwest.",
+        "terrainTypes": [
+          "Plain",
+          "Forest",
+          "Hill"
+        ],
+        "fromX": 0,
+        "fromY": 0,
+        "toX": 18,
+        "toY": 4
+      },
+      {
+        "name": "Twin Thrones Audience Hall",
+        "description": "A large, central indoor hall featuring two thrones and multiple staircases. This is the main defensive and symbolic heart of the fortress, accessible from multiple directions but protected by thick walls.",
+        "terrainTypes": [
+          "Floor",
+          "Throne",
+          "Stairs"
+        ],
+        "fromX": 5,
+        "fromY": 5,
+        "toX": 13,
+        "toY": 8
+      },
+      {
+        "name": "Inner Fortress Corridors",
+        "description": "A network of corridors and rooms within the fortress, containing pillars for cover and staircases for vertical movement. Connects the throne room to the treasure chamber and other fortress areas.",
+        "terrainTypes": [
+          "Floor",
+          "Pillar",
+          "Stairs"
+        ],
+        "fromX": 5,
+        "fromY": 9,
+        "toX": 13,
+        "toY": 14
+      },
+      {
+        "name": "Treasure Vault",
+        "description": "A small, secure chamber containing a valuable chest and pillars for defense. Accessible only through the inner corridors, making it easy to defend.",
+        "terrainTypes": [
+          "Floor",
+          "Chest",
+          "Pillar"
+        ],
+        "fromX": 5,
+        "fromY": 13,
+        "toX": 12,
+        "toY": 14
+      },
+      {
+        "name": "Southern Fortress Exit and Road",
+        "description": "The southern exit of the fortress, featuring doors, stairs, and a road leading out to the open plains. This area is a key point for reinforcements or escape, and is the main route for entering or leaving the fortress from the south.",
+        "terrainTypes": [
+          "Floor",
+          "Door",
+          "Stairs",
+          "Road",
+          "Plain",
+          "Forest"
+        ],
+        "fromX": 5,
+        "fromY": 15,
+        "toX": 18,
+        "toY": 20
+      }
+    ],
+    "keyPointsOfInterest": [
+      "Twin Thrones at (7,6) and (7,6)",
+      "Treasure Chest at (11,13)",
+      "Multiple staircases at (13,6), (14,8), (14,9), (5,16), (6,16)",
+      "Doors at (5,15), (6,15)"
+    ],
+    "chokePoints": [
+      "Doors at (5,15) and (6,15) separating the inner fortress from the southern exit",
+      "Narrow corridor at (7,9) with pillar",
+      "Staircase bottlenecks at (13,6), (14,8), (14,9)"
+    ],
+    "strategicConsiderations": [
+      "Defenders can hold the throne room and treasure vault with ease due to limited access points and strong walls.",
+      "Attackers must breach the southern doors or scale the walls to enter the fortress, making frontal assaults risky.",
+      "The open northern plains favor cavalry and fliers, but offer little cover for infantry.",
+      "Staircases and pillars inside the fortress provide defensive advantages and limit movement, favoring defenders.",
+      "The southern road is the main reinforcement and escape route; controlling the doors here is crucial for both sides."
+    ],
+    "givenName": "Fortress of the Twin Thrones",
+    "originalName": "BorderFort",
+    "description": "A fortified structure with a mix of indoor chambers and outdoor pathways, featuring a throne room and treasure storage.",
+    "setting": "mixed indoor and outdoor"
+  },
+  "Nobles_Evil_Doers_11_(3C_00_68_3E)__by_Aura_Wolf.png__mixed indoor and outdoor": {
+    "distinctRegions": [
+      {
+        "name": "Western Fortress Interior",
+        "description": "A series of interconnected rooms and corridors with pillars and chests, forming the western indoor section of the fortress. Contains a locked door at (2,16) and several chests, making it a valuable area for loot and defense.",
+        "terrainTypes": [
+          "Floor",
+          "Pillar",
+          "Stairs",
+          "Chest",
+          "Door"
+        ],
+        "fromX": 0,
+        "fromY": 0,
+        "toX": 6,
+        "toY": 16
+      },
+      {
+        "name": "Central Courtyard and Main Hall",
+        "description": "A large open courtyard with some forest patches and stairs, surrounded by walls and connecting to the throne room at (10,5). This is the main area for movement and combat, with multiple access points from all directions.",
+        "terrainTypes": [
+          "Plain",
+          "Floor",
+          "Stairs",
+          "Forest",
+          "Throne"
+        ],
+        "fromX": 7,
+        "fromY": 0,
+        "toX": 15,
+        "toY": 16
+      },
+      {
+        "name": "Eastern Fortress Interior",
+        "description": "A set of rooms and corridors on the eastern side of the fortress, featuring pillars and stairs. Provides flanking opportunities and access to the central courtyard.",
+        "terrainTypes": [
+          "Floor",
+          "Pillar",
+          "Stairs"
+        ],
+        "fromX": 16,
+        "fromY": 0,
+        "toX": 20,
+        "toY": 16
+      },
+      {
+        "name": "Southern Outer Approach",
+        "description": "The southernmost area outside the main fortress, with a mix of open ground, road, and some forest. This is the main approach for attackers and a key area to control for defense.",
+        "terrainTypes": [
+          "Plain",
+          "Floor",
+          "Pillar",
+          "Stairs",
+          "Road",
+          "Forest"
+        ],
+        "fromX": 0,
+        "fromY": 17,
+        "toX": 20,
+        "toY": 21
+      }
+    ],
+    "keyPointsOfInterest": [
+      "Throne at (10,5)",
+      "Chests at (0,14), (0,16), (0,18)",
+      "Locked Door at (2,16)",
+      "Stairs at (3,3), (15,3), (1,8), (7,9), (13,9), (18,9), (18,10), (6,16), (14,16), (10,17), (14,18), (9,20), (10,20), (11,20)"
+    ],
+    "chokePoints": [
+      "Locked Door at (2,16)",
+      "Narrow corridor at (2,6)-(2,7)",
+      "Stairs at (3,3), (15,3), (7,9), (13,9), (18,9), (18,10)"
+    ],
+    "strategicConsiderations": [
+      "Defenders can hold the central courtyard and throne room, using the surrounding walls and choke points to limit attacker movement.",
+      "Attackers must breach the western or eastern interiors or push through the southern approach, dealing with locked doors and narrow corridors.",
+      "Chests in the western interior are valuable but require careful navigation of tight spaces and potential ambushes.",
+      "Stairs and pillars provide defensive cover and can be used to funnel enemies into kill zones.",
+      "The southern approach is open but exposed, making it risky for attackers to advance without support."
+    ],
+    "givenName": "Fortress Courtyard",
+    "originalName": "Nobles_Evil_Doers_11_(3C_00_68_3E)__by_Aura_Wolf",
+    "description": "A fortified structure with a central courtyard surrounded by walls and buildings, featuring both indoor and outdoor areas.",
+    "setting": "mixed indoor and outdoor"
+  },
+  "TrainingFortress.png__indoor": {
+    "distinctRegions": [
+      {
+        "name": "Western Outer Courtyard",
+        "description": "An outdoor area with plains, forests, and roads. Provides approach routes to the fortress and some cover for attackers or defenders.",
+        "terrainTypes": [
+          "Plain",
+          "Forest",
+          "Road"
+        ],
+        "fromX": 0,
+        "fromY": 6,
+        "toX": 4,
+        "toY": 14
+      },
+      {
+        "name": "Northern Entry Hall",
+        "description": "The main entry hall of the fortress, accessible from the west. Serves as the initial indoor area after entering from the courtyard.",
+        "terrainTypes": [
+          "Floor"
+        ],
+        "fromX": 0,
+        "fromY": 0,
+        "toX": 4,
+        "toY": 1
+      },
+      {
+        "name": "Central Fortress Corridor",
+        "description": "A long, continuous corridor running through the center of the fortress, connecting multiple rooms and providing access to the inner areas.",
+        "terrainTypes": [
+          "Floor"
+        ],
+        "fromX": 6,
+        "fromY": 0,
+        "toX": 10,
+        "toY": 5
+      },
+      {
+        "name": "Eastern Fortress Hall",
+        "description": "A large hall with stairs and barrels, likely used for storage or as a secondary defensive position. Connects to the central corridor and inner rooms.",
+        "terrainTypes": [
+          "Floor",
+          "Stairs",
+          "Barrel"
+        ],
+        "fromX": 6,
+        "fromY": 6,
+        "toX": 14,
+        "toY": 13
+      },
+      {
+        "name": "Southern Fortress Passage",
+        "description": "A narrow passage at the southern edge of the fortress, providing a route between the eastern and western sides.",
+        "terrainTypes": [
+          "Floor"
+        ],
+        "fromX": 6,
+        "fromY": 14,
+        "toX": 14,
+        "toY": 14
+      }
+    ],
+    "keyPointsOfInterest": [
+      "Stairs at (11,5) and (11,9)",
+      "Barrel at (14,2) and (14,12)",
+      "Multiple wall segments forming defensive bottlenecks"
+    ],
+    "chokePoints": [
+      "Narrow corridor at (6,4)-(6,5)",
+      "Wall gaps at (6,0)-(6,1) and (6,6)-(6,7)",
+      "Southern passage at (6,14)-(14,14)"
+    ],
+    "strategicConsiderations": [
+      "The outer courtyard provides cover and approach options for attackers, but is exposed to defenders in the fortress.",
+      "The central corridor is a key defensive line; controlling it restricts enemy movement between regions.",
+      "Stairs and barrels in the eastern hall can be used for ambushes or to slow down attackers.",
+      "Choke points at corridor entrances and the southern passage are ideal for defensive stands.",
+      "Multiple wall segments create natural bottlenecks, making it difficult for large groups to advance together."
+    ],
+    "givenName": "Fortress Entrance",
+    "originalName": "TrainingFortress",
+    "description": "A fortified indoor area with strategic pathways and defensive structures.",
+    "setting": "indoor"
+  },
+  "AssassinTest.png__outdoor": {
+    "distinctRegions": [
+      {
+        "name": "Northern Coastal Forts and Plains",
+        "description": "A coastal region with two forts and open plains, bordered by the sea. Provides strong defensive positions and is a likely starting area for one side.",
+        "terrainTypes": [
+          "Sea",
+          "Plain",
+          "Fort"
+        ],
+        "fromX": 0,
+        "fromY": 0,
+        "toX": 14,
+        "toY": 2
+      },
+      {
+        "name": "North Central Forested Plains",
+        "description": "A mix of open plains, forests, and thickets, with cliffs to the west. Offers both mobility and cover, and serves as a transition between the coast and the river.",
+        "terrainTypes": [
+          "Plain",
+          "Forest",
+          "Thicket",
+          "Cliff"
+        ],
+        "fromX": 3,
+        "fromY": 3,
+        "toX": 14,
+        "toY": 6
+      },
+      {
+        "name": "Western Riverbank and Bridge",
+        "description": "A winding riverbank with a key bridge at (3,14), surrounded by forests and thickets. This area is a major chokepoint for movement between north and south.",
+        "terrainTypes": [
+          "Plain",
+          "Forest",
+          "River",
+          "Bridge",
+          "Thicket",
+          "Cliff"
+        ],
+        "fromX": 0,
+        "fromY": 7,
+        "toX": 10,
+        "toY": 15
+      },
+      {
+        "name": "Central River Crossing",
+        "description": "The main river crossing in the center-east, with a bridge at (11,11). Surrounded by forests and thickets, this is a critical area for controlling map flow.",
+        "terrainTypes": [
+          "Plain",
+          "Forest",
+          "River",
+          "Bridge",
+          "Thicket"
+        ],
+        "fromX": 11,
+        "fromY": 7,
+        "toX": 14,
+        "toY": 15
+      },
+      {
+        "name": "Southern Forested Plains and Hills",
+        "description": "A large southern region with open plains, dense forests, thickets, and a hill in the southeast. Multiple bridges and rivers create several movement options and chokepoints.",
+        "terrainTypes": [
+          "Plain",
+          "Forest",
+          "Thicket",
+          "River",
+          "Bridge",
+          "Hill"
+        ],
+        "fromX": 0,
+        "fromY": 16,
+        "toX": 14,
+        "toY": 20
+      }
+    ],
+    "keyPointsOfInterest": [
+      "Fort at (4,0)",
+      "Fort at (4,0) and (4,0) (overlap due to chunk, but only one fort)",
+      "Bridge at (3,14)",
+      "Bridge at (11,11)",
+      "Bridge at (6,19)",
+      "Bridge at (9,17)"
+    ],
+    "chokePoints": [
+      "Bridge at (3,14)",
+      "Bridge at (11,11)",
+      "Bridge at (6,19)",
+      "Bridge at (9,17)",
+      "Narrow river crossings at (5,7)-(7,7) and (5,8)-(7,8)"
+    ],
+    "strategicConsiderations": [
+      "Controlling the bridges is vital for movement between north and south.",
+      "Forts in the north provide strong defensive positions and healing.",
+      "Forests and thickets offer cover for ambushes and defense.",
+      "The central and eastern bridges are likely to be heavily contested.",
+      "Southern hills and forests provide defensive terrain for units holding the bottom of the map.",
+      "Wide open plains in the south and north allow for cavalry and flier mobility, but are vulnerable to ranged attacks."
+    ],
+    "givenName": "River Crossing",
+    "originalName": "AssassinTest",
+    "description": "A lush landscape with winding rivers and multiple bridges connecting various paths. The map features dense forests and open plains, providing strategic opportunities for movement and ambush.",
+    "setting": "outdoor"
+  },
+  "Knights_Villagers_Bandits_11_(0E_00_72_10)__by_Aura_Wolf.png__outdoor": {
+    "distinctRegions": [
+      {
+        "name": "Northern Village and Outskirts",
+        "description": "A large area containing the main northern village, a burning house, and surrounding plains and forests. This region is the main deployment and staging area for northern forces, with access to both bridges.",
+        "terrainTypes": [
+          "Plain",
+          "Road",
+          "Forest",
+          "Village",
+          "House"
+        ],
+        "fromX": 0,
+        "fromY": 0,
+        "toX": 18,
+        "toY": 4
+      },
+      {
+        "name": "Western Bridge Crossing",
+        "description": "A narrow stone bridge crossing the central river, providing a key chokepoint for movement between north and south. Control of this bridge is vital for advancing or defending either side.",
+        "terrainTypes": [
+          "Road"
+        ],
+        "fromX": 7,
+        "fromY": 5,
+        "toX": 8,
+        "toY": 12
+      },
+      {
+        "name": "Eastern Bridge Crossing",
+        "description": "A second, parallel stone bridge crossing the river to the east. Offers an alternative route for flanking or splitting forces.",
+        "terrainTypes": [
+          "Road"
+        ],
+        "fromX": 13,
+        "fromY": 5,
+        "toX": 14,
+        "toY": 12
+      },
+      {
+        "name": "Central River",
+        "description": "A wide, impassable river running horizontally through the map, separating the north and south. Only crossable at the two bridges.",
+        "terrainTypes": [
+          "Sea"
+        ],
+        "fromX": 0,
+        "fromY": 7,
+        "toX": 18,
+        "toY": 12
+      },
+      {
+        "name": "Southern Fortified Approach",
+        "description": "A fortified southern area with roads, plains, and some forest cover. This region is the main defensive position for southern forces and the goal for attackers crossing the bridges.",
+        "terrainTypes": [
+          "Plain",
+          "Road",
+          "Forest"
+        ],
+        "fromX": 0,
+        "fromY": 13,
+        "toX": 18,
+        "toY": 15
+      }
+    ],
+    "keyPointsOfInterest": [
+      "Village at (7,1)",
+      "House at (1,3)",
+      "Western Bridge (7,5)-(8,12)",
+      "Eastern Bridge (13,5)-(14,12)"
+    ],
+    "chokePoints": [
+      "Western Bridge Crossing (7,5)-(8,12)",
+      "Eastern Bridge Crossing (13,5)-(14,12)"
+    ],
+    "strategicConsiderations": [
+      "Both bridges are critical chokepoints; controlling them allows movement between north and south.",
+      "The river is impassable except at the bridges, forcing units to funnel through narrow crossings.",
+      "The northern village provides cover and deployment options, but is vulnerable to being cut off if bridges are lost.",
+      "The southern approach is fortified and offers defensive terrain, making it difficult for attackers to break through if defenders hold the bridges.",
+      "Splitting forces to threaten both bridges can force defenders to divide their attention, but risks being defeated in detail if not coordinated."
+    ],
+    "givenName": "Twin Bridges Crossing",
+    "originalName": "Knights_Villagers_Bandits_11_(0E_00_72_10)__by_Aura_Wolf",
+    "description": "A strategic outdoor map featuring two parallel bridges over a wide river, with villages and a fort nearby.",
+    "setting": "outdoor"
+  },
+  "Nobles_Evil_Doers_9_(5F_00_60_61)__by_Aura_Wolf.png__indoor": {
+    "distinctRegions": [
+      {
+        "name": "Treasure Chamber",
+        "description": "A small, well-guarded room in the northwest corner containing a valuable chest. Accessible only through a locked door at (2,0), making it a high-value, defensible area.",
+        "terrainTypes": [
+          "Floor",
+          "Chest"
+        ],
+        "fromX": 1,
+        "fromY": 1,
+        "toX": 3,
+        "toY": 3
+      },
+      {
+        "name": "Grand Central Hall",
+        "description": "A large, open hall with pillars providing cover. This is the main thoroughfare of the ruins, connecting most other regions and offering both mobility and defensive options.",
+        "terrainTypes": [
+          "Floor",
+          "Pillar"
+        ],
+        "fromX": 5,
+        "fromY": 4,
+        "toX": 15,
+        "toY": 7
+      },
+      {
+        "name": "Northern Corridor",
+        "description": "A long corridor running along the north side of the map, connecting the Treasure Chamber to the Grand Central Hall. Useful for flanking or rapid movement between regions.",
+        "terrainTypes": [
+          "Floor"
+        ],
+        "fromX": 5,
+        "fromY": 0,
+        "toX": 15,
+        "toY": 3
+      },
+      {
+        "name": "Southern Pillared Gallery",
+        "description": "A southern gallery with multiple pillars and stairs, providing defensive positions and access to the lower part of the ruins.",
+        "terrainTypes": [
+          "Floor",
+          "Pillar",
+          "Stairs"
+        ],
+        "fromX": 0,
+        "fromY": 11,
+        "toX": 13,
+        "toY": 13
+      },
+      {
+        "name": "Eastern Gallery",
+        "description": "A gallery on the eastern side, accessible from the Grand Central Hall and the Southern Pillared Gallery. Offers a route to the map's eastern edge and potential escape or reinforcement path.",
+        "terrainTypes": [
+          "Floor",
+          "Pillar"
+        ],
+        "fromX": 10,
+        "fromY": 10,
+        "toX": 17,
+        "toY": 13
+      }
+    ],
+    "keyPointsOfInterest": [
+      "Chest at (2,2)",
+      "Door at (2,0)",
+      "Stairs at (2,11), (3,11), (4,11)",
+      "Pillars at (7,5), (13,5), (12,12), (3,13), (8,13), (13,12), (8,5), (13,13), (8,13)"
+    ],
+    "chokePoints": [
+      "Door at (2,0) leading to Treasure Chamber",
+      "Narrow corridor at (5,7)-(6,7)",
+      "Stairs at (2,11)-(4,11)",
+      "Wall bottlenecks at (5,7), (9,7), (11,7), (15,7)"
+    ],
+    "strategicConsiderations": [
+      "The Treasure Chamber is highly defensible but only accessible through a single door, making it easy to block or trap units inside.",
+      "The Grand Central Hall is the main combat zone, with pillars for cover and multiple access points, making it ideal for both offense and defense.",
+      "The Northern Corridor allows for flanking maneuvers and quick movement between the left and right sides of the map.",
+      "The Southern Pillared Gallery and Eastern Gallery provide alternative routes for reinforcements or retreat, and their pillars offer strong defensive positions.",
+      "Choke points at doors, stairs, and narrow corridors should be controlled to limit enemy movement and protect key areas."
+    ],
+    "givenName": "Ancient Ruins",
+    "originalName": "Nobles_Evil_Doers_9_(5F_00_60_61)__by_Aura_Wolf",
+    "description": "A mysterious indoor map featuring stone pathways, overgrown vegetation, and hidden treasures.",
+    "setting": "indoor"
+  },
+  "DefenseFort.png__outdoor": {
+    "distinctRegions": [
+      {
+        "name": "Fortress Main Hall",
+        "description": "The central interior of the fortress, featuring multiple rooms, pillars for cover, and a chest room in the north. Accessible via several doors and stairs, this is the main defensive area and the heart of the fortress.",
+        "terrainTypes": [
+          "Floor",
+          "Pillar",
+          "Stairs",
+          "Chest"
+        ],
+        "fromX": 0,
+        "fromY": 0,
+        "toX": 14,
+        "toY": 10
+      },
+      {
+        "name": "Fortress Western Approach",
+        "description": "The open area west and south of the fortress, with a mix of plains, hills, forests, and roads. Provides multiple approach vectors for attackers and is key for staging assaults or defending against reinforcements.",
+        "terrainTypes": [
+          "Plain",
+          "Hill",
+          "Forest",
+          "Road"
+        ],
+        "fromX": 0,
+        "fromY": 11,
+        "toX": 15,
+        "toY": 23
+      },
+      {
+        "name": "Fortress Eastern Fields",
+        "description": "Expansive open fields east of the fortress, with scattered forests and hills. Offers flanking opportunities and is important for controlling the battlefield outside the fortress walls.",
+        "terrainTypes": [
+          "Plain",
+          "Hill",
+          "Forest",
+          "Road"
+        ],
+        "fromX": 12,
+        "fromY": 0,
+        "toX": 20,
+        "toY": 23
+      },
+      {
+        "name": "Southern Outpost",
+        "description": "A small, isolated building or outpost at the southern edge of the map, possibly used for storage or as a guard post. Provides a secondary objective or fallback point.",
+        "terrainTypes": [
+          "Floor",
+          "Plain",
+          "Forest",
+          "Hill"
+        ],
+        "fromX": 15,
+        "fromY": 20,
+        "toX": 20,
+        "toY": 23
+      }
+    ],
+    "keyPointsOfInterest": [
+      "Chest at (12,7)",
+      "Multiple doors at (9,2), (1,11), (2,11), (1,12), (2,12)",
+      "Stairs at (0,3), (1,3), (2,3), (4,7), (5,7), (6,7), (11,7), (11,8), (1,17), (1,18)",
+      "Pillars at (5,3), (9,6), (5,9), (9,9)",
+      "Outpost building at (15,20)-(20,23)"
+    ],
+    "chokePoints": [
+      "Doors at (9,2), (1,11), (2,11), (1,12), (2,12)",
+      "Narrow fortress entrances at (7,0)-(7,6), (11,0)-(11,6)",
+      "Stairs and wall bottlenecks at (4,7)-(6,7), (11,7)-(12,8)"
+    ],
+    "strategicConsiderations": [
+      "The fortress main hall is highly defensible with limited entrances and interior cover from pillars.",
+      "Attackers must breach doors or funnel through narrow stairways, making them vulnerable to defenders.",
+      "The open fields to the east and west allow for flanking but provide little cover, so controlling forests and hills is key.",
+      "The southern outpost can be used as a fallback or reinforcement point, but is isolated from the main fortress.",
+      "Securing the chest room early can provide valuable resources, but it is deep within the fortress and requires breaching multiple defenses."
+    ],
+    "givenName": "Fortress Approach",
+    "originalName": "DefenseFort",
+    "description": "A strategic map featuring a fortress with multiple entry points and surrounding open fields.",
+    "setting": "outdoor"
+  },
+  "BoatsatSea.png__indoor": {
+    "distinctRegions": [
+      {
+        "name": "Forecastle Deck",
+        "description": "The front section of the leftmost ship, featuring a narrow deck, barrels for cover, and stairs leading below deck. Bordered by walls and surrounded by sea and lake tiles.",
+        "terrainTypes": [
+          "Floor",
+          "Barrel",
+          "Stairs",
+          "Wall"
+        ],
+        "fromX": 0,
+        "fromY": 5,
+        "toX": 6,
+        "toY": 10
+      },
+      {
+        "name": "Main Deck of Left Ship",
+        "description": "The central and rear area of the leftmost ship, with open space for movement, stairs, and barrels. Enclosed by walls and surrounded by water.",
+        "terrainTypes": [
+          "Floor",
+          "Barrel",
+          "Stairs",
+          "Wall"
+        ],
+        "fromX": 0,
+        "fromY": 11,
+        "toX": 6,
+        "toY": 17
+      },
+      {
+        "name": "Central Bridge",
+        "description": "A narrow bridge connecting the leftmost ship to the middle ship, serving as a critical chokepoint for advancing units.",
+        "terrainTypes": [
+          "Bridge"
+        ],
+        "fromX": 6,
+        "fromY": 11,
+        "toX": 9,
+        "toY": 11
+      },
+      {
+        "name": "Main Deck of Middle Ship",
+        "description": "The main deck of the central ship, with open combat space, stairs, and barrels. Bordered by walls and surrounded by sea and lake.",
+        "terrainTypes": [
+          "Floor",
+          "Barrel",
+          "Stairs",
+          "Wall"
+        ],
+        "fromX": 10,
+        "fromY": 5,
+        "toX": 13,
+        "toY": 17
+      },
+      {
+        "name": "Right Bridge",
+        "description": "A bridge connecting the middle ship to the rightmost ship, another key chokepoint for movement.",
+        "terrainTypes": [
+          "Bridge"
+        ],
+        "fromX": 14,
+        "fromY": 11,
+        "toX": 16,
+        "toY": 11
+      },
+      {
+        "name": "Deck of Right Ship",
+        "description": "The deck of the rightmost ship, a smaller area with stairs and barrels, enclosed by walls and surrounded by water.",
+        "terrainTypes": [
+          "Floor",
+          "Barrel",
+          "Stairs",
+          "Wall"
+        ],
+        "fromX": 17,
+        "fromY": 5,
+        "toX": 18,
+        "toY": 15
+      }
+    ],
+    "keyPointsOfInterest": [
+      "Barrels (cover) at (3,7), (17,10)",
+      "Stairs at (1,8), (4,8), (11,15), (12,15), (1,17), (4,17), (13,7), (18,5), (18,6), (11,7), (13,15), (17,7), (18,7), (11,15), (12,15)",
+      "Bridges at (6,11)-(9,11) and (14,11)-(16,11)"
+    ],
+    "chokePoints": [
+      "Central Bridge (6,11)-(9,11)",
+      "Right Bridge (14,11)-(16,11)",
+      "Narrow ship corridors between walls"
+    ],
+    "strategicConsiderations": [
+      "Bridges are critical chokepoints; controlling them can halt enemy advances.",
+      "Ships are surrounded by impassable water, limiting movement to bridges and decks.",
+      "Barrels provide cover for ranged units.",
+      "Stairs may allow for reinforcements or flanking from below deck.",
+      "Defending the bridges is key to preventing enemy progression.",
+      "Narrow corridors on ships favor defensive formations and can bottleneck attackers."
+    ],
+    "givenName": "Triple Ship Assault",
+    "originalName": "BoatsatSea",
+    "description": "A map featuring three connected ships on the open sea, with narrow bridges linking them. The layout requires strategic movement across the vessels.",
+    "setting": "indoor"
+  },
+  "Knights_Villagers_Bandits_10_(3C_00_CE_3E)__by_Aura_Wolf.png__outdoor": {
+    "distinctRegions": [
+      {
+        "name": "Northern Fortress Hall",
+        "description": "A large, enclosed stone structure at the top of the map, featuring pillars for cover, a chest, and multiple staircases. This is likely the command center or throne room, highly defensible and a key objective.",
+        "terrainTypes": [
+          "Floor",
+          "Pillar",
+          "Chest",
+          "Stairs"
+        ],
+        "fromX": 0,
+        "fromY": 0,
+        "toX": 16,
+        "toY": 4
+      },
+      {
+        "name": "Central Courtyard",
+        "description": "A spacious open area with scattered trees, roads, and some hills. This is the main outdoor space, providing mobility but limited cover. It connects the fortress to the barracks and the southern approach.",
+        "terrainTypes": [
+          "Plain",
+          "Forest",
+          "Road",
+          "Hill"
+        ],
+        "fromX": 0,
+        "fromY": 5,
+        "toX": 19,
+        "toY": 13
+      },
+      {
+        "name": "Eastern Barracks and Vault",
+        "description": "A stone building on the east side, accessible via a door at (19,12), containing a chest and stairs. This area is isolated from the main courtyard by walls and is a valuable target for treasure.",
+        "terrainTypes": [
+          "Floor",
+          "Stairs",
+          "Chest",
+          "Door"
+        ],
+        "fromX": 17,
+        "fromY": 8,
+        "toX": 19,
+        "toY": 13
+      },
+      {
+        "name": "Western Barracks",
+        "description": "A stone building on the west side, featuring pillars and stairs. It is separated from the courtyard by walls and serves as a defensive outpost or troop quarters.",
+        "terrainTypes": [
+          "Floor",
+          "Pillar",
+          "Stairs"
+        ],
+        "fromX": 0,
+        "fromY": 14,
+        "toX": 4,
+        "toY": 17
+      },
+      {
+        "name": "Southern Passage and Outbuildings",
+        "description": "A series of southern rooms and passages, including outbuildings and connecting roads. This area provides access to the rest of the fortress and may serve as a reinforcement entry point.",
+        "terrainTypes": [
+          "Plain",
+          "Road",
+          "Floor",
+          "Pillar",
+          "Stairs"
+        ],
+        "fromX": 5,
+        "fromY": 14,
+        "toX": 19,
+        "toY": 17
+      }
+    ],
+    "keyPointsOfInterest": [
+      "Chest at (1,1)",
+      "Chest at (19,10)",
+      "Door at (19,12)",
+      "Multiple stairs: (12,3), (16,0), (16,1), (16,2), (8,6), (9,16), (3,17), (9,17), (16,13), (16,14), (16,15), (16,16), (16,17)"
+    ],
+    "chokePoints": [
+      "Door at (19,12) leading to Eastern Barracks and Vault",
+      "Narrow stair access at (8,6) and (9,16)",
+      "Entrances to Northern Fortress Hall at (12,3), (16,0), (16,1), (16,2)"
+    ],
+    "strategicConsiderations": [
+      "The Northern Fortress Hall is highly defensible with limited entrances and pillars for cover.",
+      "The Central Courtyard is open and vulnerable to ranged attacks but allows for rapid movement.",
+      "The Eastern Barracks and Vault is isolated and can be locked down via the door at (19,12); prioritize thieves or keys.",
+      "The Western Barracks provides a flanking position and can be used to reinforce the courtyard or defend against southern incursions.",
+      "Southern Passage and Outbuildings may be used for reinforcements or as a fallback position if the courtyard is lost."
+    ],
+    "givenName": "Fortress Courtyard",
+    "originalName": "Knights_Villagers_Bandits_10_(3C_00_CE_3E)__by_Aura_Wolf",
+    "description": "A fortified outdoor area surrounded by stone structures, featuring a central open space with scattered trees and pathways.",
+    "setting": "outdoor"
+  },
+  "Nobles_Evil_Doers_6_(6C_00_A3_6E)__by_Aura_Wolf.png__indoor": {
+    "distinctRegions": [
+      {
+        "name": "Grand Central Hall",
+        "description": "A large, open hall with pillars for cover, serving as the main hub and connecting point for all wings of the ruins. Multiple entrances and wide sightlines make it a key battleground.",
+        "terrainTypes": [
+          "Floor",
+          "Pillar"
+        ],
+        "fromX": 0,
+        "fromY": 0,
+        "toX": 19,
+        "toY": 4
+      },
+      {
+        "name": "Western Gallery",
+        "description": "A series of rooms and corridors on the left side, featuring pillars and stairs. Offers flanking routes and defensive positions, with some plain tiles at the edge.",
+        "terrainTypes": [
+          "Floor",
+          "Pillar",
+          "Stairs",
+          "Plain"
+        ],
+        "fromX": 0,
+        "fromY": 5,
+        "toX": 6,
+        "toY": 11
+      },
+      {
+        "name": "Eastern Gallery",
+        "description": "A mirrored set of rooms and corridors on the right side, with similar features to the Western Gallery. Provides access to the central hall and lower passage.",
+        "terrainTypes": [
+          "Floor",
+          "Pillar",
+          "Stairs",
+          "Plain"
+        ],
+        "fromX": 12,
+        "fromY": 5,
+        "toX": 19,
+        "toY": 11
+      },
+      {
+        "name": "Northern Corridor",
+        "description": "A corridor running along the north side of the map, connecting the two wings and providing access to the central hall. Contains stairs for vertical movement.",
+        "terrainTypes": [
+          "Floor",
+          "Stairs"
+        ],
+        "fromX": 7,
+        "fromY": 0,
+        "toX": 19,
+        "toY": 3
+      },
+      {
+        "name": "Southern Passage",
+        "description": "A long passage along the southern edge, with several rooms, pillars, and stairs. Connects to both galleries and the central hall, and features some plain tiles at the far end.",
+        "terrainTypes": [
+          "Floor",
+          "Stairs",
+          "Pillar",
+          "Plain"
+        ],
+        "fromX": 7,
+        "fromY": 5,
+        "toX": 26,
+        "toY": 11
+      }
+    ],
+    "keyPointsOfInterest": [
+      "Multiple Stairs (e.g., 10,3; 16,6; 16,9; 25,2; 25,3; 25,4; 25,9; 26,9; 16,10)",
+      "Numerous Pillars (e.g., 4,0; 14,1; 3,5; 0,8; 22,4; 20,6; 23,9; 10,10; 20,10)",
+      "Transition to Plain tiles at map edges (e.g., 0,5; 1,6; 23,6; 22,7; 22,8; 21,9; 23,11; 26,11)"
+    ],
+    "chokePoints": [
+      "Narrow corridors between rooms (e.g., 8,1-8,2; 14,4-14,5; 14,8-14,9)",
+      "Stairwells (e.g., 10,3; 16,6; 16,9; 25,2; 25,3; 25,4; 25,9; 26,9; 16,10)",
+      "Entrances to central hall from wings"
+    ],
+    "strategicConsiderations": [
+      "The Grand Central Hall is a key area for control due to its connectivity and open sightlines.",
+      "Pillars provide cover for both offense and defense, especially in the galleries and central hall.",
+      "Stairs allow for vertical movement and can be used for ambushes or quick repositioning.",
+      "Narrow corridors and room entrances serve as natural choke points for defensive stands.",
+      "Plain tiles at the map's edge may be less defensible and are likely entry/exit points for reinforcements or escape."
+    ],
+    "givenName": "Ancient Ruins",
+    "originalName": "Nobles_Evil_Doers_6_(6C_00_A3_6E)__by_Aura_Wolf",
+    "description": "A complex indoor map featuring multiple rooms and corridors, with a mix of open spaces and narrow passages.",
+    "setting": "indoor"
+  },
+  "CesarianCapitalRetreat.png__indoor": {
+    "distinctRegions": [
+      {
+        "name": "Northern Treasure Corridor",
+        "description": "A long, narrow corridor at the top of the fortress lined with treasure chests and pillars, ideal for ambushes and defensive stands. The corridor is segmented by walls and pillars, with chests at both ends.",
+        "terrainTypes": [
+          "Floor",
+          "Chest",
+          "Pillar",
+          "Stairs"
+        ],
+        "fromX": 0,
+        "fromY": 0,
+        "toX": 13,
+        "toY": 3
+      },
+      {
+        "name": "Central Fortress Hall",
+        "description": "The main chamber of the fortress, spacious and filled with pillars and staircases. Multiple exits and connections to other regions make this the strategic heart of the map, suitable for both defense and rapid movement.",
+        "terrainTypes": [
+          "Floor",
+          "Pillar",
+          "Stairs"
+        ],
+        "fromX": 0,
+        "fromY": 4,
+        "toX": 13,
+        "toY": 15
+      },
+      {
+        "name": "Eastern Treasure Corridor",
+        "description": "A secluded corridor on the eastern side, containing treasure chests and pillars. It is separated from the main hall by walls, making it a defensible and isolated area.",
+        "terrainTypes": [
+          "Floor",
+          "Chest",
+          "Pillar",
+          "Stairs"
+        ],
+        "fromX": 14,
+        "fromY": 0,
+        "toX": 18,
+        "toY": 3
+      },
+      {
+        "name": "Eastern Lower Hall",
+        "description": "A large hall on the eastern side, accessible through doors and stairs. Contains pillars for cover and is connected to the southern and central regions via doors, making it a key area for flanking or retreat.",
+        "terrainTypes": [
+          "Floor",
+          "Pillar",
+          "Stairs"
+        ],
+        "fromX": 14,
+        "fromY": 4,
+        "toX": 18,
+        "toY": 15
+      },
+      {
+        "name": "Southern Storage and Pillar Room",
+        "description": "A southern room filled with pillars, providing cover and multiple movement options. It is separated from the central hall by walls and doors, making it a secondary defensive position or a staging area for reinforcements.",
+        "terrainTypes": [
+          "Floor",
+          "Pillar"
+        ],
+        "fromX": 0,
+        "fromY": 16,
+        "toX": 13,
+        "toY": 20
+      },
+      {
+        "name": "Southeast Lower Hall",
+        "description": "A southeastern extension of the lower hall, with pillars and open space. It is accessible from the eastern lower hall and provides a route for flanking or retreat.",
+        "terrainTypes": [
+          "Floor",
+          "Pillar"
+        ],
+        "fromX": 14,
+        "fromY": 16,
+        "toX": 18,
+        "toY": 20
+      }
+    ],
+    "keyPointsOfInterest": [
+      "Chests at (10,0), (12,0), (7,6), (10,9), (12,9), (7,6), (10,9), (12,9)",
+      "Multiple staircases throughout the map",
+      "Doors at (10,11), (11,11), (12,11), (10,12), (11,12), (12,12), (16,5), (17,5), (16,6), (17,6), (10,11), (11,11), (12,11), (10,12), (11,12), (12,12)"
+    ],
+    "chokePoints": [
+      "Narrow corridors at the north and east",
+      "Doors at (10,11), (11,11), (12,11), (10,12), (11,12), (12,12), (16,5), (17,5), (16,6), (17,6)",
+      "Staircases connecting upper and lower levels"
+    ],
+    "strategicConsiderations": [
+      "Defenders can use the narrow treasure corridors and doors to create strong choke points.",
+      "The central hall allows for rapid movement and reinforcement between regions.",
+      "Pillars and staircases provide cover and vertical mobility, favoring units with high movement or ranged attacks.",
+      "Attackers must breach doors and navigate narrow corridors, making them vulnerable to ambushes.",
+      "Control of the central hall is crucial for both offense and defense, as it connects all major regions."
+    ],
+    "givenName": "Fortress of Treasures",
+    "originalName": "CesarianCapitalRetreat",
+    "description": "An indoor fortress filled with treasure chests and narrow corridors, designed for strategic movement and defense.",
+    "setting": "indoor"
+  },
+  "Chapter7OstiasRebellion_Diff_Tileset__by_Shin19.png__outdoor": {
+    "distinctRegions": [
+      {
+        "name": "Castle Throne Room",
+        "description": "The innermost chamber of the fortress, containing the throne. Highly defensible and the main objective for seize missions.",
+        "terrainTypes": [
+          "Floor",
+          "Throne"
+        ],
+        "fromX": 2,
+        "fromY": 0,
+        "toX": 8,
+        "toY": 1
+      },
+      {
+        "name": "Northern Castle Interior",
+        "description": "A series of rooms and corridors with stairs, connecting the throne room to the rest of the fortress. Provides access to the treasure alcove and castle gate.",
+        "terrainTypes": [
+          "Floor",
+          "Stairs"
+        ],
+        "fromX": 2,
+        "fromY": 2,
+        "toX": 6,
+        "toY": 4
+      },
+      {
+        "name": "Treasure Alcove",
+        "description": "A small, walled-off area containing valuable chests. Accessible via stairs and a door, making it a high-priority target for thieves.",
+        "terrainTypes": [
+          "Chest",
+          "Road",
+          "Plain"
+        ],
+        "fromX": 17,
+        "fromY": 1,
+        "toX": 20,
+        "toY": 2
+      },
+      {
+        "name": "Castle Gate and Approach",
+        "description": "The main entrance to the fortress, featuring a wide road and stairs. Acts as a major chokepoint for attackers.",
+        "terrainTypes": [
+          "Road",
+          "Plain",
+          "Stairs",
+          "Door"
+        ],
+        "fromX": 4,
+        "fromY": 4,
+        "toX": 16,
+        "toY": 6
+      },
+      {
+        "name": "Central Arena",
+        "description": "A large, open area surrounded by forest and roads, ideal for large-scale battles and duels. The arena is a key feature here.",
+        "terrainTypes": [
+          "Arena",
+          "Road",
+          "Forest",
+          "Plain"
+        ],
+        "fromX": 6,
+        "fromY": 16,
+        "toX": 11,
+        "toY": 17
+      },
+      {
+        "name": "Village Row",
+        "description": "A line of villages along the eastern edge, providing cover and potential objectives for both sides.",
+        "terrainTypes": [
+          "Village",
+          "Road",
+          "Plain"
+        ],
+        "fromX": 13,
+        "fromY": 15,
+        "toX": 15,
+        "toY": 21
+      },
+      {
+        "name": "Southern Pathway",
+        "description": "A long, winding road bordered by forests and plains, connecting the southern villages and arena to the rest of the map.",
+        "terrainTypes": [
+          "Road",
+          "Plain",
+          "Forest"
+        ],
+        "fromX": 0,
+        "fromY": 19,
+        "toX": 20,
+        "toY": 27
+      },
+      {
+        "name": "Western Vendor and Armory District",
+        "description": "A small area with a vendor and armory, providing shopping opportunities and strategic value for resupplying units.",
+        "terrainTypes": [
+          "Vendor",
+          "Armory",
+          "Road",
+          "Plain",
+          "Forest"
+        ],
+        "fromX": 2,
+        "fromY": 10,
+        "toX": 14,
+        "toY": 12
+      }
+    ],
+    "keyPointsOfInterest": [
+      "Throne at (5,1)",
+      "Chests at (18,1) and (20,1)",
+      "Arena at (6,16)",
+      "Vendor at (2,12)",
+      "Armory at (14,10) and (19,11)",
+      "Villages at (15,15), (13,18), (19,15), (13,24), (19,21), (1,18), (1,24), (15,21)"
+    ],
+    "chokePoints": [
+      "Castle gate at (4,4)-(16,4)",
+      "Doors at (4,8), (5,8), (5,8)",
+      "Stairs at (5,3), (6,3), (17,4), (17,5)",
+      "Narrow road at (8,15)-(11,15)"
+    ],
+    "strategicConsiderations": [
+      "The castle gate is the primary defensive chokepoint; defenders can hold off attackers here.",
+      "The treasure alcove is isolated and can be reached only through a door, making it vulnerable to thieves but easy to defend.",
+      "The central arena is open and ideal for cavalry or large-scale battles, but the surrounding forests provide cover for infantry and archers.",
+      "Village row on the east can be used for defensive positioning or as objectives for side missions.",
+      "The southern pathway allows for flanking maneuvers and reinforcements, but is exposed to ambushes from the forests.",
+      "Vendors and armories are critical for resupplying, and controlling these areas can provide a logistical advantage."
+    ],
+    "givenName": "Fortress Approach",
+    "originalName": "Chapter7OstiasRebellion_Diff_Tileset__by_Shin19",
+    "description": "A strategic map featuring a fortified castle entrance, surrounded by villages and a central arena. The layout encourages tactical movement through narrow paths and open areas.",
+    "setting": "outdoor"
+  },
+  "Chapter12TheTrueEnemy_Fire_tileset_Minor_Changes__by_Shin19.png__indoor": {
+    "distinctRegions": [
+      {
+        "name": "Throne Room",
+        "description": "The main objective area, heavily fortified and only accessible through a series of corridors. Contains the throne tile, likely the boss location.",
+        "terrainTypes": [
+          "Floor",
+          "Throne"
+        ],
+        "fromX": 8,
+        "fromY": 1,
+        "toX": 10,
+        "toY": 2
+      },
+      {
+        "name": "Central Pillared Hall",
+        "description": "A large, open hall with pillars and stairs, providing both cover and vertical movement. Connects the throne room to the rest of the fortress.",
+        "terrainTypes": [
+          "Floor",
+          "Pillar",
+          "Stairs"
+        ],
+        "fromX": 11,
+        "fromY": 1,
+        "toX": 21,
+        "toY": 6
+      },
+      {
+        "name": "Northern Treasure Corridor",
+        "description": "A narrow corridor lined with treasure chests, accessible from the central hall and protected by doors.",
+        "terrainTypes": [
+          "Floor",
+          "Chest"
+        ],
+        "fromX": 25,
+        "fromY": 3,
+        "toX": 28,
+        "toY": 8
+      },
+      {
+        "name": "Maze of Halls",
+        "description": "A complex network of winding corridors and doors, forming the main body of the fortress. Multiple access points to other regions.",
+        "terrainTypes": [
+          "Floor",
+          "Door",
+          "Pillar"
+        ],
+        "fromX": 5,
+        "fromY": 3,
+        "toX": 24,
+        "toY": 7
+      },
+      {
+        "name": "Southern Treasure Vault",
+        "description": "A secure vault in the lower left, containing chests and protected by a door. Accessible from the southern corridor.",
+        "terrainTypes": [
+          "Floor",
+          "Chest",
+          "Door"
+        ],
+        "fromX": 4,
+        "fromY": 20,
+        "toX": 7,
+        "toY": 24
+      },
+      {
+        "name": "Eastern Treasure Vault",
+        "description": "A treasure room on the east side, containing chests and protected by a door. Accessible from the eastern corridor.",
+        "terrainTypes": [
+          "Floor",
+          "Chest",
+          "Door"
+        ],
+        "fromX": 25,
+        "fromY": 12,
+        "toX": 27,
+        "toY": 16
+      },
+      {
+        "name": "Southern Corridor",
+        "description": "A long corridor running along the southern edge of the fortress, connecting the entrance to the vaults and the central maze.",
+        "terrainTypes": [
+          "Floor",
+          "Door",
+          "Stairs"
+        ],
+        "fromX": 9,
+        "fromY": 16,
+        "toX": 24,
+        "toY": 21
+      },
+      {
+        "name": "Main Entrance Hall",
+        "description": "The main entrance to the fortress, featuring stairs leading up into the main structure.",
+        "terrainTypes": [
+          "Floor",
+          "Stairs"
+        ],
+        "fromX": 18,
+        "fromY": 0,
+        "toX": 19,
+        "toY": 1
+      }
+    ],
+    "keyPointsOfInterest": [
+      "Throne at (9,1)",
+      "Multiple chests at (5,20), (5,23), (26,6), (26,12), (27,4), (27,8)",
+      "Stairs at (18,0), (19,0), (12,6), (26,20), (11,25), (12,25)",
+      "Doors at (24,5), (8,7), (9,7), (24,7), (26,10), (27,14), (7,20), (7,24)"
+    ],
+    "chokePoints": [
+      "Doors at (24,5), (8,7), (9,7), (24,7), (26,10), (27,14), (7,20), (7,24)",
+      "Narrow corridors between (5,3)-(7,7) and (25,3)-(28,8)"
+    ],
+    "strategicConsiderations": [
+      "The throne room is heavily fortified and only accessible through a series of corridors and doors, making it ideal for a last stand or boss defense.",
+      "Treasure vaults are isolated and require opening doors, making them vulnerable to ambushes but also easy to defend.",
+      "The central hall with pillars provides cover and multiple movement options, but is exposed to attacks from several directions.",
+      "Choke points at doors and narrow corridors can be used to control enemy movement and set up defensive lines.",
+      "Stairs provide vertical movement and potential reinforcement entry points.",
+      "The southern corridor and entrance hall are the main access routes for attackers, and should be guarded to prevent flanking."
+    ],
+    "givenName": "Fortress Maze",
+    "originalName": "Chapter12TheTrueEnemy_Fire_tileset_Minor_Changes__by_Shin19",
+    "description": "A complex indoor fortress with winding corridors and multiple treasure rooms.",
+    "setting": "indoor"
+  },
+  "BacrunCastle.png__indoor": {
+    "distinctRegions": [
+      {
+        "name": "Northern Aquatic Hall",
+        "description": "A long, open hall with pillars, running along the north side of the fortress. Provides a vantage point over the central waterway and is ideal for ranged units to control movement across the top of the map.",
+        "terrainTypes": [
+          "Floor",
+          "Pillar"
+        ],
+        "fromX": 11,
+        "fromY": 0,
+        "toX": 19,
+        "toY": 5
+      },
+      {
+        "name": "Central Waterway",
+        "description": "A wide, impassable water channel that divides the fortress horizontally. It acts as a natural barrier, restricting movement and forcing units to use the surrounding walkways.",
+        "terrainTypes": [
+          "Lake"
+        ],
+        "fromX": 0,
+        "fromY": 1,
+        "toX": 9,
+        "toY": 3
+      },
+      {
+        "name": "Western Walkway",
+        "description": "A corridor running along the west side of the fortress, featuring pillars for cover. Connects the northern hall to the southern chambers and provides flanking opportunities.",
+        "terrainTypes": [
+          "Floor",
+          "Pillar"
+        ],
+        "fromX": 11,
+        "fromY": 6,
+        "toX": 15,
+        "toY": 13
+      },
+      {
+        "name": "Eastern Walkway",
+        "description": "A corridor on the east side, mirroring the western walkway. Offers access to the upper and lower parts of the fortress and is a key route for maneuvering around the central waterway.",
+        "terrainTypes": [
+          "Floor",
+          "Pillar"
+        ],
+        "fromX": 16,
+        "fromY": 6,
+        "toX": 19,
+        "toY": 13
+      },
+      {
+        "name": "Southern Grand Hall",
+        "description": "A large, open chamber at the southern end of the fortress, with multiple staircases and pillars. This area is a major battleground and connects to the throne room and treasure vault.",
+        "terrainTypes": [
+          "Floor",
+          "Pillar",
+          "Stairs"
+        ],
+        "fromX": 11,
+        "fromY": 14,
+        "toX": 19,
+        "toY": 19
+      },
+      {
+        "name": "Throne Room and Vault",
+        "description": "A secure chamber containing the throne and treasure chests, heavily fortified and accessible only through a locked door. The final defensive position for the map.",
+        "terrainTypes": [
+          "Floor",
+          "Throne",
+          "Chest"
+        ],
+        "fromX": 4,
+        "fromY": 20,
+        "toX": 14,
+        "toY": 21
+      },
+      {
+        "name": "Southern Outer Corridor",
+        "description": "A wide corridor running along the southernmost edge of the fortress, providing access to the throne room and serving as a staging area for reinforcements.",
+        "terrainTypes": [
+          "Floor"
+        ],
+        "fromX": 0,
+        "fromY": 24,
+        "toX": 19,
+        "toY": 25
+      }
+    ],
+    "keyPointsOfInterest": [
+      "Throne at (4,20)",
+      "Chests at (11,20) and (13,20)",
+      "Locked Door at (12,22)",
+      "Multiple Stairs at (15,8)-(19,10), (15,14), (15,15), (15,20), (16,8)-(19,10), (16,14)-(19,15), (12,23), (5,23), (4,23), (3,23), (4,14), (4,15), (4,13)",
+      "Pillars at (14,1), (18,1), (12,6), (12,11), (12,16), (18,21)"
+    ],
+    "chokePoints": [
+      "Locked Door at (12,22)",
+      "Narrow staircases at (15,8)-(19,10), (15,14), (15,15), (15,20), (16,8)-(19,10), (16,14)-(19,15), (12,23), (5,23), (4,23), (3,23), (4,14), (4,15), (4,13)",
+      "Corridor junctions at (11,5)-(11,6) and (19,5)-(19,6)"
+    ],
+    "strategicConsiderations": [
+      "The central waterway divides the map, forcing attackers to use the narrow walkways on the east and west sides or the southern grand hall to advance.",
+      "The throne room is heavily fortified, accessible only through a locked door and surrounded by defensive terrain.",
+      "Pillars throughout the walkways and halls provide cover for defenders, making ranged attacks and defensive formations highly effective.",
+      "Staircases and narrow corridors act as natural choke points, ideal for stalling enemy advances or setting up ambushes.",
+      "The southern outer corridor allows for rapid reinforcement movement and flanking, but is exposed to attacks from multiple directions."
+    ],
+    "givenName": "Aquatic Fortress",
+    "originalName": "BacrunCastle",
+    "description": "A fortified indoor structure with water channels and multiple chambers, designed for strategic defense and movement.",
+    "setting": "indoor"
+  },
+  "KilthelTemple.png__indoor": {
+    "distinctRegions": [
+      {
+        "name": "Grand Central Hall",
+        "description": "A vast open hall with pillars for cover, forming the main thoroughfare of the fortress. It connects to most other regions and is ideal for large-scale battles or regrouping.",
+        "terrainTypes": [
+          "Floor",
+          "Pillar"
+        ],
+        "fromX": 0,
+        "fromY": 0,
+        "toX": 19,
+        "toY": 6
+      },
+      {
+        "name": "Western Pillar Gallery",
+        "description": "A side gallery with multiple pillars, providing defensive cover and flanking opportunities. It is separated from the central hall by walls and pillars.",
+        "terrainTypes": [
+          "Floor",
+          "Pillar"
+        ],
+        "fromX": 0,
+        "fromY": 0,
+        "toX": 6,
+        "toY": 6
+      },
+      {
+        "name": "Northern Treasure Alcove",
+        "description": "A small, secure room in the northeast corner containing chests. Accessible only from the north, making it a valuable but defensible objective.",
+        "terrainTypes": [
+          "Floor",
+          "Chest"
+        ],
+        "fromX": 16,
+        "fromY": 0,
+        "toX": 18,
+        "toY": 3
+      },
+      {
+        "name": "Main Stairwell Block",
+        "description": "A large area dominated by stair tiles, connecting the upper and lower levels of the fortress. It serves as a major vertical transition zone and a key movement bottleneck.",
+        "terrainTypes": [
+          "Floor",
+          "Stairs"
+        ],
+        "fromX": 7,
+        "fromY": 5,
+        "toX": 17,
+        "toY": 9
+      },
+      {
+        "name": "Inner Fortress Ring",
+        "description": "A ring-shaped set of rooms and corridors encircling the central hall, with multiple staircases and pillars. It provides access to the outer wings and is critical for controlling fortress movement.",
+        "terrainTypes": [
+          "Floor",
+          "Pillar",
+          "Stairs"
+        ],
+        "fromX": 6,
+        "fromY": 10,
+        "toX": 13,
+        "toY": 17
+      },
+      {
+        "name": "Western Lower Quarters",
+        "description": "A series of rooms and corridors in the lower western part of the fortress, featuring stairs and defensive walls. Useful for flanking or retreating.",
+        "terrainTypes": [
+          "Floor",
+          "Stairs"
+        ],
+        "fromX": 0,
+        "fromY": 10,
+        "toX": 5,
+        "toY": 19
+      },
+      {
+        "name": "Eastern Lower Quarters",
+        "description": "A mirrored set of rooms to the east, with stairs and narrow passages. Provides access to the armory and vendor in the southeast.",
+        "terrainTypes": [
+          "Floor",
+          "Stairs"
+        ],
+        "fromX": 14,
+        "fromY": 10,
+        "toX": 19,
+        "toY": 19
+      },
+      {
+        "name": "Southern Sea Wall",
+        "description": "A southern boundary with sea tiles and walls, limiting movement and providing a natural defensive barrier.",
+        "terrainTypes": [
+          "Floor",
+          "Sea",
+          "Wall"
+        ],
+        "fromX": 0,
+        "fromY": 18,
+        "toX": 19,
+        "toY": 19
+      },
+      {
+        "name": "Southeast Market Row",
+        "description": "An open market area with an armory and vendor, accessible from the fortress interior. Important for resupplying and recruiting.",
+        "terrainTypes": [
+          "Plain",
+          "Armory",
+          "Vendor"
+        ],
+        "fromX": 9,
+        "fromY": 22,
+        "toX": 19,
+        "toY": 25
+      }
+    ],
+    "keyPointsOfInterest": [
+      "Chests at (17,0) and (17,3)",
+      "Armory at (17,23)",
+      "Vendor at (18,24)",
+      "Multiple staircases throughout the fortress"
+    ],
+    "chokePoints": [
+      "Narrow stairwells at (7,5)-(8,9) and (14,7)-(17,9)",
+      "Corridor bottlenecks at (6,10)-(13,17)",
+      "Entrances to treasure alcove at (16,0)-(18,3)",
+      "Market access at (15,22)-(19,25)"
+    ],
+    "strategicConsiderations": [
+      "The central hall is ideal for large battles but vulnerable to flanking from the inner ring.",
+      "Stairwells are critical for vertical movement and can be easily blocked to control access.",
+      "Treasure alcoves and market row are high-value targets but can be defended by holding narrow entrances.",
+      "Sea and wall boundaries in the south limit mobility and can be used to anchor defensive lines.",
+      "Pillars and walls provide cover for ranged units and can be used to create kill zones."
+    ],
+    "givenName": "Fortress of Tides",
+    "originalName": "KilthelTemple",
+    "description": "A complex indoor fortress with multiple levels and water features, featuring narrow corridors and strategic choke points.",
+    "setting": "indoor"
+  },
+  "Knights_Villagers_Bandits_13_(01_00_02_03)__by_Aura_Wolf.png__outdoor": {
+    "distinctRegions": [
+      {
+        "name": "Northern Castle Approach",
+        "description": "The northern approach to the castle, featuring a mix of plains, forests, and rivers, with bridges and a fortified gate. This area is the main entryway to the castle and is heavily defensible due to the river and wall barriers.",
+        "terrainTypes": [
+          "Plain",
+          "Forest",
+          "River",
+          "Bridge",
+          "Wall",
+          "Gate",
+          "Fort",
+          "House",
+          "Hill"
+        ],
+        "fromX": 0,
+        "fromY": 0,
+        "toX": 9,
+        "toY": 4
+      },
+      {
+        "name": "Northern Mountain Pass",
+        "description": "A rugged mountain pass to the northeast, providing natural defense and limited mobility. Only accessible to fliers or units with high mobility.",
+        "terrainTypes": [
+          "Mountain",
+          "Cliff",
+          "Hill",
+          "Plain"
+        ],
+        "fromX": 10,
+        "fromY": 0,
+        "toX": 16,
+        "toY": 5
+      },
+      {
+        "name": "Central River Crossing",
+        "description": "The central region dominated by a wide river with multiple bridges and fords. This area is the main battleground for crossing between north and south, with several forts and forests providing cover.",
+        "terrainTypes": [
+          "River",
+          "Bridge",
+          "Plain",
+          "Forest",
+          "Fort",
+          "Cliff"
+        ],
+        "fromX": 0,
+        "fromY": 5,
+        "toX": 16,
+        "toY": 12
+      },
+      {
+        "name": "Western Village and Outskirts",
+        "description": "A village and its outskirts on the western side, including houses, a village, armory, and vendor. This area is important for resupplying and recruiting, and is partially protected by cliffs and sea.",
+        "terrainTypes": [
+          "Plain",
+          "Forest",
+          "House",
+          "Village",
+          "Armory",
+          "Vendor",
+          "Bridge",
+          "Cliff",
+          "Sea"
+        ],
+        "fromX": 0,
+        "fromY": 13,
+        "toX": 6,
+        "toY": 22
+      },
+      {
+        "name": "Eastern Settlement and Forts",
+        "description": "A settlement with multiple buildings, including houses, forts, a village, and shops. This region is a key resource and reinforcement point, with some natural barriers.",
+        "terrainTypes": [
+          "Plain",
+          "Forest",
+          "House",
+          "Fort",
+          "Armory",
+          "Vendor",
+          "Bridge",
+          "Cliff",
+          "Sea",
+          "Village"
+        ],
+        "fromX": 13,
+        "fromY": 10,
+        "toX": 16,
+        "toY": 22
+      },
+      {
+        "name": "Southern Plains and Lake Shore",
+        "description": "The southern part of the map, featuring open plains, some forest, and the shore of a large lake (sea tiles). This area is open to flanking and rapid movement, but is bordered by cliffs and water.",
+        "terrainTypes": [
+          "Plain",
+          "Forest",
+          "Cliff",
+          "Sea",
+          "Bridge"
+        ],
+        "fromX": 7,
+        "fromY": 13,
+        "toX": 12,
+        "toY": 22
+      }
+    ],
+    "keyPointsOfInterest": [
+      "Castle Gate at (8,3)",
+      "Bridges at (4,3), (4,4), (9,8), (10,8), (9,20), (8,21), (8,22)",
+      "Forts at (4,1), (8,7), (12,12), (1,14), (13,10), (12,12), (15,13)",
+      "Villages at (2,20), (15,18)",
+      "Armory at (5,20), (5,20)",
+      "Vendor at (11,20), (11,20)",
+      "Houses at (0,2), (16,14), (13,21)"
+    ],
+    "chokePoints": [
+      "Castle Gate at (8,3)",
+      "Bridges at (4,3), (4,4), (9,8), (10,8), (9,20), (8,21), (8,22)",
+      "Narrow mountain pass at (10,0)-(16,5)",
+      "Cliff bottlenecks at (6,13)-(7,13), (10,13)-(11,13), (5,14)-(6,14)"
+    ],
+    "strategicConsiderations": [
+      "The central river and its bridges are the main points of conflict; controlling these is vital for movement between north and south.",
+      "The castle gate is a strong defensive position, with walls and limited access.",
+      "Mountain and cliff regions restrict movement, favoring fliers and ranged units.",
+      "Villages and shops in the west and east provide resources and potential reinforcements; securing these early can be decisive.",
+      "Southern plains and lake shore are open to fast movement and flanking, but are vulnerable to attacks from multiple directions.",
+      "Forts scattered throughout the map offer healing and defensive bonuses, making them valuable for holding or staging attacks."
+    ],
+    "givenName": "River Crossing Battle",
+    "originalName": "Knights_Villagers_Bandits_13_(01_00_02_03)__by_Aura_Wolf",
+    "description": "A strategic map featuring a central river with multiple bridges, surrounded by villages and a castle.",
     "setting": "outdoor"
   }
 }
