@@ -57,8 +57,10 @@ export default async function assembleUnitPlacement({
     terrainGrid,
     // TODO: don't hardcode
     numUnits: 8,
-    startX: playerRegion.fromX,
-    startY: playerRegion.fromY,
+    fromX: playerRegion.fromX,
+    fromY: playerRegion.fromY,
+    toX: playerRegion.toX,
+    toY: playerRegion.toY,
   })
 
   return {

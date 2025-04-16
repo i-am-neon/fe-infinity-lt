@@ -24,6 +24,7 @@ export default async function genUnitClassAndAi(description: string): Promise<{ 
         schema,
         temperature: 0,
         model: "nano",
+        logResults: false,
     });
 
     // Apply specific rules for certain class types

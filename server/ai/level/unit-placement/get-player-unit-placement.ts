@@ -48,26 +48,51 @@ function isPositionSpaced(
 }
 
 /**
- * Finds a valid tile near the given coordinates
+ * Checks if a position is already occupied
+ */
+function isPositionOccupied(
+    x: number,
+    y: number,
+    existingPositions: Array<{ x: number; y: number }>
+): boolean {
+    return existingPositions.some(pos => pos.x === x && pos.y === y);
+}
+
+/**
+ * Checks if a position is within the specified boundary
+ */
+function isWithinBoundary(
+    x: number,
+    y: number,
+    fromX: number,
+    fromY: number,
+    toX: number,
+    toY: number
+): boolean {
+    return x >= fromX && x <= toX && y >= fromY && y <= toY;
+}
+
+/**
+ * Finds a valid tile near the given coordinates within boundary constraints
  */
 function findNearestValidTile(
     terrainGrid: TerrainGrid,
-    startX: number,
-    startY: number,
-    existingPositions: Array<{ x: number; y: number }> = []
+    x: number,
+    y: number,
+    fromX: number,
+    fromY: number,
+    toX: number,
+    toY: number,
+    existingPositions: Array<{ x: number; y: number }> = [],
+    requireSpacing: boolean = true
 ): { x: number; y: number } | null {
-    const { width, height } = getTerrainGridSize(terrainGrid);
-
-    // Clamp starting coordinates to grid bounds
-    const x = Math.max(0, Math.min(startX, width - 1));
-    const y = Math.max(0, Math.min(startY, height - 1));
-
     const startKey = `${x},${y}`;
     // Check if start position is already valid
     if (
         terrainGrid[startKey] &&
         isTileValidForPlayer(terrainGrid[startKey]) &&
-        isPositionSpaced(x, y, existingPositions)
+        !isPositionOccupied(x, y, existingPositions) &&
+        (!requireSpacing || isPositionSpaced(x, y, existingPositions))
     ) {
         return { x, y };
     }
@@ -85,7 +110,8 @@ function findNearestValidTile(
         if (
             terrain &&
             isTileValidForPlayer(terrain) &&
-            isPositionSpaced(current.x, current.y, existingPositions)
+            !isPositionOccupied(current.x, current.y, existingPositions) &&
+            (!requireSpacing || isPositionSpaced(current.x, current.y, existingPositions))
         ) {
             return current;
         }
@@ -98,7 +124,7 @@ function findNearestValidTile(
             const nx = current.x + dx;
             const ny = current.y + dy;
 
-            if (nx >= 0 && ny >= 0 && nx < width && ny < height) {
+            if (isWithinBoundary(nx, ny, fromX, fromY, toX, toY)) {
                 const nKey = `${nx},${ny}`;
                 if (!visited.has(nKey)) {
                     visited.add(nKey);
@@ -113,41 +139,117 @@ function findNearestValidTile(
 }
 
 /**
- * Places player units on valid base terrains with proper spacing
+ * Finds any valid unoccupied position within the boundary
+ */
+function findAnyValidPosition(
+    terrainGrid: TerrainGrid,
+    fromX: number,
+    fromY: number,
+    toX: number,
+    toY: number,
+    existingPositions: Array<{ x: number; y: number }>
+): { x: number; y: number } | null {
+    // Scan the entire boundary for any valid position
+    for (let y = fromY; y <= toY; y++) {
+        for (let x = fromX; x <= toX; x++) {
+            const key = `${x},${y}`;
+            if (
+                terrainGrid[key] &&
+                isTileValidForPlayer(terrainGrid[key]) &&
+                !isPositionOccupied(x, y, existingPositions)
+            ) {
+                return { x, y };
+            }
+        }
+    }
+    return null;
+}
+
+/**
+ * Counts valid placement tiles within boundary
+ */
+function countValidTiles(
+    terrainGrid: TerrainGrid,
+    fromX: number,
+    fromY: number,
+    toX: number,
+    toY: number
+): number {
+    let count = 0;
+    for (let y = fromY; y <= toY; y++) {
+        for (let x = fromX; x <= toX; x++) {
+            const key = `${x},${y}`;
+            if (terrainGrid[key] && isTileValidForPlayer(terrainGrid[key])) {
+                count++;
+            }
+        }
+    }
+    return count;
+}
+
+/**
+ * Places player units on valid base terrains within specified boundary
+ * If space is too limited, it will place units adjacent to each other
  */
 export default function getPlayerUnitPlacement({
     terrainGrid,
     numUnits,
-    startX = 0,
-    startY = 0,
+    fromX,
+    fromY,
+    toX,
+    toY,
 }: {
     terrainGrid: TerrainGrid;
     numUnits: number;
-    startX?: number;
-    startY?: number;
+    fromX: number;
+    fromY: number;
+    toX: number;
+    toY: number;
 }): Array<{ x: number; y: number }> {
     const positions: Array<{ x: number; y: number }> = [];
-    const { width, height } = getTerrainGridSize(terrainGrid);
 
-    // Clamp starting point to valid grid coordinates
-    const x = Math.max(0, Math.min(startX, width - 1));
-    const y = Math.max(0, Math.min(startY, height - 1));
+    // Determine if we have enough space to maintain spacing
+    const validTileCount = countValidTiles(terrainGrid, fromX, fromY, toX, toY);
 
-    // Try to place first unit at or near starting position
-    const firstPosition = findNearestValidTile(terrainGrid, x, y);
+    // If there aren't enough valid tiles for the number of units, return fewer units
+    if (validTileCount < numUnits) {
+        numUnits = validTileCount;
+    }
+
+    const canMaintainSpacing = validTileCount >= numUnits * 9; // Rough estimate: each unit needs a 3x3 area
+
+    // Find a good starting position within the boundary (center of the region)
+    const centerX = Math.floor((fromX + toX) / 2);
+    const centerY = Math.floor((fromY + toY) / 2);
+
+    // Try to place first unit near the center of the boundary
+    const firstPosition = findNearestValidTile(
+        terrainGrid,
+        centerX,
+        centerY,
+        fromX,
+        fromY,
+        toX,
+        toY,
+        [],
+        canMaintainSpacing
+    );
+
     if (firstPosition) {
         positions.push(firstPosition);
     } else {
-        // If no valid starting position, search through the grid systematically
-        for (let y = 0; y < height; y++) {
-            for (let x = 0; x < width; x++) {
-                const key = `${x},${y}`;
-                if (terrainGrid[key] && isTileValidForPlayer(terrainGrid[key])) {
-                    positions.push({ x, y });
-                    break;
-                }
-            }
-            if (positions.length > 0) break;
+        // If no valid position near center, search through the boundary area systematically
+        const anyPosition = findAnyValidPosition(
+            terrainGrid,
+            fromX,
+            fromY,
+            toX,
+            toY,
+            positions
+        );
+
+        if (anyPosition) {
+            positions.push(anyPosition);
         }
     }
 
@@ -156,9 +258,9 @@ export default function getPlayerUnitPlacement({
         return [];
     }
 
-    // Place remaining units with proper spacing
+    // Place remaining units
     let attempts = 0;
-    const maxAttempts = width * height * 2; // Prevent infinite loop
+    const maxAttempts = (toX - fromX + 1) * (toY - fromY + 1) * 2; // Prevent infinite loop
 
     while (positions.length < numUnits && attempts < maxAttempts) {
         attempts++;
@@ -166,31 +268,72 @@ export default function getPlayerUnitPlacement({
         // Get the last placed position as reference point for the next one
         const lastPos = positions[positions.length - 1];
 
-        // Try to place next unit near the last one
-        const nextPosition = findNearestValidTile(
+        // Try to place next unit near the last one with spacing if possible
+        let nextPosition = findNearestValidTile(
             terrainGrid,
             lastPos.x,
             lastPos.y,
-            positions
+            fromX,
+            fromY,
+            toX,
+            toY,
+            positions,
+            canMaintainSpacing
         );
+
+        // If no position found with spacing, try without spacing
+        if (!nextPosition && canMaintainSpacing) {
+            nextPosition = findNearestValidTile(
+                terrainGrid,
+                lastPos.x,
+                lastPos.y,
+                fromX,
+                fromY,
+                toX,
+                toY,
+                positions,
+                false
+            );
+        }
 
         if (nextPosition) {
             positions.push(nextPosition);
         } else {
-            // If no position found near last unit, try a different starting point
-            // This helps in cases where units need to be placed in separate regions
-            const randomX = Math.floor(Math.random() * width);
-            const randomY = Math.floor(Math.random() * height);
+            // Try a random position within boundary
+            const randomX = fromX + Math.floor(Math.random() * (toX - fromX + 1));
+            const randomY = fromY + Math.floor(Math.random() * (toY - fromY + 1));
 
             const altPosition = findNearestValidTile(
                 terrainGrid,
                 randomX,
                 randomY,
-                positions
+                fromX,
+                fromY,
+                toX,
+                toY,
+                positions,
+                false // At this point, just try to place it anywhere valid
             );
 
             if (altPosition) {
                 positions.push(altPosition);
+            } else {
+                // Try harder - scan the entire area for any remaining valid position
+                const lastResort = findAnyValidPosition(
+                    terrainGrid,
+                    fromX,
+                    fromY,
+                    toX,
+                    toY,
+                    positions
+                );
+
+                if (lastResort) {
+                    positions.push(lastResort);
+                } else {
+                    // If we can't find any more valid positions, stop
+                    break;
+                }
             }
         }
     }
@@ -199,22 +342,27 @@ export default function getPlayerUnitPlacement({
 }
 
 if (import.meta.main) {
-    // Test the function with various numbers of units
-    const test3Units = getPlayerUnitPlacement({
+    // Test with boundary constraints
+    const testBoundary = getPlayerUnitPlacement({
         terrainGrid: ch4TerrainGrid,
         numUnits: 3,
-        startX: 1,
-        startY: 1,
+        fromX: 0,
+        fromY: 0,
+        toX: 5,
+        toY: 5,
     });
 
-    console.log("Placement for 3 units:", test3Units);
+    console.log("Placement within boundary (0,0)-(5,5):", testBoundary);
 
-    const test8Units = getPlayerUnitPlacement({
+    // Test with tight boundary to demonstrate adjacent placement
+    const testTightBoundary = getPlayerUnitPlacement({
         terrainGrid: ch4TerrainGrid,
         numUnits: 8,
-        startX: 4,
-        startY: 2,
+        fromX: 0,
+        fromY: 2,
+        toX: 3,
+        toY: 6,
     });
 
-    console.log("Placement for 8 units:", test8Units);
+    console.log("Placement in tight boundary (0,2)-(3,6):", testTightBoundary);
 } 
