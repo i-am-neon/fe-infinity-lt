@@ -2641,23 +2641,6 @@ export const allPortraitOptions: PortraitMetadata[] = [
   {
     "gender": "male",
     "age": "young adult",
-    "hairColor": "green",
-    "eyeColor": "green",
-    "vibe": "brave, determined, heroic",
-    "clothing": "blue armor with red scarf",
-    "originalName": "Alm {Atey}",
-    "blinkingOffset": [
-      24,
-      32
-    ],
-    "smilingOffset": [
-      24,
-      48
-    ]
-  },
-  {
-    "gender": "male",
-    "age": "young adult",
     "hairColor": "blonde",
     "eyeColor": "blue",
     "vibe": "confident, adventurous, friendly",
@@ -2742,26 +2725,6 @@ export const allPortraitOptions: PortraitMetadata[] = [
     "smilingOffset": [
       16,
       40
-    ]
-  },
-  {
-    "gender": "male",
-    "age": "mature adult",
-    "hairColor": "gray",
-    "eyeColor": "brown",
-    "vibe": "stoic, determined, wise",
-    "clothing": "brown cloak",
-    "headgear": "bandana",
-    "facialHair": "goatee",
-    "accessories": "earring",
-    "originalName": "Monke Alt6 (Smug_Mug)",
-    "blinkingOffset": [
-      32,
-      16
-    ],
-    "smilingOffset": [
-      32,
-      32
     ]
   },
   {
@@ -4127,23 +4090,6 @@ export const allPortraitOptions: PortraitMetadata[] = [
     "smilingOffset": [
       32,
       48
-    ]
-  },
-  {
-    "gender": "male",
-    "age": "young adult",
-    "hairColor": "unknown",
-    "eyeColor": "yellow",
-    "vibe": "mysterious, stealthy, intense",
-    "clothing": "gray hooded robe and face covering",
-    "originalName": "42",
-    "blinkingOffset": [
-      40,
-      24
-    ],
-    "smilingOffset": [
-      40,
-      40
     ]
   },
   {
