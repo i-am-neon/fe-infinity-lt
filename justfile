@@ -87,3 +87,9 @@ process-items:
     rm -rf server/vector-db/data/items.json
     just run server/item-processing/process-items.ts
     just start-vector-db
+
+process-scene-backgrounds:
+    rm -rf server/vector-db/seed-data/scene-backgrounds.json
+    rm -rf server/vector-db/data/scene-backgrounds.json
+    just run server/scene-background-processing/process-all-scene-backgrounds.ts
+    just start-vector-db

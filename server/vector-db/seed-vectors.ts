@@ -19,6 +19,9 @@ export async function seedVectors(
     ),
     music: getPathWithinServer("vector-db/seed-data/music.json"),
     items: getPathWithinServer("vector-db/seed-data/items.json"),
+    "scene-backgrounds": getPathWithinServer(
+      "vector-db/seed-data/scene-backgrounds.json"
+    ),
   };
 
   const filesToSeed = seedFiles || defaultSeedFiles;
@@ -69,17 +72,7 @@ async function seedVectorsFromFile(
     // If we have data files but no seed files, copy them
     if (vectors.length === 0) {
       const dataFilePath = getPathWithinServer(
-        `/vector-db/data/${
-          vectorType === "maps"
-            ? "maps"
-            : vectorType === "portraits-male"
-            ? "portraits-male"
-            : vectorType === "portraits-female"
-            ? "portraits-female"
-            : vectorType === "items"
-            ? "items"
-            : "music"
-        }.json`
+        `vector-db/data/${vectorType}.json`
       );
 
       try {

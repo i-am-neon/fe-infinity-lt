@@ -19,6 +19,7 @@ export class VectorStore {
     "portraits-female": [],
     music: [],
     items: [],
+    "scene-backgrounds": [],
   };
 
   constructor(dataDir: string) {
@@ -42,6 +43,7 @@ export class VectorStore {
         "portraits-female": [],
         music: [],
         items: [],
+        "scene-backgrounds": [],
       };
     }
 
@@ -51,6 +53,7 @@ export class VectorStore {
     await this.loadVectors("portraits-female");
     await this.loadVectors("music");
     await this.loadVectors("items");
+    await this.loadVectors("scene-backgrounds");
   }
 
   /**

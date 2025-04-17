@@ -3,7 +3,8 @@ export type VectorType =
   | "portraits-male"
   | "portraits-female"
   | "music"
-  | "items";
+  | "items"
+  | "scene-backgrounds";
 
 export interface Vector {
   id: string;

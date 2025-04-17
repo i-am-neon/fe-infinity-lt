@@ -57,9 +57,9 @@ if (import.meta.main) {
     );
 
     // Example query
-    const query = "young male with silver hair";
+    const query = "Ship on the sea";
     const results = await similaritySearch({
-      vectorType: "portraits-male",
+      vectorType: "scene-backgrounds",
       query,
       limit: 3,
     });

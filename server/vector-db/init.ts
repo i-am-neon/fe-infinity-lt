@@ -35,6 +35,7 @@ const SUPPORTED_VECTOR_TYPES: VectorType[] = [
   "portraits-female",
   "music",
   "items",
+  "scene-backgrounds",
 ];
 
 let vectorStore: VectorStore | null = null;
