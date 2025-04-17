@@ -265,13 +265,39 @@ export default function GameDetailPage() {
     }
   }, [loadingAction, generationProgress.progress]);
   
-  // Automatically close the loader modal when generation action completes
+  // Handle real chapter generation completion (non-test)
   useEffect(() => {
-    // If the modal is open but no loading action is active, close the modal
-    if (generatingChapterModalOpen && loadingAction === null) {
-      setGeneratingChapterModalOpen(false);
+    // When in generate mode and final step reached, close loader and refresh game
+    if (loadingAction === "generate" && generationProgress.progress.currentStep === 16) {
+      const completionTimer = setTimeout(async () => {
+        // Close loader
+        setLoadingAction(null);
+        setGeneratingChapterModalOpen(false);
+        // Refresh game data and auto-run
+        if (nid) {
+          try {
+            const res = await apiCall<{
+              success: boolean;
+              game?: Game;
+              error?: string;
+              creationError?: string;
+            }>(`games/${nid}`);
+            if (res.success && res.game) {
+              setData(res);
+              // Auto-run the updated game
+              await apiCall("run-game", {
+                method: "POST",
+                body: { directory: res.game.directory },
+              });
+            }
+          } catch (err) {
+            console.error("Error refreshing game after chapter generation:", err);
+          }
+        }
+      }, 3000);
+      return () => clearTimeout(completionTimer);
     }
-  }, [loadingAction, generatingChapterModalOpen]);
+  }, [loadingAction, generationProgress.progress.currentStep, nid]);
 
   const handleTestGeneration = useCallback(async () => {
     if (!data?.game || !nid) return;

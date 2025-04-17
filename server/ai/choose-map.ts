@@ -43,7 +43,7 @@ Given the user's Fire Emblem chapter idea, provide a brief single-line string (n
     systemMessage: systemMessageForQuery,
     prompt: promptForQuery,
     temperature: 0.3,
-    model: "fast",
+    model: "nano",
   });
 
   // 2) Run similarity search
