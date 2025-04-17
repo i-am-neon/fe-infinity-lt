@@ -5,7 +5,7 @@ export const SceneBackgroundMetadataSchema = z.object({
     "A one sentence description of the scene depicted in the image."
   ),
   setting: z.enum(['indoor', 'outdoor']),
-  timeOfDay: z.enum(['morning', 'afternoon', 'evening', 'night']).optional(),
+  timeOfDay: z.enum(['morning', 'afternoon', 'evening', 'night']).optional().describe('MUST be one of: morning, afternoon, evening, night.'),
   weather: z.string().optional().describe('A one-word description of the weather conditions in the scene, only if outdoor.'),
 });
 

@@ -1,6 +1,6 @@
 {
   "Boat": {
-    "description": "The deck of a ship with wooden planks and a large structure at the center.",
+    "description": "A ship's deck with a large ship in the background.",
     "setting": "outdoor",
     "timeOfDay": "afternoon"
   },

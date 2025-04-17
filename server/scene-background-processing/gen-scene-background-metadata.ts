@@ -31,6 +31,7 @@ export default async function genSceneBackgroundMetadata(
   const metadata = await generateStructuredDataWithImage({
     systemMessage,
     imagePath,
+    prompt: `Image name: ${imagePath}`,
     schema: SceneBackgroundMetadataSchema,
     model: "nano"
   });
