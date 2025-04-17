@@ -9,6 +9,7 @@
     "@std/fs": "jsr:@std/fs@^1.0.11",
     "@std/path": "jsr:@std/path@^1.0.8",
     "ai": "npm:ai@^4.3.9",
+    "imagescript": "npm:imagescript@^1.2.17",
     "openai": "npm:openai@^4.95.0",
     "pg": "npm:pg@^8.14.1",
     "uuid": "npm:uuid@^11.1.0",
