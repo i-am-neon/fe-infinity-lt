@@ -40,6 +40,7 @@ if (import.meta.main) {
     level: number;
     isPromoted: boolean;
   }[] = [
+      { fe8Class: "Cleric", level: 1, isPromoted: false },
       { fe8Class: "Myrmidon", level: 20, isPromoted: false },
       { fe8Class: "Knight", level: 20, isPromoted: false },
       { fe8Class: "Wyvern Lord", level: 20, isPromoted: true },
