@@ -1,7 +1,8 @@
-export const allSceneBackgroundOptions = [
+import { SceneBackgroundMetadataWithFileName } from "@/types/scene-background-metadata.ts";
+export const allSceneBackgroundOptions: SceneBackgroundMetadataWithFileName[] = [
   {
     "fileName": "Boat",
-    "description": "A view from the deck of a wooden sailing ship under a clear sky.",
+    "description": "The deck of a ship with wooden planks and a large structure at the center.",
     "setting": "outdoor",
     "timeOfDay": "afternoon"
   },

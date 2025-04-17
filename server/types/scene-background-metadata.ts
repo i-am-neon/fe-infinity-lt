@@ -12,3 +12,7 @@ export const SceneBackgroundMetadataSchema = z.object({
 export type SceneBackgroundMetadata = z.infer<
   typeof SceneBackgroundMetadataSchema
 >;
+
+export type SceneBackgroundMetadataWithFileName = {
+  fileName: string;
+} & SceneBackgroundMetadata;

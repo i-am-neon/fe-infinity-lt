@@ -6,7 +6,8 @@ export default function writeAllSceneBackgroundOptions(
   const outputPath = getPathWithinServer(
     "scene-background-processing/all-scene-background-options.ts"
   );
-  const outputContent = `export const allSceneBackgroundOptions = ${JSON.stringify(
+  const outputContent = `import { SceneBackgroundMetadataWithFileName } from "@/types/scene-background-metadata.ts";
+export const allSceneBackgroundOptions: SceneBackgroundMetadataWithFileName[] = ${JSON.stringify(
     options,
     null,
     2
