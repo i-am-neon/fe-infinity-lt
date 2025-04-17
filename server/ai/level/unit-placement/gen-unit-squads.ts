@@ -69,19 +69,19 @@ export async function genUnitSquads({
 ## Villages and Houses
 This map has ${housesAndVillages.length} village/house tiles that players can visit for rewards.
 
-You should include some Brigands, Pirates, Berserkers, or Warriors in your squad composition, as these units will be assigned to pursue and destroy villages. This creates tension for the player who must race to visit villages before enemies destroy them.
+You should include some Brigands, Pirates, Berserkers, or Warriors in your squad composition, as only these unit types can pursue and raze villages. This creates tension for the player who must race to visit villages before enemies destroy them.
 
-When suggesting these units, mention that they will be targeting villages/houses for destruction.
+When suggesting these village units, assign at least some of them the village-raiding AI (targeting villages/houses for destruction), but not all—they can also perform other roles like patrolling or guarding to add variety. Ensure that none of these village-raiding units are placed in the same region as any village; they should start in a different region to give players advance warning and time to respond.
 `;
   }
 
   if (hasChests || hasDoors) {
     villagesGuidance += `
 ## Chests and Doors
-This map has ${hasChests ? chests.length : 0} chests and ${hasDoors ? doors.length : 0
-      } doors.
-You should
- include some Thieves, Assassins, or Rogues in your squad composition, as these units will be assigned to pursue and open chests and doors.`;
+This map has ${hasChests ? chests.length : 0} chests and ${hasDoors ? doors.length : 0} doors.
+
+You should include some Thieves, Assassins, or Rogues in your squad composition, as only these unit types can pursue and open chests and doors. Ensure that none of these chest-raiding units are placed in the same region as any chest or door; they should start in a different region so players have a chance to intercept and defend.
+`;
   }
 
   const systemMessage = `

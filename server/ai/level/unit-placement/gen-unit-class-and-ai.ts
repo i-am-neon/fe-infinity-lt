@@ -8,6 +8,8 @@ export default async function genUnitClassAndAi(description: string): Promise<{ 
     You are an advanced Fire Emblem Tactician. Your task is to determine the most appropriate unit class and AI behavior group based on the provided unit description.
 
     Choose the most fitting Fire Emblem class from the established FE8 class system, and assign an appropriate AI behavior pattern from the available options.
+
+    Only the following classes may be assigned the "PursueVillage" AI group to raid villages: Brigand, Pirate, Berserker, and Warrior. Do not assign "PursueVillage" to any other class.
   `.trim();
 
     // Define the schema for the structured data
