@@ -401,7 +401,7 @@ export default function GameDetailPage() {
                     message: gameCreationProgress.progress.message || "Creating your new game..."
                   }}
                   title="Creating New Game"
-                  description="The AI is generating your new game world, characters, and first chapter. This typically takes around 2-3 minutes, and will open automatically when complete."
+                  description="The AI is generating your new game world, characters, and first chapter. This typically takes around 2-3 minutes, and will open automatically when complete. Do not close this window!"
                   mode="game"
                 />
               )}
@@ -492,7 +492,7 @@ export default function GameDetailPage() {
                   title={loadingAction === "test" ? "Testing Chapter Generation" : "Generating Next Chapter"}
                   description={loadingAction === "test"
                     ? "This is a test simulation showing the chapter generation process with 3-second intervals between steps."
-                    : "The AI is creating your next chapter based on your gameplay. This typically takes around 2-3 minutes, and the game will launch automatically when complete."}
+                    : "The AI is creating your next chapter based on your gameplay. This typically takes around 2-3 minutes, and the game will launch automatically when complete. Do not close this window!"}
                   mode="chapter"
                 />
               )}
