@@ -8,6 +8,7 @@ import { ChapterIdea, ChapterIdeaSchema } from "@/ai/types/chapter-idea.ts";
 import { InitialGameIdea } from "@/ai/types/initial-game-idea.ts";
 import { WorldSummary } from "@/ai/types/world-summary.ts";
 import { validateCharacterMentions } from "@/ai/validators/validate-character-mentions.ts";
+import { validateDistinctNewCharacters } from "@/ai/validators/validate-distinct-new-characters.ts";
 import { DeadCharacterRecord } from "@/types/dead-character-record.ts";
 import replaceBadCharacters from "@/lib/formatting/replace-bad-characters.ts";
 
@@ -158,7 +159,7 @@ Constraints:
 6) Verify that if there are dead characters (from allDeadCharacters or newlyDeadThisChapter), the chapter narrative acknowledges these deaths in some meaningful way - either through explicit mentions in dialogue, plot consequences, or character reactions.
 If all good => fixText="None". Otherwise => fix instructions.`;
     },
-    validators: [validateCharacterMentions],
+    validators: [validateCharacterMentions, validateDistinctNewCharacters],
   });
   return {
     ...chIdea,
