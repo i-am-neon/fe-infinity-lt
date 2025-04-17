@@ -6,7 +6,7 @@ import {
   saveSceneBackgroundMetadataToCheckpoint,
 } from "./scene-background-metadata-checkpoint.ts";
 
-const systemMessage = `Generate a one sentence description of this scene.`;
+const systemMessage = `This is a background scene from a Fire Emblem style tactical RPG game. Generate a concise, one-sentence description of this scene. Be direct and brief. Do not use phrases like "this image contains" or "this scene shows" and do not mention the art style.`;
 
 export default async function genSceneBackgroundMetadata(
   imagePath: string,
@@ -32,6 +32,7 @@ export default async function genSceneBackgroundMetadata(
     systemMessage,
     imagePath,
     schema: SceneBackgroundMetadataSchema,
+    model: "nano"
   });
 
   const fileName = imagePath
@@ -49,6 +50,6 @@ if (import.meta.main) {
   const imagePath = getPathWithinServer(
     "assets/scene-backgrounds/Boat.png"
   );
-  const res = await genSceneBackgroundMetadata(imagePath);
+  const res = await genSceneBackgroundMetadata(imagePath, true);
   console.log(res);
 }

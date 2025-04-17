@@ -15,6 +15,7 @@ export default async function generateStructuredDataWithImage<T>({
   temperature = 0,
   imagePath,
   maxRetries = 3,
+  model = "strong",
 }: {
   schema: ZodSchema<T>;
   systemMessage: string;
@@ -22,7 +23,13 @@ export default async function generateStructuredDataWithImage<T>({
   temperature?: number;
   imagePath: string;
   maxRetries?: number;
+  model?: "nano" | "fast" | "strong";
 }): Promise<T> {
+  const chosenModel = model === "nano"
+    ? "gpt-4.1-nano"
+    : model === "fast"
+      ? "gpt-4.1-mini"
+      : "gpt-4.1";
   const fileContents = readFileSync(imagePath);
   const base64 = fileContents.toString("base64");
 
@@ -31,7 +38,7 @@ export default async function generateStructuredDataWithImage<T>({
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
       const { object: result } = await generateObject({
-        model: openai("gpt-4.1"),
+        model: openai(chosenModel),
         schema,
         system: systemMessage,
         messages: [

@@ -6,6 +6,7 @@ export const SceneBackgroundMetadataSchema = z.object({
   ),
   setting: z.enum(['indoor', 'outdoor']),
   timeOfDay: z.enum(['morning', 'afternoon', 'evening', 'night']).optional(),
+  weather: z.string().optional().describe('A one-word description of the weather conditions in the scene, only if outdoor.'),
 });
 
 export type SceneBackgroundMetadata = z.infer<
