@@ -46,7 +46,8 @@ Examples:
 The command should come immediately after the dialogue or narration where the item is mentioned.
 Always use underscores instead of spaces in item names.
 This is CRITICAL for gameplay mechanics - if an item is mentioned, the "give_item" command MUST be included.
-- IMPORTANT: Only include give_item commands for items that exist in the vanilla Fire Emblem: The Sacred Stones game. Do not invent or give non-vanilla items; fictional quest items should only be referenced in dialogue without a give_item command.
+   - IMPORTANT: Only include give_item commands for items that exist in the vanilla Fire Emblem: The Sacred Stones game. Do not invent or give non-vanilla items; fictional quest items should only be referenced in dialogue without a give_item command.
+   - IMPORTANT: Items awarded (give_item/give_money) should be level-appropriate: provide basic vanilla items in early chapters and reserve more advanced or rare vanilla items for later chapters. Assume a 30-chapter game.
 
 The event should:
 - use the Chapter Idea's outro as the basis for the event
