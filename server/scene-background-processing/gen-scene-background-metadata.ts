@@ -33,7 +33,8 @@ export default async function genSceneBackgroundMetadata(
     imagePath,
     prompt: `Image name: ${imagePath}`,
     schema: SceneBackgroundMetadataSchema,
-    model: "nano"
+    model: "fast",
+    maxRetries: 5,
   });
 
   const fileName = imagePath
