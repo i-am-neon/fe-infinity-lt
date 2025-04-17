@@ -30,7 +30,7 @@ const chapterGenerationSteps: LoadingState[] = [
 const gameCreationPreSteps: LoadingState[] = [
     { text: "Initializing project environment" },
     { text: "Creating unique game world" },
-    { text: "Generating initial main character" },
+    { text: "Generating initial main characters" },
     { text: "Designing the world map layout" },
     { text: "Configuring initial settings" },
     { text: "Drafting the overarching storyline" }

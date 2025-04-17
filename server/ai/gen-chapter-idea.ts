@@ -168,6 +168,7 @@ If all good => fixText="None". Otherwise => fix instructions.`;
     ...chIdea,
     enemyFaction: {
       ...chIdea.enemyFaction,
+      name: replaceBadCharacters(chIdea.enemyFaction.name),
       desc: replaceBadCharacters(chIdea.enemyFaction.desc),
     }
   }
