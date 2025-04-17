@@ -11,6 +11,8 @@ import appendAllTilesetsData from "@/game-engine-io/write-chapter/append-all-til
 import modifyConstant from "@/game-engine-io/modify-constant.ts";
 import { copyMusicAndUpdateJson } from "@/game-engine-io/write-chapter/copy-music.ts";
 import copyGenericPortraitsToProject from "@/file-io/copy-generic-portraits-to-project.ts";
+import modifyEquation from "@/game-engine-io/modify-equation.ts";
+import modifyItem from "@/game-engine-io/modify-item.ts";
 
 export default async function initializeProject(projectName: string) {
   const initProjectScriptPath = getPathWithinLtMaker("create_new_project.py");
@@ -254,6 +256,36 @@ export default async function initializeProject(projectName: string) {
     key: "info_menu_blink",
     newValue: true,
   });
+
+  // Fix staff equations
+  await modifyEquation({
+    projectNameEndingInDotLtProj: newProjectNameEndingInDotLtProj,
+    nid: "HEAL",
+    newExpression: "MAG + 10",
+  })
+  await modifyEquation({
+    projectNameEndingInDotLtProj: newProjectNameEndingInDotLtProj,
+    nid: "MEND",
+    newExpression: "MAG + 20",
+  })
+  await modifyEquation({
+    projectNameEndingInDotLtProj: newProjectNameEndingInDotLtProj,
+    nid: "PHYSIC",
+    newExpression: "MAG + 15",
+  })
+  // Apply staff equations to items
+  await modifyItem({
+    projectNameEndingInDotLtProj: newProjectNameEndingInDotLtProj,
+    nid: "Mend",
+    componentKey: "equation_heal",
+    newValue: "MEND",
+  })
+  await modifyItem({
+    projectNameEndingInDotLtProj: newProjectNameEndingInDotLtProj,
+    nid: "Physic",
+    componentKey: "equation_heal",
+    newValue: "PHYSIC",
+  })
 
   // Remove music that plays during battle
   await removeWithinLtMaker({
