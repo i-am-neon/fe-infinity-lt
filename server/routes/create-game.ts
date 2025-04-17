@@ -81,7 +81,7 @@ export async function handleCreateGame(req: Request): Promise<Response> {
     // Set initial progress
     gameCreationProgress.set(gameNid, {
       step: GAME_CREATION_STEPS.INITIALIZE_PROJECT,
-      message: "Initializing project..."
+      message: "Initializing project"
     });
     logger.info(`Game creation progress: Initializing project (step ${GAME_CREATION_STEPS.INITIALIZE_PROJECT})`);
 
@@ -104,7 +104,7 @@ export async function handleCreateGame(req: Request): Promise<Response> {
         success: true,
         gameNid,
         message:
-          "Initial game record created. Generation tasks are continuing in the background.",
+          "Game setup is underway. Please wait a few minutes—the game will launch automatically when ready.",
       }),
       {
         headers: { "Content-Type": "application/json" },
@@ -118,7 +118,7 @@ export async function handleCreateGame(req: Request): Promise<Response> {
         // Generate world summary
         gameCreationProgress.set(gameNid, {
           step: GAME_CREATION_STEPS.CREATE_WORLD,
-          message: "Creating game world..."
+          message: "Creating game world"
         });
         logger.info(`Game creation progress: Creating game world (step ${GAME_CREATION_STEPS.CREATE_WORLD})`);
 
@@ -127,11 +127,17 @@ export async function handleCreateGame(req: Request): Promise<Response> {
           gameDescription: description,
           tone,
         });
+        // Select main theme music
+        gameCreationProgress.set(gameNid, {
+          step: GAME_CREATION_STEPS.GENERATE_CHARACTERS,
+          message: "Selecting main theme music"
+        });
+        logger.info(`Game creation progress: Selecting main theme music (step ${GAME_CREATION_STEPS.GENERATE_CHARACTERS})`);
 
-        // Design world map / select music
+        // Design world map layout
         gameCreationProgress.set(gameNid, {
           step: GAME_CREATION_STEPS.DESIGN_WORLD_MAP,
-          message: "Designing world map..."
+          message: "Designing world map layout"
         });
         logger.info(`Game creation progress: Designing world map (step ${GAME_CREATION_STEPS.DESIGN_WORLD_MAP})`);
 
@@ -141,10 +147,10 @@ export async function handleCreateGame(req: Request): Promise<Response> {
           tone,
         });
 
-        // Generate storyline / initial game idea
+        // Generate initial story ideas
         gameCreationProgress.set(gameNid, {
           step: GAME_CREATION_STEPS.GENERATE_STORYLINE,
-          message: "Generating storyline..."
+          message: "Drafting initial story ideas"
         });
         logger.info(`Game creation progress: Generating storyline (step ${GAME_CREATION_STEPS.GENERATE_STORYLINE})`);
 
@@ -156,7 +162,7 @@ export async function handleCreateGame(req: Request): Promise<Response> {
         // Setup initial conditions before chapter creation
         gameCreationProgress.set(gameNid, {
           step: GAME_CREATION_STEPS.SETUP_CONDITIONS,
-          message: "Setting up initial conditions..."
+          message: "Setting up initial conditions"
         });
         logger.info(`Game creation progress: Setting up initial conditions (step ${GAME_CREATION_STEPS.SETUP_CONDITIONS})`);
 
@@ -165,7 +171,7 @@ export async function handleCreateGame(req: Request): Promise<Response> {
         // Create the first chapter (prologue)
         gameCreationProgress.set(gameNid, {
           step: GAME_CREATION_STEPS.CREATE_FIRST_CHAPTER,
-          message: "Creating first chapter..."
+          message: "Creating first chapter"
         });
         logger.info(`Game creation progress: Creating first chapter (step ${GAME_CREATION_STEPS.CREATE_FIRST_CHAPTER})`);
 
@@ -182,7 +188,7 @@ export async function handleCreateGame(req: Request): Promise<Response> {
 
             gameCreationProgress.set(gameNid, {
               step: step,
-              message: progress.message || "Creating first chapter..."
+              message: progress.message || "Creating first chapter"
             });
             logger.info(`Game creation progress: ${progress.message} (step ${step})`);
           },
@@ -191,7 +197,7 @@ export async function handleCreateGame(req: Request): Promise<Response> {
         // Set up game files
         gameCreationProgress.set(gameNid, {
           step: GAME_CREATION_STEPS.SETUP_GAME_FILES,
-          message: "Setting up game files..."
+          message: "Setting up game files"
         });
         logger.info(`Game creation progress: Setting up game files (step ${GAME_CREATION_STEPS.SETUP_GAME_FILES})`);
 
@@ -212,7 +218,7 @@ export async function handleCreateGame(req: Request): Promise<Response> {
         // Finalize game creation
         gameCreationProgress.set(gameNid, {
           step: GAME_CREATION_STEPS.FINALIZE,
-          message: "Finalizing game creation..."
+          message: "Finalizing game creation"
         });
         logger.info(`Game creation progress: Finalizing game creation (step ${GAME_CREATION_STEPS.FINALIZE})`);
 

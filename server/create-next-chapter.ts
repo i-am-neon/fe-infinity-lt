@@ -50,10 +50,10 @@ export default async function createNextChapter({
   });
   const logger = getCurrentLogger();
 
-  // Set initial progress - Initializing game engine
+  // Set initial progress - Initializing game environment
   chapterGenerationProgress.set(gameNid, {
     step: INITIALIZING_STEPS.GAME_ENGINE,
-    message: "Initializing game engine..."
+    message: "Initializing game environment"
   });
 
   // Add 2-second timeouts for testing the progress updates
@@ -62,7 +62,7 @@ export default async function createNextChapter({
   // Loading game data
   chapterGenerationProgress.set(gameNid, {
     step: INITIALIZING_STEPS.LOADING_DATA,
-    message: "Loading game data..."
+    message: "Loading your saved game data"
   });
 
   await new Promise(resolve => setTimeout(resolve, 2000));
@@ -78,10 +78,10 @@ export default async function createNextChapter({
     finishedChapterNumber: existingGame.chapters.length,
   });
 
-  // Analyzing previous chapter
+  // Reviewing previous chapter
   chapterGenerationProgress.set(gameNid, {
     step: INITIALIZING_STEPS.ANALYZING,
-    message: "Analyzing previous chapter..."
+    message: "Reviewing last chapter details"
   });
 
   await new Promise(resolve => setTimeout(resolve, 2000));
@@ -98,10 +98,10 @@ export default async function createNextChapter({
     choiceOptions: lastChapterChoiceOptions,
   });
 
-  // Processing player choices
+  // Applying player choices
   chapterGenerationProgress.set(gameNid, {
     step: INITIALIZING_STEPS.PROCESSING,
-    message: "Processing player choices..."
+    message: "Incorporating your choices"
   });
 
   await new Promise(resolve => setTimeout(resolve, 2000));
@@ -131,10 +131,10 @@ export default async function createNextChapter({
   await removeStubEvent(projectNameEndingInDotLtProj);
   deleteSuspendSave();
 
-  // Moving to the generation phase
+  // Beginning AI chapter creation
   chapterGenerationProgress.set(gameNid, {
     step: INITIALIZING_STEPS.GENERATION_START,
-    message: "Starting chapter generation..."
+    message: "Beginning next chapter creation"
   });
 
   await new Promise(resolve => setTimeout(resolve, 2000));

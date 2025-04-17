@@ -90,8 +90,8 @@ export default async function genChapter({
     logger.info(`Chapter generation progress: ${message}`, { step });
   };
 
-  // Step 1: Generate chapter idea
-  reportProgress(0, "Generating chapter idea and storyline...");
+  // Step 1: Draft chapter storyline
+  reportProgress(0, "Drafting chapter storyline");
   const chapterIdea = await genChapterIdea({
     worldSummary,
     initialGameIdea,
@@ -104,8 +104,8 @@ export default async function genChapter({
     playerChoice,
   });
 
-  // Build array of new characters from initialGameIdea (if prologue) plus boss + new units
-  reportProgress(1, "Creating new characters and assigning traits...");
+  // Step 2: Craft new character profiles
+  reportProgress(1, "Crafting new character profiles");
   const newCharacterIdeas: CharacterIdea[] = [
     ...(initialGameIdea && chapterNumber === 0
       ? initialGameIdea.characterIdeas
@@ -119,8 +119,8 @@ export default async function genChapter({
   const usedSoFar = usedPortraitsSoFar ?? [];
   logger.debug("Used portraits so far", { usedSoFar });
 
-  // Step 2: Create the new unit datas and select assets
-  reportProgress(2, "Selecting portraits for characters...");
+  // Step 3: Assign portraits to characters
+  reportProgress(2, "Assigning portraits to characters");
   const [portraitMap, newCharacterUnitDatas] = await Promise.all([
     choosePortraits({
       characterIdeas: newCharacterIdeas,
@@ -132,39 +132,43 @@ export default async function genChapter({
     }),
   ]);
 
-  // Step 3: Choose music
-  reportProgress(3, "Composing battle music...");
+  // Step 4: Compose battle theme music
+  reportProgress(3, "Composing battle theme music");
   const [playerPhaseMusic, enemyPhaseMusic] = await Promise.all([
     chooseMusic(`exciting, intense, heroic ${chapterIdea.battle}`),
     chooseMusic(`ominous, menacing, villainous ${chapterIdea.battle}`),
   ]);
 
-  // Step 4: Generate intro and outro dialogue events in parallel
-  reportProgress(4, "Generating intro and outro dialogue events...");
-  const [introAIEvent, outroAIEvent] = await Promise.all([
-    genIntroEvent({
-      worldSummary,
-      chapterIdea,
-      tone,
-      initialGameIdea: chapterNumber === 0 ? initialGameIdea : undefined,
-      existingChapters,
-      existingCharacterIdeas: existingCharacters.map((c) => c.characterIdea),
-      allDeadCharacters,
-      newlyDeadThisChapter,
-    }),
-    genOutroEvent({
-      worldSummary,
-      initialGameIdea,
-      chapterIdea,
-      tone,
-    }),
-  ]);
+  // Step 5: Write introduction cutscene dialogue
+  reportProgress(4, "Writing introduction cutscene dialogue");
+  const introAIEvent = await genIntroEvent({
+    worldSummary,
+    chapterIdea,
+    tone,
+    initialGameIdea: chapterNumber === 0 ? initialGameIdea : undefined,
+    existingChapters,
+    existingCharacterIdeas: existingCharacters.map((c) => c.characterIdea),
+    allDeadCharacters,
+    newlyDeadThisChapter,
+  });
+  // Step 6: Write conclusion cutscene dialogue
+  reportProgress(5, "Writing conclusion cutscene dialogue");
+  const outroAIEvent = await genOutroEvent({
+    worldSummary,
+    initialGameIdea,
+    chapterIdea,
+    tone,
+  });
 
-  // Step 5: Select backgrounds and music for events
-  reportProgress(5, "Selecting backgrounds and music for events...");
-  const [introBackgroundChoice, outroBackgroundChoice, introMusic, outroMusic] = await Promise.all([
+  // Step 7: Choose event backgrounds
+  reportProgress(6, "Choosing event backgrounds");
+  const [introBackgroundChoice, outroBackgroundChoice] = await Promise.all([
     chooseBackground(chapterIdea.intro),
     chooseBackground(chapterIdea.outro),
+  ]);
+  // Step 8: Choose event music
+  reportProgress(7, "Selecting event music");
+  const [introMusic, outroMusic] = await Promise.all([
     chooseMusic(chapterIdea.intro),
     chooseMusic(`Reflective conclusion for chapter: ${chapterIdea.outro}`),
   ]);
@@ -238,8 +242,8 @@ export default async function genChapter({
     allLivingPlayerCharacterIdeas,
   });
 
-  // Step 6: Choose and set up map
-  reportProgress(6, "Creating the map layout...");
+  // Step 8: Build the map layout
+  reportProgress(7, "Building the map layout");
   const usedMapNames = existingChapters.map((c) => c.tilemap.nid);
   const chosenMapName = await chooseMap(chapterIdea, usedMapNames);
 
@@ -260,8 +264,8 @@ export default async function genChapter({
     );
   }
 
-  // Step 7: Place units on map
-  reportProgress(7, "Placing units on the battlefield...");
+  // Step 9: Position units on the battlefield
+  reportProgress(8, "Positioning units on the battlefield");
   const { units: levelUnits, formationRegions } = await getLevelUnits({
     chosenMapName,
     chapterIdea,
@@ -272,8 +276,8 @@ export default async function genChapter({
     )!,
   });
 
-  // Step 8: Set up map interactions
-  reportProgress(8, "Setting up special map interactions...");
+  // Step 10: Configure map interactables
+  reportProgress(9, "Configuring map interactables");
   // Collect region and event info from environment
   const chestEventsAndRegions = getChestEventsAndRegions({
     mapName: chosenMapName,
@@ -365,8 +369,8 @@ export default async function genChapter({
     introEvent._source.push("give_money;1000;no_banner");
   }
 
-  // Step 9: Handle mid-battle recruitment and prepare boss battle dialogues in parallel
-  reportProgress(9, "Writing recruitment conversations...");
+  // Step 11: Write recruitment conversation scenes
+  reportProgress(10, "Writing recruitment conversation scenes");
   // Mid-battle recruitment logic
   const allPreviousNonBattleChars = new Set<string>();
   for (const ch of existingChapters) {
@@ -404,8 +408,8 @@ export default async function genChapter({
     return { talkSetupCommands: [], recruitmentEvents: [] };
   })();
 
-  // Step 10: Generate boss battle dialogues
-  reportProgress(10, "Creating boss battle dialogues...");
+  // Step 12: Generate boss battle sequences
+  reportProgress(11, "Generating boss battle sequences");
   const bossFightPromise = genBossFightEvents({
     boss: chapterIdea.boss,
     playerUnits: allLivingPlayerCharacterIdeas.filter(
@@ -425,8 +429,8 @@ export default async function genChapter({
   talkSetupCommands = recResults.talkSetupCommands;
   recruitmentEvents = recResults.recruitmentEvents;
 
-  // Step 11: Final chapter assembly
-  reportProgress(11, "Finalizing chapter assembly...");
+  // Step 13: Finalize and review the chapter
+  reportProgress(12, "Finalizing and reviewing the chapter");
   // Build level events
   const newChapter: Chapter = {
     title: chapterIdea.title,

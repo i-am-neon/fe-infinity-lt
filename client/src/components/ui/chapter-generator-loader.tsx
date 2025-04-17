@@ -3,47 +3,43 @@ import { MultiStepLoader, LoadingState } from "@/components/ui/multi-step-loader
 
 // Shared generation phase steps (used by both chapter and game creation)
 const generationPhaseSteps: LoadingState[] = [
-    { text: "Generating chapter idea and storyline..." },
-    { text: "Creating new characters and assigning traits..." },
-    { text: "Selecting portraits for characters..." },
-    { text: "Composing battle music..." },
-    { text: "Writing dialogue for intro event..." },
-    { text: "Writing dialogue for outro event..." },
-    { text: "Selecting background scenes..." },
-    { text: "Creating the map layout..." },
-    { text: "Placing units on the battlefield..." },
-    { text: "Setting up special map interactions..." },
-    { text: "Writing recruitment conversations..." },
-    { text: "Creating boss battle dialogues..." },
-    { text: "Finalizing chapter assembly..." }
+  { text: "Drafting chapter storyline" },
+  { text: "Crafting new character profiles" },
+  { text: "Assigning portraits to characters" },
+  { text: "Composing battle theme music" },
+  { text: "Writing introduction cutscene dialogue" },
+  { text: "Writing conclusion cutscene dialogue" },
+  { text: "Choosing event backgrounds" },
+  { text: "Building the map layout" },
+  { text: "Positioning units on the battlefield" },
+  { text: "Configuring map interactables" },
+  { text: "Writing recruitment conversation scenes" },
+  { text: "Generating boss battle sequences" },
+  { text: "Finalizing and reviewing the chapter" }
 ];
 
-// Steps for chapter generation - initializing phase + generation phase
+// Steps for chapter generation: initialization phase
 const chapterGenerationSteps: LoadingState[] = [
-    // Initializing phase
-    { text: "Initializing game engine..." },
-    { text: "Loading game data..." },
-    { text: "Analyzing previous chapter..." },
-    { text: "Processing player choices..." },
-    // Generation phase steps are added dynamically in the component
+  { text: "Initializing game engine" },
+  { text: "Loading game data" },
+  { text: "Analyzing previous chapter" },
+  { text: "Processing player choices" }
 ];
 
 // Steps specific to game creation (pre-generation)
 const gameCreationPreSteps: LoadingState[] = [
-    { text: "Initializing project..." },
-    { text: "Creating game world..." },
-    { text: "Generating main characters..." },
-    { text: "Designing world map..." },
-    { text: "Setting up initial conditions..." },
-    { text: "Generating storyline..." },
-    // After these steps, the CREATE_FIRST_CHAPTER step begins
-    // and gen-chapter.ts takes over with generationPhaseSteps
+  { text: "Initializing project environment" },
+  { text: "Creating vast game world" },
+  { text: "Generating main character roster" },
+  { text: "Designing the world map layout" },
+  { text: "Configuring initial settings" },
+  { text: "Drafting the overarching storyline" }
 ];
 
 // Steps specific to game creation (post-generation)
 const gameCreationPostSteps: LoadingState[] = [
-    { text: "Setting up game files..." },
-    { text: "Finalizing game creation..." }
+  { text: "Setting up game files and resources" },
+  { text: "Performing final touches and cleanup" }
 ];
 
 // Define the step indexes where each phase begins

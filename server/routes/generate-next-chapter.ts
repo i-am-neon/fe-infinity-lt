@@ -40,7 +40,7 @@ export async function handleGenerateNextChapter(
         success: true,
         gameNid,
         message:
-          "Generating next chapter in the background. You can retrieve the updated game soon.",
+          "Your next chapter is being created. Please wait a few minutes—the game will update automatically when it's ready.",
       }),
       {
         headers: { "Content-Type": "application/json" },
