@@ -65,6 +65,7 @@ export async function handleGenerateNextChapter(
           gameNid,
           duration,
         });
+        runGame(directory)
       } catch (err) {
         console.error("Error in background next chapter creation:", err);
         // Update the progress state with error information so the client can detect it

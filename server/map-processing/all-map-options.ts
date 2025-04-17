@@ -1,6 +1,6 @@
 import { MapMetadata } from "@/types/maps/map-metadata.ts";
 
-  export const allMapOptions: MapMetadata[] = [
+export const allMapOptions: MapMetadata[] = [
   {
     "distinctRegions": [
       {
@@ -2611,119 +2611,6 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
     "givenName": "Fortress Entrance",
     "originalName": "Knights_Villagers_Bandits_7_(18_00_48_1A)__by_Aura_Wolf",
     "description": "A fortified indoor area with multiple rooms and corridors, featuring a central entrance and various strategic points.",
-    "setting": "indoor"
-  },
-  {
-    "distinctRegions": [
-      {
-        "name": "Throne Room",
-        "description": "A regal, enclosed chamber with a throne at (3,1). This is the primary defensive objective and likely the boss's location. Accessible only from the south, making it easy to defend.",
-        "terrainTypes": [
-          "Floor",
-          "Throne"
-        ],
-        "fromX": 1,
-        "fromY": 0,
-        "toX": 4,
-        "toY": 3
-      },
-      {
-        "name": "Grand Hallway",
-        "description": "A long, wide corridor with multiple staircases, connecting the Throne Room to the rest of the map. Provides fast movement and is a key route for both offense and defense.",
-        "terrainTypes": [
-          "Floor",
-          "Stairs"
-        ],
-        "fromX": 1,
-        "fromY": 4,
-        "toX": 15,
-        "toY": 6
-      },
-      {
-        "name": "Central Pillar Chamber",
-        "description": "A large open room with pillars for cover and several staircases. This area is ideal for skirmishes and provides multiple flanking opportunities.",
-        "terrainTypes": [
-          "Floor",
-          "Pillar",
-          "Stairs"
-        ],
-        "fromX": 1,
-        "fromY": 7,
-        "toX": 15,
-        "toY": 9
-      },
-      {
-        "name": "Western Residential Wing",
-        "description": "A series of rooms and corridors with pillars and stairs, likely used for living quarters. Offers multiple entry points and is less defensible than the Throne Room.",
-        "terrainTypes": [
-          "Floor",
-          "Stairs",
-          "Pillar"
-        ],
-        "fromX": 1,
-        "fromY": 12,
-        "toX": 15,
-        "toY": 16
-      },
-      {
-        "name": "Eastern Residential Wing",
-        "description": "Mirroring the western wing, this area provides additional living space and access routes. It is connected to the central and southern areas.",
-        "terrainTypes": [
-          "Floor",
-          "Stairs",
-          "Pillar"
-        ],
-        "fromX": 7,
-        "fromY": 12,
-        "toX": 19,
-        "toY": 16
-      },
-      {
-        "name": "Southern Outer Hall",
-        "description": "A southern corridor with stair access, serving as the main entry/exit for the lower part of the map. It is a likely reinforcement or escape route.",
-        "terrainTypes": [
-          "Floor",
-          "Stairs"
-        ],
-        "fromX": 7,
-        "fromY": 17,
-        "toX": 19,
-        "toY": 19
-      },
-      {
-        "name": "Southern Courtyard",
-        "description": "A small, open area at the southernmost part of the map, possibly an exit or reinforcement zone. It is less defensible but offers quick access to the rest of the map.",
-        "terrainTypes": [
-          "Floor",
-          "Stairs"
-        ],
-        "fromX": 7,
-        "fromY": 20,
-        "toX": 9,
-        "toY": 21
-      }
-    ],
-    "keyPointsOfInterest": [
-      "Throne at (3,1)",
-      "Multiple staircases throughout the map",
-      "Pillars in central and residential wings",
-      "Doors at (8,4) and (14,4) as main chokepoints"
-    ],
-    "chokePoints": [
-      "Doors at (8,4) and (14,4)",
-      "Narrow corridor between Throne Room and Grand Hallway",
-      "Stair clusters in central and southern areas"
-    ],
-    "strategicConsiderations": [
-      "Defending the Throne Room is paramount; focus on the southern entrance.",
-      "The Grand Hallway allows rapid movement but is vulnerable to ambushes from side rooms.",
-      "Pillars in the Central Pillar Chamber provide cover for both attackers and defenders.",
-      "Staircases may be used for reinforcements or flanking maneuvers.",
-      "Controlling the doors at (8,4) and (14,4) can bottleneck enemy advances."
-    ],
-    "givenName": "Royal Courtyard",
-    "originalName": "ClintManor",
-    "description": "An indoor map featuring a blend of open courtyards and narrow corridors, designed for strategic maneuvering.",
     "setting": "indoor"
   },
   {

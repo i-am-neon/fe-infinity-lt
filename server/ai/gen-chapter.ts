@@ -29,6 +29,7 @@ import { DeadCharacterRecord } from "@/types/dead-character-record.ts";
 import { Event } from "@/types/events/event.ts";
 import { LevelRegion } from "@/types/level.ts";
 import { Tilemap } from "@/types/maps/tilemap.ts";
+import genRecruitmentEvents from "@/ai/level/gen-recruitment-events.ts";
 
 /**
  * Creates the next chapter based on the given data.
@@ -138,29 +139,29 @@ export default async function genChapter({
     chooseMusic(`ominous, menacing, villainous ${chapterIdea.battle}`),
   ]);
 
-  // Step 4: Generate events
-  reportProgress(4, "Writing dialogue for intro event...");
-  const introAIEvent = await genIntroEvent({
-    worldSummary,
-    chapterIdea,
-    tone,
-    initialGameIdea: chapterNumber === 0 ? initialGameIdea : undefined,
-    existingChapters,
-    existingCharacterIdeas: existingCharacters.map((c) => c.characterIdea),
-    allDeadCharacters,
-    newlyDeadThisChapter,
-  });
+  // Step 4: Generate intro and outro dialogue events in parallel
+  reportProgress(4, "Generating intro and outro dialogue events...");
+  const [introAIEvent, outroAIEvent] = await Promise.all([
+    genIntroEvent({
+      worldSummary,
+      chapterIdea,
+      tone,
+      initialGameIdea: chapterNumber === 0 ? initialGameIdea : undefined,
+      existingChapters,
+      existingCharacterIdeas: existingCharacters.map((c) => c.characterIdea),
+      allDeadCharacters,
+      newlyDeadThisChapter,
+    }),
+    genOutroEvent({
+      worldSummary,
+      initialGameIdea,
+      chapterIdea,
+      tone,
+    }),
+  ]);
 
-  reportProgress(5, "Writing dialogue for outro event...");
-  const outroAIEvent = await genOutroEvent({
-    worldSummary,
-    initialGameIdea,
-    chapterIdea,
-    tone,
-  });
-
-  // Step 5: Choose backgrounds and music for events
-  reportProgress(6, "Selecting background scenes...");
+  // Step 5: Select backgrounds and music for events
+  reportProgress(5, "Selecting backgrounds and music for events...");
   const [introBackgroundChoice, outroBackgroundChoice, introMusic, outroMusic] = await Promise.all([
     chooseBackground(chapterIdea.intro),
     chooseBackground(chapterIdea.outro),
@@ -238,7 +239,7 @@ export default async function genChapter({
   });
 
   // Step 6: Choose and set up map
-  reportProgress(7, "Creating the map layout...");
+  reportProgress(6, "Creating the map layout...");
   const usedMapNames = existingChapters.map((c) => c.tilemap.nid);
   const chosenMapName = await chooseMap(chapterIdea, usedMapNames);
 
@@ -260,7 +261,7 @@ export default async function genChapter({
   }
 
   // Step 7: Place units on map
-  reportProgress(8, "Placing units on the battlefield...");
+  reportProgress(7, "Placing units on the battlefield...");
   const { units: levelUnits, formationRegions } = await getLevelUnits({
     chosenMapName,
     chapterIdea,
@@ -272,7 +273,7 @@ export default async function genChapter({
   });
 
   // Step 8: Set up map interactions
-  reportProgress(9, "Setting up special map interactions...");
+  reportProgress(8, "Setting up special map interactions...");
   // Collect region and event info from environment
   const chestEventsAndRegions = getChestEventsAndRegions({
     mapName: chosenMapName,
@@ -364,8 +365,8 @@ export default async function genChapter({
     introEvent._source.push("give_money;1000;no_banner");
   }
 
-  // Step 9: Handle mid-battle recruitment
-  reportProgress(10, "Writing recruitment conversations...");
+  // Step 9: Handle mid-battle recruitment and prepare boss battle dialogues in parallel
+  reportProgress(9, "Writing recruitment conversations...");
   // Mid-battle recruitment logic
   const allPreviousNonBattleChars = new Set<string>();
   for (const ch of existingChapters) {
@@ -386,26 +387,26 @@ export default async function genChapter({
   // gather living recruiters as CharacterIdea
   const livingRecruiters = allLivingPlayerCharacterIdeas;
 
+  // Initialize recruitment events container
   let talkSetupCommands: string[] = [];
   let recruitmentEvents: Event[] = [];
-  if (recruitableIdeas.length > 0 && livingRecruiters.length > 0) {
-    const { default: genRecruitmentEvents } = await import(
-      "@/ai/level/gen-recruitment-events.ts"
-    );
-    const recResults = await genRecruitmentEvents({
-      recruitables: recruitableIdeas,
-      recruiters: livingRecruiters,
-      chapterNumber,
-      chapterIdea,
-    });
-    talkSetupCommands = recResults.talkSetupCommands;
-    recruitmentEvents = recResults.recruitmentEvents;
-  }
 
-  // Step 10: Generate boss dialogue
-  reportProgress(11, "Creating boss battle dialogues...");
-  // Generate boss fight events for all living player units
-  const bossFightEvents = await genBossFightEvents({
+  // Start recruitment event generation asynchronously
+  const recPromise = (async () => {
+    if (recruitableIdeas.length > 0 && livingRecruiters.length > 0) {
+      return await genRecruitmentEvents({
+        recruitables: recruitableIdeas,
+        recruiters: livingRecruiters,
+        chapterNumber,
+        chapterIdea,
+      });
+    }
+    return { talkSetupCommands: [], recruitmentEvents: [] };
+  })();
+
+  // Step 10: Generate boss battle dialogues
+  reportProgress(10, "Creating boss battle dialogues...");
+  const bossFightPromise = genBossFightEvents({
     boss: chapterIdea.boss,
     playerUnits: allLivingPlayerCharacterIdeas.filter(
       (idea) => idea.firstName !== chapterIdea.boss.firstName
@@ -419,8 +420,13 @@ export default async function genChapter({
     ),
   });
 
+  // Await both recruitment and boss fight event generation
+  const [recResults, bossFightEvents] = await Promise.all([recPromise, bossFightPromise]);
+  talkSetupCommands = recResults.talkSetupCommands;
+  recruitmentEvents = recResults.recruitmentEvents;
+
   // Step 11: Final chapter assembly
-  reportProgress(12, "Finalizing chapter assembly...");
+  reportProgress(11, "Finalizing chapter assembly...");
   // Build level events
   const newChapter: Chapter = {
     title: chapterIdea.title,
@@ -504,7 +510,7 @@ export default async function genChapter({
   ];
 
   // Chapter generation complete!
-  reportProgress(13, "Chapter generation complete!");
+  reportProgress(12, "Chapter generation complete!");
 
   return {
     chapter: newChapter,

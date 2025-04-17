@@ -76,7 +76,7 @@ export default async function getLevelUnits({
   recruitableUnits.forEach((ru) => {
     units.push({
       nid: ru.nid,
-      team: ru.firstSeenAs === "allied NPC" ? "other" : "enemy",
+      team: ru.firstSeenAs === "allied NPC" ? "other" : ru.firstSeenAs === 'ally' ? 'player' : "enemy",
       ai: "Defend",
       roam_ai: null,
       ai_group: "",
