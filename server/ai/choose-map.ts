@@ -4,6 +4,7 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
 import similaritySearch from "@/vector-db/similarity-search.ts";
 import { z } from "zod";
 import generateStructuredData from "./lib/generate-structured-data.ts";
+import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
 
 interface EphemeralMapOption {
   ephemeralId: "A" | "B" | "C";
@@ -24,9 +25,7 @@ const decideSchema = z.object({
 });
 
 export default async function chooseMap(
-  chapterIdea: ChapterIdea,
-  usedMapNames: string[] = []
-): Promise<string> {
+  { chapterIdea, usedMapNames = [], forceSmallMap = false }: { chapterIdea: ChapterIdea; usedMapNames?: string[]; forceSmallMap?: boolean; }): Promise<string> {
   // For chest map testing
   // return "Knights_Villagers_Bandits_3_(0E_00_72_10)__by_Aura_Wolf";
   // For Avenir map testing
@@ -48,22 +47,53 @@ Given the user's Fire Emblem chapter idea, provide a brief single-line string (n
   });
 
   // 2) Run similarity search
+  const limit = forceSmallMap ? 15 : 5;
   const topResults = await similaritySearch<MapMetadata>({
     query: searchQuery,
-    limit: 5,
+    limit,
     vectorType: "maps",
   });
   if (!topResults.length) {
     throw new Error("No map results found for this query.");
   }
 
-  const filteredResults = topResults.filter((res) => {
+  let filteredResults = topResults.filter((res) => {
     const originalName = (res.metadata?.originalName as string) || "";
     return !usedMapNames.includes(originalName);
   });
 
   if (!filteredResults.length) {
     throw new Error("No new map results found (all are used).");
+  }
+
+  // 2a) If forcing small map, filter out maps larger than 20x20
+  if (forceSmallMap) {
+    const smallResults: typeof filteredResults = [];
+    for (const res of filteredResults) {
+      const originalName = (res.metadata?.originalName as string) || "";
+      const jsonPath = getPathWithinServer(`assets/maps/${originalName}.json`);
+      let mapData: unknown;
+      try {
+        const jsonText = await Deno.readTextFile(jsonPath);
+        mapData = JSON.parse(jsonText);
+      } catch (e) {
+        throw new Error(`Error reading or parsing map JSON for ${originalName}: ${e}`);
+      }
+      const size = (mapData as { size?: unknown }).size;
+      if (
+        Array.isArray(size) &&
+        typeof size[0] === "number" &&
+        typeof size[1] === "number" &&
+        size[0] <= 17 &&
+        size[1] <= 17
+      ) {
+        smallResults.push(res);
+      }
+    }
+    if (smallResults.length === 0) {
+      throw new Error("No small maps found in top 15 results.");
+    }
+    filteredResults = smallResults;
   }
 
   // Keep top 3
@@ -112,7 +142,7 @@ Return a JSON object { "chosenId": "A" } or "B" or "C" with no extra commentary.
 }
 
 if (import.meta.main) {
-  chooseMap(testPrologueChapter.idea)
+  chooseMap({ chapterIdea: testPrologueChapter.idea, forceSmallMap: true })
     .then((chosenMap) => {
       console.log("Chosen map:", chosenMap);
     })

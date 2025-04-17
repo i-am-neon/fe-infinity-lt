@@ -1,6 +1,6 @@
 import { MapMetadata } from "@/types/maps/map-metadata.ts";
 
-export const allMapOptions: MapMetadata[] = [
+  export const allMapOptions: MapMetadata[] = [
   {
     "distinctRegions": [
       {
