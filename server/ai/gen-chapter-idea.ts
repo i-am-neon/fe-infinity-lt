@@ -63,7 +63,8 @@ OUTRO AND CHOICE INTEGRATION:
 - Make the final lines of the outro create the context for why this specific choice is being presented
 - Ensure there's a clear narrative connection between the concluding events and the choice options
 
-Additionally, the 'intro' and 'outro' fields must each be a single full paragraph summarizing all the events, dialogue, and interactions that happen in those scenes. Make sure new characters' introductions feel natural and their reasons for joining are compelling and tied to their backstories.`;
+Additionally, the 'intro' and 'outro' fields must each be a single full paragraph summarizing all the events, dialogue, and interactions that happen in those scenes. Make sure new characters' introductions feel natural and their reasons for joining are compelling and tied to their backstories.
+- IMPORTANT: Any items mentioned as rewards or special weapons in the narrative must be items from the vanilla Fire Emblem: The Sacred Stones game. Do not invent fictional items as physical rewards; quest-specific or custom items can be referenced in dialogue but should not correspond to actual game items.`;
 
   // Prologue-specific part of the system message
   const prologueSpecific = `You are a Fire Emblem Fangame Chapter Idea Generator (generator).
