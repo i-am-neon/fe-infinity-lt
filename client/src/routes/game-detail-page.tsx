@@ -224,16 +224,6 @@ export default function GameDetailPage() {
               setOldChapterCount(null);
               setGeneratingChapterModalOpen(false);
               clearInterval(pollId);
-
-              // Auto-run the game on success
-              try {
-                await apiCall("run-game", {
-                  method: "POST",
-                  body: { directory: res.game.directory },
-                });
-              } catch (error) {
-                console.error("Error auto-running game:", error);
-              }
             }
           }
         } catch (err) {
@@ -264,7 +254,7 @@ export default function GameDetailPage() {
       return () => clearTimeout(completionTimer);
     }
   }, [loadingAction, generationProgress.progress]);
-  
+
   // Handle real chapter generation completion (non-test)
   useEffect(() => {
     // When in generate mode and final step reached, close loader and refresh game
@@ -284,11 +274,6 @@ export default function GameDetailPage() {
             }>(`games/${nid}`);
             if (res.success && res.game) {
               setData(res);
-              // Auto-run the updated game
-              await apiCall("run-game", {
-                method: "POST",
-                body: { directory: res.game.directory },
-              });
             }
           } catch (err) {
             console.error("Error refreshing game after chapter generation:", err);

@@ -245,7 +245,7 @@ export default async function genChapter({
   // Step 8: Build the map layout
   reportProgress(7, "Building the map layout");
   const usedMapNames = existingChapters.map((c) => c.tilemap.nid);
-  const chosenMapName = await chooseMap({ chapterIdea, usedMapNames, forceSmallMap: chapterNumber <= 2 });
+  const chosenMapName = await chooseMap({ chapterIdea, usedMapNames, forceSmallMap: chapterNumber === 0 });
 
   const existingPlayerUnitDatas = existingCharacters
     .map((c) => c.unitData)
