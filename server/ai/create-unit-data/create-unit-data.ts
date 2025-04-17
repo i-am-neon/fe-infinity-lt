@@ -42,7 +42,7 @@ export default async function createUnitData({
   const { baseStats, growthRates } = decideStats({
     fe8Class: klass,
     // Give player units higher stats
-    level: characterIdea.firstSeenAs !== "boss" ? level + 2 : level,
+    level,
     isPromoted,
     statBoons,
   });
