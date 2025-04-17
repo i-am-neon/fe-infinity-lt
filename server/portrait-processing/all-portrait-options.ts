@@ -1155,7 +1155,7 @@ export const allPortraitOptions: PortraitMetadata[] = [
     ],
     "smilingOffset": [
       24,
-      40
+      48
     ]
   },
   {
