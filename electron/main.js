@@ -1,6 +1,7 @@
 const { app, BrowserWindow, dialog, ipcMain } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const archiver = require('archiver');
 const { startServer, stopServer, isServerReady } = require('./server-manager');
 const { runGameWithWine, preparePythonEnvironment } = require('./game-runner');
 const { startGameLauncherServer } = require('./game-launcher');
@@ -710,6 +711,35 @@ ipcMain.handle('api-call', async (event, { endpoint, method, body }) => {
     return { success: true, data };
   } catch (error) {
     logger.log('error', `API call to ${endpoint} failed`, { error: error.message });
+    return { success: false, error: error.message };
+  }
+});
+
+// Handle export logs request: zip log files and save to Downloads folder
+ipcMain.handle('exportLogs', async () => {
+  try {
+    logger.log('info', 'Export logs requested');
+    const logDir = logger.getLogDirectory();
+    const downloadsDir = app.getPath('downloads');
+    const zipName = `FE-Infinity-logs-${new Date().toISOString().replace(/[:.]/g, '-')}.zip`;
+    const zipPath = path.join(downloadsDir, zipName);
+    const output = fs.createWriteStream(zipPath);
+    const archive = archiver('zip', { zlib: { level: 9 } });
+    return new Promise(resolve => {
+      output.on('close', () => {
+        logger.log('info', `Logs exported to ${zipPath}`);
+        resolve({ success: true, path: zipPath });
+      });
+      archive.on('error', err => {
+        logger.log('error', 'Error exporting logs', { error: err.message });
+        resolve({ success: false, error: err.message });
+      });
+      archive.pipe(output);
+      archive.directory(logDir, false);
+      archive.finalize();
+    });
+  } catch (error) {
+    logger.log('error', 'Exception in exportLogs handler', { error: error.stack });
     return { success: false, error: error.message };
   }
 });

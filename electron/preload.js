@@ -28,7 +28,16 @@ contextBridge.exposeInMainWorld('electron', {
       }
     },
     invoke: (channel, data) => {
-      const validChannels = ['isServerReady', 'runGame', 'api-call', 'getApiKey', 'setApiKey', 'deleteApiKey', 'hasApiKey'];
+      const validChannels = [
+        'isServerReady',
+        'runGame',
+        'api-call',
+        'getApiKey',
+        'setApiKey',
+        'deleteApiKey',
+        'hasApiKey',
+        'exportLogs'
+      ];
       if (validChannels.includes(channel)) {
         return ipcRenderer.invoke(channel, data);
       }
