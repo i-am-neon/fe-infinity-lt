@@ -1,15 +1,18 @@
 import { FE8Class } from "@/types/fe8-class.ts";
 import { StatValues } from "../../types/character/unit-data.ts";
 import { unitStatsLookup } from "@/ai/create-unit-data/unit-stats-lookup.ts";
+import { StatBoon } from "@/ai/types/stat-boons.ts";
 
 export default function decideStats({
   fe8Class,
   level,
   isPromoted,
+  statBoons,
 }: {
   fe8Class: FE8Class;
   level: number;
   isPromoted: boolean;
+  statBoons?: StatBoon;
 }): {
   baseStats: StatValues;
   growthRates: StatValues;
@@ -18,6 +21,19 @@ export default function decideStats({
 
   const baseStats = { ...data.base };
   const growthRates = { ...data.growth };
+
+  // Apply stat boosts if provided
+  if (statBoons) {
+    // Apply base stat boosts
+    for (const boost of statBoons.baseStatBoosts) {
+      baseStats[boost.stat] += boost.value;
+    }
+
+    // Apply growth rate boosts
+    for (const boost of statBoons.growthRateBoosts) {
+      growthRates[boost.stat] += boost.value;
+    }
+  }
 
   const effectiveLevel = isPromoted ? level + 20 : level;
   if (effectiveLevel > 1) {

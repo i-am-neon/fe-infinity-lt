@@ -3,6 +3,7 @@ import { CharacterIdea } from "@/ai/types/character-idea.ts";
 import decideLevel from "@/ai/create-unit-data/decide-level.ts";
 import decideClass from "@/ai/create-unit-data/decide-class.ts";
 import decideStats from "@/ai/create-unit-data/decide-stats.ts";
+import genCharacterStatBoons from "@/ai/create-unit-data/gen-character-stat-boons.ts";
 import { testCharIdeaThorne } from "@/ai/test-data/character-ideas.ts";
 import getWeaponExp from "@/ai/create-unit-data/get-weapon-exp.ts";
 import { FE8ClassToLTNidMap } from "@/types/fe8-class.ts";
@@ -31,11 +32,19 @@ export default async function createUnitData({
     }
   }
   const klass = await decideClass({ isPromoted, level, characterIdea });
+
+  // Generate stat boons based on character concept and class
+  const statBoons = await genCharacterStatBoons({
+    character: characterIdea,
+    fe8Class: klass,
+  });
+
   const { baseStats, growthRates } = decideStats({
     fe8Class: klass,
     // Give player units higher stats
     level: characterIdea.firstSeenAs !== "boss" ? level + 2 : level,
     isPromoted,
+    statBoons,
   });
   // Combine all starting items
   const startingItems = [
