@@ -3,43 +3,43 @@ import { MultiStepLoader, LoadingState } from "@/components/ui/multi-step-loader
 
 // Shared generation phase steps (used by both chapter and game creation)
 const generationPhaseSteps: LoadingState[] = [
-  { text: "Drafting chapter storyline" },
-  { text: "Crafting new character profiles" },
-  { text: "Assigning portraits to characters" },
-  { text: "Composing battle theme music" },
-  { text: "Writing introduction cutscene dialogue" },
-  { text: "Writing conclusion cutscene dialogue" },
-  { text: "Choosing event backgrounds" },
-  { text: "Building the map layout" },
-  { text: "Positioning units on the battlefield" },
-  { text: "Configuring map interactables" },
-  { text: "Writing recruitment conversation scenes" },
-  { text: "Generating boss battle sequences" },
-  { text: "Finalizing and reviewing the chapter" }
+    { text: "Drafting chapter storyline" },
+    { text: "Crafting new character profiles" },
+    { text: "Assigning portraits to characters" },
+    { text: "Choosing battle theme music" },
+    { text: "Writing chapter intro scene dialogue" },
+    { text: "Writing chapter outro scene dialogue" },
+    { text: "Choosing scene backdrops" },
+    { text: "Building the map layout" },
+    { text: "Positioning units on the battlefield" },
+    { text: "Configuring map interactables" },
+    { text: "Writing recruitment conversation scenes" },
+    { text: "Generating boss battle sequences" },
+    { text: "Finalizing and reviewing the chapter" }
 ];
 
 // Steps for chapter generation: initialization phase
 const chapterGenerationSteps: LoadingState[] = [
-  { text: "Initializing game engine" },
-  { text: "Loading game data" },
-  { text: "Analyzing previous chapter" },
-  { text: "Processing player choices" }
+    { text: "Initializing game engine" },
+    { text: "Loading game data" },
+    { text: "Analyzing previous chapter" },
+    { text: "Processing player choices" }
 ];
 
 // Steps specific to game creation (pre-generation)
 const gameCreationPreSteps: LoadingState[] = [
-  { text: "Initializing project environment" },
-  { text: "Creating vast game world" },
-  { text: "Generating main character roster" },
-  { text: "Designing the world map layout" },
-  { text: "Configuring initial settings" },
-  { text: "Drafting the overarching storyline" }
+    { text: "Initializing project environment" },
+    { text: "Creating unique game world" },
+    { text: "Generating initial main character" },
+    { text: "Designing the world map layout" },
+    { text: "Configuring initial settings" },
+    { text: "Drafting the overarching storyline" }
 ];
 
 // Steps specific to game creation (post-generation)
 const gameCreationPostSteps: LoadingState[] = [
-  { text: "Setting up game files and resources" },
-  { text: "Performing final touches and cleanup" }
+    { text: "Setting up game files and resources" },
+    { text: "Performing final touches and cleanup" }
 ];
 
 // Define the step indexes where each phase begins
@@ -70,7 +70,7 @@ interface ChapterGeneratorLoaderProps {
 export function ChapterGeneratorLoader({
     progress,
     title = "Generating Next Chapter",
-    description = "The AI is creating your next chapter based on your gameplay. This typically takes around five minutes, and the game will launch automatically when complete.",
+    description = "The AI is creating your next chapter based on your gameplay. This typically takes around 2-3 minutes, and the game will launch automatically when complete.",
     mode = 'chapter' // Default to chapter generation mode
 }: ChapterGeneratorLoaderProps) {
     // Combine the appropriate steps based on mode

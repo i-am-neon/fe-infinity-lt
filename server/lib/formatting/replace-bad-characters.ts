@@ -3,7 +3,7 @@ export default function replaceBadCharacters(input: string): string {
     "—": "-",
     "’": "'",
     "‘": "'",
-    ";": ":",
+    ";": ",",
     "…": "..."
   };
 
