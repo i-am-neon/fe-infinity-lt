@@ -264,6 +264,14 @@ export default function GameDetailPage() {
       return () => clearTimeout(completionTimer);
     }
   }, [loadingAction, generationProgress.progress]);
+  
+  // Automatically close the loader modal when generation action completes
+  useEffect(() => {
+    // If the modal is open but no loading action is active, close the modal
+    if (generatingChapterModalOpen && loadingAction === null) {
+      setGeneratingChapterModalOpen(false);
+    }
+  }, [loadingAction, generatingChapterModalOpen]);
 
   const handleTestGeneration = useCallback(async () => {
     if (!data?.game || !nid) return;
