@@ -12,6 +12,7 @@ import { ChapterIdea } from "@/ai/types/chapter-idea.ts";
 import { InitialGameIdea } from "@/ai/types/initial-game-idea.ts";
 import { WorldSummary } from "@/ai/types/world-summary.ts";
 import { sluggify } from "@/lib/sluggify.ts";
+import replaceBadCharacters from "@/lib/formatting/replace-bad-characters.ts";
 
 /**
  * Generates an AIEvent that serves as the outro scene for the chapter, wrapping up the chapter's story.
@@ -66,11 +67,10 @@ If the outro references a 'boss', 'newPlayableUnits', or 'newNonBattleCharacters
     worldSummary,
     null,
     2
-  )}${
-    initialGameIdea
-      ? `\nInitial Game Idea: ${JSON.stringify(initialGameIdea, null, 2)}`
-      : ""
-  }
+  )}${initialGameIdea
+    ? `\nInitial Game Idea: ${JSON.stringify(initialGameIdea, null, 2)}`
+    : ""
+    }
 Chapter Idea: ${JSON.stringify(chapterIdea)}
 Tone: ${tone}`;
 
@@ -133,7 +133,8 @@ If there are issues => provide detailed fixText and set passesCheck=false.`;
     command: "choice",
     args: [
       sluggify(chapterIdea.endOfChapterChoice.displayText),
-      chapterIdea.endOfChapterChoice.displayText,
+      "What will you do?", // Hard code so it doesn't go over char limit - can't break into new lines
+      // replaceBadCharacters(chapterIdea.endOfChapterChoice.displayText),
       chapterIdea.endOfChapterChoice.options.join(","),
     ],
   });
