@@ -162,15 +162,15 @@ export default async function genChapter({
   // Step 5: Choose backgrounds and music for events
   reportProgress(6, "Selecting background scenes...");
   const [introBackgroundChoice, outroBackgroundChoice, introMusic, outroMusic] = await Promise.all([
-    chooseBackground(introAIEvent),
-    chooseBackground(outroAIEvent),
+    chooseBackground(chapterIdea.intro),
+    chooseBackground(chapterIdea.outro),
     chooseMusic(chapterIdea.intro),
     chooseMusic(`Reflective conclusion for chapter: ${chapterIdea.outro}`),
   ]);
 
   const introEvent = convertAIEventToEvent({
     aiEvent: introAIEvent,
-    backgroundChoice: introBackgroundChoice,
+    backgroundChoice: introBackgroundChoice.fileName,
     musicChoice: introMusic,
     chapterNumber,
     showChapterTitle: true,
@@ -178,7 +178,7 @@ export default async function genChapter({
 
   const outroEvent = convertAIEventToEvent({
     aiEvent: outroAIEvent,
-    backgroundChoice: outroBackgroundChoice,
+    backgroundChoice: outroBackgroundChoice.fileName,
     musicChoice: outroMusic,
     chapterNumber,
     showChapterTitle: false,
@@ -431,6 +431,10 @@ export default async function genChapter({
     tilemap,
     enemyFaction: chapterIdea.enemyFaction,
     idea: chapterIdea,
+    sceneBackgrounds: [
+      introBackgroundChoice.fileName,
+      outroBackgroundChoice.fileName,
+    ],
   };
 
   // add mid-battle recruitment events

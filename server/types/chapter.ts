@@ -14,5 +14,6 @@ export interface Chapter {
   tilemap: Tilemap;
   enemyFaction?: EnemyFaction;
   idea: ChapterIdea;
+  sceneBackgrounds: string[];
 }
 

@@ -1,42 +1,43 @@
-import generateStructuredData from "../lib/generate-structured-data.ts";
-import { z } from "zod";
-import { AIEvent } from "@/ai/types/ai-event.ts";
-import {
-  BackgroundOptionsSchema,
-  BackgroundOption,
-} from "@/ai/types/background-option.ts";
-import { testAIEventPrologueIntro } from "@/ai/test-data/events.ts";
+import similaritySearch from "@/vector-db/similarity-search.ts";
+import { SceneBackgroundMetadataWithFileName } from "@/types/scene-background-metadata.ts";
+import { allSceneBackgroundOptions } from "@/scene-background-processing/all-scene-background-options.ts";
 
-const resultSchema = z.object({
-  chosenBackground: BackgroundOptionsSchema,
-});
-
+/**
+ * Choose the most similar scene background based on a text description.
+ * @param description - A string describing the desired scene.
+ * @returns The matching SceneBackgroundMetadataWithFileName.
+ */
 export default async function chooseBackground(
-  aiEvent: AIEvent
-): Promise<BackgroundOption> {
-  const systemMessage = `You are a Fire Emblem fangame background decider.
-We have a list of possible backgrounds to choose from, enumerated in the set:
-Arena, Bedroom, Black Background, Castle Ruins, Castle Sepia, Clearing, Deep Forest, Forest, Forest Dark, Grado Castle, Hill, House, Inside Castle, Plains, Ruins, Town, Town Sunset, Village, Village Gate.
-Use the AIEvent as context to pick the most suitable background for this scene.
-Output a JSON object { "chosenBackground": "OneOfTheBackgroundOptions" }. No additional commentary.
-
-Ensure the background name matches exactly. You must ONLY choose from the set of options provided. No other backgrounds are allowed.`;
-
-  const { chosenBackground } = await generateStructuredData({
-    fnName: "chooseBackground",
-    schema: resultSchema,
-    systemMessage,
-    prompt: JSON.stringify(aiEvent),
-    model: "fast",
-    temperature: 0,
+  description: string
+): Promise<SceneBackgroundMetadataWithFileName> {
+  // Perform similarity search against the scene-backgrounds vector store
+  const results = await similaritySearch<{ fileName: string }>({
+    vectorType: "scene-backgrounds",
+    query: description,
+    limit: 1,
   });
 
-  return chosenBackground;
+  if (results.length === 0) {
+    throw new Error(`No matching scene backgrounds found for: ${description}`);
+  }
+
+  const { fileName } = results[0].metadata;
+  const option = allSceneBackgroundOptions.find(
+    (opt) => opt.fileName === fileName
+  );
+  if (!option) {
+    throw new Error(`Scene background option not found for filename: ${fileName}`);
+  }
+
+  return option;
 }
 
+// Example usage
 if (import.meta.main) {
-  chooseBackground(testAIEventPrologueIntro).then((res) => {
-    console.log("Chosen background:", res);
-  });
+  const testDescription =
+    "A wooden ship afloat on calm waters with a distant horizon";
+  chooseBackground(testDescription)
+    .then((res) => console.log("Chosen background:", res))
+    .catch(console.error);
 }
 

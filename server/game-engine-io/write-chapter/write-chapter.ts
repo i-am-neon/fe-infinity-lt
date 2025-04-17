@@ -5,6 +5,7 @@ import { appendEvents } from "@/game-engine-io/write-chapter/append-events.ts";
 import { appendLevel } from "@/game-engine-io/write-chapter/append-level.ts";
 import writeCharacters from "@/game-engine-io/write-character/write-characters.ts";
 import { copyMusicAndUpdateJson } from "@/game-engine-io/write-chapter/copy-music.ts";
+import { copyBackgroundsAndUpdateJson } from "@/game-engine-io/write-chapter/copy-backgrounds.ts";
 import appendFaction from "@/game-engine-io/write-chapter/append-faction.ts";
 
 export default async function writeChapter({
@@ -46,5 +47,12 @@ export default async function writeChapter({
     projectNameEndingInDotLtProj,
   });
   await copyMusicAndUpdateJson({ projectNameEndingInDotLtProj, music });
+  // Copy any scene backgrounds and update panoramas.json
+  if (chapter.sceneBackgrounds && chapter.sceneBackgrounds.length > 0) {
+    await copyBackgroundsAndUpdateJson({
+      projectNameEndingInDotLtProj,
+      backgrounds: chapter.sceneBackgrounds,
+    });
+  }
 }
 

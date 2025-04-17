@@ -1,10 +1,5 @@
 import { testAIEventPrologueIntro } from "@/ai/test-data/events.ts";
 import { AIEvent } from "@/ai/types/ai-event.ts";
-import {
-  backgroundImageMap,
-  BackgroundOption,
-  BackgroundOptions,
-} from "@/ai/types/background-option.ts";
 import { Event } from "@/types/events/event.ts";
 import cleanGameText from "../../lib/formatting/clean-game-text.ts";
 
@@ -16,7 +11,7 @@ export default function convertAIEventToEvent({
   showChapterTitle,
 }: {
   aiEvent: AIEvent;
-  backgroundChoice: BackgroundOption;
+  backgroundChoice: string;
   musicChoice: string;
   chapterNumber: number;
   showChapterTitle?: boolean;
@@ -28,7 +23,7 @@ export default function convertAIEventToEvent({
 
   const _source = [
     showChapterTitle ? "chapter_title" : "",
-    `change_background;${backgroundImageMap[backgroundChoice]}`,
+    `change_background;${backgroundChoice}`,
     `music;${musicChoice};1000`,
     "transition;Open",
   ].filter(Boolean);
@@ -66,7 +61,7 @@ if (import.meta.main) {
   console.log(
     convertAIEventToEvent({
       aiEvent: testAIEventPrologueIntro,
-      backgroundChoice: BackgroundOptions.Forest,
+      backgroundChoice: "Boat",
       musicChoice: "Distant Roads",
       chapterNumber: 0,
     })
