@@ -3,7 +3,7 @@
  */
 export default function breakTextIntoGameLines(
   text: string,
-  chunkSize = 15
+  chunkSize = 12
 ): string {
   const words = text.split(/\s+/);
   const chunks: string[] = [];
