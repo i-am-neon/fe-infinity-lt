@@ -15,7 +15,7 @@ export default function genInitialGameIdea({
 }): Promise<InitialGameIdea> {
   const generatorSystemMessage = `You are a Fire Emblem Fangame Prologue Story Generator (generator).
 We want an initialGameIdea with:
-- at least 3 new playable characters
+- between 4-7 new playable characters (inclusive)
 - short backstory
 - 1+ potential plot directions
 Return only JSON.`;
@@ -26,8 +26,7 @@ Tone: ${tone}
 
   const checkerSystemMessage = `You are a Fire Emblem Fangame Prologue Checker (checker).
 Check constraints:
-1) 3+ char ideas
-2) no resurrecting dead
+1) Between 4-7 character ideas (inclusive)
 If valid => fixText=None. Otherwise => fix instructions as fixObject.`;
 
   return genAndCheck<InitialGameIdea>({
@@ -40,7 +39,7 @@ If valid => fixText=None. Otherwise => fix instructions as fixObject.`;
     checkerPrompt: (candidate) => {
       return `Candidate:\n${JSON.stringify(candidate, null, 2)}
 Constraints:
-- Must have >=3 char ideas
+- Must have between 4-7 character ideas (inclusive)
 If good => fixText=None. Else => fix instructions.`;
     },
   });

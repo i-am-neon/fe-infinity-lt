@@ -133,7 +133,7 @@ If there are issues => provide detailed fixText and set passesCheck=false.`;
     command: "choice",
     args: [
       sluggify(chapterIdea.endOfChapterChoice.displayText),
-      "What will you do?", // Hard code so it doesn't go over char limit - can't break into new lines
+      "Which will you choose?", // Hard code so it doesn't go over char limit - can't break into new lines
       // replaceBadCharacters(chapterIdea.endOfChapterChoice.displayText),
       chapterIdea.endOfChapterChoice.options.join(","),
     ],

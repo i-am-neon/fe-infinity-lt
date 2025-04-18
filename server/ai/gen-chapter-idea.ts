@@ -54,6 +54,8 @@ CRITICAL REQUIREMENTS:
   * Minor unit deaths should be referenced in the story, but will likely only alter the next chapter slightly.
   * When referencing dead boss characters, make sure to never refer to them as part of the player party.
 - Must not reuse a previous boss from earlier chapters
+${newlyDeadThisChapter.length > 0 ? `- MUST introduce at least ${newlyDeadThisChapter.length} new playable unit(s) to replace those lost in the previous chapter
+  * If ${newlyDeadThisChapter.length > 1 ? 'multiple units' : 'a unit'} died in the previous chapter, provide a mix of new player units that start as: player units, allied NPCs, and/or recruitable enemy units` : ''}
 - Must produce a new Chapter Idea that strictly matches the ChapterIdea schema
 - Return only JSON without any commentary
 
@@ -85,6 +87,10 @@ We want to generate a single new chapter that logically follows them for the Pro
 
 ${commonRequirements}
 
+${newlyDeadThisChapter.length > 0 ? `- Since ${newlyDeadThisChapter.length} character(s) died previously, this chapter MUST introduce at least ${newlyDeadThisChapter.length} new playable unit(s)
+  * If multiple characters died, provide a mixture of units that start as: player units, allied NPCs that can be saved, and/or enemy non-boss units that can be recruited
+  * Each new unit should have a compelling reason to join the party that ties into the main story
+  * Make sure to clearly explain how these new characters are integrated into the narrative` : ''}
 - Consider including monetary rewards or special items as part of the narrative.
   - Examples:
     - characters find treasure
@@ -108,6 +114,10 @@ ${commonRequirements}
 - The story of this chapter MUST be heavily influenced by the player's last choice "${playerChoice}"
 - The narrative should clearly show the consequences of this choice
 - Character interactions, plot development, and chapter setting should all reflect this decision
+${newlyDeadThisChapter.length > 0 ? `- Since ${newlyDeadThisChapter.length} character(s) died in the previous chapter, this chapter MUST introduce at least ${newlyDeadThisChapter.length} new playable unit(s)
+  * If multiple characters died, provide a mixture of units that start as: player units, allied NPCs that can be saved, and/or enemy non-boss units that can be recruited
+  * Each new unit should have a compelling reason to join the party that ties into the main story
+  * Make sure to clearly explain how these new characters are integrated into the narrative` : ''}
 - When creating the endOfChapterChoice, ensure none of the options include attempting to recruit a certain character`;
 
   const generatorSystemMessage = isPrologue
@@ -160,6 +170,9 @@ Constraints:
   c) New bosses and characters are always allowed even if they talk about resurrection themes.
 5) Only check that boss characters from previous chapters aren't reused with the same name and role.
 6) Verify that if there are dead characters (from allDeadCharacters or newlyDeadThisChapter), the chapter narrative acknowledges these deaths in some meaningful way - either through explicit mentions in dialogue, plot consequences, or character reactions.
+${newlyDeadThisChapter.length > 0 ? `7) Since ${newlyDeadThisChapter.length} character(s) died in the previous chapter, verify that at least ${newlyDeadThisChapter.length} new playable unit(s) are introduced in this chapter (through newPlayableUnits array).
+  a) If multiple characters died (${newlyDeadThisChapter.length > 1 ? 'true in this case' : 'not applicable here'}), check that there's a mix of units starting as player units, allied NPCs, and/or recruitable enemy units.
+  b) Verify that each new character has a clear narrative reason for joining the party.` : ''}
 If all good => fixText="None". Otherwise => fix instructions.`;
     },
     validators: [validateCharacterMentions, validateDistinctNewCharacters],
