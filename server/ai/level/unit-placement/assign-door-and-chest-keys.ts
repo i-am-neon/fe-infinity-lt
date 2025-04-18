@@ -4,6 +4,7 @@ import {
   EnemyGenericUnitWithStartingItems,
 } from "@/ai/types/unit-placement.ts";
 import { ch3TerrainGrid } from "@/map-processing/test-data/terrain-grid.ts";
+import getTerrainGridFromMapName from "@/ai/level/unit-placement/get-terrain-grid-from-tilemap.ts";
 
 export default function assignDoorAndChestKeys(
   terrainGrid: TerrainGrid,
@@ -13,7 +14,8 @@ export default function assignDoorAndChestKeys(
     ...e,
   }));
 
-  const doorCells: Array<{ x: number; y: number }> = [];
+  // Find all door and chest cells
+  const allDoorCells: Array<{ x: number; y: number }> = [];
   const chestCells: Array<{ x: number; y: number }> = [];
 
   for (const key in terrainGrid) {
@@ -22,9 +24,52 @@ export default function assignDoorAndChestKeys(
     const y = parseInt(yStr, 10);
     const terrain = terrainGrid[key];
     if (terrain === "Door") {
-      doorCells.push({ x, y });
+      allDoorCells.push({ x, y });
     } else if (terrain === "Chest") {
       chestCells.push({ x, y });
+    }
+  }
+
+  // Group adjacent door cells
+  const groupedDoors: Array<Array<{ x: number; y: number }>> = [];
+  const visitedDoorCells = new Set<string>();
+
+  for (const doorCell of allDoorCells) {
+    const key = `${doorCell.x},${doorCell.y}`;
+    if (visitedDoorCells.has(key)) continue;
+
+    const doorGroup: Array<{ x: number; y: number }> = [];
+    const queue: Array<{ x: number; y: number }> = [doorCell];
+
+    while (queue.length > 0) {
+      const current = queue.shift()!;
+      const currentKey = `${current.x},${current.y}`;
+
+      if (visitedDoorCells.has(currentKey)) continue;
+      visitedDoorCells.add(currentKey);
+      doorGroup.push(current);
+
+      // Check adjacent cells (up, down, left, right)
+      const adjacentCells = [
+        { x: current.x + 1, y: current.y },
+        { x: current.x - 1, y: current.y },
+        { x: current.x, y: current.y + 1 },
+        { x: current.x, y: current.y - 1 },
+      ];
+
+      for (const adj of adjacentCells) {
+        const adjKey = `${adj.x},${adj.y}`;
+        if (
+          !visitedDoorCells.has(adjKey) &&
+          allDoorCells.some(cell => cell.x === adj.x && cell.y === adj.y)
+        ) {
+          queue.push(adj);
+        }
+      }
+    }
+
+    if (doorGroup.length > 0) {
+      groupedDoors.push(doorGroup);
     }
   }
 
@@ -51,17 +96,24 @@ export default function assignDoorAndChestKeys(
     }
   }
 
-  for (const { x, y } of doorCells) {
+  // Assign one key per door group
+  for (const doorGroup of groupedDoors) {
+    // Use the center of the door group to find the closest enemy
+    const centerX = doorGroup.reduce((sum, cell) => sum + cell.x, 0) / doorGroup.length;
+    const centerY = doorGroup.reduce((sum, cell) => sum + cell.y, 0) / doorGroup.length;
+
     let closestEnemyIndex = -1;
     let closestDist = Number.MAX_SAFE_INTEGER;
+
     for (let i = 0; i < newEnemies.length; i++) {
       const e = newEnemies[i];
-      const dist = getManhattanDist(x, y, e.x, e.y);
+      const dist = getManhattanDist(centerX, centerY, e.x, e.y);
       if (dist < closestDist && !unitHasItem(e, "Door_Key")) {
         closestDist = dist;
         closestEnemyIndex = i;
       }
     }
+
     if (closestEnemyIndex >= 0) {
       const chosenUnit = newEnemies[closestEnemyIndex];
       ensureStartingItemsArray(chosenUnit);
@@ -92,7 +144,9 @@ export default function assignDoorAndChestKeys(
 
 if (import.meta.main) {
   // this map has chests and doors
-  const terrainGrid = ch3TerrainGrid;
+  // const terrainGrid = ch3TerrainGrid;
+  // this map has door that spans multiple tiles
+  const terrainGrid = getTerrainGridFromMapName('CesarianCapitalAssassin');
   const enemies: EnemyGenericUnit[] = [
     { x: 0, y: 0, class: "Archer", aiGroup: "Attack" }, // should get chest key
     { x: 8, y: 0, class: "Archer", aiGroup: "Attack" }, // should get chest key
