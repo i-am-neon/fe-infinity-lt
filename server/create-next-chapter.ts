@@ -9,7 +9,7 @@ import writeStubChapter from "@/game-engine-io/write-chapter/write-stub-chapter.
 import { getCurrentLogger, setCurrentLogger } from "@/lib/current-logger.ts";
 import { determineRoleForDeadUnit } from "@/lib/determine-role-for-dead-unit.ts";
 import { DeadCharacterRecord } from "@/types/dead-character-record.ts";
-import { getGameByNid } from "./db/games.ts";
+import { getGameByNid, insertGame } from "./db/games.ts";
 
 // Step indexes for the initializing phase
 const INITIALIZING_STEPS = {
@@ -49,6 +49,12 @@ export default async function createNextChapter({
     chapterNumber: nextChapterNumber,
   });
   const logger = getCurrentLogger();
+
+  logger.info("Creating next chapter", {
+    projectNameEndingInDotLtProj,
+    gameNid,
+    nextChapterNumber,
+  });
 
   // Set initial progress - Initializing game environment
   chapterGenerationProgress.set(gameNid, {
@@ -168,6 +174,9 @@ export default async function createNextChapter({
   // Add the new chapter to the game
   existingGame.chapters.push(chapter);
   existingGame.usedPortraits.push(...usedPortraits);
+
+  // Update the database with the newly appended chapters
+  insertGame(existingGame);
 
   // Write the next chapter to the project
   await writeChapter({

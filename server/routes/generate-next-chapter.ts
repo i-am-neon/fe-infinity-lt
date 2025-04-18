@@ -1,7 +1,7 @@
 import createNextChapter, { getChapterGenerationProgress, chapterGenerationProgress } from "@/create-next-chapter.ts";
 import { getCurrentLogger } from "@/lib/current-logger.ts";
 import runGame from "@/run-game.ts";
-import { getGameByNid, insertGame } from "../db/games.ts";
+import { getGameByNid } from "../db/games.ts";
 
 export async function handleGenerateNextChapter(
   req: Request
@@ -55,8 +55,7 @@ export async function handleGenerateNextChapter(
           gameNid,
         });
 
-        // Update the DB with the newly appended chapters
-        insertGame(existingGame);
+        // Database update now handled within createNextChapter
 
         const logger = getCurrentLogger();
         const duration = Date.now() - startTime;
