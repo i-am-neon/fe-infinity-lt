@@ -1,7 +1,7 @@
 import assignDoorAndChestKeys from "@/ai/level/unit-placement/assign-door-and-chest-keys.ts";
 import correctUnitPlacement from "@/ai/level/unit-placement/correct-unit-placement.ts";
 import { NonGenericUnitPlacementResult } from "@/ai/level/unit-placement/gen-boss-and-player-and-recruitable-unit-coords.ts";
-import genUnitClassAndAi from "@/ai/level/unit-placement/gen-unit-class-and-ai.ts";
+import genGenericUnitClassAndAi from "./gen-generic-unit-class-and-ai.ts";
 import { genUnitSquads } from "@/ai/level/unit-placement/gen-unit-squads.ts";
 import getEnemyComposition from "@/ai/level/unit-placement/get-enemy-composition.ts";
 import getGenericEnemyCountNumberRange from "@/ai/level/unit-placement/get-generic-enemy-number-range.ts";
@@ -45,7 +45,7 @@ export default async function getGenericEnemies({
     unitSquadsByRegion.flatMap((regionSquadInfo) => {
       return regionSquadInfo.placement.map(async (p) => {
         const { unitType, x, y } = p;
-        const { aiGroup, "class": unitClass } = await genUnitClassAndAi(unitType);
+        const { aiGroup, "class": unitClass } = await genGenericUnitClassAndAi(unitType);
         const unit: EnemyGenericUnit = {
           x, y, aiGroup, "class": unitClass
         };

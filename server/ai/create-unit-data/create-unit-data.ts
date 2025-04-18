@@ -1,7 +1,7 @@
 import { UnitData } from "@/types/character/unit-data.ts";
 import { CharacterIdea } from "@/ai/types/character-idea.ts";
 import decideLevel from "@/ai/create-unit-data/decide-level.ts";
-import decideClass from "@/ai/create-unit-data/decide-class.ts";
+import decideClassForNonGeneric from "./decide-class-for-non-generic.ts";
 import decideStats from "@/ai/create-unit-data/decide-stats.ts";
 import genCharacterStatBoons from "@/ai/create-unit-data/gen-character-stat-boons.ts";
 import { testCharIdeaThorne } from "@/ai/test-data/character-ideas.ts";
@@ -31,7 +31,7 @@ export default async function createUnitData({
       level = 20;
     }
   }
-  const klass = await decideClass({ isPromoted, level, characterIdea });
+  const klass = await decideClassForNonGeneric({ isPromoted, level, characterIdea });
 
   // Generate stat boons based on character concept and class
   const statBoons = await genCharacterStatBoons({

@@ -3,7 +3,7 @@ import { EnemyAIGroup, EnemyAIGroupSchema } from "@/ai/types/enemy-ai-group.ts";
 import generateStructuredData from "../../lib/generate-structured-data.ts";
 import { z } from "zod";
 
-export default async function genUnitClassAndAi(description: string): Promise<{ class: FE8Class, aiGroup: EnemyAIGroup }> {
+export default async function genGenericUnitClassAndAi(description: string): Promise<{ class: FE8Class, aiGroup: EnemyAIGroup }> {
     const systemMessage = `
     You are an advanced Fire Emblem Tactician. Your task is to determine the most appropriate unit class and AI behavior group based on the provided unit description.
 
@@ -65,7 +65,7 @@ if (import.meta.main) {
 
     for (const example of examples) {
         console.log(`Testing description: "${example}"`);
-        genUnitClassAndAi(example).then(result => {
+        genGenericUnitClassAndAi(example).then(result => {
             console.log(`Result: Class = ${result.class}, AI Group = ${result.aiGroup}`);
             console.log("---");
         });

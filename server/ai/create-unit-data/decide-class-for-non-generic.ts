@@ -11,7 +11,7 @@ import {
 import { isClassValidForGender } from "@/types/gender-locked-classes.ts";
 import { z } from "zod";
 
-export interface DecideClassOptions {
+export interface DecideClassForNonGenericOptions {
   isPromoted: boolean;
   level: number;
   characterIdea: CharacterIdea;
@@ -21,11 +21,11 @@ const resultSchema = z.object({
   chosenClass: FE8ClassSchema,
 });
 
-export default async function decideClass({
+export default async function decideClassForNonGeneric({
   isPromoted,
   level,
   characterIdea,
-}: DecideClassOptions): Promise<FE8Class> {
+}: DecideClassForNonGenericOptions): Promise<FE8Class> {
   // Filter classes by promotion status and gender
   const promotionFilteredClasses = isPromoted
     ? PromotedFE8Classes
@@ -68,7 +68,7 @@ Use the character idea to pick the best class from that list. Output only JSON: 
 }
 
 if (import.meta.main) {
-  decideClass({
+  decideClassForNonGeneric({
     isPromoted: false,
     level: 5,
     characterIdea: testCharIdeaThorne,
