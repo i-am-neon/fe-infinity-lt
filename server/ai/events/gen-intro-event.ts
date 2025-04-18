@@ -69,8 +69,11 @@ This is CRITICAL for gameplay mechanics - if an item is mentioned, the "give_ite
 The event must also:
 - use the Chapter Idea's intro as the basis for the event
 - make characters speak with the "add_portrait" command for each character and then use the "speak" command for them to speak
-- unless a character enters the scene later, all characters in the event should be added with "add_portrait" before anyone speaks
-  - if a character appears in or enters the scene later, add them with "add_portrait" when they enter
+- IMPORTANT FOR CHARACTER ENTRY TIMING:
+  - ONLY use "add_portrait" at the beginning of the scene for characters who are present from the start
+  - For characters who enter the scene later, place the "add_portrait" command EXACTLY at the moment they enter
+  - NEVER add all character portraits at the beginning if some characters are meant to enter later
+  - This timing is critical for proper scene flow - incorrectly timed portraits break immersion
 - be sure to include the Chapter Idea's newNonBattleCharacters as characters in the event, as mentioned in the "intro" section of the Chapter Idea
 - if a character is mentioned in the intro, it must be included in the event
 - you may only give speaking roles to characters mentioned in the intro, not any other characters
@@ -90,25 +93,24 @@ If the chapter idea's intro references a 'boss', 'newPlayableUnits', or 'newNonB
     worldSummary,
     null,
     2
-  )}${
-    initialGameIdea
-      ? `\nGame Idea: ${JSON.stringify(initialGameIdea, null, 2)}`
-      : ""
-  }
+  )}${initialGameIdea
+    ? `\nGame Idea: ${JSON.stringify(initialGameIdea, null, 2)}`
+    : ""
+    }
 Chapter Idea: ${JSON.stringify(chapterIdea)}
 Tone: ${tone}
 Existing Character Ideas: ${JSON.stringify(existingCharacterIdeas, null, 2)}
 Existing Chapters: ${JSON.stringify(existingChapters, null, 2)}
 All Dead Characters: ${JSON.stringify(
-    allDeadCharacters,
-    null,
-    2
-  )}. You must NOT give these characters speaking roles in the current chapter idea! They are dead and the story can reference and change because of that, but dead characters can never show up again in any scenes.
+      allDeadCharacters,
+      null,
+      2
+    )}. You must NOT give these characters speaking roles in the current chapter idea! They are dead and the story can reference and change because of that, but dead characters can never show up again in any scenes.
 Newly Dead This Chapter: ${JSON.stringify(
-    newlyDeadThisChapter,
-    null,
-    2
-  )}. You must NOT give these characters speaking roles in the current chapter idea! They are dead and the story can reference and change because of that, but dead characters can never show up again in any scenes.`;
+      newlyDeadThisChapter,
+      null,
+      2
+    )}. You must NOT give these characters speaking roles in the current chapter idea! They are dead and the story can reference and change because of that, but dead characters can never show up again in any scenes.`;
 
   const checkerSystemMessage = `You are a Fire Emblem Fangame Intro Event Checker (checker).
 We must ensure:
