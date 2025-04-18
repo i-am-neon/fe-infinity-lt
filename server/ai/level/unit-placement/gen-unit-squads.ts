@@ -57,6 +57,30 @@ export async function genUnitSquads({
   const hasChests = chests.length > 0;
   const hasDoors = doors.length > 0;
 
+  // Use map metadata to find which distinct regions contain villages, chests, and doors
+  const villageRegions: string[] = [];
+  const chestRegions: string[] = [];
+  const doorRegions: string[] = [];
+
+  if (hasVillages || hasChests || hasDoors) {
+    mapMetadata.distinctRegions.forEach(region => {
+      // Check if region contains villages/houses
+      if (region.terrainTypes.includes("Village") || region.terrainTypes.includes("House")) {
+        villageRegions.push(region.name);
+      }
+
+      // Check if region contains chests
+      if (region.terrainTypes.includes("Chest")) {
+        chestRegions.push(region.name);
+      }
+
+      // Check if region contains doors
+      if (region.terrainTypes.includes("Door")) {
+        doorRegions.push(region.name);
+      }
+    });
+  }
+
   const allClassOptions = getAllClassOptions();
   const filteredClassOptions =
     enemyComposition.unpromoted === 100
@@ -71,7 +95,10 @@ This map has ${housesAndVillages.length} village/house tiles that players can vi
 
 You should include some Brigands, Pirates, Berserkers, or Warriors in your squad composition, as only these unit types can pursue and raze villages. This creates tension for the player who must race to visit villages before enemies destroy them.
 
-When suggesting these village units, assign at least some of them the village-raiding AI (targeting villages/houses for destruction), but not all—they can also perform other roles like patrolling or guarding to add variety. Ensure that none of these village-raiding units are placed in the same region as any village; they should start in a different region to give players advance warning and time to respond.
+When suggesting these village units, assign at least some of them the village-raiding AI (targeting villages/houses for destruction), but not all—they can also perform other roles like patrolling or guarding to add variety.
+
+**IMPORTANT: DO NOT PLACE ANY VILLAGE-RAIDING UNITS IN THESE REGIONS THAT CONTAIN VILLAGES/HOUSES: ${villageRegions.join(", ")}.**
+Village-raiding units must be placed in entirely different regions from any villages to give players advance warning and time to respond.
 `;
   }
 
@@ -80,7 +107,11 @@ When suggesting these village units, assign at least some of them the village-ra
 ## Chests and Doors
 This map has ${hasChests ? chests.length : 0} chests and ${hasDoors ? doors.length : 0} doors.
 
-You should include some Thieves, Assassins, or Rogues in your squad composition, as only these unit types can pursue and open chests and doors. Ensure that none of these chest-raiding units are placed in the same region as any chest or door; they should start in a different region so players have a chance to intercept and defend.
+You should include some Thieves, Assassins, or Rogues in your squad composition, as only these unit types can pursue and open chests and doors.
+
+**IMPORTANT: DO NOT PLACE ANY CHEST-TARGETING THIEVES/ROGUES/ASSASSINS IN THESE REGIONS THAT CONTAIN CHESTS: ${chestRegions.join(", ")}.**
+**IMPORTANT: DO NOT PLACE ANY DOOR-TARGETING THIEVES/ROGUES/ASSASSINS IN THESE REGIONS THAT CONTAIN DOORS: ${doorRegions.join(", ")}.**
+Chest/door-targeting units must be placed in entirely different regions from any chests or doors so players have a chance to intercept and defend.
 `;
   }
 
@@ -101,6 +132,11 @@ ${villagesGuidance}
 
 **CRITICAL**: DO NOT place any generic enemy units within the Player Start Region(s): ${nonGenericUnitPlacementResult.playerUnits.regions.join(', ')}.
 Use the locations of the boss and recruitable units to inform your placement strategy for generic enemies in their respective regions.
+
+**CRITICAL**: 
+- DO NOT place brigands, pirates, berserkers, or warriors that target villages in the same regions as villages: ${villageRegions.join(", ")}.
+- DO NOT place thieves, assassins, or rogues that target chests in the same regions as chests: ${chestRegions.join(", ")}.
+- DO NOT place thieves, assassins, or rogues that target doors in the same regions as doors: ${doorRegions.join(", ")}.
 
 ## Number of Units
 
