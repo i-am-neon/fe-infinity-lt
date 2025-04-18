@@ -72,6 +72,8 @@ export default async function getLevelUnits({
     generic: false,
   });
 
+  logger.info('adding recruitable units in get-level-units', { recruitableUnits })
+
   // add recruitable units
   recruitableUnits.forEach((ru) => {
     units.push({

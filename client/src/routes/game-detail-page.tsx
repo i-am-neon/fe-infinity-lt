@@ -524,6 +524,14 @@ export default function GameDetailPage() {
             <p className="italic text-sm text-muted-foreground">
               Tone: {data.game.tone}
             </p>
+            {/* Current chapter header */}
+            {data.game.chapters.length > 0 && (
+              <h2 className="mt-4 text-xl font-semibold">
+                {data.game.chapters.length === 1
+                  ? `Prologue: ${data.game.chapters[0].title}`
+                  : `Chapter ${data.game.chapters.length - 1}: ${data.game.chapters[data.game.chapters.length - 1].title}`}
+              </h2>
+            )}
 
             <div className="flex flex-col sm:flex-row sm:items-center gap-2">
               <Button onClick={handlePlay} disabled={disabled}>
