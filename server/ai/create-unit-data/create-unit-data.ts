@@ -62,22 +62,34 @@ export default async function createUnitData({
     }),
   ];
 
-  // Post-processing to ensure only one item is droppable and player units never have droppable items
+  // Post-processing to ensure player units never have droppable items
+  // For enemy units, only the last item should be droppable
   const isPlayerUnit =
     characterIdea.firstSeenAs === "ally" ||
     characterIdea.firstSeenAs === "allied NPC";
-  let foundDroppable = false;
-  for (let i = 0; i < startingItems.length; i++) {
-    // If this is a player unit, make sure no items are droppable
-    if (isPlayerUnit) {
+
+  // For player units, make sure no items are droppable
+  if (isPlayerUnit) {
+    for (let i = 0; i < startingItems.length; i++) {
       startingItems[i] = [startingItems[i][0], false];
     }
-    // Otherwise ensure only one item is droppable
-    else if (startingItems[i][1]) {
-      if (foundDroppable) {
+  }
+  // For enemy units, ensure only the last item is droppable
+  else {
+    // First, find if there's any droppable item
+    const droppableIndex = startingItems.findIndex(item => item[1]);
+
+    // If there's a droppable item
+    if (droppableIndex !== -1) {
+      // Make all items non-droppable
+      for (let i = 0; i < startingItems.length; i++) {
         startingItems[i] = [startingItems[i][0], false];
-      } else {
-        foundDroppable = true;
+      }
+
+      // Make only the last item droppable
+      if (startingItems.length > 0) {
+        const lastIndex = startingItems.length - 1;
+        startingItems[lastIndex] = [startingItems[lastIndex][0], true];
       }
     }
   }
