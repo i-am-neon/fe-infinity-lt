@@ -19,7 +19,7 @@ export function validateDistinctNewCharacters(
     errors.push(
       `Characters ${duplicates.join(
         ", "
-      )} appear in both newPlayableUnits and newNonBattleCharacters.`
+      )} appear in both newPlayableUnits and newNonBattleCharacters. Move them to newPlayableUnits.`
     );
   }
   return { isValid: errors.length === 0, errors };
