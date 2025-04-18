@@ -27,7 +27,8 @@ export default async function chooseMusic(scenario: string): Promise<string> {
 }
 
 if (import.meta.main) {
-  chooseMusic("Exciting upbeat adventurous happy Whispers in the Frost")
+  // chapter battle
+  chooseMusic("Rumors spread swiftly that supporters of the executed commander are plotting revenge. As the group moves through the lively Jester's Fields—now shadowed with suspicion—they are ambushed by masked agitators from the Order of the Glorious Blade, seeking to avenge their fallen and discredit the heroes. In the chaos, Marin attempts to mediate, using her sharp wit to stall the attackers, while Evelyn and Silas protect festival-goers. Cassandra, disturbed by the consequences of their decision, fights with renewed determination, while Alden works to disarm magical traps set by the vengeful agitators. Midway through the battle, the party discovers a Vulnerary dropped by a fleeing combatant.")
     .then((res) => {
       console.log("Chosen music track name:", res);
     })
