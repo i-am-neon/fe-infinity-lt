@@ -64,6 +64,11 @@ Use the character idea to pick the best class from that list. Output only JSON: 
     model: "fast",
   });
 
+  if (characterIdea.firstSeenAs === 'boss' && chosenClass === 'Cleric') {
+    // Bosses should be able to attack
+    return 'Monk';
+  }
+
   return chosenClass;
 }
 
