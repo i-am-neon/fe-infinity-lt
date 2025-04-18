@@ -286,6 +286,22 @@ export default async function initializeProject(projectName: string) {
     componentKey: "equation_heal",
     newValue: "PHYSIC",
   })
+  // Make Shamshir available for thieves and rogues
+  await modifyItem({
+    projectNameEndingInDotLtProj: newProjectNameEndingInDotLtProj,
+    nid: "Shamshir",
+    componentKey: "prf_class",
+    newValue: [
+      "Myrmidon",
+      "Swordmaster",
+      "Eirika_Lord",
+      "Assassin",
+      "Sword_Bonewalker",
+      "Sword_Wight",
+      "Thief",
+      "Rogue",
+    ],
+  })
 
   // Remove music that plays during battle
   await removeWithinLtMaker({
