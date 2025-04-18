@@ -76,11 +76,53 @@ function clampCoord(
   return { x: clampedX, y: clampedY };
 }
 
+/**
+ * Check if a tile at (x, y) is adjacent to any Village tile.
+ */
+function isAdjacentToVillage(
+  terrainGrid: TerrainGrid,
+  x: number,
+  y: number
+): boolean {
+  for (const [dx, dy] of [
+    [0, 1],
+    [0, -1],
+    [1, 0],
+    [-1, 0],
+  ]) {
+    const neighborKey = `${x + dx},${y + dy}`;
+    if (terrainGrid[neighborKey] === "Village") {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Check if a tile at (x, y) is valid for boss placement (not Village and not adjacent to Village).
+ */
+function isTileValidForBoss(
+  terrainGrid: TerrainGrid,
+  x: number,
+  y: number
+): boolean {
+  const key = `${x},${y}`;
+  const terrain = terrainGrid[key];
+  if (terrain === "Village") {
+    return false;
+  }
+  if (isAdjacentToVillage(terrainGrid, x, y)) {
+    return false;
+  }
+  return true;
+}
+
 function findNearestValidTile(
   terrainGrid: TerrainGrid,
   startX: number,
   startY: number,
-  movementGroup: string
+  movementGroup: string,
+  isBoss: boolean = false
 ): { x: number; y: number } | null {
   const { width, height } = getTerrainGridSize(terrainGrid);
   const start = clampCoord(startX, startY, width, height);
@@ -88,7 +130,8 @@ function findNearestValidTile(
   const startKey = `${start.x},${start.y}`;
   if (
     terrainGrid[startKey] &&
-    isTileValidForMovementGroup(terrainGrid[startKey], movementGroup)
+    isTileValidForMovementGroup(terrainGrid[startKey], movementGroup) &&
+    (!isBoss || isTileValidForBoss(terrainGrid, start.x, start.y))
   ) {
     return start;
   }
@@ -101,7 +144,11 @@ function findNearestValidTile(
     const { x, y } = queue[idx++];
     const key = `${x},${y}`;
     const terrain = terrainGrid[key];
-    if (terrain && isTileValidForMovementGroup(terrain, movementGroup)) {
+    if (
+      terrain &&
+      isTileValidForMovementGroup(terrain, movementGroup) &&
+      (!isBoss || isTileValidForBoss(terrainGrid, x, y))
+    ) {
       return { x, y };
     }
     for (const [dx, dy] of [
@@ -127,7 +174,7 @@ function findNearestValidTile(
 }
 
 export default function correctUnitPlacement<
-  T extends { x: number; y: number; class?: FE8Class }
+  T extends { x: number; y: number; class?: FE8Class; isBoss?: boolean }
 >({
   terrainGrid,
   units,
@@ -151,9 +198,19 @@ export default function correctUnitPlacement<
     let newX = unit.x;
     let newY = unit.y;
 
-    // Check if position is valid for terrain
-    if (!terrain || !isTileValidForMovementGroup(terrain, mg)) {
-      const nearest = findNearestValidTile(terrainGrid, unit.x, unit.y, mg);
+    // Check if position is valid for terrain and boss constraints
+    if (
+      !terrain ||
+      !isTileValidForMovementGroup(terrain, mg) ||
+      (unit.isBoss && !isTileValidForBoss(terrainGrid, unit.x, unit.y))
+    ) {
+      const nearest = findNearestValidTile(
+        terrainGrid,
+        unit.x,
+        unit.y,
+        mg,
+        Boolean(unit.isBoss)
+      );
       // If no valid position found, skip this unit entirely
       if (nearest === null) {
         return processedUnits;
@@ -172,7 +229,8 @@ export default function correctUnitPlacement<
         newX,
         newY,
         mg,
-        occupiedPositions
+        occupiedPositions,
+        Boolean(unit.isBoss)
       );
 
       // If no valid position found, skip this unit entirely
@@ -195,7 +253,8 @@ function findNearestValidUnoccupiedTile(
   startX: number,
   startY: number,
   movementGroup: string,
-  occupiedPositions: Set<string>
+  occupiedPositions: Set<string>,
+  isBoss: boolean = false
 ): { x: number; y: number } | null {
   const { width, height } = getTerrainGridSize(terrainGrid);
   const start = clampCoord(startX, startY, width, height);
@@ -204,7 +263,8 @@ function findNearestValidUnoccupiedTile(
   if (
     terrainGrid[startKey] &&
     isTileValidForMovementGroup(terrainGrid[startKey], movementGroup) &&
-    !occupiedPositions.has(startKey)
+    !occupiedPositions.has(startKey) &&
+    (!isBoss || isTileValidForBoss(terrainGrid, start.x, start.y))
   ) {
     return start;
   }
@@ -220,7 +280,8 @@ function findNearestValidUnoccupiedTile(
     if (
       terrain &&
       isTileValidForMovementGroup(terrain, movementGroup) &&
-      !occupiedPositions.has(key)
+      !occupiedPositions.has(key) &&
+      (!isBoss || isTileValidForBoss(terrainGrid, x, y))
     ) {
       return { x, y };
     }
@@ -247,13 +308,14 @@ function findNearestValidUnoccupiedTile(
 }
 
 if (import.meta.main) {
-  const sampleUnits: EnemyGenericUnit[] = [
+  const sampleUnits: (EnemyGenericUnit & { isBoss?: boolean })[] = [
     { x: 100, y: 100, class: "Brigand", aiGroup: "None" }, // out of bounds
     { x: 7, y: 0, class: "Pegasus Knight", aiGroup: "None" }, // wall
     { x: 10, y: 0, class: "Cavalier", aiGroup: "None" }, // cliff
     { x: 8, y: 7, class: "Archer", aiGroup: "None" }, // river
     { x: 0, y: 7, class: "Cavalier", aiGroup: "None" }, // hill
     { x: 0, y: 0, class: "Berserker", aiGroup: "None" }, // forest, no change needed
+    { x: 8, y: 2, class: "Berserker", aiGroup: "None", isBoss: true }, // 8,2 is village, boss cannot be placed here or adjacent to it
   ];
   // Test with overlap
   const existingPositions = [{ x: 0, y: 0 }]; // Position overlaps with the Berserker

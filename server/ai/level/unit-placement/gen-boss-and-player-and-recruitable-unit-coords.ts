@@ -134,7 +134,8 @@ Coordinates must lie within their chosen region(s). The sceneOverview might indi
 
   const correctedBoss = correctUnitPlacement({
     terrainGrid,
-    units: [{ x: boss.x, y: boss.y }],
+    // Mark boss unit to enforce special placement rules
+    units: [{ x: boss.x, y: boss.y, isBoss: true }],
   })[0];
 
   const correctedPlayers = correctUnitPlacement({
