@@ -46,7 +46,7 @@ export default function getArmoryAndVendorEventsAndRegions({
       sub_nid: shopType,
       condition: "True",
       time_left: null,
-      only_once: true,
+      only_once: false,
       interrupt_move: false,
     };
 
