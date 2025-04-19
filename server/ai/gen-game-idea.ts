@@ -45,8 +45,8 @@ Return ONLY valid JSON matching the schema with the following fields:
     systemMessage,
     prompt: userPrompt,
     schema: gameIdeaSchema,
-    temperature: 0.8,
-    model: "nano",
+    temperature: 1,
+    model: "strong",
   });
 }
 

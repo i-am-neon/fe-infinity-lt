@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import apiCall from "@/lib/api-call";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2 } from "lucide-react";
+import { Loader2, ChevronLeft } from "lucide-react";
 
 interface StoryIdea {
   title: string;
@@ -114,10 +114,17 @@ export default function CreateStoryPage() {
 
   return (
     <div className="max-w-3xl mx-auto p-6">
-      <header className="mb-6 flex items-center justify-between">
+      <Button
+        variant="ghost"
+        className="inline-flex items-center mb-4"
+        onClick={() => navigate("/")}
+      >
+        <ChevronLeft className="w-4 h-4 mr-1" />
+        Back
+      </Button>
+
+      <header className="mb-6">
         <h1 className="text-2xl font-bold">Create New Story</h1>
-        {/** Back button **/}
-        <Button variant="link" onClick={() => navigate("/")}>← Home</Button>
       </header>
 
       <section>
