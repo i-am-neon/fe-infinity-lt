@@ -82,7 +82,8 @@ export default function CreateStoryPage() {
   const [blurb, setBlurb] = useState("");
   const [feedback, setFeedback] = useState("");
   const [generated, setGenerated] = useState<StoryIdea | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isTweakLoading, setIsTweakLoading] = useState(false);
+  const [isCreateLoading, setIsCreateLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showTweakOptions, setShowTweakOptions] = useState(false);
 
@@ -103,7 +104,7 @@ export default function CreateStoryPage() {
 
   const handleGenerate = async () => {
     setError(null);
-    setIsLoading(true);
+    setIsTweakLoading(true);
     try {
       const res = await apiCall<{ success: boolean; title?: string; description?: string; tone?: string; error?: string }>(
         "generate-story",
@@ -120,14 +121,14 @@ export default function CreateStoryPage() {
     } catch (e) {
       setError(e instanceof Error ? e.message : "Unknown error");
     } finally {
-      setIsLoading(false);
+      setIsTweakLoading(false);
     }
   };
 
   const handleTweak = async () => {
     if (!generated) return;
     setError(null);
-    setIsLoading(true);
+    setIsTweakLoading(true);
     console.log('calling tweak with', { selectedTags, blurb, feedback, generated });
     try {
       const res = await apiCall<{ success: boolean; title?: string; description?: string; tone?: string; error?: string }>(
@@ -151,14 +152,14 @@ export default function CreateStoryPage() {
     } catch (e) {
       setError(e instanceof Error ? e.message : "Unknown error");
     } finally {
-      setIsLoading(false);
+      setIsTweakLoading(false);
     }
   };
 
   const handleCreateStory = async () => {
     if (!generated) return;
     setError(null);
-    setIsLoading(true);
+    setIsCreateLoading(true);
     try {
       const res = await apiCall<{ success: boolean; gameId?: string; error?: string }>(
         "create-game",
@@ -175,11 +176,11 @@ export default function CreateStoryPage() {
         navigate(`/games/${res.gameId}?new=true`);
       } else {
         setError(res.error || "Failed to create game");
-        setIsLoading(false);
+        setIsCreateLoading(false);
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Unknown error");
-      setIsLoading(false);
+      setIsCreateLoading(false);
     }
   };
 
@@ -252,6 +253,54 @@ export default function CreateStoryPage() {
         </div>
       </section>
 
+      {generated && (
+        <section className="mt-8 max-w-4xl">
+          <h2 className="text-lg font-semibold mb-2">Your Story Idea</h2>
+          <div className="p-6 border rounded-lg">
+            <h3 className="font-bold text-xl">{generated.title}</h3>
+            <p className="mt-2">{generated.description}</p>
+            <p className="mt-1 italic">Tone: {generated.tone}</p>
+
+            <div className="mt-6 flex gap-4">
+              <Button
+                variant="outline"
+                onClick={() => setShowTweakOptions(!showTweakOptions)}
+                className="flex-1"
+              >
+                <Wand2 className="mr-2 h-4 w-4" />
+                {showTweakOptions ? "Hide Tweak Options" : "Tweak"}
+              </Button>
+
+              <Button
+                onClick={handleCreateStory}
+                disabled={isCreateLoading || isTweakLoading}
+                className="flex-1"
+              >
+                {isCreateLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Create Game
+              </Button>
+            </div>
+
+            {showTweakOptions && (
+              <div className="mt-6 border-t pt-6">
+                <h4 className="font-semibold mb-2">Feedback / Tweak</h4>
+                <Textarea
+                  placeholder="Enter feedback about what you'd like to change..."
+                  value={feedback}
+                  onChange={(e) => setFeedback(e.target.value)}
+                  className="mb-4 w-full"
+                />
+                <Button onClick={handleTweak} disabled={isTweakLoading || isCreateLoading}>
+                  {isTweakLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Apply Tweaks
+                </Button>
+                {error && <p className="text-red-500 mt-2">{error}</p>}
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
       {!generated && (
         <>
           <hr className="my-6" />
@@ -275,60 +324,12 @@ export default function CreateStoryPage() {
               onChange={(e) => setBlurb(e.target.value)}
               className="mb-4 w-1/2"
             />
-            <Button onClick={handleGenerate} disabled={isLoading}>
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Generate Story
+            <Button onClick={handleGenerate} disabled={isTweakLoading}>
+              {isTweakLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Generate Story
             </Button>
             {error && <p className="text-red-500 mt-2">{error}</p>}
           </section>
         </>
-      )}
-
-      {generated && (
-        <section className="mt-8 max-w-4xl">
-          <h2 className="text-lg font-semibold mb-2">Your Story Idea</h2>
-          <div className="p-6 border rounded-lg">
-            <h3 className="font-bold text-xl">{generated.title}</h3>
-            <p className="mt-2">{generated.description}</p>
-            <p className="mt-1 italic">Tone: {generated.tone}</p>
-
-            <div className="mt-6 flex gap-4">
-              <Button
-                variant="outline"
-                onClick={() => setShowTweakOptions(!showTweakOptions)}
-                className="flex-1"
-              >
-                <Wand2 className="mr-2 h-4 w-4" />
-                {showTweakOptions ? "Hide Tweak Options" : "Tweak"}
-              </Button>
-
-              <Button
-                onClick={handleCreateStory}
-                disabled={isLoading}
-                className="flex-1"
-              >
-                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Create Story
-              </Button>
-            </div>
-
-            {showTweakOptions && (
-              <div className="mt-6 border-t pt-6">
-                <h4 className="font-semibold mb-2">Feedback / Tweak</h4>
-                <Textarea
-                  placeholder="Enter feedback about what you'd like to change..."
-                  value={feedback}
-                  onChange={(e) => setFeedback(e.target.value)}
-                  className="mb-4 w-full"
-                />
-                <Button onClick={handleTweak} disabled={isLoading}>
-                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Apply Tweaks
-                </Button>
-                {error && <p className="text-red-500 mt-2">{error}</p>}
-              </div>
-            )}
-          </div>
-        </section>
       )}
     </div>
   );

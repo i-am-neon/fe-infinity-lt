@@ -19,6 +19,14 @@ export default function genGameIdea(
 
   let systemMessage = `You are a Fire Emblem Fangame Game Idea Generator.
 Generate a creative and original game idea for a Fire Emblem fangame.
+
+IMPORTANT CONSTRAINTS:
+- All ideas MUST be set in a medieval fantasy world like Fire Emblem 8 (Sacred Stones)
+- Include only medieval weapons (swords, lances, axes, bows) and magic
+- Follow the traditional Fire Emblem structure: each chapter will have battles and progress through the storyline with the party
+- No modern, sci-fi, or completely unrelated settings/themes
+- Be creative and unique WITHIN these constraints
+
 Return ONLY valid JSON matching the schema with the following fields:
 - title: A short, descriptive title for the game (3-5 words)
 - description: A concise summary (one or two sentences) of the game's setting and plot.
@@ -35,6 +43,13 @@ The following elements MUST be preserved unless EXPLICITLY asked to change them:
 2. Core setting (e.g., if set in an empire, keep the empire setting)
 3. Central conflict (e.g., if about reclaiming power, keep that motivation)
 4. Key themes (e.g., if about redemption vs. damnation, maintain that theme)
+
+IMPORTANT CONSTRAINTS:
+- All ideas MUST remain in a medieval fantasy world like Fire Emblem 8 (Sacred Stones)
+- Include only medieval weapons (swords, lances, axes, bows) and magic
+- Follow the traditional Fire Emblem structure: protagonist noble/lord character, conflict, tactical battles
+- No modern, sci-fi, or completely unrelated settings/themes
+- Be creative and unique WITHIN these constraints
 
 EXAMPLE - If original is about "an undead warlord reclaiming an empire" and feedback is "make it funnier":
 - BAD: Completely changing to "villagers defending against chickens"
