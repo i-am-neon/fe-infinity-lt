@@ -1,6 +1,6 @@
 import { PortraitMetadata } from "@/types/portraits/portrait-metadata.ts";
 
-  export const allPortraitOptions: PortraitMetadata[] = [
+export const allPortraitOptions: PortraitMetadata[] = [
   {
     "gender": "female",
     "age": "young adult",
@@ -5211,24 +5211,6 @@ import { PortraitMetadata } from "@/types/portraits/portrait-metadata.ts";
     "smilingOffset": [
       32,
       40
-    ]
-  },
-  {
-    "gender": "male",
-    "age": "elderly",
-    "hairColor": "white",
-    "eyeColor": "brown",
-    "vibe": "wise, calm, mystical",
-    "clothing": "gray hooded robe with patterned trim",
-    "facialHair": "long white beard",
-    "originalName": "Ohtz Alt1 (Smug_Mug)",
-    "blinkingOffset": [
-      32,
-      16
-    ],
-    "smilingOffset": [
-      32,
-      32
     ]
   },
   {
