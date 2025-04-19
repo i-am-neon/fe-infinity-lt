@@ -4,7 +4,21 @@ import { useNavigate } from "react-router-dom";
 import apiCall from "@/lib/api-call";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, ChevronLeft } from "lucide-react";
+import { Loader2, ChevronLeft, RefreshCw } from "lucide-react";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious
+} from "@/components/ui/carousel";
+import { GlowCard } from "@/components/ui/glow-card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface StoryIdea {
   title: string;
@@ -30,6 +44,24 @@ const presets: StoryIdea[] = [
     description:
       "A crumbling kingdom is torn by rival factions vying for the throne. Trust is a fragile currency in this world of spies, shifting loyalties, and high-stakes diplomacy.",
     tone: "political intrigue, strategic",
+  },
+  {
+    title: "Celestial Vanguard",
+    description:
+      "When star-beings descend from the heavens, a band of unlikely heroes must master ancient magic to save their realm. The boundary between divine and mortal blurs with each passing day.",
+    tone: "epic fantasy, mystical",
+  },
+  {
+    title: "Crimson Dynasty",
+    description:
+      "The royal family's blood magic sustains the empire, but at a terrible cost. As the power wanes and rebellion stirs, a young heir must choose between tradition and transformation.",
+    tone: "dark political, tragic",
+  },
+  {
+    title: "Nomad's Legacy",
+    description:
+      "Wandering tribes navigate a harsh world where ancient ruins hold forgotten technologies. When a mysterious artifact is discovered, it sparks a race that could lead to salvation or destruction.",
+    tone: "post-apocalyptic, adventure",
   },
   // Add more presets as needed
 ];
@@ -57,6 +89,15 @@ export default function CreateStoryPage() {
     setSelectedTags((prev) =>
       prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
     );
+  };
+
+  const handleReset = () => {
+    setSelectedPreset(null);
+    setSelectedTags([]);
+    setBlurb("");
+    setFeedback("");
+    setGenerated(null);
+    setError(null);
   };
 
   const handleGenerate = async () => {
@@ -113,38 +154,71 @@ export default function CreateStoryPage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-6">
-      <Button
-        variant="ghost"
-        className="inline-flex items-center mb-4"
-        onClick={() => navigate("/")}
-      >
-        <ChevronLeft className="w-4 h-4 mr-1" />
-        Back
-      </Button>
+    <div className="max-w-6xl mx-auto p-6">
+      <div className="flex items-center justify-between mb-4">
+        <Button
+          variant="ghost"
+          className="inline-flex items-center"
+          onClick={() => navigate("/")}
+        >
+          <ChevronLeft className="w-4 h-4 mr-1" />
+          Back
+        </Button>
+
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleReset}
+                aria-label="Reset"
+              >
+                <RefreshCw className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Reset</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
 
       <header className="mb-6">
         <h1 className="text-2xl font-bold">Create New Story</h1>
       </header>
 
-      <section>
-        <h2 className="text-lg font-semibold mb-2">Presets</h2>
-        <div className="flex overflow-x-auto space-x-4 pb-2">
-          {presets.map((p) => (
-            <div
-              key={p.title}
-              className={`min-w-[200px] p-4 border rounded cursor-pointer ${selectedPreset === p.title ? "border-blue-500" : "border-gray-200"
-                }`}
-              onClick={() => {
-                setSelectedPreset(p.title);
-                setGenerated(p);
-              }}
-            >
-              <h3 className="font-bold">{p.title}</h3>
-              <p className="text-sm">{p.description}</p>
-              <p className="mt-1 italic text-xs">Tone: {p.tone}</p>
-            </div>
-          ))}
+      <section className="mb-8">
+        <h2 className="text-lg font-semibold mb-4">Presets</h2>
+        <div className="relative px-12">
+          <Carousel
+            opts={{
+              align: "start",
+            }}
+            className="w-full"
+          >
+            <CarouselContent className="-ml-4">
+              {presets.map((p) => (
+                <CarouselItem key={p.title} className="pl-4 md:basis-1/2 lg:basis-1/3">
+                  <div
+                    className="cursor-pointer h-full p-1"
+                    onClick={() => {
+                      setSelectedPreset(p.title);
+                      setGenerated(p);
+                    }}
+                  >
+                    <GlowCard className={selectedPreset === p.title ? "bg-muted" : ""}>
+                      <h3 className="font-bold">{p.title}</h3>
+                      <p className="text-sm mt-2">{p.description}</p>
+                      <p className="mt-2 italic text-xs">Tone: {p.tone}</p>
+                    </GlowCard>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="-left-10" />
+            <CarouselNext className="-right-10" />
+          </Carousel>
         </div>
       </section>
 
@@ -152,7 +226,7 @@ export default function CreateStoryPage() {
         <>
           <hr className="my-6" />
           <section>
-            <h2 className="text-lg font-semibold mb-2">Generate Your Own</h2>
+            <h2 className="text-lg font-semibold mb-2">Or, Generate Your Own</h2>
             <div className="flex flex-wrap gap-2 mb-4">
               {availableTags.map((tag) => (
                 <Button
@@ -169,7 +243,7 @@ export default function CreateStoryPage() {
               placeholder="Optional blurb..."
               value={blurb}
               onChange={(e) => setBlurb(e.target.value)}
-              className="mb-4 w-full"
+              className="mb-4 w-1/2"
             />
             <Button onClick={handleGenerate} disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Generate Story
