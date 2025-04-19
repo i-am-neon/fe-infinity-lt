@@ -140,7 +140,7 @@ Return a JSON object { "chosenId": "A" } or "B" or "C" with no extra commentary.
   }
 
   const logger = getCurrentLogger();
-  logger.info("Map chosen", { originalName: chosen.originalName });
+  logger.info("Chose Map", { originalName: chosen.originalName });
 
   return chosen.originalName || chosen.id;
 }

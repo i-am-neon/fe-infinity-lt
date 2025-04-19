@@ -104,7 +104,7 @@ if (import.meta.main) {
   //   }
   // })();
   // same just for Nobles_Evil_Doers_5_(6C_00_A3_6E)__by_Aura_Wolf:
-  const mapFile = "Mages_Mercenaries_1_(0E_00_72_10)__by_Aura_Wolf.json";
+  const mapFile = "Underground.json";
   const filePath = join(mapsDir, mapFile);
   const foundDoors = getDoorsForMap(filePath);
   console.log(`Map: ${mapFile.replace(".json", "")}`);
