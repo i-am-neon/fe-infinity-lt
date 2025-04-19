@@ -138,6 +138,10 @@ export async function handleRequest(req: Request): Promise<Response> {
   } else if (req.method === "POST" && url.pathname === "/create-game") {
     // "Create Game" route
     response = await handleCreateGame(req);
+  } else if (req.method === "POST" && url.pathname === "/generate-story") {
+    // Generate a new story idea (title, description, tone)
+    const { handleGenerateStory } = await import("./generate-story.ts");
+    response = await handleGenerateStory(req);
   } else if (req.method === "POST" && url.pathname === "/add-mock-game") {
     // Add mock game route
     const { handleAddMockGame } = await import("./add-mock-game.ts");

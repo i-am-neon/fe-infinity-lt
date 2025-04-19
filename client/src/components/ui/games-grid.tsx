@@ -55,10 +55,7 @@ export default function GamesGrid() {
     return (
       <div className="grid w-full max-w-[600px] grid-cols-1 gap-4 mx-auto">
         {/* Create New Game Card */}
-        <div
-          onClick={() => window.dispatchEvent(new CustomEvent('openCreateGameDialog'))}
-          className="cursor-pointer"
-        >
+        <Link to="/create-story" className="cursor-pointer">
           <DashedBorderCard className="hover:bg-accent/20 transition-colors duration-200 flex items-center justify-center h-full">
             <div className="flex flex-col items-center justify-center py-8">
               <div className="rounded-full bg-primary/10 p-3 mb-2">
@@ -70,7 +67,7 @@ export default function GamesGrid() {
               </CardDescription>
             </div>
           </DashedBorderCard>
-        </div>
+        </Link>
       </div>
     );
   }
@@ -93,10 +90,7 @@ export default function GamesGrid() {
       ))}
 
       {/* Create New Game Card */}
-      <div
-        onClick={() => window.dispatchEvent(new CustomEvent('openCreateGameDialog'))}
-        className="cursor-pointer"
-      >
+      <Link to="/create-story" className="cursor-pointer">
         <DashedBorderCard className="hover:bg-accent/20 transition-colors duration-200 flex items-center justify-center h-full">
           <div className="flex flex-col items-center justify-center py-8">
             <div className="rounded-full bg-primary/10 p-3 mb-2">
@@ -105,7 +99,7 @@ export default function GamesGrid() {
             <CardTitle className="text-center">Create New</CardTitle>
           </div>
         </DashedBorderCard>
-      </div>
+      </Link>
     </div>
   );
 }
