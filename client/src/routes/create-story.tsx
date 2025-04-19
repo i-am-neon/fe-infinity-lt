@@ -157,10 +157,6 @@ export default function CreateStoryPage() {
       if (res.success && res.title && res.description && res.tone) {
         setGenerated({ title: res.title, description: res.description, tone: res.tone });
         setFeedback("");
-
-        toast.success("Story tweaked successfully", {
-          description: "Your feedback has been applied to the story."
-        });
       } else {
         const errorMessage = res.error || "Failed to tweak story";
         setError(errorMessage);
