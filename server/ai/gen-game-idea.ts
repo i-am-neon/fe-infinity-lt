@@ -17,6 +17,9 @@ export default function genGameIdea(
 ): Promise<GameIdea> {
   const { tags, blurb, feedback, previousIdea } = options;
 
+  // Use different temperature values for new ideas vs tweaking
+  const temperature = previousIdea && feedback ? 0.4 : 1.0;
+
   let systemMessage = `You are a Fire Emblem Fangame Game Idea Generator.
 Generate a creative and original game idea for a Fire Emblem fangame.
 
@@ -37,26 +40,34 @@ Return ONLY valid JSON matching the schema with the following fields:
     systemMessage = `You are a Fire Emblem Fangame Game Idea Refiner.
 You will be given a previous game idea and feedback for tweaks.
 
-CRITICAL INSTRUCTION: You MUST maintain the fundamental essence of the original idea.
-The following elements MUST be preserved unless EXPLICITLY asked to change them:
-1. Main characters/factions (e.g., if about a warlord, keep the warlord as protagonist)
-2. Core setting (e.g., if set in an empire, keep the empire setting)
-3. Central conflict (e.g., if about reclaiming power, keep that motivation)
-4. Key themes (e.g., if about redemption vs. damnation, maintain that theme)
+CRITICAL INSTRUCTION: You MUST preserve the main story, characters, and themes of the original idea EXACTLY.
+
+STRICTLY FOLLOW THESE RULES:
+1. NEVER change the core concept of the story
+2. NEVER invent completely new characters, factions, or kingdoms unless specifically requested
+3. NEVER change the basic premise of what the story is actually about
+4. ONLY make the SMALLEST changes necessary to incorporate the feedback
+5. When in doubt, KEEP ELEMENTS from the original idea
+
+SPECIFIC INSTRUCTIONS FOR TWEAKING:
+- If asked to change the setting (e.g., "make it in a desert"), simply move the EXACT SAME STORY to that setting
+- If asked to change the tone (e.g., "make it darker"), keep the EXACT SAME PLOT but adjust only the mood/atmosphere
+- Keep all unique references, inside jokes, or special themes from the original
 
 IMPORTANT CONSTRAINTS:
 - All ideas MUST remain in a medieval fantasy world like Fire Emblem 8 (Sacred Stones)
 - Include only medieval weapons (swords, lances, axes, bows) and magic
-- Follow the traditional Fire Emblem structure: protagonist noble/lord character, conflict, tactical battles
+- Follow the traditional Fire Emblem structure: each chapter will have battles and progress through the storyline with the party
 - No modern, sci-fi, or completely unrelated settings/themes
 - Be creative and unique WITHIN these constraints
 
-EXAMPLE - If original is about "an undead warlord reclaiming an empire" and feedback is "make it funnier":
-- BAD: Completely changing to "villagers defending against chickens"
-- GOOD: "An undead warlord with a sardonic sense of humor attempts to reclaim his empire while dealing with comically incompetent minions"
+EXAMPLES OF GOOD TWEAKING:
+Original: "Knights of Memevale, where eccentric heroes band together to save their bug-ridden world from the Hacker Sorcerer"
+Feedback: "Make it set in the desert"
+BAD response: "Sands of Sablune, where heroes defend their oasis from rival clans" (completely different story)
+GOOD response: "Desert Knights of Memevale, where eccentric heroes trek across the sandy wastes of Memevale to save their bug-ridden desert kingdom from the Hacker Sorcerer"
 
-Your task is to ADJUST the original idea based on feedback, not REPLACE it.
-Small modifications are appropriate - complete rewrites are NOT.
+Your task is to MINIMALLY ADJUST the original idea based on feedback. The core story MUST remain intact.
 
 Return ONLY valid JSON matching the schema with the following fields:
 - title: A short, descriptive title for the game (3-5 words)
@@ -86,7 +97,7 @@ Return ONLY valid JSON matching the schema with the following fields:
     systemMessage,
     prompt: userPrompt,
     schema: gameIdeaSchema,
-    temperature: 1,
+    temperature,
     model: "strong",
   });
 }
