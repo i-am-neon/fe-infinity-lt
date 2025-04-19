@@ -27,6 +27,34 @@ interface StoryIdea {
   tone: string;
 }
 
+// Organize tags into categories
+const tagCategories = {
+  genre: [
+    "dark fantasy",
+    "high fantasy",
+    "political intrigue",
+    "epic adventure",
+    "war chronicle",
+    "mystery"
+  ],
+  tone: [
+    "lighthearted",
+    "strategic",
+    "romantic",
+    "tragic",
+    "comedic",
+    "suspenseful"
+  ],
+  setting: [
+    "kingdom",
+    "empire",
+    "wilderness",
+    "coastal",
+    "mountain",
+    "islands"
+  ]
+};
+
 const presets: StoryIdea[] = [
   {
     title: "Revenant Oath",
@@ -65,15 +93,6 @@ const presets: StoryIdea[] = [
     tone: "post-apocalyptic, adventure",
   },
   // Add more presets as needed
-];
-
-const availableTags = [
-  "dark fantasy",
-  "lighthearted",
-  "political intrigue",
-  "epic adventure",
-  "romantic",
-  "strategic",
 ];
 
 export default function CreateStoryPage() {
@@ -341,29 +360,77 @@ export default function CreateStoryPage() {
         <>
           <hr className="my-6" />
           <section>
-            <h2 className="text-lg font-semibold mb-2">Or, Generate Your Own</h2>
-            <div className="flex flex-wrap gap-2 mb-4">
-              {availableTags.map((tag) => (
-                <Button
-                  key={tag}
-                  size="sm"
-                  variant={selectedTags.includes(tag) ? "secondary" : "outline"}
-                  onClick={() => toggleTag(tag)}
-                >
-                  {tag}
-                </Button>
-              ))}
+            <h2 className="text-lg font-semibold mb-2">Or, Create Your Own</h2>
+            <p className="text-muted-foreground mb-6">
+              Select tags from each category below to influence your story idea. You can choose multiple tags, a single tag, or no tags from any category—it's completely optional. Add a brief concept if you wish, then click "Generate Story." After the AI creates your idea, you can further tweak and refine it to your liking.
+            </p>
+
+            <div className="space-y-6">
+              {/* Genre Tags */}
+              <div>
+                <h3 className="text-sm font-medium mb-2">Genre</h3>
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {tagCategories.genre.map((tag) => (
+                    <Button
+                      key={tag}
+                      size="sm"
+                      variant={selectedTags.includes(tag) ? "secondary" : "outline"}
+                      onClick={() => toggleTag(tag)}
+                    >
+                      {tag}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Tone Tags */}
+              <div>
+                <h3 className="text-sm font-medium mb-2">Tone</h3>
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {tagCategories.tone.map((tag) => (
+                    <Button
+                      key={tag}
+                      size="sm"
+                      variant={selectedTags.includes(tag) ? "secondary" : "outline"}
+                      onClick={() => toggleTag(tag)}
+                    >
+                      {tag}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Setting Tags */}
+              <div>
+                <h3 className="text-sm font-medium mb-2">Setting</h3>
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {tagCategories.setting.map((tag) => (
+                    <Button
+                      key={tag}
+                      size="sm"
+                      variant={selectedTags.includes(tag) ? "secondary" : "outline"}
+                      onClick={() => toggleTag(tag)}
+                    >
+                      {tag}
+                    </Button>
+                  ))}
+                </div>
+              </div>
             </div>
-            <Textarea
-              placeholder="Optional blurb..."
-              value={blurb}
-              onChange={(e) => setBlurb(e.target.value)}
-              className="mb-4 w-1/2"
-            />
-            <Button onClick={handleGenerate} disabled={isTweakLoading}>
-              {isTweakLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Generate Story
-            </Button>
-            {error && <p className="text-red-500 mt-2">{error}</p>}
+
+            <div className="mt-6">
+              <h3 className="text-sm font-medium mb-2">Concept (Optional)</h3>
+              <Textarea
+                placeholder="Describe your story concept in a few words..."
+                value={blurb}
+                onChange={(e) => setBlurb(e.target.value)}
+                className="mb-4 w-1/2"
+              />
+              <Button onClick={handleGenerate} disabled={isTweakLoading}>
+                {isTweakLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Generate Story
+              </Button>
+              {error && <p className="text-red-500 mt-2">{error}</p>}
+            </div>
           </section>
         </>
       )}
