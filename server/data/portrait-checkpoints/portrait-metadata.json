@@ -5244,5 +5244,218 @@
       16,
       40
     ]
+  },
+  "Scáthach (New version) {Melia}.png": {
+    "gender": "male",
+    "age": "young adult",
+    "hairColor": "black",
+    "eyeColor": "brown",
+    "vibe": "determined, adventurous, focused",
+    "clothing": "purple sleeveless tunic with shoulder armor",
+    "accessories": "sword on back",
+    "originalName": "Scáthach (New version) {Melia}",
+    "blinkingOffset": [
+      24,
+      32
+    ],
+    "smilingOffset": [
+      16,
+      48
+    ]
+  },
+  "{Kanna} [F2E] OC 47.png": {
+    "gender": "male",
+    "age": "young adult",
+    "hairColor": "blonde",
+    "eyeColor": "blue",
+    "vibe": "brave, confident, heroic",
+    "clothing": "orange armor with blue accents",
+    "originalName": "{Kanna} [F2E] OC 47",
+    "blinkingOffset": [
+      24,
+      32
+    ],
+    "smilingOffset": [
+      24,
+      48
+    ]
+  },
+  "Galzus {Stitch}.png": {
+    "gender": "male",
+    "age": "mature adult",
+    "hairColor": "gray",
+    "eyeColor": "red",
+    "vibe": "fierce,strong,confident",
+    "clothing": "fur-lined armor",
+    "originalName": "Galzus {Stitch}",
+    "blinkingOffset": [
+      24,
+      24
+    ],
+    "smilingOffset": [
+      24,
+      40
+    ]
+  },
+  "Boyd (Older) {NickT, Stitch}.png": {
+    "gender": "male",
+    "age": "young adult",
+    "hairColor": "green",
+    "eyeColor": "blue",
+    "vibe": "bold,strong,confident",
+    "clothing": "spiked armor with brown trim",
+    "headgear": "brown headband",
+    "originalName": "Boyd (Older) {NickT, Stitch}",
+    "blinkingOffset": [
+      24,
+      24
+    ],
+    "smilingOffset": [
+      24,
+      40
+    ]
+  },
+  "{Kanna} [F2E] OC 1.png": {
+    "gender": "female",
+    "age": "young adult",
+    "hairColor": "teal",
+    "eyeColor": "purple",
+    "vibe": "regal, serene, mystical",
+    "clothing": "white and purple dress with gold accents",
+    "accessories": "gold choker, gold circlet, earrings",
+    "originalName": "{Kanna} [F2E] OC 1",
+    "blinkingOffset": [
+      24,
+      32
+    ],
+    "smilingOffset": [
+      24,
+      48
+    ]
+  },
+  "Dheginsea {NickT, Stitch}.png": {
+    "gender": "male",
+    "age": "mature adult",
+    "hairColor": "bald",
+    "eyeColor": "blue",
+    "vibe": "intense, commanding, mysterious",
+    "clothing": "ornate dark robe with gold trim",
+    "facialHair": "long mustache and goatee",
+    "originalName": "Dheginsea {NickT, Stitch}",
+    "blinkingOffset": [
+      24,
+      16
+    ],
+    "smilingOffset": [
+      24,
+      32
+    ]
+  },
+  "{Kanna} [F2E] OC 4.png": {
+    "gender": "female",
+    "age": "young adult",
+    "hairColor": "dark purple",
+    "eyeColor": "brown",
+    "vibe": "determined, calm, focused",
+    "clothing": "purple and red armor",
+    "headgear": "red headband",
+    "originalName": "{Kanna} [F2E] OC 4",
+    "blinkingOffset": [
+      24,
+      24
+    ],
+    "smilingOffset": [
+      24,
+      40
+    ]
+  },
+  "Mordecai {NickT, Stitch}.png": {
+    "gender": "male",
+    "age": "mature adult",
+    "hairColor": "white",
+    "eyeColor": "blue",
+    "vibe": "rugged,strong,resolute",
+    "clothing": "teal shirt",
+    "facialHair": "white beard",
+    "originalName": "Mordecai {NickT, Stitch}",
+    "blinkingOffset": [
+      24,
+      16
+    ],
+    "smilingOffset": [
+      24,
+      40
+    ]
+  },
+  "{Memestaralbert} [F2E] OC Demon.png": {
+    "gender": "male",
+    "age": "young adult",
+    "hairColor": "silver",
+    "eyeColor": "yellow",
+    "vibe": "confident, mysterious, composed",
+    "clothing": "maroon cloak with gold trim, armor shoulder plate",
+    "originalName": "{Memestaralbert} [F2E] OC Demon",
+    "blinkingOffset": [
+      32,
+      24
+    ],
+    "smilingOffset": [
+      32,
+      40
+    ]
+  },
+  "{MeatofJustice} F2E OC 18.png": {
+    "gender": "male",
+    "age": "mature adult",
+    "hairColor": "dark purple",
+    "eyeColor": "brown",
+    "vibe": "stoic,strong,determined",
+    "clothing": "green and purple armor",
+    "headgear": "green headband",
+    "facialHair": "short beard",
+    "originalName": "{MeatofJustice} F2E OC 18",
+    "blinkingOffset": [
+      24,
+      16
+    ],
+    "smilingOffset": [
+      16,
+      32
+    ]
+  },
+  "{MeatofJustice} F2E OC 19.png": {
+    "gender": "male",
+    "age": "young adult",
+    "hairColor": "blonde",
+    "eyeColor": "brown",
+    "vibe": "friendly, calm, approachable",
+    "clothing": "sleeveless jacket with high collar",
+    "originalName": "{MeatofJustice} F2E OC 19",
+    "blinkingOffset": [
+      24,
+      24
+    ],
+    "smilingOffset": [
+      24,
+      40
+    ]
+  },
+  "Breguet.png": {
+    "gender": "male",
+    "age": "mature adult",
+    "hairColor": "blue",
+    "eyeColor": "brown",
+    "vibe": "stern, disciplined, commanding",
+    "clothing": "golden armor",
+    "facialHair": "mustache",
+    "originalName": "Breguet",
+    "blinkingOffset": [
+      24,
+      24
+    ],
+    "smilingOffset": [
+      16,
+      40
+    ]
   }
 }

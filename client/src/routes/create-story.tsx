@@ -19,6 +19,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { toast, Toaster } from "sonner";
 
 interface StoryIdea {
   title: string;
@@ -116,10 +117,20 @@ export default function CreateStoryPage() {
       if (res.success && res.title && res.description && res.tone) {
         setGenerated({ title: res.title, description: res.description, tone: res.tone });
       } else {
-        setError(res.error || "Failed to generate story");
+        const errorMessage = res.error || "Failed to generate story";
+        setError(errorMessage);
+
+        toast.error("Failed to generate story", {
+          description: errorMessage
+        });
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Unknown error");
+      const errorMessage = e instanceof Error ? e.message : "Unknown error";
+      setError(errorMessage);
+
+      toast.error("Error generating story", {
+        description: errorMessage
+      });
     } finally {
       setIsTweakLoading(false);
     }
@@ -146,11 +157,25 @@ export default function CreateStoryPage() {
       if (res.success && res.title && res.description && res.tone) {
         setGenerated({ title: res.title, description: res.description, tone: res.tone });
         setFeedback("");
+
+        toast.success("Story tweaked successfully", {
+          description: "Your feedback has been applied to the story."
+        });
       } else {
-        setError(res.error || "Failed to tweak story");
+        const errorMessage = res.error || "Failed to tweak story";
+        setError(errorMessage);
+
+        toast.error("Failed to tweak story", {
+          description: errorMessage
+        });
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Unknown error");
+      const errorMessage = e instanceof Error ? e.message : "Unknown error";
+      setError(errorMessage);
+
+      toast.error("Error tweaking story", {
+        description: errorMessage
+      });
     } finally {
       setIsTweakLoading(false);
     }
@@ -161,7 +186,7 @@ export default function CreateStoryPage() {
     setError(null);
     setIsCreateLoading(true);
     try {
-      const res = await apiCall<{ success: boolean; gameId?: string; error?: string }>(
+      const res = await apiCall<{ success: boolean; gameId?: string; gameNid?: string; error?: string; message?: string }>(
         "create-game",
         {
           method: "POST",
@@ -172,20 +197,35 @@ export default function CreateStoryPage() {
           },
         }
       );
-      if (res.success && res.gameId) {
-        navigate(`/games/${res.gameId}?new=true`);
+
+      if (res.success && (res.gameId || res.gameNid)) {
+        const gameIdentifier = res.gameId || res.gameNid;
+        navigate(`/games/${gameIdentifier}?new=true`);
+        toast.success(res.message || "Game creation started", {
+          description: "Your game is being generated and will be ready shortly."
+        });
       } else {
-        setError(res.error || "Failed to create game");
+        const errorMessage = res.error || "Failed to create game";
+        setError(errorMessage);
         setIsCreateLoading(false);
+        toast.error("Failed to start game creation", {
+          description: errorMessage
+        });
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Unknown error");
+      const errorMessage = e instanceof Error ? e.message : "Unknown error";
+      setError(errorMessage);
       setIsCreateLoading(false);
+      toast.error("Error creating game", {
+        description: errorMessage
+      });
     }
   };
 
   return (
     <div className="max-w-6xl mx-auto p-6">
+      <Toaster position="top-right" />
+
       <div className="flex items-center justify-between mb-4">
         <Button
           variant="ghost"
