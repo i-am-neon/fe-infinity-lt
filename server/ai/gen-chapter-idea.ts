@@ -9,6 +9,7 @@ import { InitialGameIdea } from "@/ai/types/initial-game-idea.ts";
 import { WorldSummary } from "@/ai/types/world-summary.ts";
 import { validateCharacterMentions } from "@/ai/validators/validate-character-mentions.ts";
 import { validateDistinctNewCharacters } from "@/ai/validators/validate-distinct-new-characters.ts";
+import { validateNoReintroducedCharacters } from "@/ai/validators/validate-no-reintroduced-characters.ts";
 import { DeadCharacterRecord } from "@/types/dead-character-record.ts";
 import replaceBadCharacters from "@/lib/formatting/replace-bad-characters.ts";
 
@@ -46,6 +47,7 @@ CRITICAL REQUIREMENTS:
   * Create natural connections between them and existing characters
   * Show personality traits from their character description in their dialogue/actions
   * MUST mention EACH CHARACTER BY NAME explicitly in intro, battle, or outro text
+- IMPORTANT: ONLY USE newPlayableUnits and newNonBattleCharacters arrays for COMPLETELY NEW characters who have NEVER been introduced in any previous chapter
 - IMPORTANT: ANY supporting character who appears in the narrative (e.g., a messenger, villager, or temporary character) MUST be added to the newNonBattleCharacters array with a complete character profile
 - Must not reuse or resurrect any dead characters
 - The death of characters must significantly impact the story:
@@ -96,7 +98,10 @@ ${newlyDeadThisChapter.length > 0 ? `- Since ${newlyDeadThisChapter.length} char
     - characters find treasure
     - thankful townspeople give special weapon/item as thanks after the battle
     - king gives party money to aid their adventure
-  - Note that money should be given sparingly and definitely not every chapter or more than once in a chapter.`;
+  - Note that money should be given sparingly and definitely not every chapter or more than once in a chapter.
+- CRITICAL: ALL characters in newPlayableUnits and newNonBattleCharacters MUST be completely new characters that have never appeared in any previous chapter
+  * Do not reintroduce characters with the same names as existing characters
+  * Every character in these arrays must be making their first appearance in the story`;
 
   // Regular chapter-specific part of the system message
   const regularChapterSpecific = `You are a Fire Emblem Fangame Chapter Idea Generator (generator).
@@ -118,7 +123,14 @@ ${newlyDeadThisChapter.length > 0 ? `- Since ${newlyDeadThisChapter.length} char
   * If multiple characters died, provide a mixture of units that start as: player units, allied NPCs that can be saved, and/or enemy non-boss units that can be recruited
   * Each new unit should have a compelling reason to join the party that ties into the main story
   * Make sure to clearly explain how these new characters are integrated into the narrative` : ''}
-- When creating the endOfChapterChoice, ensure none of the options include attempting to recruit a certain character`;
+- When creating the endOfChapterChoice, ensure none of the options include attempting to recruit a certain character
+- CRITICAL: ALL characters in newPlayableUnits and newNonBattleCharacters MUST be completely new characters that have never appeared in any previous chapter
+  * Previous character list (DO NOT include any of these characters in newPlayableUnits or newNonBattleCharacters): ${previousChapterIdeas.flatMap(chapter => [
+    ...(chapter.newPlayableUnits || []).map(char => char.firstName),
+    ...(chapter.newNonBattleCharacters || []).map(char => char.firstName),
+    chapter.boss.firstName
+  ]).join(', ')}
+  * Every character in these arrays must be making their first appearance in the story`;
 
   const generatorSystemMessage = isPrologue
     ? prologueSpecific
@@ -175,7 +187,11 @@ ${newlyDeadThisChapter.length > 0 ? `7) Since ${newlyDeadThisChapter.length} cha
   b) Verify that each new character has a clear narrative reason for joining the party.` : ''}
 If all good => fixText="None". Otherwise => fix instructions.`;
     },
-    validators: [validateCharacterMentions, validateDistinctNewCharacters],
+    validators: [
+      validateCharacterMentions,
+      validateDistinctNewCharacters,
+      (chapterIdea) => validateNoReintroducedCharacters(chapterIdea, previousChapterIdeas)
+    ],
   });
   return {
     ...chIdea,

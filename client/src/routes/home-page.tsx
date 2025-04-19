@@ -39,6 +39,7 @@ export default function HomePage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [testResults, setTestResults] = useState<any>(null);
   const [showTestResults, setShowTestResults] = useState(false);
+  const [isGeneratingIdea, setIsGeneratingIdea] = useState(false);
 
   // Add useEffect to listen for custom event
   useEffect(() => {
@@ -241,8 +242,34 @@ export default function HomePage() {
     }
   }, []);
 
+  // Handler for generating a new game idea (title, description, tone)
+  const handleGenerateStoryCall = useCallback(async () => {
+    setIsGeneratingIdea(true);
+    setError(null);
+    try {
+      const res = await apiCall<{
+        success: boolean;
+        title?: string;
+        description?: string;
+        tone?: string;
+        error?: string;
+      }>("generate-story", { method: "POST" });
+      if (res.success && res.title && res.description && res.tone) {
+        // Combine into same format as selector
+        setGameIdea(`${res.title} - ${res.description} - ${res.tone}`);
+      } else {
+        setError(res.error || "Failed to generate story idea.");
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Failed to generate story idea.";
+      setError(msg);
+    } finally {
+      setIsGeneratingIdea(false);
+    }
+  }, []);
+
   return (
-    <div className="max-w-3xl mx-auto">
+    <div className="max-w-4xl mx-auto p-4">
       {/* Header with title and settings */}
       <div className="flex items-center mb-6 mt-4 relative">
         {/* Settings button moved to the left */}
@@ -283,6 +310,18 @@ export default function HomePage() {
                 onChange={(val) => setGameIdea(val)}
                 selected={gameIdea}
               />
+            </div>
+            <div className="mt-4">
+              <Button
+                variant="outline"
+                onClick={handleGenerateStoryCall}
+                disabled={isGeneratingIdea}
+              >
+                {isGeneratingIdea && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                Generate Story
+              </Button>
             </div>
             <DialogFooter>
               <Button variant="secondary" onClick={() => setDialogOpen(false)}>

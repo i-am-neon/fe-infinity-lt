@@ -5,6 +5,7 @@ import similaritySearch from "@/vector-db/similarity-search.ts";
 import { z } from "zod";
 import generateStructuredData from "./lib/generate-structured-data.ts";
 import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
+import { getCurrentLogger } from "@/lib/current-logger.ts";
 
 interface EphemeralMapOption {
   ephemeralId: "A" | "B" | "C";
@@ -137,6 +138,9 @@ Return a JSON object { "chosenId": "A" } or "B" or "C" with no extra commentary.
   if (!chosen) {
     throw new Error("LLM returned an invalid ephemeral ID for map selection.");
   }
+
+  const logger = getCurrentLogger();
+  logger.info("Map chosen", { originalName: chosen.originalName });
 
   return chosen.originalName || chosen.id;
 }

@@ -32,10 +32,6 @@ export default async function genGenericUnitClassAndAi(description: string): Pro
     // Apply specific rules for certain class types
     let aiGroup = result.aiGroup;
 
-    // If the unit is one of the village raider types, assign PursueVillage AI
-    if (["Brigand", "Pirate", "Berserker", "Warrior"].includes(result.class)) {
-        aiGroup = "PursueVillage";
-    }
 
     // If the unit is a thief-type unit, assign Thief or SimpleThief AI
     if (["Thief", "Rogue", "Assassin"].includes(result.class)) {
@@ -45,6 +41,11 @@ export default async function genGenericUnitClassAndAi(description: string): Pro
     // If the unit is a staff-using unit, assign Heal AI
     if (["Cleric", "Bishop", "Troubadour", "Valkyrie", "Sage", "Mage Knight"].includes(result.class)) {
         aiGroup = "Heal";
+    }
+
+    if (aiGroup === 'None') {
+        // Assign a default AI group if none is specified
+        aiGroup = "Defend";
     }
 
     return {

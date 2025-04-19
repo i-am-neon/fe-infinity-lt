@@ -1155,7 +1155,7 @@ export const allPortraitOptions: PortraitMetadata[] = [
     ],
     "smilingOffset": [
       24,
-      48
+      40
     ]
   },
   {
@@ -1660,10 +1660,10 @@ export const allPortraitOptions: PortraitMetadata[] = [
     "age": "young adult",
     "hairColor": "black",
     "eyeColor": "brown",
-    "vibe": "determined, brave, adventurous",
-    "clothing": "purple armor",
-    "accessories": "sword",
-    "originalName": "Scáthach (New version) {Melia}",
+    "vibe": "determined, adventurous, focused",
+    "clothing": "purple sleeveless tunic with shoulder armor",
+    "accessories": "sword on back",
+    "originalName": "Scáthach (New version) {Melia}",
     "blinkingOffset": [
       24,
       32
@@ -3984,7 +3984,7 @@ export const allPortraitOptions: PortraitMetadata[] = [
       24
     ],
     "smilingOffset": [
-      32,
+      24,
       32
     ]
   },
@@ -4505,9 +4505,9 @@ export const allPortraitOptions: PortraitMetadata[] = [
     "gender": "male",
     "age": "young adult",
     "hairColor": "green",
-    "eyeColor": "brown",
+    "eyeColor": "blue",
     "vibe": "bold,strong,confident",
-    "clothing": "spiked armor with open collar",
+    "clothing": "spiked armor with brown trim",
     "headgear": "brown headband",
     "originalName": "Boyd (Older) {NickT, Stitch}",
     "blinkingOffset": [
@@ -4524,7 +4524,7 @@ export const allPortraitOptions: PortraitMetadata[] = [
     "age": "young adult",
     "hairColor": "blonde",
     "eyeColor": "blue",
-    "vibe": "brave, noble, determined",
+    "vibe": "brave, confident, heroic",
     "clothing": "orange armor with blue accents",
     "originalName": "{Kanna} [F2E] OC 47",
     "blinkingOffset": [
@@ -4543,7 +4543,7 @@ export const allPortraitOptions: PortraitMetadata[] = [
     "eyeColor": "purple",
     "vibe": "regal, serene, mystical",
     "clothing": "white and purple dress with gold accents",
-    "accessories": "gold choker, gold circlet, white hair ribbons",
+    "accessories": "gold choker, gold circlet, earrings",
     "originalName": "{Kanna} [F2E] OC 1",
     "blinkingOffset": [
       24,
@@ -4577,7 +4577,7 @@ export const allPortraitOptions: PortraitMetadata[] = [
     "age": "mature adult",
     "hairColor": "gray",
     "eyeColor": "red",
-    "vibe": "fierce, rugged, determined",
+    "vibe": "fierce,strong,confident",
     "clothing": "fur-lined armor",
     "originalName": "Galzus {Stitch}",
     "blinkingOffset": [
@@ -4612,7 +4612,7 @@ export const allPortraitOptions: PortraitMetadata[] = [
     "age": "mature adult",
     "hairColor": "bald",
     "eyeColor": "blue",
-    "vibe": "stern, commanding, mysterious",
+    "vibe": "intense, commanding, mysterious",
     "clothing": "ornate dark robe with gold trim",
     "facialHair": "long mustache and goatee",
     "originalName": "Dheginsea {NickT, Stitch}",
@@ -4631,7 +4631,7 @@ export const allPortraitOptions: PortraitMetadata[] = [
     "hairColor": "silver",
     "eyeColor": "yellow",
     "vibe": "confident, mysterious, composed",
-    "clothing": "maroon and gold cloak with armor",
+    "clothing": "maroon cloak with gold trim, armor shoulder plate",
     "originalName": "{Memestaralbert} [F2E] OC Demon",
     "blinkingOffset": [
       32,
@@ -4756,7 +4756,7 @@ export const allPortraitOptions: PortraitMetadata[] = [
     "age": "young adult",
     "hairColor": "dark purple",
     "eyeColor": "brown",
-    "vibe": "determined,strong,focused",
+    "vibe": "determined, calm, focused",
     "clothing": "purple and red armor",
     "headgear": "red headband",
     "originalName": "{Kanna} [F2E] OC 4",
@@ -4826,7 +4826,7 @@ export const allPortraitOptions: PortraitMetadata[] = [
     "age": "mature adult",
     "hairColor": "blue",
     "eyeColor": "brown",
-    "vibe": "stern,strong,commanding",
+    "vibe": "stern, disciplined, commanding",
     "clothing": "golden armor",
     "facialHair": "mustache",
     "originalName": "Breguet",
@@ -4842,10 +4842,10 @@ export const allPortraitOptions: PortraitMetadata[] = [
   {
     "gender": "male",
     "age": "mature adult",
-    "hairColor": "dark",
+    "hairColor": "dark purple",
     "eyeColor": "brown",
-    "vibe": "stoic, rugged, disciplined",
-    "clothing": "armor with green accents",
+    "vibe": "stoic,strong,determined",
+    "clothing": "green and purple armor",
     "headgear": "green headband",
     "facialHair": "short beard",
     "originalName": "{MeatofJustice} F2E OC 18",
@@ -5211,24 +5211,6 @@ export const allPortraitOptions: PortraitMetadata[] = [
     "smilingOffset": [
       32,
       40
-    ]
-  },
-  {
-    "gender": "male",
-    "age": "elderly",
-    "hairColor": "white",
-    "eyeColor": "brown",
-    "vibe": "wise, calm, mystical",
-    "clothing": "gray hooded robe with patterned trim",
-    "facialHair": "long white beard",
-    "originalName": "Ohtz Alt1 (Smug_Mug)",
-    "blinkingOffset": [
-      32,
-      16
-    ],
-    "smilingOffset": [
-      32,
-      32
     ]
   },
   {
