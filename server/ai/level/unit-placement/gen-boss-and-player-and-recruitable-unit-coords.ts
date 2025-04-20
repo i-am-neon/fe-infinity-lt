@@ -57,6 +57,7 @@ Recruitable Units (green and red):
   - They might be near or adjacent to the player if the story suggests it, or somewhere else if the story calls for it.
 - Characters with 'firstSeenAs'='enemy non-boss' are enemies that can be recruited.
   - They typically start in a region that thematically aligns with the story, in similar regions as other enemies.
+- DO NOT include regions for characters with 'firstSeenAs'='ally' as they will be placed with player units.
 
 Structure your choice in JSON as:
 {
@@ -74,9 +75,16 @@ Ensure region names match exactly.
     recruitableUnitRegions: z.array(z.string()).optional(),
   });
 
-  const prompt = `Chapter Idea: ${JSON.stringify(
-    chapterIdea
-  )}\nmapMetadata: ${JSON.stringify(
+  // Filter out units with firstSeenAs="ally" as they'll be placed with player units
+  const nonAllyRecruitableUnits = chapterIdea.newPlayableUnits?.filter(
+    unit => unit.firstSeenAs !== "ally"
+  ) || [];
+
+  const prompt = `Chapter Idea: ${JSON.stringify({
+    ...chapterIdea,
+    // Only send non-ally units for placement
+    newPlayableUnits: nonAllyRecruitableUnits
+  })}\nmapMetadata: ${JSON.stringify(
     mapMetadata
   )}\nterrainGrid: ${JSON.stringify(terrainGrid)}`;
 
@@ -99,6 +107,7 @@ IMPORTANT: Ensure the boss and player units are as far away from each other as p
 
 Only include recruitableUnits if chapterIdea.newPlayableUnits is provided.
 Coordinates must lie within their chosen region(s). The sceneOverview might indicate splitting players or green units among multiple spots. Distribute them as appropriate. If you place the boss on a tile that is typically used for a throne, fort, or gate, keep that in mind if relevant.
+DO NOT generate coordinates for characters with firstSeenAs="ally" as they will be placed with player units.
 `;
 
   const coordsSchema = z.object({
@@ -115,7 +124,7 @@ Coordinates must lie within their chosen region(s). The sceneOverview might indi
   )}\nNumber of Player Units: ${playerUnitsNumber}\nChosen green unit region(s): ${JSON.stringify(
     recruitableUnitRegions
   )}\nRecruitable Units to Place: ${JSON.stringify(
-    chapterIdea.newPlayableUnits
+    nonAllyRecruitableUnits
   )}\nMap Metadata: ${JSON.stringify(
     mapMetadata
   )}\nTerrain Grid: ${JSON.stringify(terrainGrid)}`;
@@ -151,13 +160,13 @@ Coordinates must lie within their chosen region(s). The sceneOverview might indi
     coords: UnitCoords;
   }> = [];
 
+  // Process non-ally recruitable units
   if (recruitableUnits.length > 0) {
     recruitableUnits.forEach((ru, index) => {
-      if (
-        !chapterIdea.newPlayableUnits?.some((unit) => unit.firstName === ru.nid)
-      ) {
+      const matchingUnit = nonAllyRecruitableUnits.find(unit => unit.firstName === ru.nid);
+      if (!matchingUnit) {
         throw new Error(
-          `Recruitable unit with NID "${ru.nid}" does not match any unit's firstName in chapterIdea.newPlayableUnits`
+          `Recruitable unit with NID "${ru.nid}" does not match any unit's firstName in filtered nonAllyRecruitableUnits`
         );
       }
       const correctedRecruitable = correctUnitPlacement({
@@ -168,9 +177,56 @@ Coordinates must lie within their chosen region(s). The sceneOverview might indi
 
       correctedRecruitableUnits.push({
         nid: ru.nid,
-        firstSeenAs: ru.firstSeenAs,
+        firstSeenAs: matchingUnit.firstSeenAs,
         region: recruitableUnitRegions[index % recruitableUnitRegions.length], // Use mod to handle if there are more units than regions
         coords: { x: correctedRecruitable.x, y: correctedRecruitable.y },
+      });
+    });
+  }
+
+  // Add ally units to start with player units
+  const allyUnits = chapterIdea.newPlayableUnits?.filter(
+    unit => unit.firstSeenAs === "ally"
+  ) || [];
+
+  if (allyUnits.length > 0) {
+    // Find the player region
+    const playerRegion = mapMetadata.distinctRegions.find(
+      region => region.name === playerRegions[0]
+    );
+
+    if (!playerRegion) {
+      throw new Error("Player region not found for ally unit placement");
+    }
+
+    // Add ally units starting at the player region
+    allyUnits.forEach(allyUnit => {
+      // Place allies with players using the same algorithm as correctUnitPlacement
+      // but starting from player region positions
+      const allExistingPositions = [
+        correctedBoss,
+        ...correctedPlayers,
+        ...correctedRecruitableUnits.map(u => ({ x: u.coords.x, y: u.coords.y }))
+      ];
+
+      // Find an available position in the player region
+      const availablePosition = correctUnitPlacement({
+        terrainGrid,
+        units: [{
+          x: playerRegion.fromX,
+          y: playerRegion.fromY
+        }],
+        existingPositions: allExistingPositions,
+      })[0];
+
+      correctedRecruitableUnits.push({
+        nid: allyUnit.firstName,
+        firstSeenAs: "ally",
+        region: playerRegions[0],
+        coords: {
+          x: availablePosition.x,
+          y: availablePosition.y
+        },
       });
     });
   }
