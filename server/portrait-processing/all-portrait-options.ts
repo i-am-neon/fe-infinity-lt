@@ -1,6 +1,6 @@
 import { PortraitMetadata } from "@/types/portraits/portrait-metadata.ts";
 
-export const allPortraitOptions: PortraitMetadata[] = [
+  export const allPortraitOptions: PortraitMetadata[] = [
   {
     "gender": "female",
     "age": "young adult",
