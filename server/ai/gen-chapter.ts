@@ -354,8 +354,11 @@ export default async function genChapter({
   if (chapterNumber > 0) {
     introEvent._source.push("prep;true");
   }
-  // if prologue add some shop items
+  // If prologue
   if (chapterNumber === 0) {
+    // set convoy game var
+    introEvent._source.push("game_var;_convoy;True");
+    // add some shop items
     introEvent._source.push("add_market_item;Iron_Sword");
     introEvent._source.push("add_market_item;Iron_Axe");
     introEvent._source.push("add_market_item;Iron_Lance");
