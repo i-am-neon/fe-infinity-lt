@@ -53,6 +53,13 @@ This is CRITICAL for gameplay mechanics - if an item is mentioned, the "give_ite
 The event should:
 - use the Chapter Idea's outro as the basis for the event
 - ensure that any character who speaks has an "add_portrait" command somewhere earlier in the event script
+- CRITICAL - PORTRAIT MANAGEMENT:
+  - Never have more than 6 character portraits visible at once in a scene
+  - If more than 6 characters are in a conversation, use "remove_portrait" for less important characters before adding new ones
+  - Not every player character needs to appear in the outro scene
+  - Prioritize newly introduced characters and those most important to the scene
+  - When a character exits a scene or is no longer actively participating in the conversation, use "remove_portrait"
+  - Balance the scene with appropriate add/remove commands to maintain clarity and focus
 - be sure to include the Chapter Idea's newNonBattleCharacters as characters in the event, as mentioned in the "intro" section of the Chapter Idea
 - if a character is mentioned in the outro, it must be included in the event
 - you may only give speaking roles to characters mentioned in the outro, not any other characters
@@ -77,7 +84,7 @@ Tone: ${tone}`;
   const checkerSystemMessage = `You are a Fire Emblem Fangame Outro Event Checker (checker).
 We have an AIEvent candidate. We must ensure:
 1) No resurrected or reintroduced actual dead characters from previous chapters.
-2) The event must only use valid commands ("add_portrait", "speak", "narrate").
+2) The event must only use valid commands ("add_portrait", "speak", "narrate", "give_item", "give_money", "remove_portrait").
 3) If the chapter idea's outro references a 'boss', 'newPlayableUnits', or 'newNonBattleCharacters', ensure they appear in the event.
 
 SPECIAL ITEM CHECKING - CRITICALLY IMPORTANT:
@@ -111,8 +118,10 @@ If the candidate is valid, return { "fixText": "None", "passesCheck": true }. Ot
 
 Constraints (apply leniently):
 1) Must not resurrect ACTUAL dead characters from previous chapters or mention them as living.
-2) Must only use valid commands ("add_portrait", "speak", "narrate").
+2) Must only use valid commands ("add_portrait", "speak", "narrate", "remove_portrait").
 3) If the chapter idea's intro mentions a 'boss', 'newPlayableUnits', or 'newNonBattleCharacters', ensure they appear in the final event.
+4) PORTRAIT LIMIT CHECK: Never have more than 6 character portraits visible at once. Use remove_portrait 
+   when needed and ensure the narrative flow makes sense with characters entering and exiting at appropriate times.
 
 IMPORTANT:
 - Allow storytelling with references to characters being "thought dead" or returned

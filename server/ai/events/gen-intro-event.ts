@@ -74,6 +74,13 @@ The event must also:
   - For characters who enter the scene later, place the "add_portrait" command EXACTLY at the moment they enter
   - NEVER add all character portraits at the beginning if some characters are meant to enter later
   - This timing is critical for proper scene flow - incorrectly timed portraits break immersion
+- CRITICAL - PORTRAIT MANAGEMENT:
+  - Never have more than 6 character portraits visible at once in a scene
+  - If more than 6 characters are in a conversation, use "remove_portrait" for less important characters before adding new ones
+  - Not every player character needs to appear in the intro scene
+  - Prioritize newly introduced characters and those most important to the scene
+  - When a character exits a scene or is no longer actively participating in the conversation, use "remove_portrait"
+  - Balance the scene with appropriate add/remove commands to maintain clarity and focus
 - be sure to include the Chapter Idea's newNonBattleCharacters as characters in the event, as mentioned in the "intro" section of the Chapter Idea
 - if a character is mentioned in the intro, it must be included in the event
 - you may only give speaking roles to characters mentioned in the intro, not any other characters
@@ -115,7 +122,7 @@ Newly Dead This Chapter: ${JSON.stringify(
   const checkerSystemMessage = `You are a Fire Emblem Fangame Intro Event Checker (checker).
 We must ensure:
 1) It does not resurrect or give speaking roles to actually dead characters from previous chapters (those in allDeadCharacters list).
-2) The event uses required commands correctly ("add_portrait", "speak", "narrate", "give_item", "give_money").
+2) The event uses required commands correctly ("add_portrait", "speak", "narrate", "give_item", "give_money", "remove_portrait").
 3) The event must not mention or speak for newlyDeadThisChapter.
 4) Characters can be introduced naturally in the narrative, including:
    - Narrative references to historical/lore figures being "thought dead" or returning
@@ -158,9 +165,11 @@ Check the following constraints carefully but leniently:
       2
     )}.
 2) Portrait validation is now handled by the algorithm and the result is shown above.
-3) Must follow the AIEvent schema exactly and only use valid commands ("add_portrait", "speak", "narrate", "give_item", "give_money").
+3) Must follow the AIEvent schema exactly and only use valid commands ("add_portrait", "speak", "narrate", "give_item", "give_money", "remove_portrait").
 4) SPECIAL ITEM CHECK: If the intro text mentions items or money being found (e.g., "stumbles upon a Silver Blade"),
    there MUST be a corresponding "give_item" or "give_money" command in the sourceObjects.
+5) PORTRAIT LIMIT CHECK: Never have more than 6 character portraits visible at once. The validation now checks this automatically, 
+   but ensure the narrative flow makes sense with characters being added and removed at appropriate moments.
 
 IMPORTANT:
 - Allow storytelling with references to characters being "thought dead" or returned
