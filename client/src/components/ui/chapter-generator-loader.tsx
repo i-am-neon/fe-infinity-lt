@@ -70,7 +70,7 @@ interface ChapterGeneratorLoaderProps {
 export function ChapterGeneratorLoader({
     progress,
     title = "Generating Next Chapter",
-    description = "The AI is creating your next chapter based on your gameplay. This typically takes around 2-3 minutes, and the game will launch automatically when complete. Do not close this window!",
+    description = "The AI is creating your next chapter based on your gameplay. This typically takes around 2 minutes, and the game will launch automatically when complete. Do not close this window!",
     mode = 'chapter' // Default to chapter generation mode
 }: ChapterGeneratorLoaderProps) {
     // Combine the appropriate steps based on mode

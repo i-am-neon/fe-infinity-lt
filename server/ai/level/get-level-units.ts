@@ -79,7 +79,7 @@ export default async function getLevelUnits({
     units.push({
       nid: ru.nid,
       team: ru.firstSeenAs === "allied NPC" ? "other" : ru.firstSeenAs === 'ally' ? 'player' : "enemy",
-      ai: "Defend",
+      ai: ru.firstSeenAs === 'ally' ? "None" : "Defend",
       roam_ai: null,
       ai_group: "",
       starting_position: [ru.coords.x, ru.coords.y],
