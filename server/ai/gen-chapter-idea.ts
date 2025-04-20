@@ -10,6 +10,7 @@ import { WorldSummary } from "@/ai/types/world-summary.ts";
 import { validateCharacterMentions } from "@/ai/validators/validate-character-mentions.ts";
 import { validateDistinctNewCharacters } from "@/ai/validators/validate-distinct-new-characters.ts";
 import { validateNoReintroducedCharacters } from "@/ai/validators/validate-no-reintroduced-characters.ts";
+import { validatePlayerInIntro } from "@/ai/validators/validate-player-in-intro.ts";
 import { DeadCharacterRecord } from "@/types/dead-character-record.ts";
 import replaceBadCharacters from "@/lib/formatting/replace-bad-characters.ts";
 
@@ -47,6 +48,7 @@ CRITICAL REQUIREMENTS:
   * Create natural connections between them and existing characters
   * Show personality traits from their character description in their dialogue/actions
   * MUST mention EACH CHARACTER BY NAME explicitly in intro, battle, or outro text
+- IMPORTANT: Characters with firstSeenAs = "ally" MUST be mentioned in the intro section
 - IMPORTANT: ONLY USE newPlayableUnits and newNonBattleCharacters arrays for COMPLETELY NEW characters who have NEVER been introduced in any previous chapter
 - IMPORTANT: ANY supporting character who appears in the narrative (e.g., a messenger, villager, or temporary character) MUST be added to the newNonBattleCharacters array with a complete character profile
 - Must not reuse or resurrect any dead characters
@@ -190,6 +192,7 @@ If all good => fixText="None". Otherwise => fix instructions.`;
     validators: [
       validateCharacterMentions,
       validateDistinctNewCharacters,
+      validatePlayerInIntro,
       (chapterIdea) => validateNoReintroducedCharacters(chapterIdea, previousChapterIdeas)
     ],
   });
