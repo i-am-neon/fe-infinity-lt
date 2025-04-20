@@ -58,7 +58,7 @@ export default async function getGenericEnemies({
     units: enemyGenericUnitPlacement,
   });
 
-  const finalUnits = assignDoorAndChestKeys(terrainGrid, correctedUnits);
+  const finalUnits = assignDoorAndChestKeys({ terrainGrid, enemies: correctedUnits, originalMapName: mapMetadata.originalName });
   return finalUnits;
 }
 

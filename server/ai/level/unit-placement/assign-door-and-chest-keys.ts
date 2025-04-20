@@ -1,17 +1,17 @@
-import { TerrainGrid } from "@/types/maps/terrain-grid.ts";
+import getTerrainGridFromMapName from "@/ai/level/unit-placement/get-terrain-grid-from-tilemap.ts";
+import { getTerrainGridSize } from "@/ai/level/unit-placement/get-terrain-grid-size.ts";
 import {
   EnemyGenericUnit,
   EnemyGenericUnitWithStartingItems,
 } from "@/ai/types/unit-placement.ts";
-import { ch3TerrainGrid } from "@/map-processing/test-data/terrain-grid.ts";
-import getTerrainGridFromMapName from "@/ai/level/unit-placement/get-terrain-grid-from-tilemap.ts";
+import { getDoorsForMap } from "@/map-region-processing/get-doors-for-map.ts";
+import { getChestsForMap } from "@/map-region-processing/get-chests-for-map.ts";
+import { TerrainGrid } from "@/types/maps/terrain-grid.ts";
 import { TerrainType } from "@/types/maps/terrain-type.ts";
-import { getTerrainGridSize } from "@/ai/level/unit-placement/get-terrain-grid-size.ts";
+import { join } from "https://deno.land/std@0.224.0/path/mod.ts";
 
 export default function assignDoorAndChestKeys(
-  terrainGrid: TerrainGrid,
-  enemies: EnemyGenericUnit[]
-): EnemyGenericUnitWithStartingItems[] {
+  { terrainGrid, enemies, originalMapName }: { terrainGrid: TerrainGrid; enemies: EnemyGenericUnit[]; originalMapName: string; }): EnemyGenericUnitWithStartingItems[] {
   const newEnemies: EnemyGenericUnitWithStartingItems[] = enemies.map((e) => ({
     ...e,
   }));
@@ -25,7 +25,7 @@ export default function assignDoorAndChestKeys(
 
   // Find all door and chest cells
   const allDoorCells: Array<{ x: number; y: number }> = [];
-  const chestCells: Array<{ x: number; y: number }> = [];
+  let chestCells: Array<{ x: number; y: number }> = [];
   const wallCells: Array<{ x: number; y: number }> = [];
 
   for (const key in terrainGrid) {
@@ -44,46 +44,104 @@ export default function assignDoorAndChestKeys(
   }
 
   // Group adjacent door cells
-  const groupedDoors: Array<Array<{ x: number; y: number }>> = [];
-  const visitedDoorCells = new Set<string>();
+  let groupedDoors: Array<Array<{ x: number; y: number }>> = [];
 
-  for (const doorCell of allDoorCells) {
-    const key = `${doorCell.x},${doorCell.y}`;
-    if (visitedDoorCells.has(key)) continue;
+  // Get door regions from getDoorsForMap
+  try {
+    const mapsDir = join(Deno.cwd(), "server", "assets", "maps");
+    const filePath = join(mapsDir, `${originalMapName}.json`);
+    const doorRegions = getDoorsForMap(filePath);
 
-    const doorGroup: Array<{ x: number; y: number }> = [];
-    const queue: Array<{ x: number; y: number }> = [doorCell];
+    // Transform door regions to our format
+    const layerNids = new Set<string>();
 
-    while (queue.length > 0) {
-      const current = queue.shift()!;
-      const currentKey = `${current.x},${current.y}`;
+    // First collect unique layer NIDs (some doors may appear multiple times)
+    doorRegions.forEach(region => {
+      layerNids.add(region.layerNid);
+    });
 
-      if (visitedDoorCells.has(currentKey)) continue;
-      visitedDoorCells.add(currentKey);
-      doorGroup.push(current);
+    // Process each unique door layer
+    layerNids.forEach(nid => {
+      const tilesForLayer: Array<{ x: number; y: number }> = [];
 
-      // Check adjacent cells (up, down, left, right)
-      const adjacentCells = [
-        { x: current.x + 1, y: current.y },
-        { x: current.x - 1, y: current.y },
-        { x: current.x, y: current.y + 1 },
-        { x: current.x, y: current.y - 1 },
-      ];
+      // Collect all tiles from regions with this layer NID
+      doorRegions
+        .filter(region => region.layerNid === nid)
+        .forEach(region => {
+          region.tiles.forEach(tile => {
+            // Avoid duplicates
+            if (!tilesForLayer.some(t => t.x === tile.x && t.y === tile.y)) {
+              tilesForLayer.push(tile);
+            }
+          });
+        });
 
-      for (const adj of adjacentCells) {
-        const adjKey = `${adj.x},${adj.y}`;
-        if (
-          !visitedDoorCells.has(adjKey) &&
-          allDoorCells.some(cell => cell.x === adj.x && cell.y === adj.y)
-        ) {
-          queue.push(adj);
+      if (tilesForLayer.length > 0) {
+        groupedDoors.push(tilesForLayer);
+      }
+    });
+
+    // Also try to get chest data using getChestsForMap
+    try {
+      const chestRegions = getChestsForMap(filePath);
+      if (chestRegions.length > 0) {
+        // Replace terrain-based chest cells with the more accurate data from getChestsForMap
+        chestCells = chestRegions.map(chest => chest.coordinates);
+      }
+    } catch (chestError) {
+      console.error(`Error getting chest regions for map ${originalMapName}:`, chestError);
+      // Keep using terrain-based chest cells as fallback
+    }
+  } catch (error) {
+    console.error(`Error getting door regions for map ${originalMapName}:`, error);
+    // Fall back to original method
+    groupedDoors = groupDoorCells(allDoorCells);
+  }
+
+  function groupDoorCells(doorCells: Array<{ x: number; y: number }>): Array<Array<{ x: number; y: number }>> {
+    const grouped: Array<Array<{ x: number; y: number }>> = [];
+    const visitedDoorCells = new Set<string>();
+
+    for (const doorCell of doorCells) {
+      const key = `${doorCell.x},${doorCell.y}`;
+      if (visitedDoorCells.has(key)) continue;
+
+      const doorGroup: Array<{ x: number; y: number }> = [];
+      const queue: Array<{ x: number; y: number }> = [doorCell];
+
+      while (queue.length > 0) {
+        const current = queue.shift()!;
+        const currentKey = `${current.x},${current.y}`;
+
+        if (visitedDoorCells.has(currentKey)) continue;
+        visitedDoorCells.add(currentKey);
+        doorGroup.push(current);
+
+        // Check adjacent cells (up, down, left, right)
+        const adjacentCells = [
+          { x: current.x + 1, y: current.y },
+          { x: current.x - 1, y: current.y },
+          { x: current.x, y: current.y + 1 },
+          { x: current.x, y: current.y - 1 },
+        ];
+
+        for (const adj of adjacentCells) {
+          const adjKey = `${adj.x},${adj.y}`;
+          if (
+            !visitedDoorCells.has(adjKey) &&
+            doorCells.some(cell => cell.x === adj.x && cell.y === adj.y)
+          ) {
+            queue.push(adj);
+          }
         }
+      }
+
+      if (doorGroup.length > 0) {
+        grouped.push(doorGroup);
       }
     }
 
-    if (doorGroup.length > 0) {
-      groupedDoors.push(doorGroup);
-    }
+    return grouped;
   }
 
   function getManhattanDist(
@@ -324,6 +382,7 @@ export default function assignDoorAndChestKeys(
     }
   }
 
+  // Assign chest keys to nearest enemies
   for (const { x, y } of chestCells) {
     let closestEnemyIndex = -1;
     let closestDist = Number.MAX_SAFE_INTEGER;
@@ -347,13 +406,23 @@ export default function assignDoorAndChestKeys(
 
 if (import.meta.main) {
   // this map has door that spans multiple tiles
-  const terrainGrid = getTerrainGridFromMapName('CesarianCapitalAssassin');
+  // const terrainGrid = getTerrainGridFromMapName('CesarianCapitalAssassin');
+  // const enemies: EnemyGenericUnit[] = [
+  //   { x: 5, y: 7, class: "Archer", aiGroup: "Attack" }, // on the inside of the room, should not get a door key
+  //   { x: 10, y: 15, class: "Archer", aiGroup: "Attack" }, // should on the outside of the room should get the door key
+  //   { x: 20, y: 20, class: "Archer", aiGroup: "Attack" }, // should get chest key
+  // ];
+  // const res = assignDoorAndChestKeys(terrainGrid, enemies);
+  // console.log("enemies :>> ", res);
+
+  // Has three doors
+  const terrainGrid = getTerrainGridFromMapName('Alusq_FE8_0A009B0C_in_the_dark__by_FEU');
   const enemies: EnemyGenericUnit[] = [
-    { x: 5, y: 7, class: "Archer", aiGroup: "Attack" }, // on the inside of the room, should not get a door key
-    { x: 10, y: 15, class: "Archer", aiGroup: "Attack" }, // should on the outside of the room should get the door key
-    { x: 20, y: 20, class: "Archer", aiGroup: "Attack" }, // should get chest key
+    { x: 6, y: 12, class: "Archer", aiGroup: "Attack" }, // bottom door
+    { x: 7, y: 6, class: "Archer", aiGroup: "Attack" }, // top left door
+    { x: 11, y: 3, class: "Archer", aiGroup: "Attack" }, // top right door
   ];
-  const res = assignDoorAndChestKeys(terrainGrid, enemies);
+  const res = assignDoorAndChestKeys({ terrainGrid, enemies, originalMapName: 'Alusq_FE8_0A009B0C_in_the_dark__by_FEU' });
   console.log("enemies :>> ", res);
 }
 
