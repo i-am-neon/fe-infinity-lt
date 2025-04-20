@@ -37,6 +37,11 @@ export default async function genChapterIdea({
 }): Promise<ChapterIdea> {
   const isPrologue = chapterNumber === 0 && initialGameIdea;
 
+  // Filter dead characters to separate player/ally deaths from boss deaths
+  const playerDeadCharacters = allDeadCharacters.filter(char => char.role !== "boss");
+  const bossDeadCharacters = allDeadCharacters.filter(char => char.role === "boss");
+  const newlyDeadPlayers = newlyDeadThisChapter.filter(char => char.role !== "boss");
+
   // Common critical requirements shared by both prologue and regular chapters
   const commonRequirements = `
 CRITICAL REQUIREMENTS:
@@ -53,13 +58,14 @@ CRITICAL REQUIREMENTS:
 - IMPORTANT: ANY supporting character who appears in the narrative (e.g., a messenger, villager, or temporary character) MUST be added to the newNonBattleCharacters array with a complete character profile
 - Must not reuse or resurrect any dead characters
 - The death of characters must significantly impact the story:
-  * Living player characters should reference the deaths of dead player characters, highlighting the relationship between them and the deceased.
+  * Living player characters should reference the deaths of dead ALLY characters (${playerDeadCharacters.map(char => char.name).join(", ") || "none so far"}), highlighting the relationship between them and the deceased.
+  * CRITICAL: Dead BOSS characters (${bossDeadCharacters.map(char => char.name).join(", ") || "none so far"}) should NEVER be referenced as if they were allies or part of the player's group.
   * The death of characters central to the storyline must be referenced in the story, and will likely change the direction of the next chapter.
   * Minor unit deaths should be referenced in the story, but will likely only alter the next chapter slightly.
   * When referencing dead boss characters, make sure to never refer to them as part of the player party.
 - Must not reuse a previous boss from earlier chapters
-${newlyDeadThisChapter.length > 0 ? `- MUST introduce at least ${newlyDeadThisChapter.length} new playable unit(s) to replace those lost in the previous chapter
-  * If ${newlyDeadThisChapter.length > 1 ? 'multiple units' : 'a unit'} died in the previous chapter, provide a mix of new player units that start as: player units, allied NPCs, and/or recruitable enemy units` : ''}
+${newlyDeadPlayers.length > 0 ? `- MUST introduce at least ${newlyDeadPlayers.length} new playable unit(s) to replace those lost in the previous chapter
+  * If ${newlyDeadPlayers.length > 1 ? 'multiple units' : 'a unit'} died in the previous chapter, provide a mix of new player units that start as: player units, allied NPCs, and/or recruitable enemy units` : ''}
 - Must produce a new Chapter Idea that strictly matches the ChapterIdea schema
 - Return only JSON without any commentary
 
@@ -82,16 +88,16 @@ The user provides:
 2) An Initial Game Idea
 3) A tone
 4) A list of all previously dead characters: ${JSON.stringify(
-    allDeadCharacters
+    playerDeadCharacters
   )}
 5) Characters who died specifically in the last chapter: ${JSON.stringify(
-    newlyDeadThisChapter
+    newlyDeadPlayers
   )}
 We want to generate a single new chapter that logically follows them for the Prologue (chapterNumber=0).
 
 ${commonRequirements}
 
-${newlyDeadThisChapter.length > 0 ? `- Since ${newlyDeadThisChapter.length} character(s) died previously, this chapter MUST introduce at least ${newlyDeadThisChapter.length} new playable unit(s)
+${newlyDeadPlayers.length > 0 ? `- Since ${newlyDeadPlayers.length} character(s) died previously, this chapter MUST introduce at least ${newlyDeadPlayers.length} new playable unit(s)
   * If multiple characters died, provide a mixture of units that start as: player units, allied NPCs that can be saved, and/or enemy non-boss units that can be recruited
   * Each new unit should have a compelling reason to join the party that ties into the main story
   * Make sure to clearly explain how these new characters are integrated into the narrative` : ''}
@@ -111,8 +117,9 @@ ${newlyDeadThisChapter.length > 0 ? `- Since ${newlyDeadThisChapter.length} char
 We have:
 - A World Summary
 - Existing chapters
-- Dead characters: ${JSON.stringify(allDeadCharacters)}
-- Newly dead: ${JSON.stringify(newlyDeadThisChapter)}
+- Dead ally characters: ${JSON.stringify(playerDeadCharacters)}
+- Dead boss characters: ${JSON.stringify(bossDeadCharacters)}
+- Newly dead: ${JSON.stringify(newlyDeadPlayers)}
 - Player's choice from previous chapter: "${playerChoice}" (chosen from question: ${choiceQuestion})
 We want chapter ${chapterNumber}. Return only valid JSON, no commentary.
 
@@ -121,7 +128,7 @@ ${commonRequirements}
 - The story of this chapter MUST be heavily influenced by the player's last choice "${playerChoice}"
 - The narrative should clearly show the consequences of this choice
 - Character interactions, plot development, and chapter setting should all reflect this decision
-${newlyDeadThisChapter.length > 0 ? `- Since ${newlyDeadThisChapter.length} character(s) died in the previous chapter, this chapter MUST introduce at least ${newlyDeadThisChapter.length} new playable unit(s)
+${newlyDeadPlayers.length > 0 ? `- Since ${newlyDeadPlayers.length} character(s) died in the previous chapter, this chapter MUST introduce at least ${newlyDeadPlayers.length} new playable unit(s)
   * If multiple characters died, provide a mixture of units that start as: player units, allied NPCs that can be saved, and/or enemy non-boss units that can be recruited
   * Each new unit should have a compelling reason to join the party that ties into the main story
   * Make sure to clearly explain how these new characters are integrated into the narrative` : ''}
@@ -159,6 +166,7 @@ Also check that the story appropriately acknowledges dead characters from previo
 - The narrative should reference the impact of these deaths on the living characters and storyline
 - Living characters should mention or react to the deaths of significant characters
 - If major characters died, the plot should reflect this change in direction
+- IMPORTANT: Dead BOSS characters must NEVER be referenced as if they were allies or part of the player's group
 Themes of resurrection, undead, etc. are perfectly fine in the story - only check that actual dead characters from previous chapters aren't brought back as active characters.
 Dramatically, language in death quotes (like "I'll rise again") is completely acceptable.
 Return { fixText: "None", fixObject: {} } if good; else fix instructions. Only JSON.`;
@@ -184,8 +192,9 @@ Constraints:
   c) New bosses and characters are always allowed even if they talk about resurrection themes.
 5) Only check that boss characters from previous chapters aren't reused with the same name and role.
 6) Verify that if there are dead characters (from allDeadCharacters or newlyDeadThisChapter), the chapter narrative acknowledges these deaths in some meaningful way - either through explicit mentions in dialogue, plot consequences, or character reactions.
-${newlyDeadThisChapter.length > 0 ? `7) Since ${newlyDeadThisChapter.length} character(s) died in the previous chapter, verify that at least ${newlyDeadThisChapter.length} new playable unit(s) are introduced in this chapter (through newPlayableUnits array).
-  a) If multiple characters died (${newlyDeadThisChapter.length > 1 ? 'true in this case' : 'not applicable here'}), check that there's a mix of units starting as player units, allied NPCs, and/or recruitable enemy units.
+7) CRITICAL: Check that dead boss characters are NEVER referenced as if they were allies or part of the player's group. They should be referred to correctly as enemies who were defeated.
+${newlyDeadPlayers.length > 0 ? `8) Since ${newlyDeadPlayers.length} character(s) died in the previous chapter, verify that at least ${newlyDeadPlayers.length} new playable unit(s) are introduced in this chapter (through newPlayableUnits array).
+  a) If multiple characters died (${newlyDeadPlayers.length > 1 ? 'true in this case' : 'not applicable here'}), check that there's a mix of units starting as player units, allied NPCs, and/or recruitable enemy units.
   b) Verify that each new character has a clear narrative reason for joining the party.` : ''}
 If all good => fixText="None". Otherwise => fix instructions.`;
     },
