@@ -53,6 +53,7 @@ CRITICAL REQUIREMENTS:
   * Create natural connections between them and existing characters
   * Show personality traits from their character description in their dialogue/actions
   * MUST mention EACH CHARACTER BY NAME explicitly in intro, battle, or outro text
+  * Choose classes that round out the team compared to player units that are still alive, avoiding too many duplicate classes when possible
 - IMPORTANT: Characters with firstSeenAs = "ally" MUST be mentioned in the intro section
 - IMPORTANT: ONLY USE newPlayableUnits and newNonBattleCharacters arrays for COMPLETELY NEW characters who have NEVER been introduced in any previous chapter
 - IMPORTANT: ANY supporting character who appears in the narrative (e.g., a messenger, villager, or temporary character) MUST be added to the newNonBattleCharacters array with a complete character profile
@@ -65,7 +66,8 @@ CRITICAL REQUIREMENTS:
   * When referencing dead boss characters, make sure to never refer to them as part of the player party.
 - Must not reuse a previous boss from earlier chapters
 ${newlyDeadPlayers.length > 0 ? `- MUST introduce at least ${newlyDeadPlayers.length} new playable unit(s) to replace those lost in the previous chapter
-  * If ${newlyDeadPlayers.length > 1 ? 'multiple units' : 'a unit'} died in the previous chapter, provide a mix of new player units that start as: player units, allied NPCs, and/or recruitable enemy units` : ''}
+  * If ${newlyDeadPlayers.length > 1 ? 'multiple units' : 'a unit'} died in the previous chapter, provide a mix of new player units that start as: player units, allied NPCs, and/or recruitable enemy units
+  * Choose unit classes that complement the existing team composition, avoiding duplicate classes when possible to ensure a balanced party` : ''}
 - Must produce a new Chapter Idea that strictly matches the ChapterIdea schema
 - Return only JSON without any commentary
 
@@ -100,7 +102,8 @@ ${commonRequirements}
 ${newlyDeadPlayers.length > 0 ? `- Since ${newlyDeadPlayers.length} character(s) died previously, this chapter MUST introduce at least ${newlyDeadPlayers.length} new playable unit(s)
   * If multiple characters died, provide a mixture of units that start as: player units, allied NPCs that can be saved, and/or enemy non-boss units that can be recruited
   * Each new unit should have a compelling reason to join the party that ties into the main story
-  * Make sure to clearly explain how these new characters are integrated into the narrative` : ''}
+  * Make sure to clearly explain how these new characters are integrated into the narrative
+  * Choose unit classes that complement the existing team composition, avoiding duplicate classes when possible to ensure a balanced party` : ''}
 - Consider including monetary rewards or special items as part of the narrative.
   - Examples:
     - characters find treasure
@@ -131,7 +134,8 @@ ${commonRequirements}
 ${newlyDeadPlayers.length > 0 ? `- Since ${newlyDeadPlayers.length} character(s) died in the previous chapter, this chapter MUST introduce at least ${newlyDeadPlayers.length} new playable unit(s)
   * If multiple characters died, provide a mixture of units that start as: player units, allied NPCs that can be saved, and/or enemy non-boss units that can be recruited
   * Each new unit should have a compelling reason to join the party that ties into the main story
-  * Make sure to clearly explain how these new characters are integrated into the narrative` : ''}
+  * Make sure to clearly explain how these new characters are integrated into the narrative
+  * Choose unit classes that complement the existing team composition, avoiding duplicate classes when possible to ensure a balanced party` : ''}
 - When creating the endOfChapterChoice, ensure none of the options include attempting to recruit a certain character
 - CRITICAL: ALL characters in newPlayableUnits and newNonBattleCharacters MUST be completely new characters that have never appeared in any previous chapter
   * Previous character list (DO NOT include any of these characters in newPlayableUnits or newNonBattleCharacters): ${previousChapterIdeas.flatMap(chapter => [

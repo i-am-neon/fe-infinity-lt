@@ -104,7 +104,7 @@ if (import.meta.main) {
   //   }
   // })();
   // same just for Nobles_Evil_Doers_5_(6C_00_A3_6E)__by_Aura_Wolf:
-  const mapFile = "Underground.json";
+  const mapFile = "Alusq_FE8_0A009B0C_in_the_dark__by_FEU.json";
   const filePath = join(mapsDir, mapFile);
   const foundDoors = getDoorsForMap(filePath);
   console.log(`Map: ${mapFile.replace(".json", "")}`);
