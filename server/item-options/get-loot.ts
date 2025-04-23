@@ -346,6 +346,11 @@ export default function getLoot(chapterNumber: number): string {
   } else if (roll < 85) {
     return pickStatBooster();
   } else {
+    // Don't give Master Seal in early chapters
+    if (chapterNumber < 5) {
+      // Return either a weapon or stat booster instead
+      return Math.random() < 0.5 ? pickWeapon(chapterNumber) : pickStatBooster();
+    }
     return "Master_Seal";
   }
 }
