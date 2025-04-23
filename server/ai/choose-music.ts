@@ -1,29 +1,46 @@
+import generateStructuredData from "@/ai/lib/generate-structured-data.ts";
 import { getCurrentLogger } from "@/lib/current-logger.ts";
 import { sluggify } from "@/lib/sluggify.ts";
-import { SongMetadata } from "@/music-processing/types/song-list-with-links.ts";
-import similaritySearch from "@/vector-db/similarity-search.ts";
+import concatAllMusicOptions from "@/music-processing/concat-all-music-options.ts";
+import { z } from "zod";
+import type { SongMetadata } from "@/music-processing/types/song-list-with-links.ts";
 
 export default async function chooseMusic(scenario: string): Promise<string> {
   const logger = getCurrentLogger();
-  const topResults = await similaritySearch<SongMetadata>({
-    query: scenario,
-    limit: 3,
-    vectorType: "music",
-  });
-  if (!topResults.length) {
-    throw new Error("No music results found for this scenario.");
+  const optionsJson = concatAllMusicOptions();
+  const options: SongMetadata[] = JSON.parse(optionsJson);
+  const schema = z.object({ songName: z.string() });
+  const systemMessage = `You are given a description of a scenario and a list of song metadata options in JSON format.
+Choose the most appropriate songName from the options based on the scenario.
+Return an object with a single property songName set to the chosen name.`;
+
+  let songName: string | undefined;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    const result = await generateStructuredData({
+      fnName: "allSongsInContext",
+      schema,
+      systemMessage,
+      prompt: `scenario: ${scenario}\noptions: ${optionsJson}`,
+      model: "fast",
+    });
+    songName = result.songName;
+    if (!songName) {
+      throw new Error("No songName returned from LLM.");
+    }
+    if (options.some((opt) => opt.songName === songName)) {
+      break;
+    }
+    logger.warn(`Chosen songName "${songName}" not in options, retrying (${attempt}/3).`);
+    songName = undefined;
   }
 
-  const randomIndex = Math.floor(Math.random() * topResults.length);
-  const chosen = topResults[randomIndex];
-  const songName = chosen.metadata?.songName as string | undefined;
   if (!songName) {
-    throw new Error("No songName found in metadata for chosen music track.");
+    throw new Error("LLM did not choose a valid songName after 3 attempts.");
   }
 
-  const sluggifiedName = sluggify(songName);
-  logger.debug("Chose music track:", { scenario, songName, sluggifiedName });
-  return sluggifiedName;
+  const sluggified = sluggify(songName!);
+  logger.debug("LLM chose music track:", { scenario, songName, sluggified });
+  return sluggified;
 }
 
 if (import.meta.main) {

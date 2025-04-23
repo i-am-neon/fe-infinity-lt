@@ -135,8 +135,8 @@ export default async function genChapter({
   // Step 4: Compose battle theme music
   reportProgress(3, "Composing battle theme music");
   const [playerPhaseMusic, enemyPhaseMusic] = await Promise.all([
-    chooseMusic(chapterIdea.battle),
-    chooseMusic(chapterIdea.battle),
+    chooseMusic(`Player phase music for battle. Should be fast-paced and exciting and uplifting. Battle: ${chapterIdea.battle}`),
+    chooseMusic(`Enemy phase music for battle. Battle: ${chapterIdea.battle}`),
   ]);
 
   // Step 5: Write introduction cutscene dialogue
@@ -169,8 +169,8 @@ export default async function genChapter({
   // Step 8: Choose event music
   reportProgress(7, "Selecting event music");
   const [introMusic, outroMusic] = await Promise.all([
-    chooseMusic(chapterIdea.intro),
-    chooseMusic(`Reflective conclusion for chapter: ${chapterIdea.outro}`),
+    chooseMusic(`Music for intro scene. Title: ${chapterIdea.title}. Description: ${chapterIdea.intro}`),
+    chooseMusic(`Music for conclusion scene. Title: ${chapterIdea.title}. Description: ${chapterIdea.outro}`),
   ]);
 
   const introEvent = convertAIEventToEvent({

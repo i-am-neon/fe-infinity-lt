@@ -143,6 +143,7 @@ export async function handleCreateGame(req: Request): Promise<Response> {
 
         const topLevelMusics = await chooseTopLevelMusic({
           projectNameEndingInDotLtProj,
+          gameTitle: projectName,
           gameDescription: description,
           tone,
         });
