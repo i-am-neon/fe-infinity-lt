@@ -2,6 +2,7 @@ import { testAIEventPrologueIntro } from "@/ai/test-data/events.ts";
 import { AIEvent } from "@/ai/types/ai-event.ts";
 import { Event } from "@/types/events/event.ts";
 import cleanGameText from "../../lib/formatting/clean-game-text.ts";
+import replaceBadCharacters from "@/lib/formatting/replace-bad-characters.ts";
 
 export default function convertAIEventToEvent({
   aiEvent,
@@ -46,7 +47,7 @@ export default function convertAIEventToEvent({
   });
 
   return {
-    name: aiEvent.name,
+    name: replaceBadCharacters(aiEvent.name),
     trigger: aiEvent.trigger,
     level_nid: chapterNumber.toString(),
     condition,
