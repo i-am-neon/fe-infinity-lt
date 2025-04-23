@@ -53,6 +53,8 @@ This is CRITICAL for gameplay mechanics - if an item is mentioned, the "give_ite
 The event should:
 - use the Chapter Idea's outro as the basis for the event
 - ensure that any character who speaks has an "add_portrait" command somewhere earlier in the event script
+- CRITICAL: EVERY character MUST have an "add_portrait" command BEFORE they speak for the first time
+- CRITICAL: Characters CANNOT speak after "remove_portrait" has been called on them, unless an "add_portrait" command is used again
 - CRITICAL - PORTRAIT MANAGEMENT:
   - Never have more than 6 character portraits visible at once in a scene
   - If more than 6 characters are in a conversation, use "remove_portrait" for less important characters before adding new ones
@@ -86,6 +88,10 @@ We have an AIEvent candidate. We must ensure:
 1) No resurrected or reintroduced actual dead characters from previous chapters.
 2) The event must only use valid commands ("add_portrait", "speak", "narrate", "give_item", "give_money", "remove_portrait").
 3) If the chapter idea's outro references a 'boss', 'newPlayableUnits', or 'newNonBattleCharacters', ensure they appear in the event.
+4) CRITICAL: Every character must have an "add_portrait" command BEFORE any "speak" command for that character.
+   A character can't speak unless they already have a portrait displayed on screen.
+5) CRITICAL: A character CANNOT speak after "remove_portrait" has been called on them, unless they have a new "add_portrait" command after the removal.
+   You must track the current state of each character's portrait throughout the event sequence.
 
 SPECIAL ITEM CHECKING - CRITICALLY IMPORTANT:
 - Read the original outro text in the Chapter Idea carefully
@@ -122,6 +128,16 @@ Constraints (apply leniently):
 3) If the chapter idea's intro mentions a 'boss', 'newPlayableUnits', or 'newNonBattleCharacters', ensure they appear in the final event.
 4) PORTRAIT LIMIT CHECK: Never have more than 6 character portraits visible at once. Use remove_portrait 
    when needed and ensure the narrative flow makes sense with characters entering and exiting at appropriate times.
+5) CRITICAL SPEAKING CHECK: Verify that EVERY character has an "add_portrait" command BEFORE their first "speak" command.
+   Characters should never speak if they don't have a portrait on screen yet.
+   - For each character that speaks, check if they had an "add_portrait" command earlier
+   - If a character speaks before they're added, that's an error that must be fixed
+6) CRITICAL PORTRAIT STATE CHECK: Verify that characters do not speak after "remove_portrait" has been called on them,
+   unless they have been re-added with "add_portrait".
+   - Track when portraits are added and removed for each character
+   - If a character speaks after being removed without being re-added, that's an error
+7) SPECIAL ITEM CHECK: If the outro text mentions items or money being found or received,
+   there MUST be a corresponding "give_item" or "give_money" command in the sourceObjects.
 
 IMPORTANT:
 - Allow storytelling with references to characters being "thought dead" or returned
