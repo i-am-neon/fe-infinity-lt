@@ -1,6 +1,6 @@
 import { MapMetadata } from "@/types/maps/map-metadata.ts";
 
-  export const allMapOptions: MapMetadata[] = [
+export const allMapOptions: MapMetadata[] = [
   {
     "distinctRegions": [
       {
@@ -5834,8 +5834,8 @@ import { MapMetadata } from "@/types/maps/map-metadata.ts";
         ],
         "fromX": 0,
         "fromY": 0,
-        "toX": 21,
-        "toY": 2
+        "toX": 9,
+        "toY": 6
       },
       {
         "name": "Western Approach Corridor",
