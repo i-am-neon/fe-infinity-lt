@@ -190,6 +190,7 @@ export const testInitialGameIdea: InitialGameIdea = {
 export const testPrologueChapter: Chapter = {
   title: "The Grand Mischief",
   number: 0,
+  sceneBackgrounds: [],
   level: {
     nid: "0",
     name: "Prologue: The Grand Mischief",
