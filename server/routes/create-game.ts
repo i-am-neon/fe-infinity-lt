@@ -10,6 +10,7 @@ import removeExistingGame from "@/lib/remove-existing-game.ts";
 import runGame from "@/run-game.ts";
 import { Game } from "@/types/game.ts";
 import { insertGame } from "../db/games.ts";
+import genAndSaveTitleImage from "../ai/gen-and-save-title-image.ts";
 
 // Game creation steps indices (matching the UI steps)
 const GAME_CREATION_STEPS = {
@@ -176,24 +177,34 @@ export async function handleCreateGame(req: Request): Promise<Response> {
         });
         logger.info(`Game creation progress: Creating first chapter (step ${GAME_CREATION_STEPS.CREATE_FIRST_CHAPTER})`);
 
-        const { chapter, usedPortraits, musicToCopy } = await genChapter({
-          worldSummary,
-          initialGameIdea,
-          tone,
-          chapterNumber: 0,
-          onProgress: (progress) => {
-            // Map the gen-chapter steps to our UI steps
-            // We need to use the generation phase steps that are shared between
-            // chapter generation and game creation in the UI
-            const step = progress.step + GAME_CREATION_STEPS.CREATE_FIRST_CHAPTER;
+        const [_, chapterResult] = await Promise.all([
+          genAndSaveTitleImage({
+            gameTitle: projectName,
+            worldSummary,
+            initialGameIdea,
+            projectNameEndingInDotLtProj
+          }),
+          genChapter({
+            worldSummary,
+            initialGameIdea,
+            tone,
+            chapterNumber: 0,
+            onProgress: (progress) => {
+              // Map the gen-chapter steps to our UI steps
+              // We need to use the generation phase steps that are shared between
+              // chapter generation and game creation in the UI
+              const step = progress.step + GAME_CREATION_STEPS.CREATE_FIRST_CHAPTER;
 
-            gameCreationProgress.set(gameNid, {
-              step: step,
-              message: progress.message || "Creating first chapter"
-            });
-            logger.info(`Game creation progress: ${progress.message} (step ${step})`);
-          },
-        });
+              gameCreationProgress.set(gameNid, {
+                step: step,
+                message: progress.message || "Creating first chapter"
+              });
+              logger.info(`Game creation progress: ${progress.message} (step ${step})`);
+            },
+          })
+        ]);
+
+        const { chapter, usedPortraits, musicToCopy } = chapterResult;
 
         // Set up game files
         gameCreationProgress.set(gameNid, {

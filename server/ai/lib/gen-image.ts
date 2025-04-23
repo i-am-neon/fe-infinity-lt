@@ -1,25 +1,27 @@
 import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
 import OpenAI from "openai";
 import { Image, decode } from "imagescript";
+import { getCurrentLogger } from "@/lib/current-logger.ts";
 
 // This currently isn't being used because I'm waiting for 4o image generation to come out in the API.
 // When available, hook it up in the game generation and name it "title_background.png" and put it in resources/panoramas and it will automatically be used.
 // You'll also need to remove the "Lion's Throne" text overlay
 export default async function genImage({ prompt, filePath }: { prompt: string; filePath: string; }): Promise<void> {
     try {
+        const logger = getCurrentLogger();
+        const startTime = performance.now();
         // Initialize OpenAI client
         const openai = new OpenAI();
 
         // Generate the image using OpenAI SDK
         const response = await openai.images.generate({
-            model: "dall-e-3",
+            model: "gpt-image-1",
             prompt,
             n: 1,
             size: "1024x1024",
-            response_format: "b64_json",
         });
 
-        const base64Data = response.data[0].b64_json;
+        const base64Data = response?.data?.[0]?.b64_json;
         if (!base64Data) {
             throw new Error("No base64 data received from OpenAI");
         }
@@ -32,6 +34,8 @@ export default async function genImage({ prompt, filePath }: { prompt: string; f
 
         // Write the cropped image to file
         await Deno.writeFile(filePath, processedImage);
+        const elapsedMs = performance.now() - startTime;
+        logger.info("Title image generated", { elapsedMs });
     } catch (error) {
         console.error("Error generating image:", error);
         throw error;
@@ -126,7 +130,9 @@ if (import.meta.main) {
 Title: "The Grand Tourney"
 Desc: "As the Grand Tourney in Veloria's capital Virelle begins, the city is aflame with excitement, mischief, and anticipation. Nobles and commoners alike descend upon the marble streets, eager for glory, laughter, or a chance to tip the scales of power. Amid the festivities, a trio of unlikely companions—each with their own reasons for entering the Tourney—find themselves swept into a farcical mix-up during the opening parade. What starts as an innocent comedic rivalry soon reveals hints of a deeper conspiracy: a mysterious masked figure sabotages key tournament events and spreads chaos among the factions. With reputations and fortunes on the line, the group must band together to uncover the prankster's identity before the Festival Arena descends into utter pandemonium."
 
-Make sure to include the title text in a stylized way, do not put the description on there, but use it as context for image gen. `;
+Make sure to include the title text in a stylized way, do not put the description on there, but use it as context for image gen.
+
+The image should not contain any characters.`;
     await genImage({ prompt, filePath: testImagePath });
     console.log(`Image saved to: ${testImagePath}`);
 }
