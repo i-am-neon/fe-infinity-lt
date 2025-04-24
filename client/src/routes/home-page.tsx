@@ -22,7 +22,7 @@ import { useCallback, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FeInfinityTitle } from "@/components/ui/fe-infinity-title";
 
-const showDebugButtons = true;
+const showDebugButtons = false;
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -363,7 +363,7 @@ export default function HomePage() {
         <Dialog open={helpDialogOpen} onOpenChange={setHelpDialogOpen}>
           <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle>How to Play FE Infinity</DialogTitle>
+              <DialogTitle className="text-2xl">How to Play FE Infinity</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div>

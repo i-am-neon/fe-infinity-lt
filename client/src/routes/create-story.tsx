@@ -107,6 +107,12 @@ export default function CreateStoryPage() {
   const [error, setError] = useState<string | null>(null);
   const [showTweakOptions, setShowTweakOptions] = useState(false);
 
+  // Determine if user has made any choices
+  const hasUserMadeChoices = selectedPreset !== null ||
+    selectedTags.length > 0 ||
+    blurb !== "" ||
+    generated !== null;
+
   const toggleTag = (tag: string) => {
     setSelectedTags((prev) =>
       prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
@@ -251,23 +257,25 @@ export default function CreateStoryPage() {
           Back
         </Button>
 
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleReset}
-                aria-label="Reset"
-              >
-                <RefreshCw className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Reset</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        {hasUserMadeChoices && (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleReset}
+                  aria-label="Reset"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Reset</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
       </div>
 
       <header className="mb-6">

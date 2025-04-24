@@ -20,6 +20,8 @@ import useGenerationProgress, { useGameCreationProgress } from "@/lib/use-genera
 import { AnimatePresence, motion } from "framer-motion";
 import { getTitleImagePath } from "@/lib/asset-path";
 
+const showDebugButtons = false;
+
 export default function GameDetailPage() {
   const { nid } = useParams<{ nid: string }>();
   const navigate = useNavigate();
@@ -657,7 +659,7 @@ export default function GameDetailPage() {
               </Button>
 
               {/* Debug button for testing chapter generation */}
-              {process.env.NODE_ENV !== "production" && (
+              {showDebugButtons && (
                 <Button
                   variant="outline"
                   size="sm"
