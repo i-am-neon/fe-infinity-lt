@@ -17,7 +17,8 @@ export function initializeDatabase() {
       used_portraits TEXT,
       world_summary TEXT,
       initial_game_idea TEXT,
-      dead_characters TEXT
+      dead_characters TEXT,
+      previous_chapter_music TEXT
     )
   `);
 }

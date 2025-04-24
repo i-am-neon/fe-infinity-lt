@@ -14,8 +14,8 @@ export default async function chooseTopLevelMusic({
 }): Promise<string[]> {
   const promotionMusic = 'fdlan-winds';
   const [mainTheme, gameOverMusic] = await Promise.all([
-    chooseMusic(`Title main theme for game. Title: ${gameTitle}. Description: ${gameDescription}. Tone: ${tone}`),
-    chooseMusic(`Game Over music for game. Title: ${gameTitle}. Description: ${gameDescription}. Tone: ${tone}`),
+    chooseMusic({ scenario: `Title main theme for game. Title: ${gameTitle}. Description: ${gameDescription}. Tone: ${tone}` }),
+    chooseMusic({ scenario: `Game Over music for game. Title: ${gameTitle}. Description: ${gameDescription}. Tone: ${tone}` }),
   ]);
   await modifyConstant({
     projectNameEndingInDotLtProj,

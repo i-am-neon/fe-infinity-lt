@@ -167,6 +167,7 @@ export default async function createNextChapter({
       chapterGenerationProgress.set(gameNid, adjustedProgress);
       logger.info(`Chapter generation progress for ${gameNid}:`, adjustedProgress);
     },
+    previousChapterMusic: existingGame.previousChapterMusic || [],
   });
 
   logger.debug("created chapter", { chapter });
@@ -174,6 +175,12 @@ export default async function createNextChapter({
   // Add the new chapter to the game
   existingGame.chapters.push(chapter);
   existingGame.usedPortraits.push(...usedPortraits);
+
+  // Update the previousChapterMusic array with this chapter's music
+  if (!existingGame.previousChapterMusic) {
+    existingGame.previousChapterMusic = [];
+  }
+  existingGame.previousChapterMusic.push(musicToCopy);
 
   // Update the database with the newly appended chapters
   insertGame(existingGame);

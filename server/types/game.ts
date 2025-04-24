@@ -16,4 +16,5 @@ export interface Game {
   deadCharacters?: DeadCharacterRecord[];
   worldSummary?: WorldSummary;
   initialGameIdea?: InitialGameIdea;
+  previousChapterMusic?: string[][];
 }

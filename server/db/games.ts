@@ -16,6 +16,9 @@ export function insertGame(game: Game): void {
   const initialGameIdeaJson = game.initialGameIdea
     ? JSON.stringify(game.initialGameIdea)
     : "";
+  const previousChapterMusicJson = game.previousChapterMusic
+    ? JSON.stringify(game.previousChapterMusic)
+    : "[]";
   db.query(
     `
       INSERT OR REPLACE INTO games (
@@ -29,9 +32,10 @@ export function insertGame(game: Game): void {
         used_portraits,
         world_summary,
         initial_game_idea,
-        dead_characters
+        dead_characters,
+        previous_chapter_music
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `,
     [
       game.nid,
@@ -45,6 +49,7 @@ export function insertGame(game: Game): void {
       worldSummaryJson,
       initialGameIdeaJson,
       JSON.stringify(game.deadCharacters ?? []),
+      previousChapterMusicJson,
     ]
   );
 }
@@ -65,10 +70,11 @@ export function getGameByNid(nid: string): Game | null {
       string,
       string?,
       string?,
+      string?,
       string?
     ]
   >(
-    "SELECT nid, title, directory, description, tone, chapters, characters, used_portraits, world_summary, initial_game_idea, dead_characters FROM games WHERE nid = ? LIMIT 1",
+    "SELECT nid, title, directory, description, tone, chapters, characters, used_portraits, world_summary, initial_game_idea, dead_characters, previous_chapter_music FROM games WHERE nid = ? LIMIT 1",
     [nid]
   );
   if (query.length === 0) {
@@ -86,6 +92,7 @@ export function getGameByNid(nid: string): Game | null {
     dbWorldSummaryJson,
     dbInitialGameIdeaJson,
     dbDeadCharactersJson,
+    dbPreviousChapterMusicJson,
   ] = query[0];
 
   let chapters = [];
@@ -114,14 +121,14 @@ export function getGameByNid(nid: string): Game | null {
     if (dbWorldSummaryJson) {
       worldSummary = JSON.parse(dbWorldSummaryJson);
     }
-  } catch (_) {}
+  } catch (_) { }
 
   let initialGameIdea = undefined;
   try {
     if (dbInitialGameIdeaJson) {
       initialGameIdea = JSON.parse(dbInitialGameIdeaJson);
     }
-  } catch (_) {}
+  } catch (_) { }
 
   let deadCharacters = [];
   try {
@@ -131,7 +138,17 @@ export function getGameByNid(nid: string): Game | null {
         deadCharacters = parsedDc;
       }
     }
-  } catch (_) {}
+  } catch (_) { }
+
+  let previousChapterMusic: string[][] = [];
+  try {
+    if (dbPreviousChapterMusicJson) {
+      const parsedMusic = JSON.parse(dbPreviousChapterMusicJson);
+      if (Array.isArray(parsedMusic)) {
+        previousChapterMusic = parsedMusic;
+      }
+    }
+  } catch (_) { }
 
   return {
     nid: dbNid,
@@ -145,6 +162,7 @@ export function getGameByNid(nid: string): Game | null {
     deadCharacters,
     worldSummary,
     initialGameIdea,
+    previousChapterMusic,
   };
 }
 
@@ -163,10 +181,12 @@ export function getAllGames(): Game[] {
       string,
       string,
       string?,
+      string?,
+      string?,
       string?
     ]
   >(
-    "SELECT nid, title, directory, description, tone, chapters, characters, used_portraits, world_summary, initial_game_idea FROM games"
+    "SELECT nid, title, directory, description, tone, chapters, characters, used_portraits, world_summary, initial_game_idea, dead_characters, previous_chapter_music FROM games"
   );
 
   const games: Game[] = [];
@@ -182,6 +202,8 @@ export function getAllGames(): Game[] {
       dbUsedPortraitsJson,
       dbWorldSummaryJson,
       dbInitialGameIdeaJson,
+      dbDeadCharactersJson,
+      dbPreviousChapterMusicJson,
     ] = row;
 
     let chapters = [];
@@ -210,14 +232,34 @@ export function getAllGames(): Game[] {
       if (dbWorldSummaryJson) {
         worldSummary = JSON.parse(dbWorldSummaryJson);
       }
-    } catch (_) {}
+    } catch (_) { }
 
     let initialGameIdea = undefined;
     try {
       if (dbInitialGameIdeaJson) {
         initialGameIdea = JSON.parse(dbInitialGameIdeaJson);
       }
-    } catch (_) {}
+    } catch (_) { }
+
+    let deadCharacters = [];
+    try {
+      if (dbDeadCharactersJson) {
+        const parsedDc = JSON.parse(dbDeadCharactersJson);
+        if (Array.isArray(parsedDc)) {
+          deadCharacters = parsedDc;
+        }
+      }
+    } catch (_) { }
+
+    let previousChapterMusic: string[][] = [];
+    try {
+      if (dbPreviousChapterMusicJson) {
+        const parsedMusic = JSON.parse(dbPreviousChapterMusicJson);
+        if (Array.isArray(parsedMusic)) {
+          previousChapterMusic = parsedMusic;
+        }
+      }
+    } catch (_) { }
 
     games.push({
       nid: dbNid,
@@ -230,6 +272,8 @@ export function getAllGames(): Game[] {
       usedPortraits,
       worldSummary,
       initialGameIdea,
+      deadCharacters,
+      previousChapterMusic,
     });
   }
   return games;
@@ -258,6 +302,7 @@ if (import.meta.main) {
     chapters: [],
     characters: [],
     usedPortraits: [],
+    previousChapterMusic: [],
   };
   insertGame(exampleGame);
 

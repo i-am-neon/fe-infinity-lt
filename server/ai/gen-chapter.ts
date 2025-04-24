@@ -62,6 +62,7 @@ export default async function genChapter({
   choiceQuestion,
   playerChoice,
   onProgress,
+  previousChapterMusic = [],
 }: {
   worldSummary: WorldSummary;
   initialGameIdea: InitialGameIdea;
@@ -75,6 +76,7 @@ export default async function genChapter({
   choiceQuestion?: string;
   playerChoice?: string;
   onProgress?: ProgressCallback;
+  previousChapterMusic?: string[][];
 }): Promise<{
   chapter: Chapter;
   usedPortraits: string[];
@@ -89,6 +91,13 @@ export default async function genChapter({
     }
     logger.info(`Chapter generation progress: ${message}`, { step });
   };
+
+  // Get disallowed songs from previous chapters (last two chapters' music)
+  const disallowedSongs: string[] = previousChapterMusic
+    .slice(-2)  // Get last two chapters' music
+    .flat();    // Flatten the array
+
+  logger.debug("Disallowed songs from previous chapters", { disallowedSongs });
 
   // Step 1: Draft chapter storyline
   reportProgress(0, "Drafting chapter storyline");
@@ -135,8 +144,14 @@ export default async function genChapter({
   // Step 4: Compose battle theme music
   reportProgress(3, "Composing battle theme music");
   const [playerPhaseMusic, enemyPhaseMusic] = await Promise.all([
-    chooseMusic(`Player phase music for battle. Should be fast-paced and exciting and uplifting. Battle: ${chapterIdea.battle}`),
-    chooseMusic(`Enemy phase music for battle. Battle: ${chapterIdea.battle}`),
+    chooseMusic({
+      scenario: `Player phase music for battle. Should be fast-paced and exciting and uplifting. Battle: ${chapterIdea.battle}`,
+      disallowedSongIds: disallowedSongs
+    }),
+    chooseMusic({
+      scenario: `Enemy phase music for battle. Battle: ${chapterIdea.battle}`,
+      disallowedSongIds: disallowedSongs
+    }),
   ]);
 
   // Step 5: Write introduction cutscene dialogue
@@ -169,8 +184,14 @@ export default async function genChapter({
   // Step 8: Choose event music
   reportProgress(7, "Selecting event music");
   const [introMusic, outroMusic] = await Promise.all([
-    chooseMusic(`Music for intro scene. Title: ${chapterIdea.title}. Description: ${chapterIdea.intro}`),
-    chooseMusic(`Music for conclusion scene. Title: ${chapterIdea.title}. Description: ${chapterIdea.outro}`),
+    chooseMusic({
+      scenario: `Music for intro scene. Title: ${chapterIdea.title}. Description: ${chapterIdea.intro}`,
+      disallowedSongIds: disallowedSongs
+    }),
+    chooseMusic({
+      scenario: `Music for conclusion scene. Title: ${chapterIdea.title}. Description: ${chapterIdea.outro}`,
+      disallowedSongIds: disallowedSongs
+    }),
   ]);
 
   const introEvent = convertAIEventToEvent({
