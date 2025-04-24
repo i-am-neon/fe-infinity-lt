@@ -154,6 +154,9 @@ export async function handleRequest(req: Request): Promise<Response> {
       "./generate-next-chapter.ts"
     );
     response = await handleGenerateNextChapter(req);
+  } else if (req.method === "POST" && url.pathname === "/regenerate-current-chapter") {
+    const { handleRegenerateCurrentChapter } = await import("./regenerate-current-chapter.ts");
+    response = await handleRegenerateCurrentChapter(req);
   } else if (req.method === "POST" && url.pathname === "/delete-game") {
     const { handleDeleteGame } = await import("./delete-game.ts");
     response = await handleDeleteGame(req);

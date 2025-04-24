@@ -35,13 +35,14 @@ export default function GameDetailPage() {
   const [creationError, setCreationError] = useState<string | null>(null);
 
   const [loadingAction, setLoadingAction] = useState<
-    "play" | "generate" | "delete" | "test" | null
+    "play" | "generate" | "delete" | "test" | "regenerate" | null
   >(null);
 
   const isNew = searchParams.get("new") === "true";
   const [newGameModalOpen, setNewGameModalOpen] = useState(isNew);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [confirmNextChapterOpen, setConfirmNextChapterOpen] = useState(false);
+  const [confirmRegenerateOpen, setConfirmRegenerateOpen] = useState(false);
   const [generatingChapterModalOpen, setGeneratingChapterModalOpen] =
     useState(false);
   const [generationError, setGenerationError] = useState<string | null>(null);
@@ -50,7 +51,7 @@ export default function GameDetailPage() {
 
   const generationProgress = useGenerationProgress(
     nid,
-    loadingAction === "generate" || loadingAction === "test"
+    loadingAction === "generate" || loadingAction === "test" || loadingAction === "regenerate"
   );
 
   const gameCreationProgress = useGameCreationProgress(
@@ -97,6 +98,8 @@ export default function GameDetailPage() {
             clearInterval(intervalId);
             // remove ?new=true from URL
             navigate(`/games/${nid}`, { replace: true });
+            // Refresh the page to ensure images load properly
+            window.location.reload();
           } else if (res.error) {
             // API returned an error
             setCreationError(res.error);
@@ -200,6 +203,25 @@ export default function GameDetailPage() {
     }
   }, [data, nid]);
 
+  const handleConfirmRegenerate = useCallback(async () => {
+    setConfirmRegenerateOpen(false);
+    if (!data?.game || !nid) return;
+
+    setOldChapterCount(data.game.chapters.length - 1);
+    setGeneratingChapterModalOpen(true);
+    setLoadingAction("regenerate");
+
+    try {
+      await apiCall("regenerate-current-chapter", {
+        method: "POST",
+        body: { directory: data.game.directory, gameNid: data.game.nid }
+      });
+    } catch (err) {
+      setGenerationError(err instanceof Error ? err.message : String(err));
+      setLoadingAction(null);
+    }
+  }, [data, nid]);
+
   const handleGenerateNextChapter = useCallback(() => {
     if (!data?.game) return;
     setConfirmNextChapterOpen(true);
@@ -207,7 +229,7 @@ export default function GameDetailPage() {
 
   // Poll for generate next chapter completion
   useEffect(() => {
-    if (loadingAction === "generate" && oldChapterCount !== null && nid) {
+    if ((loadingAction === "generate" || loadingAction === "regenerate") && oldChapterCount !== null && nid) {
       const pollId = setInterval(async () => {
         try {
           const res = await apiCall<{
@@ -257,8 +279,8 @@ export default function GameDetailPage() {
 
   // Handle real chapter generation completion (non-test)
   useEffect(() => {
-    // When in generate mode and final step reached, close loader and refresh game
-    if (loadingAction === "generate" && generationProgress.progress.currentStep === 16) {
+    // When in generate or regenerate mode and final step reached, close loader and refresh game
+    if ((loadingAction === "generate" || loadingAction === "regenerate") && generationProgress.progress.currentStep === 16) {
       const completionTimer = setTimeout(async () => {
         // Close loader
         setLoadingAction(null);
@@ -410,6 +432,29 @@ export default function GameDetailPage() {
         )}
       </AnimatePresence>
 
+      {/* Regenerate Current Chapter Confirmation */}
+      <AlertDialog
+        open={confirmRegenerateOpen}
+        onOpenChange={setConfirmRegenerateOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Regenerate Current Chapter?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will overwrite your current chapter. This is useful if the AI made a mistake in the current chapter. This is irreversible, but will not affect your previous chapters or game save.
+              <br /><br />
+              <i>This does not work if the current chapter is the prologue. In that case, you must delete the game and start over.</i>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmRegenerate}>
+              Regenerate Chapter
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* Next Chapter Confirmation Dialog */}
       <AlertDialog
         open={confirmNextChapterOpen}
@@ -485,14 +530,22 @@ export default function GameDetailPage() {
               ) : (
                 <ChapterGeneratorLoader
                   progress={{
-                    isGenerating: loadingAction === "generate" || loadingAction === "test",
+                    isGenerating: loadingAction === "generate" || loadingAction === "test" || loadingAction === "regenerate",
                     currentStep: generationProgress.progress.currentStep,
                     message: generationProgress.progress.message,
                   }}
-                  title={loadingAction === "test" ? "Testing Chapter Generation" : "Generating Next Chapter"}
-                  description={loadingAction === "test"
-                    ? "This is a test simulation showing the chapter generation process with 3-second intervals between steps."
-                    : "The AI is creating your next chapter based on your gameplay. This typically takes around 2 minutes, and the game will launch automatically when complete. Do not close this window!"}
+                  title={
+                    loadingAction === "test" ? "Testing Chapter Generation"
+                      : loadingAction === "regenerate" ? "Re-generating Chapter"
+                        : "Generating Next Chapter"
+                  }
+                  description={
+                    loadingAction === "test"
+                      ? "This is a test simulation showing the chapter generation process with 3-second intervals between steps."
+                      : loadingAction === "regenerate"
+                        ? "Overwriting your current chapter. Please wait—do not close this window."
+                        : "The AI is creating your next chapter based on your gameplay. This typically takes around 2 minutes, and the game will launch automatically when complete. Do not close this window!"
+                  }
                   mode="chapter"
                 />
               )}
@@ -539,7 +592,7 @@ export default function GameDetailPage() {
 
               {/* Title and Description - Right Column */}
               <div className="md:col-span-2 flex flex-col justify-center">
-                <h1 className="text-2xl font-bold mb-3">Game: {data.game.title}</h1>
+                <h1 className="text-2xl font-bold mb-3">{data.game.title}</h1>
                 <p className="mb-2">{data.game.description}</p>
                 <p className="italic text-sm text-muted-foreground">
                   Tone: {data.game.tone}
@@ -578,6 +631,17 @@ export default function GameDetailPage() {
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 )}
                 Generate Next Chapter
+              </Button>
+
+              <Button
+                variant="outline"
+                onClick={() => setConfirmRegenerateOpen(true)}
+                disabled={disabled}
+              >
+                {loadingAction === "regenerate" && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                Re-generate Current Chapter
               </Button>
 
               {/* Debug button for testing chapter generation */}
@@ -636,4 +700,3 @@ export default function GameDetailPage() {
     </>
   );
 }
-

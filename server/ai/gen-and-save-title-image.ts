@@ -19,7 +19,7 @@ export default async function genAndSaveTitleImage({ gameTitle, worldSummary, in
 
     The image should not contain any characters.
     
-    The top 1/3rd of the image will be cut off, so make sure the title text is set slightly below center.`;
+    The title text should be perfectly centered in the image.`;
 
     // Path for LT Maker
     const ltMakerFilePath = getPathWithinLtMaker(`${projectNameEndingInDotLtProj}/resources/panoramas/title_background.png`);
