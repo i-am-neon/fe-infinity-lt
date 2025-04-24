@@ -3,38 +3,44 @@ import Link from "next/link";
 import { GlowCard } from "@/components/ui/glow-card";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
+import { BackgroundGradientAnimation } from "@/components/ui/background-gradient-animation";
 
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center">
-      {/* Nav bar */}
-      <nav className="flex w-full items-center justify-center px-6 py-4">
-        <div className="ml-auto">
-          <Link href="/downloads">
-            <Button variant="ghost">Downloads</Button>
-          </Link>
-        </div>
-      </nav>
+      {/* Background gradient with hero content */}
+      <div className="w-full">
+        <BackgroundGradientAnimation>
+          {/* Nav bar inside gradient */}
+          <nav className="absolute top-0 left-0 right-0 flex w-full items-center justify-center px-6 py-4 z-50">
+            <div className="ml-auto">
+              <Link href="/downloads">
+                <Button variant="ghost" className="text-white hover:bg-white/10">Downloads</Button>
+              </Link>
+            </div>
+          </nav>
 
-      {/* Hero section */}
-      <div className="flex flex-col items-center justify-center py-16">
-        <Image
-          src="/logo.png"
-          alt="FE Infinity Logo"
-          width={120}
-          height={120}
-          className="mb-6"
-        />
-        <h1 className="text-5xl font-bold mb-6 text-center" style={{ fontFamily: 'var(--font-metamorphous)' }}>
-          FE Infinity
-        </h1>
-        <h2 className="text-2xl text-center mb-10">
-          AI Creates a Fire Emblem game as you play it
-        </h2>
+          {/* Hero content */}
+          <div className="relative z-40 flex flex-col items-center justify-center py-32 pointer-events-none">
+            <Image
+              src="/logo.png"
+              alt="FE Infinity Logo"
+              width={120}
+              height={120}
+              className="mb-6"
+            />
+            <h1 className="text-5xl font-bold mb-6 text-center text-white" style={{ fontFamily: 'var(--font-metamorphous)' }}>
+              FE Infinity
+            </h1>
+            <h2 className="text-2xl text-center mb-10 text-white">
+              AI Creates a Fire Emblem game as you play it
+            </h2>
+          </div>
+        </BackgroundGradientAnimation>
       </div>
 
-      {/* Main content */}
-      <div className="flex flex-1 flex-col items-center justify-center px-6 pt-0 pb-12">
+      {/* Cards section */}
+      <div className="flex flex-1 flex-col items-center justify-center px-6 pt-12 pb-12">
         <div className="max-w-5xl w-full">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
             {/* Card 1 */}
