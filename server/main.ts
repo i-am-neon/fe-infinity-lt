@@ -60,6 +60,7 @@ async function checkEnvironment() {
       portraits_female: vectorStore.getVectors("portraits-female").length,
       music: vectorStore.getVectors("music").length,
       items: vectorStore.getVectors("items").length,
+      scene_backgrounds: vectorStore.getVectors("scene-backgrounds").length,
     };
     console.log("Vector counts:", counts);
     console.log("Vector store initialization successful");
