@@ -47,7 +47,7 @@ export default function DownloadsPage() {
                         </Link>
 
                         {/* Mac Download */}
-                        <Link href="#mac-download" className="block h-full">
+                        <a href="https://github.com/i-am-neon/fe-infinity-lt/releases/download/ai/FE.Infinity-1.0.0-arm64.dmg" className="block h-full">
                             <GlowCard className="flex flex-col items-center justify-center text-center p-8 h-full transition-transform hover:scale-105">
                                 <div className="mb-4">
                                     <Apple size={64} />
@@ -55,7 +55,7 @@ export default function DownloadsPage() {
                                 <h3 className="text-xl font-bold mb-4">Mac</h3>
                                 <p>See below installation instructions</p>
                             </GlowCard>
-                        </Link>
+                        </a>
                     </div>
 
                     {/* Mac prerequisites */}

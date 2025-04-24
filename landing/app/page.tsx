@@ -1,7 +1,6 @@
 import { BackgroundGradientAnimation } from "@/components/ui/background-gradient-animation";
 import { Button } from "@/components/ui/button";
-import { GlowCard } from "@/components/ui/glow-card";
-import { Clock, DollarSign, Download, ExternalLink, Github, MessageSquare, Wand2, Gamepad2, Brain, Sparkles, Palette } from "lucide-react";
+import { Clock, DollarSign, Download, Gamepad2, Github, MessageSquare, Palette, Sparkles } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
