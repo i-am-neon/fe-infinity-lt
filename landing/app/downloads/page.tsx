@@ -1,5 +1,6 @@
 "use client";
 
+import { ScriptCopyBtn } from "@/components/magicui/script-copy-btn";
 import { CopyButton } from "@/components/ui/copy-button";
 import { GlowCard } from "@/components/ui/glow-card";
 import { Apple, Grid2x2 } from "lucide-react";
@@ -62,32 +63,44 @@ export default function DownloadsPage() {
                     {/* Mac prerequisites */}
                     <div className="mt-8 sm:mt-12">
                         <h3 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Mac Prerequisites</h3>
-                        <p className="mb-3 sm:mb-4">Before installing FE Infinity on Mac, you&apos;ll need to install:</p>
+                        <p className="mb-5 sm:mb-6">Before installing FE Infinity on Mac, you&apos;ll need to install some prerequisites:</p>
 
-                        <ol className="list-decimal pl-6 mb-4 sm:mb-6 space-y-1 sm:space-y-2">
-                            <li>Homebrew: <a href="https://brew.sh" className="text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer">https://brew.sh</a></li>
-                            <li>Python and Wine using Homebrew</li>
-                        </ol>
+                        <div className="space-y-8 mb-6">
+                            {/* Homebrew */}
+                            <div>
+                                <h4 className="text-lg font-medium mb-2">
+                                    1. Install <Link href="https://brew.sh" className="underline underline-offset-2 hover:text-primary" target="_blank" rel="noopener noreferrer">Homebrew</Link>
+                                </h4>
+                                <p className="mb-3 text-gray-300">Homebrew is a package manager for macOS that makes it easy to install software.</p>
+                                <ScriptCopyBtn
+                                    className="w-full"
+                                    commandMap={{ zsh: `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"` }}
+                                    codeLanguage="sh"
+                                    lightTheme="github-dark"
+                                    darkTheme="github-dark"
+                                    showMultiplePackageOptions={false}
+                                />
+                            </div>
 
-                        <div className="relative">
-                            <CodeBlock code={`/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`} />
-                            <CodeBlock code="brew install python wine" />
+                            {/* Python and Wine */}
+                            <div>
+                                <h4 className="text-lg font-medium mb-2">
+                                    2. Install <Link href="https://www.python.org/" className="underline underline-offset-2 hover:text-primary" target="_blank" rel="noopener noreferrer">Python</Link> and <Link href="https://www.winehq.org/" className="underline underline-offset-2 hover:text-primary" target="_blank" rel="noopener noreferrer">Wine</Link>
+                                </h4>
+                                <p className="mb-3 text-gray-300">Python is needed for running the game engine, and Wine allows running Windows applications on macOS.</p>
+                                <ScriptCopyBtn
+                                    className="w-full"
+                                    commandMap={{ zsh: "brew install python wine" }}
+                                    codeLanguage="sh"
+                                    lightTheme="github-dark"
+                                    darkTheme="github-dark"
+                                    showMultiplePackageOptions={false}
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </main>
-    );
-}
-
-// Code block with copy button
-function CodeBlock({ code }: { code: string }) {
-    return (
-        <div className="bg-gray-800 rounded-lg p-3 sm:p-4 mb-3 sm:mb-4 relative group overflow-x-auto">
-            <pre className="font-mono text-xs sm:text-sm text-white overflow-x-auto whitespace-pre-wrap break-all sm:break-normal">{code}</pre>
-            <div className="absolute right-1 sm:right-2 top-1 sm:top-2">
-                <CopyButton text={code} />
-            </div>
-        </div>
     );
 } 
