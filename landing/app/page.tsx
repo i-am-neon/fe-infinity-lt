@@ -14,11 +14,6 @@ const features = [
     icon: DollarSign,
   },
   {
-    name: "Quick Generation",
-    description: "Experience minimal waiting with chapters generated in approximately 2 minutes, keeping your gameplay flowing.",
-    icon: Clock,
-  },
-  {
     name: "Infinite Possibilities",
     description: "Complete battle objectives, make decisions in dialogue, and watch as AI creates the next chapter based on your choices. No two playthroughs are alike – your decisions shape unique stories, characters, and challenges each time you play.",
     icon: Sparkles,
@@ -28,6 +23,11 @@ const features = [
     description: "Experience the tactical depth of Fire Emblem with the powerful ",
     icon: Gamepad2,
     customDescription: true,
+  },
+  {
+    name: "Quick Generation",
+    description: "Experience minimal waiting with chapters generated in approximately 2 minutes, keeping your gameplay flowing.",
+    icon: Clock,
   },
   {
     name: "Open Source",
