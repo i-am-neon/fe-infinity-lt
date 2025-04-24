@@ -30,6 +30,36 @@ const getServerEnv = () => {
   };
 };
 
+// Add this function at the top, after the existing imports
+const ensureGameLogsDir = (logDir) => {
+  try {
+    const gameLogsDir = path.join(logDir, 'game_logs');
+
+    if (!fs.existsSync(gameLogsDir)) {
+      fs.mkdirSync(gameLogsDir, { recursive: true });
+      logger.log('info', `Created game logs directory: ${gameLogsDir}`);
+      console.log(`Created game logs directory: ${gameLogsDir}`);
+    }
+
+    // Set directory permissions to ensure Deno can write to it
+    if (process.platform !== 'win32') {
+      try {
+        fs.chmodSync(gameLogsDir, 0o777);
+        logger.log('info', `Set permissions on game logs directory: ${gameLogsDir}`);
+        console.log(`Set permissions on game logs directory: ${gameLogsDir}`);
+      } catch (permError) {
+        logger.log('error', `Failed to set permissions on game logs directory: ${permError.message}`);
+        console.error(`Failed to set permissions on game logs directory: ${permError.message}`);
+      }
+    }
+
+    return gameLogsDir;
+  } catch (error) {
+    logger.log('error', `Failed to create game logs directory: ${error.message}`);
+    console.error(`Failed to create game logs directory: ${error.message}`);
+    return null;
+  }
+};
 
 // Start the Deno server
 const startDenoServer = () => {
@@ -80,7 +110,7 @@ const startDenoServer = () => {
     // When packaged in asar, binaries should be in resources/app.asar.unpacked/bin
     const appPath = app.getAppPath();
     let denoCommand;
-    
+
     if (appPath.includes('app.asar')) {
       // In production, use the unpacked path
       const unpackedPath = appPath.replace('app.asar', 'app.asar.unpacked');
@@ -161,11 +191,31 @@ const startDenoServer = () => {
         fs.mkdirSync(logDir, { recursive: true });
         logger.log('info', `Created log directory: ${logDir}`);
       }
+
+      // Set permissions to ensure Deno can write to it
+      if (process.platform !== 'win32') {
+        try {
+          fs.chmodSync(logDir, 0o777);
+          logger.log('info', `Set permissions on log directory: ${logDir}`);
+        } catch (permError) {
+          logger.log('error', `Failed to set permissions on log directory: ${permError.message}`);
+        }
+      }
+
+      // Also ensure game_logs subdirectory exists
+      const gameLogsDir = ensureGameLogsDir(logDir);
+
+      // Log directory structure
+      logger.log('info', 'Log directory structure', {
+        mainLogDir: logDir,
+        gameLogsDir: gameLogsDir
+      });
+
+      logger.log('info', `Using log directory for Deno server: ${logDir}`);
+      console.log(`Using log directory for Deno server: ${logDir}`);
     } catch (logDirError) {
       logger.log('error', `Failed to create log directory: ${logDirError.message}`);
     }
-
-    logger.log('info', `Using log directory for Deno server: ${logDir}`);
 
     const serverEnv = {
       ...getServerEnv(),
@@ -255,12 +305,33 @@ const startDenoServerFallback = (serverPath, resolve, reject) => {
   try {
     if (!fs.existsSync(logDir)) {
       fs.mkdirSync(logDir, { recursive: true });
+      logger.log('info', `Created log directory: ${logDir} (fallback method)`);
     }
-  } catch (e) {
-    logger.log('error', `Failed to create log directory: ${e.message}`);
-  }
 
-  logger.log('info', `Using log directory for Deno server fallback: ${logDir}`);
+    // Set permissions to ensure Deno can write to it
+    if (process.platform !== 'win32') {
+      try {
+        fs.chmodSync(logDir, 0o777);
+        logger.log('info', `Set permissions on log directory: ${logDir} (fallback method)`);
+      } catch (permError) {
+        logger.log('error', `Failed to set permissions on log directory (fallback): ${permError.message}`);
+      }
+    }
+
+    // Also ensure game_logs subdirectory exists
+    const gameLogsDir = ensureGameLogsDir(logDir);
+
+    // Log directory structure
+    logger.log('info', 'Log directory structure (fallback method)', {
+      mainLogDir: logDir,
+      gameLogsDir: gameLogsDir
+    });
+
+    logger.log('info', `Using log directory for Deno server (fallback): ${logDir}`);
+    console.log(`Using log directory for Deno server (fallback): ${logDir}`);
+  } catch (logDirError) {
+    logger.log('error', `Failed to create log directory (fallback): ${logDirError.message}`);
+  }
 
   // Try to find LT Maker path
   const appRoot = app.getAppPath();
@@ -300,7 +371,7 @@ const startDenoServerFallback = (serverPath, resolve, reject) => {
   // Always use bundled Deno
   const appPath = app.getAppPath();
   let bundledDenoPath;
-  
+
   if (appPath.includes('app.asar')) {
     // In production, use the unpacked path
     const unpackedPath = appPath.replace('app.asar', 'app.asar.unpacked');
@@ -555,7 +626,7 @@ const startServer = async () => {
         path.join(__dirname, 'bin', 'python', 'python_embed', 'python.exe'),  // Direct path to executable
         path.join(__dirname, 'bin', 'python', 'python')                       // Wrapper script
       ];
-      
+
       let foundPythonPath = null;
       for (const pythonPath of possiblePythonPaths) {
         if (fs.existsSync(pythonPath)) {
@@ -563,20 +634,20 @@ const startServer = async () => {
           break;
         }
       }
-      
+
       const hasBundledPython = !!foundPythonPath;
-      logger.log('info', `Bundled Python: ${hasBundledPython ? 'found' : 'not found'}`, { 
+      logger.log('info', `Bundled Python: ${hasBundledPython ? 'found' : 'not found'}`, {
         path: foundPythonPath || 'not found',
         checkedPaths: possiblePythonPaths
       });
-      
+
       if (!hasBundledPython) {
         // Check if Wine is available for running Python
         const winePath = await getWineBinary();
         const hasWine = !!winePath;
-        
+
         logger.log('info', `Wine for running Python: ${hasWine ? 'found' : 'not found'}`, { path: winePath || 'not available' });
-        
+
         logger.log('error', 'Bundled Python not found');
         console.error('Bundled Python not found');
         throw new Error('Python not found. Please run the download-binaries.js script first.');
@@ -585,7 +656,7 @@ const startServer = async () => {
           // Check if Wine is available for running Python on macOS
           const winePath = await getWineBinary();
           const hasWine = !!winePath;
-          
+
           if (!hasWine) {
             logger.log('error', 'Wine is required to run bundled Python on macOS but was not found');
             console.error('Wine is required to run bundled Python on macOS but was not found');

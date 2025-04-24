@@ -34,17 +34,21 @@ export class Logger {
 
   private openLogFile() {
     if (this.stream) {
-      this.stream.close();
+      try {
+        this.stream.close();
+      } catch (e) {
+        console.error(`Error closing previous log stream: ${e}`);
+      }
       this.stream = null;
     }
 
     try {
       // Ensure base log directory exists
-      ensureDirSync(this.baseLogDir);
+      this.ensureDirectoryExists(this.baseLogDir);
 
       // Ensure project-specific directory exists
       const projectDir = join(this.baseLogDir, this.projectName);
-      ensureDirSync(projectDir);
+      this.ensureDirectoryExists(projectDir);
 
       const fileName =
         this.chapterNumber !== null ? `${this.chapterNumber}.log` : `-.log`;
@@ -52,14 +56,77 @@ export class Logger {
 
       console.log(`Opening log file: ${logFilePath}`);
 
-      this.stream = Deno.openSync(logFilePath, {
-        write: true,
-        create: true,
-        append: true,
-      });
+      try {
+        // First check if the file exists - in some cases on packaged apps
+        // Deno might fail to detect if a directory exists
+        try {
+          Deno.statSync(logFilePath);
+        } catch {
+          // If file doesn't exist, make extra sure parent directory exists
+          this.ensureDirectoryExists(projectDir);
+        }
+
+        this.stream = Deno.openSync(logFilePath, {
+          write: true,
+          create: true,
+          append: true,
+        });
+
+        // Test write to verify the stream is working
+        this.stream.writeSync(new TextEncoder().encode(
+          JSON.stringify({ timestamp: new Date().toISOString(), message: "Log file opened" }) + "\n"
+        ));
+      } catch (fileError) {
+        console.error(`Failed to open log file ${logFilePath}: ${fileError}`);
+
+        // Try alternative approach for Electron packaged environment
+        if (Deno.env.get("ELECTRON_LOG_DIR")) {
+          try {
+            // Create directory using alternative method
+            const command = new Deno.Command("mkdir", {
+              args: ["-p", projectDir],
+            });
+            const output = command.outputSync();
+            console.log(`Directory creation result: ${output.code === 0 ? "success" : "failed"}`);
+
+            // Try opening file again
+            this.stream = Deno.openSync(logFilePath, {
+              write: true,
+              create: true,
+              append: true,
+            });
+          } catch (alternativeError) {
+            console.error(`Alternative approach failed: ${alternativeError}`);
+          }
+        }
+      }
     } catch (error) {
       console.error(`Failed to open log file for ${this.projectName}:`, error);
       // Don't throw, just continue without logging to file
+    }
+  }
+
+  // Helper method to ensure a directory exists with better error handling
+  private ensureDirectoryExists(dirPath: string) {
+    try {
+      ensureDirSync(dirPath);
+    } catch (error) {
+      console.error(`Failed to create directory ${dirPath}: ${error}`);
+
+      // Try alternative approach for Electron packaged environment
+      if (Deno.env.get("ELECTRON_LOG_DIR")) {
+        try {
+          const command = new Deno.Command("mkdir", {
+            args: ["-p", dirPath],
+          });
+          const output = command.outputSync();
+          if (output.code !== 0) {
+            console.error(`Failed to create directory using command line: ${dirPath}`);
+          }
+        } catch (alternativeError) {
+          console.error(`Alternative directory creation failed: ${alternativeError}`);
+        }
+      }
     }
   }
 
@@ -72,8 +139,7 @@ export class Logger {
     if (!this.stream) {
       // If stream isn't available, at least log to console
       console.log(
-        `[${level.toUpperCase()}] ${message} ${
-          metadata ? JSON.stringify(metadata) : ""
+        `[${level.toUpperCase()}] ${message} ${metadata ? JSON.stringify(metadata) : ""
         }`
       );
       return;
@@ -86,6 +152,7 @@ export class Logger {
         message,
         metadata: {
           ...metadata,
+          project: this.projectName,
           chapter: this.chapterNumber !== null ? this.chapterNumber : "-",
         },
       };
@@ -99,6 +166,25 @@ export class Logger {
       // Try to reopen the log file
       try {
         this.openLogFile();
+
+        // If reopened successfully, try to write again
+        if (this.stream) {
+          const logEntry = {
+            timestamp: new Date().toISOString(),
+            level,
+            message: `Retry after reopen: ${message}`,
+            metadata: {
+              ...metadata,
+              project: this.projectName,
+              chapter: this.chapterNumber !== null ? this.chapterNumber : "-",
+              reopened: true,
+            },
+          };
+
+          this.stream.writeSync(
+            new TextEncoder().encode(JSON.stringify(logEntry, null, 2) + "\n")
+          );
+        }
       } catch (reopenError) {
         console.error(
           `Failed to reopen log file: ${(reopenError as Error).message}`
@@ -124,8 +210,14 @@ export class Logger {
   }
 
   close() {
-    this.stream?.close();
-    this.stream = null;
+    if (this.stream) {
+      try {
+        this.stream.close();
+      } catch (error) {
+        console.error(`Error closing log file: ${error}`);
+      }
+      this.stream = null;
+    }
   }
 }
 
