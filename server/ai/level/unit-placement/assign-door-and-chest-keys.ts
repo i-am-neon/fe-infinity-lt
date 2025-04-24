@@ -4,17 +4,31 @@ import {
   EnemyGenericUnit,
   EnemyGenericUnitWithStartingItems,
 } from "@/ai/types/unit-placement.ts";
-import { getDoorsForMap } from "@/map-region-processing/get-doors-for-map.ts";
+import { getCurrentLogger } from "@/lib/current-logger.ts";
 import { getChestsForMap } from "@/map-region-processing/get-chests-for-map.ts";
-import { TerrainGrid } from "@/types/maps/terrain-grid.ts";
+import { getDoorsForMap } from "@/map-region-processing/get-doors-for-map.ts";
 import { TerrainType } from "@/types/maps/terrain-type.ts";
 import { join } from "https://deno.land/std@0.224.0/path/mod.ts";
 
+
+function unitHasItem(
+  unit: EnemyGenericUnitWithStartingItems,
+  itemName: string
+): boolean {
+  if (!unit.startingItems) return false;
+  return unit.startingItems.some(([name]) => name === itemName);
+}
+
 export default function assignDoorAndChestKeys(
-  { terrainGrid, enemies, originalMapName }: { terrainGrid: TerrainGrid; enemies: EnemyGenericUnit[]; originalMapName: string; }): EnemyGenericUnitWithStartingItems[] {
+  { enemies, originalMapName }: { enemies: EnemyGenericUnit[]; originalMapName: string; }): EnemyGenericUnitWithStartingItems[] {
   const newEnemies: EnemyGenericUnitWithStartingItems[] = enemies.map((e) => ({
     ...e,
   }));
+  if (!originalMapName) {
+    throw new Error("originalMapName is required");
+  }
+
+  const terrainGrid = getTerrainGridFromMapName(originalMapName);
 
   // Get map boundaries
   const { width, height } = getTerrainGridSize(terrainGrid);
@@ -151,14 +165,6 @@ export default function assignDoorAndChestKeys(
     y2: number
   ): number {
     return Math.abs(x1 - x2) + Math.abs(y1 - y2);
-  }
-
-  function unitHasItem(
-    unit: EnemyGenericUnitWithStartingItems,
-    itemName: string
-  ): boolean {
-    if (!unit.startingItems) return false;
-    return unit.startingItems.some(([name]) => name === itemName);
   }
 
   function ensureStartingItemsArray(unit: EnemyGenericUnitWithStartingItems) {
@@ -401,12 +407,21 @@ export default function assignDoorAndChestKeys(
     }
   }
 
+  const logger = getCurrentLogger();
+  logger.info("Assigned door and chest keys to enemies", {
+    originalMapName,
+    enemiesWithKeys: newEnemies.filter((e) => unitHasItem(e, "Door_Key") || unitHasItem(e, "Chest_Key")),
+    allDoorCells,
+    chestCells,
+    enemies,
+    terrainGrid,
+  });
+
   return newEnemies;
 }
 
 if (import.meta.main) {
   // this map has door that spans multiple tiles
-  // const terrainGrid = getTerrainGridFromMapName('CesarianCapitalAssassin');
   // const enemies: EnemyGenericUnit[] = [
   //   { x: 5, y: 7, class: "Archer", aiGroup: "Attack" }, // on the inside of the room, should not get a door key
   //   { x: 10, y: 15, class: "Archer", aiGroup: "Attack" }, // should on the outside of the room should get the door key
@@ -416,13 +431,135 @@ if (import.meta.main) {
   // console.log("enemies :>> ", res);
 
   // Has three doors
-  const terrainGrid = getTerrainGridFromMapName('Alusq_FE8_0A009B0C_in_the_dark__by_FEU');
   const enemies: EnemyGenericUnit[] = [
-    { x: 6, y: 12, class: "Archer", aiGroup: "Attack" }, // bottom door
-    { x: 7, y: 6, class: "Archer", aiGroup: "Attack" }, // top left door
-    { x: 11, y: 3, class: "Archer", aiGroup: "Attack" }, // top right door
+    {
+      "x": 3,
+      "y": 13,
+      "aiGroup": "Defend",
+      "class": "Soldier"
+    },
+    {
+      "x": 5,
+      "y": 14,
+      "aiGroup": "Attack",
+      "class": "Archer"
+    },
+    {
+      "x": 4,
+      "y": 8,
+      "aiGroup": "Defend",
+      "class": "Mercenary"
+    },
+    {
+      "x": 7,
+      "y": 10,
+      "aiGroup": "Guard",
+      "class": "Fighter"
+    },
+    {
+      "x": 7,
+      "y": 6,
+      "aiGroup": "Defend",
+      "class": "Archer"
+    },
+    {
+      "x": 11,
+      "y": 3,
+      "aiGroup": "Guard",
+      "class": "Revenant"
+    },
+    {
+      "x": 12,
+      "y": 3,
+      "aiGroup": "Guard",
+      "class": "Sword Bonewalker"
+    },
+    {
+      "x": 11,
+      "y": 1,
+      "aiGroup": "Attack",
+      "class": "Bow Bonewalker"
+    },
+    {
+      "x": 7,
+      "y": 2,
+      "aiGroup": "Defend",
+      "class": "Cavalier"
+    },
+    {
+      "x": 9,
+      "y": 3,
+      "aiGroup": "Defend",
+      "class": "Myrmidon"
+    }
   ];
-  const res = assignDoorAndChestKeys({ terrainGrid, enemies, originalMapName: 'Alusq_FE8_0A009B0C_in_the_dark__by_FEU' });
-  console.log("enemies :>> ", res);
+  const res = assignDoorAndChestKeys({ enemies, originalMapName: 'Alusq_FE8_0A009B0C_in_the_dark__by_FEU' });
+  console.log("enemies with keys :>> ", res.filter((e) => unitHasItem(e, "Door_Key") || unitHasItem(e, "Chest_Key")));
+  // // Has three doors
+  // const terrainGrid = getTerrainGridFromMapName('Underground');
+  // const enemies: EnemyGenericUnit[] = [
+  //   {
+  //     "x": 1,
+  //     "y": 4,
+  //     "aiGroup": "Guard",
+  //     "class": "Soldier"
+  //   },
+  //   {
+  //     "x": 3,
+  //     "y": 7,
+  //     "aiGroup": "Defend",
+  //     "class": "Archer",
+  //   },
+  //   {
+  //     "x": 5,
+  //     "y": 9,
+  //     "aiGroup": "Defend",
+  //     "class": "Soldier"
+  //   },
+  //   {
+  //     "x": 2,
+  //     "y": 7,
+  //     "aiGroup": "Thief",
+  //     "class": "Thief"
+  //   },
+  //   {
+  //     "x": 2,
+  //     "y": 8,
+  //     "aiGroup": "Guard",
+  //     "class": "Soldier"
+  //   },
+  //   {
+  //     "x": 3,
+  //     "y": 5,
+  //     "aiGroup": "Guard",
+  //     "class": "Knight"
+  //   },
+  //   {
+  //     "x": 4,
+  //     "y": 0,
+  //     "aiGroup": "Defend",
+  //     "class": "Archer"
+  //   },
+  //   {
+  //     "x": 9,
+  //     "y": 1,
+  //     "aiGroup": "Guard",
+  //     "class": "Soldier"
+  //   },
+  //   {
+  //     "x": 10,
+  //     "y": 1,
+  //     "aiGroup": "Guard",
+  //     "class": "Soldier"
+  //   },
+  //   {
+  //     "x": 5,
+  //     "y": 11,
+  //     "aiGroup": "Defend",
+  //     "class": "Archer"
+  //   }
+  // ];
+  // const res = assignDoorAndChestKeys({ terrainGrid, enemies, originalMapName: 'Underground' });
+  // console.log("enemies :>> ", res);
 }
 

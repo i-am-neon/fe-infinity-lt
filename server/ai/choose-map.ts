@@ -31,6 +31,8 @@ export default async function chooseMap(
   // return "Knights_Villagers_Bandits_3_(0E_00_72_10)__by_Aura_Wolf";
   // For Avenir map testing
   // return "Aegris";
+  // For door key map testing
+  return "Alusq_FE8_0A009B0C_in_the_dark__by_FEU";
 
   // 1) Generate search query
   const systemMessageForQuery = `You are a query generator for an advanced map search system.

@@ -58,17 +58,17 @@ export default async function getGenericEnemies({
     units: enemyGenericUnitPlacement,
   });
 
-  const finalUnits = assignDoorAndChestKeys({ terrainGrid, enemies: correctedUnits, originalMapName: mapMetadata.originalName });
+  const finalUnits = assignDoorAndChestKeys({ enemies: correctedUnits, originalMapName: mapMetadata.originalName });
   return finalUnits;
 }
 
 if (import.meta.main) {
   const res = await getGenericEnemies({
-    terrainGrid: getTerrainGridFromMapName("(7)Ch3BandofMercenaries_Diff_Tileset__by_Shin19"),
+    terrainGrid: getTerrainGridFromMapName("Alusq_FE8_0A009B0C_in_the_dark__by_FEU"),
     chapterIdea: testPrologueChapter.idea,
     chapterNumber: 0,
     mapMetadata: allMapOptions.find(
-      (map) => map.originalName === "(7)Ch3BandofMercenaries_Diff_Tileset__by_Shin19"
+      (map) => map.originalName === "Alusq_FE8_0A009B0C_in_the_dark__by_FEU"
     ) as MapMetadata,
     nonGenericUnitPlacementResult: {
       boss: { region: "Eastern Ruins", coords: { x: 12, y: 0 } },
