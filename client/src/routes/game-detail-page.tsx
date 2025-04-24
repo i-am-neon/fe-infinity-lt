@@ -19,6 +19,8 @@ import { ChapterGeneratorLoader } from "@/components/ui/chapter-generator-loader
 import useGenerationProgress, { useGameCreationProgress } from "@/lib/use-generation-progress";
 import { AnimatePresence, motion } from "framer-motion";
 import { getTitleImagePath } from "@/lib/asset-path";
+import { BlurFade } from "@/components/magicui/blur-fade";
+import { BLUR_FADE_DELAY } from "@/components/ui/constants";
 
 const showDebugButtons = false;
 
@@ -558,16 +560,18 @@ export default function GameDetailPage() {
       </AnimatePresence>
 
       <div className="p-6 space-y-4 max-w-4xl mx-auto">
-        <Button
-          variant="ghost"
-          className="inline-flex items-center mb-4"
-          onClick={() => navigate("/")}
-        >
-          <ChevronLeft className="w-4 h-4 mr-1" />
-          Back
-        </Button>
+        <BlurFade>
+          <Button
+            variant="ghost"
+            className="inline-flex items-center mb-4"
+            onClick={() => navigate("/")}
+          >
+            <ChevronLeft className="w-4 h-4 mr-1" />
+            Back
+          </Button>
+        </BlurFade>
         {loading ? (
-          <div>Loading...</div>
+          <></>
         ) : !data?.success || !data.game ? (
           <div>
             <h1 className="text-xl font-bold mb-4">Error</h1>
@@ -575,139 +579,147 @@ export default function GameDetailPage() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               {/* Title Image - Left Column */}
               {data.game?.directory && (
-                <div className="md:col-span-1">
-                  <div className="rounded-md overflow-hidden shadow-lg">
-                    <img
-                      src={getTitleImagePath(data.game.directory)}
-                      alt={`${data.game.title} title image`}
-                      className="w-full aspect-[3/2] object-contain bg-black/10"
-                      onError={(e) => {
-                        // Create a reference to game to ensure it's defined
-                        const game = data.game;
-                        if (!game) return;
+                <BlurFade delay={BLUR_FADE_DELAY}>
+                  <div className="md:col-span-1">
+                    <div className="rounded-md overflow-hidden shadow-lg">
+                      <img
+                        src={getTitleImagePath(data.game.directory)}
+                        alt={`${data.game.title} title image`}
+                        className="w-full aspect-[3/2] object-contain bg-black/10"
+                        onError={(e) => {
+                          // Create a reference to game to ensure it's defined
+                          const game = data.game;
+                          if (!game) return;
 
-                        // Log the error details
-                        console.error(`[Title Image Error] Failed to load image for game: ${game.title}`, {
-                          src: e.currentTarget.src,
-                          gameDirectory: game.directory,
-                          isElectron: typeof window !== 'undefined' && !!(window as Window & { process?: { versions?: { electron?: string } } })?.process?.versions?.electron,
-                          error: e
-                        });
-                        // Hide the image if it fails to load
-                        e.currentTarget.style.display = 'none';
-                      }}
-                    />
+                          // Log the error details
+                          console.error(`[Title Image Error] Failed to load image for game: ${game.title}`, {
+                            src: e.currentTarget.src,
+                            gameDirectory: game.directory,
+                            isElectron: typeof window !== 'undefined' && !!(window as Window & { process?: { versions?: { electron?: string } } })?.process?.versions?.electron,
+                            error: e
+                          });
+                          // Hide the image if it fails to load
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                    </div>
                   </div>
-                </div>
+                </BlurFade>
               )}
 
               {/* Title and Description - Right Column */}
-              <div className="md:col-span-2 flex flex-col justify-center">
-                <h1 className="text-2xl font-bold mb-3">{data.game.title}</h1>
-                <p className="mb-2">{data.game.description}</p>
-                <p className="italic text-sm text-muted-foreground">
-                  Tone: {data.game.tone}
-                </p>
-              </div>
+              <BlurFade delay={BLUR_FADE_DELAY * 2}>
+                <div className="md:col-span-2 flex flex-col justify-center">
+                  <h1 className="text-2xl font-bold mb-3">{data.game.title}</h1>
+                  <p className="mb-2">{data.game.description}</p>
+                  <p className="italic text-sm text-muted-foreground">
+                    Tone: {data.game.tone}
+                  </p>
+                </div>
+              </BlurFade>
             </div>
 
             {/* Current chapter header */}
             {data.game.chapters.length > 0 && (
-              <>
-                <div className="text-sm text-muted-foreground mb-1 uppercase tracking-wide">
-                  Current Chapter
-                </div>
-                <h2 className="text-xl font-semibold mb-4">
-                  {data.game.chapters.length === 1
-                    ? `Prologue: ${data.game.chapters[0].title}`
-                    : `Chapter ${data.game.chapters.length - 1}: ${data.game.chapters[data.game.chapters.length - 1].title}`}
-                </h2>
-              </>
+              <BlurFade delay={BLUR_FADE_DELAY * 3}>
+                <>
+                  <div className="text-sm text-muted-foreground mb-1 uppercase tracking-wide">
+                    Current Chapter
+                  </div>
+                  <h2 className="text-xl font-semibold mb-4">
+                    {data.game.chapters.length === 1
+                      ? `Prologue: ${data.game.chapters[0].title}`
+                      : `Chapter ${data.game.chapters.length - 1}: ${data.game.chapters[data.game.chapters.length - 1].title}`}
+                  </h2>
+                </>
+              </BlurFade>
             )}
 
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2 mt-6">
-              <Button onClick={handlePlay} disabled={disabled}>
-                {loadingAction === "play" && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                )}
-                Play Game
-              </Button>
-
-              <Button
-                variant="secondary"
-                onClick={handleGenerateNextChapter}
-                disabled={disabled}
-              >
-                {loadingAction === "generate" && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                )}
-                Generate Next Chapter
-              </Button>
-
-              <Button
-                variant="outline"
-                onClick={() => setConfirmRegenerateOpen(true)}
-                disabled={disabled}
-              >
-                {loadingAction === "regenerate" && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                )}
-                Re-generate Current Chapter
-              </Button>
-
-              {/* Debug button for testing chapter generation */}
-              {showDebugButtons && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleTestGeneration}
-                  disabled={disabled}
-                  className="ml-2"
-                >
-                  {loadingAction === "test" && (
+            <BlurFade delay={BLUR_FADE_DELAY * 4}>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 mt-6">
+                <Button onClick={handlePlay} disabled={disabled}>
+                  {loadingAction === "play" && (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   )}
-                  Test Generation
+                  Play Game
                 </Button>
-              )}
 
-              <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                <AlertDialogTrigger asChild>
-                  <Button variant="destructive" noGlow disabled={disabled}>
-                    {loadingAction === "delete" && (
+                <Button
+                  variant="secondary"
+                  onClick={handleGenerateNextChapter}
+                  disabled={disabled}
+                >
+                  {loadingAction === "generate" && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  Generate Next Chapter
+                </Button>
+
+                <Button
+                  variant="outline"
+                  onClick={() => setConfirmRegenerateOpen(true)}
+                  disabled={disabled}
+                >
+                  {loadingAction === "regenerate" && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  Re-generate Current Chapter
+                </Button>
+
+                {/* Debug button for testing chapter generation */}
+                {showDebugButtons && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleTestGeneration}
+                    disabled={disabled}
+                    className="ml-2"
+                  >
+                    {loadingAction === "test" && (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     )}
-                    Delete Game
+                    Test Generation
                   </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This will permanently delete the game&apos;s data and
-                      files. This action cannot be undone.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel disabled={loadingAction === "delete"}>
-                      Cancel
-                    </AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={handleConfirmDelete}
-                      disabled={loadingAction === "delete"}
-                    >
+                )}
+
+                <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive" noGlow disabled={disabled}>
                       {loadingAction === "delete" && (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       )}
-                      Delete
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </div>
+                      Delete Game
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This will permanently delete the game&apos;s data and
+                        files. This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel disabled={loadingAction === "delete"}>
+                        Cancel
+                      </AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={handleConfirmDelete}
+                        disabled={loadingAction === "delete"}
+                      >
+                        {loadingAction === "delete" && (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        )}
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            </BlurFade>
           </>
         )}
       </div>

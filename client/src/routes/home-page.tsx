@@ -21,7 +21,8 @@ import { HelpCircle, KeyIcon, Loader2, Map, Settings } from "lucide-react";
 import { useCallback, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FeInfinityTitle } from "@/components/ui/fe-infinity-title";
-
+import { BlurFade } from "@/components/magicui/blur-fade";
+import { BLUR_FADE_DELAY } from "@/components/ui/constants";
 const showDebugButtons = false;
 
 export default function HomePage() {
@@ -273,27 +274,31 @@ export default function HomePage() {
   return (
     <div className="max-w-4xl mx-auto p-4">
       {/* Header with title and settings */}
-      <div className="flex items-center mb-6 mt-4 relative">
-        {/* Settings button moved to the left */}
-        <Button
-          variant="ghost"
-          size="lg"
-          className="absolute left-0"
-          onClick={() => navigate('/settings')}
-        >
-          <Settings className="h-7 w-7" />
-          <span className="sr-only">Settings</span>
-        </Button>
+      <BlurFade delay={BLUR_FADE_DELAY}>
+        <div className="flex items-center mb-6 mt-4 relative">
+          {/* Settings button moved to the left */}
+          <Button
+            variant="ghost"
+            size="lg"
+            className="absolute left-0"
+            onClick={() => navigate('/settings')}
+          >
+            <Settings className="h-7 w-7" />
+            <span className="sr-only">Settings</span>
+          </Button>
 
-        {/* Centered title with logo */}
-        <div className="flex items-center justify-center w-full">
-          <img src={getAssetPath('logo.png')} alt="FE Infinity Logo" className="h-10 mr-3" />
-          <FeInfinityTitle size="lg" />
+          {/* Centered title with logo */}
+          <div className="flex items-center justify-center w-full">
+            <img src={getAssetPath('logo.png')} alt="FE Infinity Logo" className="h-10 mr-3" />
+            <FeInfinityTitle size="lg" />
+          </div>
         </div>
-      </div>
+      </BlurFade>
 
       {/* API Key Notice */}
-      <ApiKeyNotice />
+      <BlurFade delay={BLUR_FADE_DELAY * 2}>
+        <ApiKeyNotice />
+      </BlurFade>
 
       {/* Main Content */}
       <div className="flex flex-col items-center gap-8">
@@ -483,18 +488,20 @@ export default function HomePage() {
         )}
 
         <div className="max-w-5xl">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-semibold">Your Games</h2>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setHelpDialogOpen(true)}
-              className="ml-2"
-            >
-              <HelpCircle className="h-5 w-5" />
-              <span className="sr-only">Help</span>
-            </Button>
-          </div>
+          <BlurFade delay={BLUR_FADE_DELAY * 3}>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-semibold">Your Games</h2>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setHelpDialogOpen(true)}
+                className="ml-2"
+              >
+                <HelpCircle className="h-5 w-5" />
+                <span className="sr-only">Help</span>
+              </Button>
+            </div>
+          </BlurFade>
           <GamesGrid />
         </div>
       </div>
