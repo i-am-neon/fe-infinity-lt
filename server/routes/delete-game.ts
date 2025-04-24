@@ -1,5 +1,6 @@
 import removeWithinLtMaker from "@/file-io/remove-within-lt-maker.ts";
 import { removeGameByNid } from "../db/games.ts";
+import { getPathWithinClient } from "@/file-io/get-path-within-client.ts";
 
 export async function handleDeleteGame(req: Request): Promise<Response> {
   try {
@@ -17,8 +18,27 @@ export async function handleDeleteGame(req: Request): Promise<Response> {
       );
     }
 
+    // Remove from database
     removeGameByNid(nid);
+
+    // Remove LT Maker files
     await removeWithinLtMaker({ relativePath: directory });
+
+    // Remove title image from client
+    try {
+      // Get project name without .ltproj extension for image path
+      const projectName = directory.replace(/\.ltproj$/, "");
+      const titleImagePath = getPathWithinClient(`public/images/title-images/${projectName}.png`);
+
+      // Check if file exists before attempting to delete
+      const fileInfo = await Deno.stat(titleImagePath).catch(() => null);
+      if (fileInfo && fileInfo.isFile) {
+        await Deno.remove(titleImagePath);
+      }
+    } catch (imgError) {
+      // Log but don't fail if image deletion fails
+      console.error("Failed to delete title image:", imgError);
+    }
 
     return new Response(JSON.stringify({ success: true }), {
       headers: { "Content-Type": "application/json" },
