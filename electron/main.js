@@ -8,6 +8,24 @@ const { startGameLauncherServer } = require('./game-launcher');
 const logger = require('./logger');
 const apiKeyManager = require('./api-key-manager');
 const { protocol } = require('electron');
+
+
+// Register the custom asset:// scheme before app readiness so that
+// it is treated like a standard, secure protocol in the renderer.  This
+// allows  and fetch() calls to succeed in the
+// packaged application.
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: "asset",
+    privileges: {
+      secure: true,
+      standard: true,
+      supportFetchAPI: true,
+      corsEnabled: true,
+      stream: true
+    }
+  }
+]);
 const { verifyAssets } = require('./verify-assets');
 
 // Set application name before anything else
@@ -284,28 +302,97 @@ app.whenReady().then(async () => {
     userDataPath: app.getPath('userData')
   });
 
+  // Copy logo file to all potential paths to ensure it's found
+  try {
+    const sourceLogoPath = path.join(__dirname, 'logo.png');
+    if (fs.existsSync(sourceLogoPath)) {
+      const destPaths = [
+        path.join(process.resourcesPath, 'logo.png'),
+        path.join(process.resourcesPath, 'app/logo.png')
+      ];
+
+      logger.log('info', `Copying logo from ${sourceLogoPath} to ensure availability`);
+      for (const destPath of destPaths) {
+        try {
+          // Create directory if it doesn't exist
+          const destDir = path.dirname(destPath);
+          if (!fs.existsSync(destDir)) {
+            fs.mkdirSync(destDir, { recursive: true });
+          }
+
+          fs.copyFileSync(sourceLogoPath, destPath);
+          logger.log('info', `Copied logo to ${destPath}`);
+        } catch (copyErr) {
+          logger.log('warn', `Failed to copy logo to ${destPath}: ${copyErr.message}`);
+        }
+      }
+    } else {
+      logger.log('warn', `Source logo not found at ${sourceLogoPath}`);
+    }
+  } catch (logoError) {
+    logger.log('error', `Error preparing logo: ${logoError.message}`);
+  }
+
   // Register the custom protocol to handle assets
   protocol.registerFileProtocol('asset', (request, callback) => {
     const url = request.url.replace(/^asset:\/\//, '');
-    const decodedUrl = decodeURI(url);
-
-    // Search for the asset in several potential locations
-    const searchPaths = [
-      // In packaged app
-      path.join(process.resourcesPath, 'client', decodedUrl),
-      path.join(process.resourcesPath, 'app', 'client', decodedUrl),
-      path.join(app.getAppPath(), 'client', decodedUrl),
-      // In public directory (current standard)
-      path.join(process.resourcesPath, 'client/public', decodedUrl),
-      path.join(process.resourcesPath, 'app/client/public', decodedUrl),
-      path.join(app.getAppPath(), 'client/public', decodedUrl),
-      // In development
-      path.join(__dirname, '../client', decodedUrl),
-      path.join(__dirname, '../client/public', decodedUrl)
-    ];
+    // Remove any trailing slashes that might be present
+    const decodedUrl = decodeURI(url).replace(/\/+$/, '');
 
     // Log the request for debugging in packaged app
     logger.log('info', `Asset request: ${decodedUrl}`);
+
+    // Special case for logo.png which could be in multiple locations
+    if (decodedUrl === 'logo.png') {
+      const logoPaths = [
+        path.join(__dirname, 'logo.png'),
+        path.join(app.getAppPath(), 'logo.png'),
+        path.join(process.resourcesPath, 'logo.png'),
+        path.join(process.resourcesPath, 'app/logo.png'),
+        // Add paths where we've found logo before
+        path.join(process.resourcesPath, 'client/dist/logo.png'),
+        path.join(process.resourcesPath, 'client/public/logo.png'),
+        path.join(app.getAppPath().replace('.asar', ''), 'logo.png')
+      ];
+
+      // Log all potential logo paths for debugging
+      logger.log('info', `Searching for logo in paths: ${JSON.stringify(logoPaths)}`);
+
+      for (const logoPath of logoPaths) {
+        try {
+          if (fs.existsSync(logoPath)) {
+            logger.log('info', `Logo found at: ${logoPath}`);
+            return callback({ path: logoPath });
+          }
+        } catch (err) {
+          logger.log('warn', `Error checking logo path: ${logoPath}`, { error: err.message });
+        }
+      }
+
+      // If logo not found in known locations, continue with standard search paths
+      logger.log('warn', 'Logo not found in known locations, trying standard paths');
+    }
+
+    // Simplified search paths based on what works
+    const searchPaths = [
+      // In public directory (current standard)
+      path.join(process.resourcesPath, 'client/public', decodedUrl),
+      path.join(app.getAppPath(), 'client/public', decodedUrl),
+      // Files copied by Vite build
+      path.join(process.resourcesPath, 'client/dist', decodedUrl),
+      path.join(app.getAppPath(), 'client/dist', decodedUrl),
+      // In development
+      path.join(__dirname, '../client/public', decodedUrl),
+      path.join(__dirname, '../client/dist', decodedUrl),
+      // Additional paths specific to packaged app
+      path.join(process.resourcesPath, decodedUrl),
+      path.join(app.getAppPath().replace('.asar', ''), decodedUrl)
+    ];
+
+    // Log search paths for debugging
+    if (decodedUrl.includes('logo')) {
+      logger.log('info', `Standard search paths for logo: ${JSON.stringify(searchPaths)}`);
+    }
 
     // Try each path in order
     for (const filePath of searchPaths) {
