@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Clock, DollarSign, Download, Gamepad2, Github, MessageSquare, Palette, Sparkles } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import HeroVideoDialog from "@/components/magicui/hero-video-dialog";
 
 const features = [
   {
@@ -78,6 +79,16 @@ export default function Home() {
             <h2 className="text-2xl text-center mb-10 text-white">
               AI Creates a Fire Emblem game as you play it
             </h2>
+
+            <div className="pointer-events-auto w-full max-w-4xl px-4 mt-6">
+              <HeroVideoDialog
+                videoSrc="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                thumbnailSrc="/video-thumbnail.jpg"
+                thumbnailAlt="FE Infinity Gameplay Demo"
+                animationStyle="fade"
+                className="shadow-2xl rounded-lg transform hover:scale-[1.01] transition-all duration-300"
+              />
+            </div>
           </div>
         </BackgroundGradientAnimation>
       </div>
