@@ -630,17 +630,6 @@ if defined PYTHON_EXE (
           winePrefix: pythonEnv.WINEPREFIX
         });
 
-        // Set a timeout to prevent indefinite hanging
-        const timeout = 120000; // 2 minutes timeout (increased from 60s)
-        const timeoutId = setTimeout(() => {
-          logger.log('error', `Wine process timed out after ${timeout / 1000} seconds`);
-          if (wineProcess && !wineProcess.killed) {
-            logger.log('info', 'Killing Wine process due to timeout');
-            wineProcess.kill();
-          }
-          resolve(); // Resolve anyway to prevent hanging UI
-        }, timeout);
-
         // Enhanced Wine process - use direct Python command on macOS
         // Important: On macOS in packaged app, we need to use a different approach
         try {
@@ -1000,7 +989,6 @@ fi
           });
 
           wineProcess.on('close', (code) => {
-            clearTimeout(timeoutId);
             logger.log('info', `Game process closed with code ${code}`);
             if (code !== 0) {
               logger.log('error', `Wine process exited with non-zero code: ${code}`);
@@ -1009,7 +997,6 @@ fi
           });
 
           wineProcess.on('error', (err) => {
-            clearTimeout(timeoutId);
             logger.log('error', 'Failed to start game process', {
               error: err.message,
               code: err.code,
@@ -1018,7 +1005,6 @@ fi
             reject(err);
           });
         } catch (spawnError) {
-          clearTimeout(timeoutId);
           logger.log('error', 'Error spawning Wine process', {
             error: spawnError.message,
             stack: spawnError.stack
