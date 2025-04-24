@@ -12,6 +12,8 @@ git fetch upstream
 git merge upstream/master
 ```
 
+then `:q` to quit vim
+
 ```bash
 git push
 ```
