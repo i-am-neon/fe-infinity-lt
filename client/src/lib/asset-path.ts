@@ -7,11 +7,54 @@ interface ElectronProcess {
 }
 
 /**
+ * Interface for Electron's exposed API
+ */
+interface ElectronAPI {
+    fileExists?: (path: string) => boolean;
+    [key: string]: unknown;
+}
+
+/**
  * Detect if we're running in an Electron environment
+ * Uses multiple detection methods for reliability
  */
 export function isElectron(): boolean {
-    return typeof window !== 'undefined' &&
-        (window as Window & { process?: ElectronProcess })?.process?.versions?.electron !== undefined;
+    // Check multiple Electron presence indicators
+    const checks = [
+        // Check process.versions.electron (traditional method)
+        typeof window !== 'undefined' &&
+        !!(window as Window & { process?: ElectronProcess })?.process?.versions?.electron,
+
+        // Check for window.electronAPI that would be injected by preload scripts
+        typeof window !== 'undefined' && !!(window as Window & { electronAPI?: ElectronAPI })?.electronAPI,
+
+        // Check for Electron in the user agent (might not be reliable in all versions)
+        typeof navigator !== 'undefined' &&
+        (navigator.userAgent.indexOf('Electron') >= 0)
+    ];
+
+    // Consider it Electron if ANY check passes
+    const isElectronEnv = checks.some(check => !!check);
+
+    console.log(`[Electron Detection] isElectron checks:`, checks);
+    console.log(`[Electron Detection] Final result: ${isElectronEnv}`);
+
+    if (isElectronEnv) {
+        console.log('[Electron Detection] Running in Electron environment', {
+            process: (window as Window & { process?: ElectronProcess })?.process?.versions,
+            electronAPI: !!(window as Window & { electronAPI?: ElectronAPI })?.electronAPI,
+            userAgent: navigator.userAgent
+        });
+    }
+
+    return isElectronEnv;
+}
+
+/**
+ * Check if we have access to the Electron API for checking file existence
+ */
+function hasElectronFs(): boolean {
+    return isElectron() && !!(window as Window & { electronAPI?: ElectronAPI })?.electronAPI?.fileExists;
 }
 
 /**
@@ -27,7 +70,23 @@ export function getAssetPath(path: string): string {
 
     // In Electron, use our custom protocol
     if (isElectron()) {
-        return `asset://${cleanPath}`;
+        const electronPath = `asset://${cleanPath}`;
+        console.log(`[Asset Path Debug] Using Electron path: ${electronPath} for ${cleanPath}`);
+
+        // Check if the file exists in Electron if the API is available
+        if (hasElectronFs()) {
+            try {
+                const electronAPI = (window as Window & { electronAPI?: ElectronAPI })?.electronAPI;
+                if (electronAPI?.fileExists) {
+                    const exists = electronAPI.fileExists(cleanPath);
+                    console.log(`[Asset Path Debug] File exists check for ${cleanPath}: ${exists}`);
+                }
+            } catch (err) {
+                console.error(`[Asset Path Debug] Error checking if file exists:`, err);
+            }
+        }
+
+        return electronPath;
     }
 
     // For non-Electron environments (development or production web)
@@ -41,7 +100,9 @@ export function getAssetPath(path: string): string {
  * @returns The correct image path to use in the current environment
  */
 export function getImagePath(imagePath: string): string {
-    return getAssetPath(`images/${imagePath}`);
+    const path = getAssetPath(`images/${imagePath}`);
+    console.log(`[Image Path Debug] Resolving image: ${imagePath} to: ${path}, isElectron: ${isElectron()}`);
+    return path;
 }
 
 /**
@@ -53,5 +114,7 @@ export function getImagePath(imagePath: string): string {
 export function getTitleImagePath(gameDirectory: string): string {
     // Remove .ltproj extension if present
     const cleanName = gameDirectory.replace(/\.ltproj$/, "");
-    return getImagePath(`title-images/${cleanName}.png`);
+    const titleImagePath = getImagePath(`title-images/${cleanName}.png`);
+    console.log(`[Title Image Debug] Game directory: ${gameDirectory}, Clean name: ${cleanName}, Path: ${titleImagePath}`);
+    return titleImagePath;
 } 

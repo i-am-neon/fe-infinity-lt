@@ -23,8 +23,14 @@ function verifyAssets() {
         path.join(process.resourcesPath, 'client/public'),
         path.join(process.resourcesPath, 'app/client/public'),
         path.join(app.getAppPath(), 'client/public'),
+        // **NEW** – assets inside the Vite build
+        path.join(process.resourcesPath, 'client/dist'),
+        path.join(process.resourcesPath, 'app/client/dist'),
+        path.join(app.getAppPath(), 'client/dist'),
+
         // For development
-        path.join(__dirname, '../client/public')
+        path.join(__dirname, '../client/public'),
+        path.join(__dirname, '../client/dist')
     ];
 
     // Log which paths we're checking
