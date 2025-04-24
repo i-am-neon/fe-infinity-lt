@@ -22,11 +22,14 @@ const getDataDir = () => {
 // Set up environment variables for the server
 const getServerEnv = () => {
   const dataDir = getDataDir();
+  const userDataPath = app.getPath('userData');
 
   return {
     ...process.env,
     // Path for SQLite database
-    DB_PATH: path.join(dataDir, 'sqlite.db')
+    DB_PATH: path.join(dataDir, 'sqlite.db'),
+    // Always set USER_DATA_PATH for consistent vector storage
+    USER_DATA_PATH: userDataPath
   };
 };
 
@@ -458,8 +461,34 @@ const startDenoServerFallback = (serverPath, resolve, reject) => {
 // Initialize the vector database
 const initVectorDb = async () => {
   // Use Deno to run the initialization script
-  const denoExecutable = path.join(__dirname, 'bin', process.platform === 'win32' ? 'deno.exe' : 'deno');
-  const serverPath = path.join(__dirname, '..', 'server');
+  const appPath = app.getAppPath();
+  let denoExecutable;
+  let serverPath;
+
+  if (appPath.includes('app.asar')) {
+    // In production, use the unpacked path for binaries
+    const unpackedPath = appPath.replace('app.asar', 'app.asar.unpacked');
+    denoExecutable = path.join(unpackedPath, 'bin', process.platform === 'win32' ? 'deno.exe' : 'deno');
+
+    // Server path should be in resources, not in asar
+    serverPath = path.join(process.resourcesPath, 'server');
+  } else {
+    // In development, use the normal paths
+    denoExecutable = path.join(__dirname, 'bin', process.platform === 'win32' ? 'deno.exe' : 'deno');
+    serverPath = path.join(__dirname, '..', 'server');
+  }
+
+  logger.log('info', `Using Deno at: ${denoExecutable} with server path: ${serverPath}`);
+  console.log(`Using Deno at: ${denoExecutable} with server path: ${serverPath}`);
+
+  // Verify paths exist
+  if (!fs.existsSync(denoExecutable)) {
+    throw new Error(`Deno executable not found at: ${denoExecutable}`);
+  }
+
+  if (!fs.existsSync(serverPath)) {
+    throw new Error(`Server directory not found at: ${serverPath}`);
+  }
 
   const vectorDbInitProcess = spawn(
     denoExecutable,
@@ -484,8 +513,34 @@ const initVectorDb = async () => {
 
 // Seed the vector database
 const seedVectorDb = async () => {
-  const denoExecutable = path.join(__dirname, 'bin', process.platform === 'win32' ? 'deno.exe' : 'deno');
-  const serverPath = path.join(__dirname, '..', 'server');
+  const appPath = app.getAppPath();
+  let denoExecutable;
+  let serverPath;
+
+  if (appPath.includes('app.asar')) {
+    // In production, use the unpacked path for binaries
+    const unpackedPath = appPath.replace('app.asar', 'app.asar.unpacked');
+    denoExecutable = path.join(unpackedPath, 'bin', process.platform === 'win32' ? 'deno.exe' : 'deno');
+
+    // Server path should be in resources, not in asar
+    serverPath = path.join(process.resourcesPath, 'server');
+  } else {
+    // In development, use the normal paths
+    denoExecutable = path.join(__dirname, 'bin', process.platform === 'win32' ? 'deno.exe' : 'deno');
+    serverPath = path.join(__dirname, '..', 'server');
+  }
+
+  logger.log('info', `Seeding vectors using Deno at: ${denoExecutable} with server path: ${serverPath}`);
+  console.log(`Seeding vectors using Deno at: ${denoExecutable} with server path: ${serverPath}`);
+
+  // Verify paths exist
+  if (!fs.existsSync(denoExecutable)) {
+    throw new Error(`Deno executable not found at: ${denoExecutable}`);
+  }
+
+  if (!fs.existsSync(serverPath)) {
+    throw new Error(`Server directory not found at: ${serverPath}`);
+  }
 
   const vectorDbSeedProcess = spawn(
     denoExecutable,
@@ -667,6 +722,14 @@ const startServer = async () => {
         }
       }
     }
+
+    // Initialize vector database with fresh data
+    logger.log('info', 'Initializing vector database...');
+    await initVectorDb();
+
+    // Always seed the vector database with fresh data to ensure latest vectors
+    logger.log('info', 'Seeding vector database with fresh data...');
+    await seedVectorDb();
 
     // Start Deno server, which will initialize everything else
     logger.log('info', 'Starting Deno server...');

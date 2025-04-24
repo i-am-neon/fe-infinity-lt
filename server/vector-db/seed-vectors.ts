@@ -3,11 +3,20 @@ import { ensureDir } from "@std/fs";
 import { Vector, VectorType } from "./types/vector-type.ts";
 import { clearVectors, storeVector } from "./vector-store.ts";
 import { getVectorStore } from "./init.ts";
+import { isElectronEnvironment } from "@/lib/env-detector.ts";
 
 export async function seedVectors(
   seedFiles?: Record<VectorType, string>,
-  clearExisting = false
+  clearExisting?: boolean
 ): Promise<void> {
+  // Default clearExisting to true in production/packaged electron mode
+  if (clearExisting === undefined) {
+    const isPackagedApp = Deno.env.get("NODE_ENV") === "production";
+    const isElectron = isElectronEnvironment();
+    clearExisting = isPackagedApp && isElectron ? true : false;
+    console.log(`Auto-determined clearExisting=${clearExisting} for vector seeding (isPackaged=${isPackagedApp}, isElectron=${isElectron})`);
+  }
+
   // Default seed files paths if not provided
   const defaultSeedFiles: Record<VectorType, string> = {
     maps: getPathWithinServer("vector-db/seed-data/maps.json"),
@@ -44,7 +53,7 @@ async function seedVectorsFromFile(
     // Get current vector store
     const vectorStore = await getVectorStore();
     const existingVectors = vectorStore.getVectors(vectorType);
-    
+
     // Clear existing vectors only if requested
     if (clearExisting) {
       await clearVectors(vectorType);
@@ -93,13 +102,13 @@ async function seedVectorsFromFile(
     // Store each vector (skip if it already exists)
     let addedCount = 0;
     const existingIds = new Set(existingVectors.map(v => v.id));
-    
+
     for (const vector of vectors) {
       if (!clearExisting && existingIds.has(vector.id)) {
         // Skip existing vector
         continue;
       }
-      
+
       await storeVector({
         id: vector.id,
         embedding: vector.embedding,

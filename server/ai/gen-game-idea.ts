@@ -29,6 +29,7 @@ IMPORTANT CONSTRAINTS:
 - Follow the traditional Fire Emblem structure: each chapter will have battles and progress through the storyline with the party
 - No modern, sci-fi, or completely unrelated settings/themes
 - Be creative and unique WITHIN these constraints
+- Game title should not include "Fire Emblem" or "Fire Emblem: "
 
 Return ONLY valid JSON matching the schema with the following fields:
 - title: A short, descriptive title for the game (3-5 words)
