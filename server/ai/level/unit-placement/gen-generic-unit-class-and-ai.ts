@@ -43,6 +43,11 @@ export default async function genGenericUnitClassAndAi(description: string): Pro
         aiGroup = "Heal";
     }
 
+    // Units that are incorrectly assigned PursueVillage
+    if (!["Brigand", "Pirate", "Berserker", "Warrior"].includes(result.class) && aiGroup === "PursueVillage") {
+        aiGroup = "Defend";
+    }
+
     if (aiGroup === 'None') {
         // Assign a default AI group if none is specified
         aiGroup = "Defend";
