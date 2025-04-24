@@ -106,7 +106,7 @@ export default function Home() {
                 An AI-Powered Fire Emblem Experience
               </p>
               <p className="mt-6 text-lg text-muted-foreground">
-                The game is created one chapter at a time. Once you complete a chapter, the AI creates the next one.
+                Your game is created one chapter at a time. Once you complete a chapter, the AI creates the next one.
                 The choices you make and the characters who die impact the story significantly.
               </p>
             </div>
