@@ -155,7 +155,7 @@ export default function Home() {
           </div>
 
 
-          <BlurFade delay={BLUR_FADE_DELAY * (features.length + 4)} inView>
+          <BlurFade delay={BLUR_FADE_DELAY * (features.length + 1)} inView>
             <div className="flex justify-center gap-4 mt-40">
               <Link href="/downloads" className="inline-flex">
                 <Button size="lg" className="text-lg gap-2">
