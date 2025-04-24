@@ -32,7 +32,7 @@ export default async function chooseMap(
   // For Avenir map testing
   // return "Aegris";
   // For door key map testing
-  return "Alusq_FE8_0A009B0C_in_the_dark__by_FEU";
+  // return "Alusq_FE8_0A009B0C_in_the_dark__by_FEU";
 
   // 1) Generate search query
   const systemMessageForQuery = `You are a query generator for an advanced map search system.
