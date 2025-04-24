@@ -1,13 +1,12 @@
 "use client";
 
+import { BlurFade } from "@/components/magicui/blur-fade";
+import { BLUR_FADE_DELAY } from "@/components/magicui/constants";
 import { ScriptCopyBtn } from "@/components/magicui/script-copy-btn";
-import { CopyButton } from "@/components/ui/copy-button";
 import { GlowCard } from "@/components/ui/glow-card";
 import { Apple, Grid2x2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { BlurFade } from "@/components/magicui/blur-fade";
-import { BLUR_FADE_DELAY } from "@/components/magicui/constants";
 
 export default function DownloadsPage() {
     return (
