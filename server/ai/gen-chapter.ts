@@ -92,9 +92,9 @@ export default async function genChapter({
     logger.info(`Chapter generation progress: ${message}`, { step });
   };
 
-  // Get disallowed songs from previous chapters (last two chapters' music)
+  // Get disallowed songs from previous chapters (last three chapters' music)
   const disallowedSongs: string[] = previousChapterMusic
-    .slice(-2)  // Get last two chapters' music
+    .slice(-3)  // Get last three chapters' music
     .flat();    // Flatten the array
 
   logger.debug("Disallowed songs from previous chapters", { disallowedSongs });
