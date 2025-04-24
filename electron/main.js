@@ -813,20 +813,17 @@ ipcMain.handle('api-call', async (event, { endpoint, method, body }) => {
     // Get API key from storage to pass to the server
     const openaiKey = apiKeyManager.getApiKey();
 
-    // Build the URL with API key as query parameter for GET requests
-    let url = `http://localhost:8000/${endpoint}`;
+    // Use URL API so we never create malformed URLs when the endpoint already
+    // contains query parameters (e.g. "generation-progress?gameNid=abc").
     const isGetOrHead = method === 'GET' || method === 'HEAD';
+    const urlObj = new URL(`http://localhost:8000/${endpoint}`);
 
-    // For GET/HEAD requests, add API key as query parameter if it exists
+    // Inject the stored API key for GET/HEAD without clobbering existing search
     if (isGetOrHead && openaiKey) {
-      const params = new URLSearchParams();
-      if (openaiKey) params.append('openaiApiKey', openaiKey);
-
-      // Append query parameters if we have any
-      if (params.toString()) {
-        url += `?${params.toString()}`;
-      }
+      urlObj.searchParams.set('openaiApiKey', openaiKey);
     }
+
+    const finalUrl = urlObj.toString();
 
     // Configure request options based on HTTP method
     const options = {
@@ -845,7 +842,7 @@ ipcMain.handle('api-call', async (event, { endpoint, method, body }) => {
       options.body = JSON.stringify(requestBody);
     }
 
-    const response = await fetch(url, options);
+    const response = await fetch(finalUrl, options);
     const data = await response.json();
 
     if (!response.ok) {
