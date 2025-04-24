@@ -88,6 +88,14 @@ export default function GamesGrid() {
                 alt={game.title}
                 className="w-full h-full object-cover"
                 onError={(e) => {
+                  // Log the error details
+                  console.error(`[Games Grid Image Error] Failed to load image for game: ${game.title}`, {
+                    src: e.currentTarget.src,
+                    gameDirectory: game.directory,
+                    isElectron: typeof window !== 'undefined' &&
+                      !!(window as Window & { process?: { versions?: { electron?: string } } })?.process?.versions?.electron,
+                    error: e
+                  });
                   // Hide the image if it fails to load
                   e.currentTarget.style.display = 'none';
                 }}

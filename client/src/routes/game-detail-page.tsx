@@ -575,7 +575,7 @@ export default function GameDetailPage() {
           <>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               {/* Title Image - Left Column */}
-              {data.game.directory && (
+              {data.game?.directory && (
                 <div className="md:col-span-1">
                   <div className="rounded-md overflow-hidden shadow-lg">
                     <img
@@ -583,6 +583,17 @@ export default function GameDetailPage() {
                       alt={`${data.game.title} title image`}
                       className="w-full aspect-[3/2] object-contain bg-black/10"
                       onError={(e) => {
+                        // Create a reference to game to ensure it's defined
+                        const game = data.game;
+                        if (!game) return;
+
+                        // Log the error details
+                        console.error(`[Title Image Error] Failed to load image for game: ${game.title}`, {
+                          src: e.currentTarget.src,
+                          gameDirectory: game.directory,
+                          isElectron: typeof window !== 'undefined' && !!(window as Window & { process?: { versions?: { electron?: string } } })?.process?.versions?.electron,
+                          error: e
+                        });
                         // Hide the image if it fails to load
                         e.currentTarget.style.display = 'none';
                       }}
