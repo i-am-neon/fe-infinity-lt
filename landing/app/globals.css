@@ -124,3 +124,7 @@
     font-family: var(--font-montserrat), sans-serif;
   }
 }
+
+.bg-radial-gradient {
+  background: radial-gradient(circle, var(--tw-gradient-from) 0%, var(--tw-gradient-via) 40%, var(--tw-gradient-to) 100%);
+}
