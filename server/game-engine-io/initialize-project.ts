@@ -13,6 +13,7 @@ import { copyMusicAndUpdateJson } from "@/game-engine-io/write-chapter/copy-musi
 import copyGenericPortraitsToProject from "@/file-io/copy-generic-portraits-to-project.ts";
 import modifyEquation from "@/game-engine-io/modify-equation.ts";
 import modifyItem from "@/game-engine-io/modify-item.ts";
+import { isElectronEnvironment } from "@/lib/env-detector.ts";
 
 export default async function initializeProject(projectName: string) {
   const initProjectScriptPath = getPathWithinLtMaker("create_new_project.py");
@@ -25,10 +26,14 @@ export default async function initializeProject(projectName: string) {
   // Normalize the project path to use forward slashes
   const normalizedProjectPath = newProjectNameEndingInDotLtProj.replace(/\\/g, '/');
 
+  // Simplify arguments for Wine compatibility when in Electron
+  // Wine has issues with complex paths and quotes, so we'll use simpler values
+  const projectNid = sluggify(projectName);
+
   console.log(`Initializing project with paths:
     - Script: ${initProjectScriptPath}
     - LT Maker Path: ${ltMakerPath}
-    - Project NID: ${sluggify(projectName)}
+    - Project NID: ${projectNid}
     - Project Title: ${projectName}
     - Project Path: ${normalizedProjectPath}
   `);
@@ -37,8 +42,8 @@ export default async function initializeProject(projectName: string) {
   const { output, error } = await runPythonScript({
     pathToPythonScript: initProjectScriptPath,
     args: [
-      sluggify(projectName),
-      projectName,
+      projectNid,
+      isElectronEnvironment() ? projectName.replace(/"/g, '') : projectName,
       ltMakerPath,
       normalizedProjectPath,
     ],

@@ -493,14 +493,18 @@ async function runGame(projectNameEndingInDotLtProj) {
         // Create a temporary Windows batch file to run the game
         const tempBatchPath = path.join(require('os').tmpdir(), 'run_game.bat');
 
-        // Function to convert Unix path to Wine-compatible Windows path
+        // Convert paths for Wine usage
         const toWinePath = (unixPath) => {
-          // First try to convert absolute paths that should be accessible via Z: drive
-          if (unixPath.startsWith('/')) {
-            return 'Z:' + unixPath.replace(/\//g, '\\');
+          // First clean up the path - remove any quotes that might be in the path
+          let cleanPath = unixPath.replace(/"/g, '');
+
+          // If path has spaces and isn't already quoted, we'll handle that in the script itself
+          // rather than trying to quote it here, as Wine path quoting is tricky
+
+          if (cleanPath.startsWith('/')) {
+            return 'Z:' + cleanPath.replace(/\//g, '\\');
           }
-          // Otherwise just convert slashes
-          return unixPath.replace(/\//g, '\\');
+          return cleanPath.replace(/\//g, '\\');
         };
 
         // Get the Wine-compatible path to the run_engine_for_project.py script
@@ -1274,10 +1278,16 @@ async function runPythonScript(scriptPath, args = []) {
 
         // Convert paths for Wine usage
         const toWinePath = (unixPath) => {
-          if (unixPath.startsWith('/')) {
-            return 'Z:' + unixPath.replace(/\//g, '\\');
+          // First clean up the path - remove any quotes that might be in the path
+          let cleanPath = unixPath.replace(/"/g, '');
+
+          // If path has spaces and isn't already quoted, we'll handle that in the script itself
+          // rather than trying to quote it here, as Wine path quoting is tricky
+
+          if (cleanPath.startsWith('/')) {
+            return 'Z:' + cleanPath.replace(/\//g, '\\');
           }
-          return unixPath.replace(/\//g, '\\');
+          return cleanPath.replace(/\//g, '\\');
         };
 
         // Create a temporary Python wrapper script to handle the execution
@@ -1303,31 +1313,41 @@ import sys
 import os
 import subprocess
 
-# Add LT Maker to Python path
-sys.path.insert(0, r'${wineLtMakerPath}')
-os.environ['PYTHONPATH'] = r'${wineLtMakerPath}' + os.pathsep + os.environ.get('PYTHONPATH', '')
+# Helper function to normalize paths
+def normalize_path(path):
+    # Remove any surrounding quotes
+    path = path.strip('"')
+    # Normalize path separators
+    return os.path.normpath(path)
+
+# Add LT Maker to Python path - normalize the path first
+lt_maker_path = normalize_path(r'${wineLtMakerPath}')
+sys.path.insert(0, lt_maker_path)
+os.environ['PYTHONPATH'] = lt_maker_path + os.pathsep + os.environ.get('PYTHONPATH', '')
 
 # Set working directory to script directory
-os.chdir(r'${toWinePath(scriptDir)}')
+script_dir = normalize_path(r'${toWinePath(scriptDir)}')
+os.chdir(script_dir)
 
-# Prepare the command line arguments
-script_args = ${JSON.stringify(formattedArgs)}
-sys.argv = [r'${wineScriptPath}'] + script_args
+# Prepare the command line arguments - normalize each argument
+original_args = ${JSON.stringify(formattedArgs)}
+script_args = [normalize_path(arg) for arg in original_args]
+script_path = normalize_path(r'${wineScriptPath}')
+sys.argv = [script_path] + script_args
 
 # Print environment for debugging
 print(f"Current directory: {os.getcwd()}")
 print(f"Python path: {sys.path}")
-print(f"Running script: {r'${wineScriptPath}'}")
-print(f"Arguments: {script_args}")
+print(f"Running script: {script_path}")
+print(f"Arguments: {' '.join(script_args)}")
 
 # Try to import and run the module directly
 try:
     # First try to import the target script as a module
-    script_name = os.path.basename(r'${wineScriptPath}').replace('.py', '')
+    script_name = os.path.basename(script_path).replace('.py', '')
     print(f"Trying to import {script_name}")
     
     # Add the script directory to path
-    script_dir = os.path.dirname(r'${wineScriptPath}')
     if script_dir not in sys.path:
         sys.path.insert(0, script_dir)
     
@@ -1344,14 +1364,18 @@ try:
             module.main()
     else:
         print(f"Module {script_name} has no main() function, executing script directly")
-        exec(open(r'${wineScriptPath}').read())
+        with open(script_path, 'r') as f:
+            script_content = f.read()
+            exec(script_content)
         
 except Exception as e:
     print(f"Error importing module: {e}")
     print("Falling back to running script directly")
     try:
         # If import fails, try executing the script directly
-        exec(open(r'${wineScriptPath}').read())
+        with open(script_path, 'r') as f:
+            script_content = f.read()
+            exec(script_content)
     except Exception as e2:
         print(f"Error executing script directly: {e2}")
         sys.exit(1)
