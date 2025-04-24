@@ -3,7 +3,7 @@ import createNextChapter, { chapterGenerationProgress } from "@/create-next-chap
 import { removeStubLevel } from "@/game-engine-io/write-chapter/remove-stub-level.ts";
 import { removeStubEvent } from "@/game-engine-io/write-chapter/remove-stub-event.ts";
 import { deleteSuspendSave } from "@/game-engine-io/delete-suspend-save.ts";
-import { getCurrentLogger } from "@/lib/current-logger.ts";
+import { getCurrentLogger, setCurrentLogger } from "@/lib/current-logger.ts";
 import { removeLastLevel } from "@/game-engine-io/write-chapter/remove-level.ts";
 import { removeEventsByLevelNid } from "@/game-engine-io/write-chapter/remove-events.ts";
 import runGame from "@/run-game.ts";
@@ -22,12 +22,6 @@ export async function handleRegenerateCurrentChapter(req: Request): Promise<Resp
       });
     }
 
-    const logger = getCurrentLogger();
-    logger.info("Regenerating current chapter", {
-      directory,
-      gameNid,
-    });
-
     const existing = getGameByNid(gameNid);
     if (!existing || existing.chapters.length === 0) {
       return new Response(JSON.stringify({ success: false, error: "No chapter to regenerate" }), {
@@ -35,6 +29,17 @@ export async function handleRegenerateCurrentChapter(req: Request): Promise<Resp
         headers: { "Content-Type": "application/json" },
       });
     }
+
+    setCurrentLogger({
+      projectName: directory,
+      chapterNumber: existing.chapters.length - 1,
+    });
+    const logger = getCurrentLogger();
+
+    logger.info("Regenerating current chapter", {
+      directory,
+      gameNid,
+    });
 
     // Get the level nid before removing the chapter
     const lastChapter = existing.chapters[existing.chapters.length - 1];
