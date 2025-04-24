@@ -21,6 +21,7 @@ function unitHasItem(
 
 export default function assignDoorAndChestKeys(
   { enemies, originalMapName }: { enemies: EnemyGenericUnit[]; originalMapName: string; }): EnemyGenericUnitWithStartingItems[] {
+  const logger = getCurrentLogger();
   const newEnemies: EnemyGenericUnitWithStartingItems[] = enemies.map((e) => ({
     ...e,
   }));
@@ -64,7 +65,20 @@ export default function assignDoorAndChestKeys(
   try {
     const mapsDir = join(Deno.cwd(), "server", "assets", "maps");
     const filePath = join(mapsDir, `${originalMapName}.json`);
+
+    // Check if the file exists before trying to access it
+    try {
+      const fileInfo = Deno.statSync(filePath);
+    } catch (fileError) {
+      logger.warn(`Map file does not exist: ${filePath}`, { error: String(fileError) });
+      // If file doesn't exist, fall back to basic grouping
+      groupedDoors = groupDoorCells(allDoorCells);
+      // Don't attempt to read the non-existent file
+      throw new Error(`Map file not found: ${filePath}`);
+    }
+
     const doorRegions = getDoorsForMap(filePath);
+    logger.info(`Found ${doorRegions.length} door regions in map file`);
 
     // Transform door regions to our format
     const layerNids = new Set<string>();
@@ -103,13 +117,20 @@ export default function assignDoorAndChestKeys(
         chestCells = chestRegions.map(chest => chest.coordinates);
       }
     } catch (chestError) {
-      console.error(`Error getting chest regions for map ${originalMapName}:`, chestError);
+      logger.error(`Error getting chest regions for map ${originalMapName}:`, { error: String(chestError) });
       // Keep using terrain-based chest cells as fallback
     }
   } catch (error) {
-    console.error(`Error getting door regions for map ${originalMapName}:`, error);
+    logger.error(`Error getting door regions for map ${originalMapName}:`, { error: String(error) });
     // Fall back to original method
+    logger.info(`Falling back to grouping door cells by adjacency for ${allDoorCells.length} cells`);
     groupedDoors = groupDoorCells(allDoorCells);
+  }
+
+  // If both methods failed, create individual door groups as final fallback
+  if (groupedDoors.length === 0 && allDoorCells.length > 0) {
+    logger.warn(`No door groups were created for map ${originalMapName}. Using fallback of one group per door cell.`);
+    groupedDoors = allDoorCells.map(cell => [cell]);
   }
 
   function groupDoorCells(doorCells: Array<{ x: number; y: number }>): Array<Array<{ x: number; y: number }>> {
@@ -118,7 +139,9 @@ export default function assignDoorAndChestKeys(
 
     for (const doorCell of doorCells) {
       const key = `${doorCell.x},${doorCell.y}`;
-      if (visitedDoorCells.has(key)) continue;
+      if (visitedDoorCells.has(key)) {
+        continue;
+      }
 
       const doorGroup: Array<{ x: number; y: number }> = [];
       const queue: Array<{ x: number; y: number }> = [doorCell];
@@ -133,19 +156,18 @@ export default function assignDoorAndChestKeys(
 
         // Check adjacent cells (up, down, left, right)
         const adjacentCells = [
-          { x: current.x + 1, y: current.y },
-          { x: current.x - 1, y: current.y },
-          { x: current.x, y: current.y + 1 },
-          { x: current.x, y: current.y - 1 },
+          { x: current.x + 1, y: current.y, dir: "right" },
+          { x: current.x - 1, y: current.y, dir: "left" },
+          { x: current.x, y: current.y + 1, dir: "down" },
+          { x: current.x, y: current.y - 1, dir: "up" },
         ];
 
         for (const adj of adjacentCells) {
           const adjKey = `${adj.x},${adj.y}`;
-          if (
-            !visitedDoorCells.has(adjKey) &&
-            doorCells.some(cell => cell.x === adj.x && cell.y === adj.y)
-          ) {
-            queue.push(adj);
+          const isAdjacent = doorCells.some(cell => cell.x === adj.x && cell.y === adj.y);
+
+          if (!visitedDoorCells.has(adjKey) && isAdjacent) {
+            queue.push({ x: adj.x, y: adj.y });
           }
         }
       }
@@ -153,6 +175,11 @@ export default function assignDoorAndChestKeys(
       if (doorGroup.length > 0) {
         grouped.push(doorGroup);
       }
+    }
+
+    // Even if there's only one door cell per group, make sure we create groups
+    if (grouped.length === 0 && doorCells.length > 0) {
+      return doorCells.map(cell => [cell]);
     }
 
     return grouped;
@@ -294,6 +321,30 @@ export default function assignDoorAndChestKeys(
 
     // Need at least one cell on each side
     if (side1Cells.length === 0 || side2Cells.length === 0) {
+      // Fallback: Just assign key to closest enemy regardless of side
+      const centerX = doorGroup.reduce((sum, cell) => sum + cell.x, 0) / doorGroup.length;
+      const centerY = doorGroup.reduce((sum, cell) => sum + cell.y, 0) / doorGroup.length;
+
+      let closestEnemyIndex = -1;
+      let closestDist = Number.MAX_SAFE_INTEGER;
+
+      for (let i = 0; i < newEnemies.length; i++) {
+        const e = newEnemies[i];
+        if (!unitHasItem(e, "Door_Key")) {
+          const dist = getManhattanDist(centerX, centerY, e.x, e.y);
+          if (dist < closestDist) {
+            closestDist = dist;
+            closestEnemyIndex = i;
+          }
+        }
+      }
+
+      if (closestEnemyIndex >= 0) {
+        const chosenUnit = newEnemies[closestEnemyIndex];
+        ensureStartingItemsArray(chosenUnit);
+        chosenUnit.startingItems!.push(["Door_Key", true]);
+      }
+
       continue;
     }
 
@@ -381,6 +432,17 @@ export default function assignDoorAndChestKeys(
       }
     }
 
+    // Stronger fallback: If still no suitable enemy, just pick any enemy
+    if (closestEnemyIndex < 0 && newEnemies.length > 0) {
+      for (let i = 0; i < newEnemies.length; i++) {
+        const dist = getManhattanDist(centerX, centerY, newEnemies[i].x, newEnemies[i].y);
+        if (dist < closestDist) {
+          closestDist = dist;
+          closestEnemyIndex = i;
+        }
+      }
+    }
+
     if (closestEnemyIndex >= 0) {
       const chosenUnit = newEnemies[closestEnemyIndex];
       ensureStartingItemsArray(chosenUnit);
@@ -407,7 +469,6 @@ export default function assignDoorAndChestKeys(
     }
   }
 
-  const logger = getCurrentLogger();
   logger.info("Assigned door and chest keys to enemies", {
     originalMapName,
     enemiesWithKeys: newEnemies.filter((e) => unitHasItem(e, "Door_Key") || unitHasItem(e, "Chest_Key")),
@@ -415,6 +476,19 @@ export default function assignDoorAndChestKeys(
     chestCells,
     enemies,
     terrainGrid,
+    doorGroupsCount: groupedDoors.length,
+    doorsWithAssignedKeys: groupedDoors.map(doorGroup => {
+      const centerX = doorGroup.reduce((sum, cell) => sum + cell.x, 0) / doorGroup.length;
+      const centerY = doorGroup.reduce((sum, cell) => sum + cell.y, 0) / doorGroup.length;
+      const hasAssignedKey = newEnemies.some(e =>
+        unitHasItem(e, "Door_Key") &&
+        getManhattanDist(centerX, centerY, e.x, e.y) < 20
+      );
+      return {
+        doorCells: doorGroup,
+        hasAssignedKey,
+      };
+    }),
   });
 
   return newEnemies;
@@ -562,4 +636,6 @@ if (import.meta.main) {
   // const res = assignDoorAndChestKeys({ terrainGrid, enemies, originalMapName: 'Underground' });
   // console.log("enemies :>> ", res);
 }
+
+
 
