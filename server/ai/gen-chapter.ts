@@ -371,6 +371,12 @@ export default async function genChapter({
     introEvent._source.push("add_market_item;Door_Key");
     introEvent._source.push("give_money;1000;no_banner");
   }
+  // if map is the one where players usually start in a room behind a locked door, give them a door key
+  if (chosenMapName === 'Alusq_FE8_0A009B0C_in_the_dark__by_FEU') {
+    const firstLivingPlayerUnit = allLivingPlayerCharacterIdeas[0].firstName;
+    introEvent._source.push(`give_item;${firstLivingPlayerUnit};Door_Key`);
+    logger.info("Giving door key to first living player unit", { firstLivingPlayerUnit });
+  }
 
   // Step 11: Write recruitment conversation scenes
   reportProgress(10, "Writing recruitment conversation scenes");
