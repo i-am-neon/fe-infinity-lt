@@ -1,7 +1,7 @@
 import {
-  CardDescription,
   CardHeader,
   CardTitle,
+  CardDescription
 } from "@/components/ui/card";
 import { DashedBorderCard } from "@/components/ui/dashed-border-card";
 import { GlowCard } from "@/components/ui/glow-card";
@@ -80,10 +80,20 @@ export default function GamesGrid() {
           to={`/games/${game.nid}`}
           className="relative block"
         >
-          <GlowCard className="hover:bg-accent/50 transition-colors duration-200">
-            <CardHeader>
-              <CardTitle>{game.title}</CardTitle>
-              <CardDescription>{game.description}</CardDescription>
+          <GlowCard className="hover:bg-accent/50 transition-colors duration-200 overflow-hidden">
+            <div className="w-full aspect-[3/2] overflow-hidden bg-black/10 rounded-t-md">
+              <img
+                src={`/images/title-images/${game.directory.replace(/\.ltproj$/, "")}.png`}
+                alt={game.title}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  // Hide the image if it fails to load
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+            </div>
+            <CardHeader className="py-3">
+              <CardTitle className="text-center">{game.title}</CardTitle>
             </CardHeader>
           </GlowCard>
         </Link>
