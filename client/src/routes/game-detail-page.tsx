@@ -519,21 +519,49 @@ export default function GameDetailPage() {
           </div>
         ) : (
           <>
-            <h1 className="text-2xl font-bold">Game: {data.game.title}</h1>
-            <p>Description: {data.game.description}</p>
-            <p className="italic text-sm text-muted-foreground">
-              Tone: {data.game.tone}
-            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              {/* Title Image - Left Column */}
+              {data.game.directory && (
+                <div className="md:col-span-1">
+                  <div className="rounded-md overflow-hidden shadow-lg">
+                    <img
+                      src={`/images/title-images/${data.game.directory.replace(/\.ltproj$/, "")}.png`}
+                      alt={`${data.game.title} title image`}
+                      className="w-full aspect-[3/2] object-contain bg-black/10"
+                      onError={(e) => {
+                        // Hide the image if it fails to load
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Title and Description - Right Column */}
+              <div className="md:col-span-2 flex flex-col justify-center">
+                <h1 className="text-2xl font-bold mb-3">Game: {data.game.title}</h1>
+                <p className="mb-2">{data.game.description}</p>
+                <p className="italic text-sm text-muted-foreground">
+                  Tone: {data.game.tone}
+                </p>
+              </div>
+            </div>
+
             {/* Current chapter header */}
             {data.game.chapters.length > 0 && (
-              <h2 className="mt-4 text-xl font-semibold">
-                {data.game.chapters.length === 1
-                  ? `Prologue: ${data.game.chapters[0].title}`
-                  : `Chapter ${data.game.chapters.length - 1}: ${data.game.chapters[data.game.chapters.length - 1].title}`}
-              </h2>
+              <>
+                <div className="text-sm text-muted-foreground mb-1 uppercase tracking-wide">
+                  Current Chapter
+                </div>
+                <h2 className="text-xl font-semibold mb-4">
+                  {data.game.chapters.length === 1
+                    ? `Prologue: ${data.game.chapters[0].title}`
+                    : `Chapter ${data.game.chapters.length - 1}: ${data.game.chapters[data.game.chapters.length - 1].title}`}
+                </h2>
+              </>
             )}
 
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 mt-6">
               <Button onClick={handlePlay} disabled={disabled}>
                 {loadingAction === "play" && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
