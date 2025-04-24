@@ -16,6 +16,7 @@ import {
   NonClosableDialogTitle,
 } from "@/components/ui/non-closable-dialog";
 import apiCall from "@/lib/api-call";
+import { getAssetPath } from "@/lib/asset-path";
 import { KeyIcon, Loader2, Map, Settings } from "lucide-react";
 import { useCallback, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -285,7 +286,7 @@ export default function HomePage() {
 
         {/* Centered title with logo */}
         <div className="flex items-center justify-center w-full">
-          <img src="/logo.png" alt="FE Infinity Logo" className="h-10 mr-3" />
+          <img src={getAssetPath('logo.png')} alt="FE Infinity Logo" className="h-10 mr-3" />
           <FeInfinityTitle size="lg" />
         </div>
       </div>
