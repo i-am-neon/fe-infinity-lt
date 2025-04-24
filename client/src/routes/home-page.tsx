@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/non-closable-dialog";
 import apiCall from "@/lib/api-call";
 import { getAssetPath } from "@/lib/asset-path";
-import { KeyIcon, Loader2, Map, Settings } from "lucide-react";
+import { HelpCircle, KeyIcon, Loader2, Map, Settings } from "lucide-react";
 import { useCallback, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FeInfinityTitle } from "@/components/ui/fe-infinity-title";
@@ -28,6 +28,7 @@ export default function HomePage() {
   const navigate = useNavigate();
   const [isCreating, setIsCreating] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [helpDialogOpen, setHelpDialogOpen] = useState(false);
   const [creatingGameModalOpen, setCreatingGameModalOpen] = useState(false);
   const [gameIdea, setGameIdea] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -358,6 +359,47 @@ export default function HomePage() {
           </NonClosableDialogContent>
         </NonClosableDialog>
 
+        {/* Help Dialog */}
+        <Dialog open={helpDialogOpen} onOpenChange={setHelpDialogOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>How to Play FE Infinity</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <h3 className="font-semibold text-lg">1. Create a game</h3>
+                <p className="text-sm text-muted-foreground">
+                  This will take about 2 minutes. The AI creates a unique game world, an original story, and the Prologue chapter of the game.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-lg">2. Play the first chapter</h3>
+                <p className="text-sm text-muted-foreground">
+                  After completing a chapter, going to the next chapter will give you the message "This chapter has not been generated yet".
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-lg">3. Generate the next chapter</h3>
+                <p className="text-sm text-muted-foreground">
+                  Click "Generate Next Chapter" on the game page within the FE Infinity app. This will take about 2 minutes. The AI reads which characters died and player choices and creates the next chapter.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-lg">4. Continue your adventure</h3>
+                <p className="text-sm text-muted-foreground">
+                  Play the next chapter and repeat the process as desired.
+                </p>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button onClick={() => setHelpDialogOpen(false)}>Close</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
         {/* Test Buttons - only shown when showDebugButtons is true */}
         {showDebugButtons && (
           <div className="flex flex-col sm:flex-row gap-2 w-full max-w-[600px] mb-4">
@@ -441,7 +483,18 @@ export default function HomePage() {
         )}
 
         <div className="max-w-5xl">
-          <h2 className="text-2xl font-semibold mb-4">Your Games</h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-semibold">Your Games</h2>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setHelpDialogOpen(true)}
+              className="ml-2"
+            >
+              <HelpCircle className="h-5 w-5" />
+              <span className="sr-only">Help</span>
+            </Button>
+          </div>
           <GamesGrid />
         </div>
       </div>
