@@ -14,6 +14,7 @@ import copyGenericPortraitsToProject from "@/file-io/copy-generic-portraits-to-p
 import modifyEquation from "@/game-engine-io/modify-equation.ts";
 import modifyItem from "@/game-engine-io/modify-item.ts";
 import { isElectronEnvironment } from "@/lib/env-detector.ts";
+import { appendTranslations } from "@/game-engine-io/write-chapter/append-translations.ts";
 
 export default async function initializeProject(projectName: string) {
   const initProjectScriptPath = getPathWithinLtMaker("create_new_project.py");
@@ -307,6 +308,14 @@ export default async function initializeProject(projectName: string) {
       "Rogue",
     ],
   })
+
+  // remove "_attribution" from title screen
+  await appendTranslations({
+    projectNameEndingInDotLtProj: newProjectNameEndingInDotLtProj,
+    newTranslations: [
+      { nid: "_attribution", text: "" },
+    ],
+  });
 
   // Remove music that plays during battle
   await removeWithinLtMaker({
