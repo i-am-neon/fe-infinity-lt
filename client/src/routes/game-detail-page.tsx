@@ -18,6 +18,7 @@ import { Game } from "../types/game";
 import { ChapterGeneratorLoader } from "@/components/ui/chapter-generator-loader";
 import useGenerationProgress, { useGameCreationProgress } from "@/lib/use-generation-progress";
 import { AnimatePresence, motion } from "framer-motion";
+import { getTitleImagePath } from "@/lib/asset-path";
 
 export default function GameDetailPage() {
   const { nid } = useParams<{ nid: string }>();
@@ -578,7 +579,7 @@ export default function GameDetailPage() {
                 <div className="md:col-span-1">
                   <div className="rounded-md overflow-hidden shadow-lg">
                     <img
-                      src={`/images/title-images/${data.game.directory.replace(/\.ltproj$/, "")}.png`}
+                      src={getTitleImagePath(data.game.directory)}
                       alt={`${data.game.title} title image`}
                       className="w-full aspect-[3/2] object-contain bg-black/10"
                       onError={(e) => {

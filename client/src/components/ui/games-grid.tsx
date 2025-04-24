@@ -6,6 +6,7 @@ import {
 import { DashedBorderCard } from "@/components/ui/dashed-border-card";
 import { GlowCard } from "@/components/ui/glow-card";
 import apiCall from "@/lib/api-call";
+import { getTitleImagePath } from "@/lib/asset-path";
 import { Game } from "@/types/game";
 import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -83,7 +84,7 @@ export default function GamesGrid() {
           <GlowCard className="hover:bg-accent/50 transition-colors duration-200 overflow-hidden">
             <div className="w-full aspect-[3/2] overflow-hidden bg-black/10 rounded-t-md">
               <img
-                src={`/images/title-images/${game.directory.replace(/\.ltproj$/, "")}.png`}
+                src={getTitleImagePath(game.directory)}
                 alt={game.title}
                 className="w-full h-full object-cover"
                 onError={(e) => {

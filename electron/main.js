@@ -7,6 +7,8 @@ const { runGameWithWine, preparePythonEnvironment } = require('./game-runner');
 const { startGameLauncherServer } = require('./game-launcher');
 const logger = require('./logger');
 const apiKeyManager = require('./api-key-manager');
+const { protocol } = require('electron');
+const { verifyAssets } = require('./verify-assets');
 
 // Set application name before anything else
 app.setName("FE Infinity");
@@ -281,6 +283,64 @@ app.whenReady().then(async () => {
     resourcesPath: process.resourcesPath || 'not available',
     userDataPath: app.getPath('userData')
   });
+
+  // Register the custom protocol to handle assets
+  protocol.registerFileProtocol('asset', (request, callback) => {
+    const url = request.url.replace(/^asset:\/\//, '');
+    const decodedUrl = decodeURI(url);
+
+    // Search for the asset in several potential locations
+    const searchPaths = [
+      // In packaged app
+      path.join(process.resourcesPath, 'client', decodedUrl),
+      path.join(process.resourcesPath, 'app', 'client', decodedUrl),
+      path.join(app.getAppPath(), 'client', decodedUrl),
+      // In public directory (current standard)
+      path.join(process.resourcesPath, 'client/public', decodedUrl),
+      path.join(process.resourcesPath, 'app/client/public', decodedUrl),
+      path.join(app.getAppPath(), 'client/public', decodedUrl),
+      // In development
+      path.join(__dirname, '../client', decodedUrl),
+      path.join(__dirname, '../client/public', decodedUrl)
+    ];
+
+    // Log the request for debugging in packaged app
+    logger.log('info', `Asset request: ${decodedUrl}`);
+
+    // Try each path in order
+    for (const filePath of searchPaths) {
+      try {
+        if (fs.existsSync(filePath)) {
+          logger.log('info', `Asset found at: ${filePath}`);
+          return callback({ path: filePath });
+        }
+      } catch (err) {
+        logger.log('warn', `Error checking path: ${filePath}`, { error: err.message });
+      }
+    }
+
+    // If we got here, file wasn't found
+    logger.log('error', `Asset not found: ${decodedUrl}`);
+    // Return a fallback or just fail
+    return callback({ error: -6 }); // FILE_NOT_FOUND
+  });
+
+  // Verify assets in packaged app
+  if (app.isPackaged) {
+    try {
+      logger.log('info', 'Verifying packaged assets...');
+      const verificationResults = verifyAssets();
+
+      if (!verificationResults.success) {
+        logger.log('warn', 'Asset verification failed', { errors: verificationResults.errors });
+        // Don't show error dialog as this might confuse users, just log it
+      } else {
+        logger.log('info', 'Asset verification passed');
+      }
+    } catch (error) {
+      logger.log('error', 'Error during asset verification', { error: error.message });
+    }
+  }
 
   // Check for Wine and Python on macOS/Linux
   if (process.platform !== 'win32') {
