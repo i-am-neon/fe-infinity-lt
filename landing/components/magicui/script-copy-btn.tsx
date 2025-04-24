@@ -62,11 +62,11 @@ export function ScriptCopyBtn({
   return (
     <div
       className={cn(
-        "mx-auto flex items-center justify-center",
+        "w-full max-w-full mx-auto flex flex-col items-center justify-center",
         className,
       )}
     >
-      <div className="w-full space-y-2">
+      <div className="w-full max-w-full overflow-hidden space-y-2">
         <div className="mb-2 flex items-center justify-between">
           {showMultiplePackageOptions && (
             <div className="relative">
@@ -80,8 +80,8 @@ export function ScriptCopyBtn({
                       variant="ghost"
                       size="sm"
                       className={`relative rounded-none bg-background px-2 py-1 hover:bg-background ${packageManager === pm
-                          ? "text-primary"
-                          : "text-muted-foreground"
+                        ? "text-primary"
+                        : "text-muted-foreground"
                         }`}
                       onClick={() => setPackageManager(pm)}
                     >
@@ -105,16 +105,16 @@ export function ScriptCopyBtn({
             </div>
           )}
         </div>
-        <div className="relative flex items-center">
-          <div className="min-w-[300px] grow font-mono">
+        <div className="relative flex w-full max-w-full items-center overflow-hidden">
+          <div className="flex-grow overflow-x-auto scrollbar-thin scrollbar-thumb-border">
             {highlightedCode ? (
               <div
-                className={`[&>pre]:overflow-x-auto [&>pre]:rounded-md [&>pre]:p-2 [&>pre]:px-4 [&>pre]:font-mono ${theme === "dark" ? "dark" : "light"
+                className={`block w-full overflow-x-auto [&>pre]:w-full [&>pre]:overflow-x-auto [&>pre]:overflow-y-hidden [&>pre]:rounded-md [&>pre]:p-2 [&>pre]:px-4 [&>pre]:font-mono [&>pre]:text-xs sm:[&>pre]:text-sm [&>pre]:whitespace-nowrap ${theme === "dark" ? "dark" : "light"
                   }`}
                 dangerouslySetInnerHTML={{ __html: highlightedCode }}
               />
             ) : (
-              <pre className="rounded-md border border-border bg-white p-2 px-4 font-mono dark:bg-black">
+              <pre className="w-full overflow-x-auto overflow-y-hidden rounded-md border border-border bg-white p-2 px-4 font-mono text-xs sm:text-sm whitespace-nowrap dark:bg-black">
                 {command}
               </pre>
             )}
@@ -122,7 +122,7 @@ export function ScriptCopyBtn({
           <Button
             variant="outline"
             size="icon"
-            className="relative ml-2 rounded-md"
+            className="relative ml-2 flex-shrink-0 rounded-md"
             onClick={copyToClipboard}
             aria-label={copied ? "Copied" : "Copy to clipboard"}
           >

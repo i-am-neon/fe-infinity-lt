@@ -31,7 +31,7 @@ export default function DownloadsPage() {
 
             {/* Main content */}
             <div className="flex flex-1 flex-col items-center justify-center px-4 sm:px-6 py-6 sm:py-12">
-                <div className="max-w-5xl w-full">
+                <div className="w-full max-w-3xl sm:max-w-4xl md:max-w-5xl">
                     <h2 className="text-3xl sm:text-4xl font-bold text-center mb-6 sm:mb-12">
                         Download FE Infinity
                     </h2>
@@ -72,14 +72,16 @@ export default function DownloadsPage() {
                                     1. Install <Link href="https://brew.sh" className="underline underline-offset-2 hover:text-primary" target="_blank" rel="noopener noreferrer">Homebrew</Link>
                                 </h4>
                                 <p className="mb-3 text-gray-300">Homebrew is a package manager for macOS that makes it easy to install software.</p>
-                                <ScriptCopyBtn
-                                    className="w-full"
-                                    commandMap={{ zsh: `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"` }}
-                                    codeLanguage="sh"
-                                    lightTheme="github-dark"
-                                    darkTheme="github-dark"
-                                    showMultiplePackageOptions={false}
-                                />
+                                <div className="w-full max-w-[calc(100vw-40px)] md:max-w-none overflow-hidden">
+                                    <ScriptCopyBtn
+                                        className="w-full max-w-full"
+                                        commandMap={{ zsh: `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"` }}
+                                        codeLanguage="sh"
+                                        lightTheme="github-dark"
+                                        darkTheme="github-dark"
+                                        showMultiplePackageOptions={false}
+                                    />
+                                </div>
                             </div>
 
                             {/* Python and Wine */}
@@ -88,14 +90,16 @@ export default function DownloadsPage() {
                                     2. Install <Link href="https://www.python.org/" className="underline underline-offset-2 hover:text-primary" target="_blank" rel="noopener noreferrer">Python</Link> and <Link href="https://www.winehq.org/" className="underline underline-offset-2 hover:text-primary" target="_blank" rel="noopener noreferrer">Wine</Link>
                                 </h4>
                                 <p className="mb-3 text-gray-300">Python is needed for running the game engine, and Wine allows running Windows applications on macOS.</p>
-                                <ScriptCopyBtn
-                                    className="w-full"
-                                    commandMap={{ zsh: "brew install python wine" }}
-                                    codeLanguage="sh"
-                                    lightTheme="github-dark"
-                                    darkTheme="github-dark"
-                                    showMultiplePackageOptions={false}
-                                />
+                                <div className="w-full max-w-[calc(100vw-40px)] md:max-w-none overflow-hidden">
+                                    <ScriptCopyBtn
+                                        className="w-full max-w-full"
+                                        commandMap={{ zsh: "brew install python wine" }}
+                                        codeLanguage="sh"
+                                        lightTheme="github-dark"
+                                        darkTheme="github-dark"
+                                        showMultiplePackageOptions={false}
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
