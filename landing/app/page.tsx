@@ -10,7 +10,7 @@ import { BLUR_FADE_DELAY } from "@/components/magicui/constants";
 const features = [
   {
     name: "Not Free, But Very Cheap",
-    description: "Each chapter costs less than a penny to generate through OpenAI's API. You pay the AI cost directly — Neon (the creator of FE Infinity) takes no cut. You control your OpenAI account, so there are no hidden fees or markups.",
+    description: "Each chapter costs less than a penny to generate through OpenAI's API. OpenAI charges your credit card directly based on usage — FE Infinity takes no cut. You control your OpenAI account, so there are no hidden fees or markups.",
     icon: DollarSign,
   },
   {
