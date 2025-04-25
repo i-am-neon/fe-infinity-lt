@@ -43,7 +43,9 @@ function createSplashWindow() {
     transparent: true,
     frame: false,
     alwaysOnTop: true,
-    icon: path.join(__dirname, '../client/public/fe-infinity-logo.png'),
+    icon: app.isPackaged 
+      ? path.join(process.resourcesPath, 'app.ico')
+      : path.join(__dirname, '../client/public/fe-infinity-logo.png'),
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false
@@ -60,7 +62,9 @@ function createMainWindow() {
     width: 1200,
     height: 800,
     show: false,
-    icon: path.join(__dirname, '../client/public/fe-infinity-logo.png'),
+    icon: app.isPackaged 
+      ? path.join(process.resourcesPath, 'app.ico') 
+      : path.join(__dirname, '../client/public/fe-infinity-logo.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
@@ -301,6 +305,24 @@ app.whenReady().then(async () => {
     resourcesPath: process.resourcesPath || 'not available',
     userDataPath: app.getPath('userData')
   });
+
+  // Add Windows icon initialization function
+  if (process.platform === 'win32') {
+    try {
+      // Check if we're in a packaged app
+      if (app.isPackaged) {
+        const iconPath = path.join(process.resourcesPath, 'app.ico');
+        if (fs.existsSync(iconPath)) {
+          logger.log('info', `Windows icon found at: ${iconPath}`);
+          app.getFileIcon = () => iconPath;
+        } else {
+          logger.log('warn', `Windows icon not found at: ${iconPath}`);
+        }
+      }
+    } catch (error) {
+      logger.log('error', 'Failed to initialize Windows icon', { error: error.message });
+    }
+  }
 
   // Copy logo file to all potential paths to ensure it's found
   try {

@@ -58,6 +58,7 @@
     "path-type": "^6.0.0",
     "pkg-up": "^5.0.0",
     "read-pkg-up": "^11.0.0",
+    "readdir-glob": "^2.0.1",
     "type-fest": "^4.39.1"
   },
   "build": {
@@ -121,6 +122,18 @@
         "filter": [
           "**/*"
         ]
+      },
+      {
+        "from": "scripts/post-install-icon-fix.js",
+        "to": "post-install-icon-fix.js"
+      },
+      {
+        "from": "tools/rcedit-x64.exe",
+        "to": "tools/rcedit-x64.exe"
+      },
+      {
+        "from": "scripts/fix-icon.bat",
+        "to": "fix-icon.bat"
       }
     ],
     "directories": {
@@ -147,7 +160,22 @@
       "publisherName": null,
       "forceCodeSigning": false,
       "artifactName": "${productName}-Setup-${version}.${ext}",
-      "executableName": "FE Infinity"
+      "executableName": "FE Infinity",
+      "extraResources": [
+        {
+          "from": "icons/icons/win/icon.ico",
+          "to": "app.ico"
+        }
+      ],
+      "nsis": {
+        "oneClick": true,
+        "perMachine": false,
+        "allowToChangeInstallationDirectory": false,
+        "include": "scripts/installer-post-fix.nsh",
+        "runAfterFinish": true,
+        "createDesktopShortcut": true,
+        "createStartMenuShortcut": true
+      }
     },
     "linux": {
       "target": [
