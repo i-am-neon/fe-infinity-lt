@@ -9,7 +9,7 @@ import { BLUR_FADE_DELAY } from "@/components/magicui/constants";
 
 const features = [
   {
-    name: "Affordable Gameplay",
+    name: "Not Free, But Very Cheap",
     description: "Each chapter costs less than a penny to generate through OpenAI's API. You pay the AI cost directly — Neon (the creator of FE Infinity) takes no cut. You control your OpenAI account, so there are no hidden fees or markups.",
     icon: DollarSign,
   },
@@ -31,7 +31,7 @@ const features = [
   },
   {
     name: "Open Source",
-    description: "FE Infinity is completely open source. Contribute to or customize the project to suit your needs.",
+    description: "FE Infinity is completely open source and free to use/modify/steal. Contribute to or customize the project to suit your needs.",
     icon: Github,
     link: {
       href: "https://github.com/i-am-neon/fe-infinity-lt",
