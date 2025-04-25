@@ -18,6 +18,10 @@ const exePath = path.join(releaseDir, 'FE Infinity.exe');
 const rceditUrl = 'https://github.com/electron/rcedit/releases/download/v1.1.1/rcedit-x64.exe';
 const rceditPath = path.join(electronDir, 'tools', 'rcedit-x64.exe');
 
+// Retry configuration
+const MAX_RETRIES = 5;
+const RETRY_DELAY = 2000; // 2 seconds
+
 console.log('Fixing Windows application icon with rcedit binary...');
 
 // Check if the icon file exists
@@ -30,6 +34,11 @@ if (!fs.existsSync(iconPath)) {
 const toolsDir = path.dirname(rceditPath);
 if (!fs.existsSync(toolsDir)) {
   fs.mkdirSync(toolsDir, { recursive: true });
+}
+
+// Sleep function for delays
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 // Function to download rcedit if not present
@@ -94,7 +103,7 @@ function copyIconToUnpacked(exePath) {
   }
 }
 
-// Function to fix icon for a given executable path
+// Function to fix icon for a given executable path with retries
 async function fixIcon(exePath) {
   if (!fs.existsSync(exePath)) {
     console.log(`Executable not found at ${exePath}`);
@@ -110,12 +119,36 @@ async function fixIcon(exePath) {
     // Copy icon to app.asar.unpacked for reference
     copyIconToUnpacked(exePath);
     
-    // Run rcedit
-    console.log(`Running rcedit with icon ${iconPath}`);
-    execSync(`"${rceditPath}" "${exePath}" --set-icon "${iconPath}"`, {
-      cwd: electronDir,
-      stdio: 'inherit'
-    });
+    // Try to apply the icon with retries
+    let success = false;
+    let attempt = 1;
+    let lastError = null;
+    
+    while (!success && attempt <= MAX_RETRIES) {
+      try {
+        // Run rcedit
+        console.log(`Running rcedit with icon ${iconPath} (attempt ${attempt}/${MAX_RETRIES})`);
+        execSync(`"${rceditPath}" "${exePath}" --set-icon "${iconPath}"`, {
+          cwd: electronDir,
+          stdio: 'inherit'
+        });
+        
+        console.log(`Successfully applied icon to ${exePath} on attempt ${attempt}`);
+        success = true;
+      } catch (error) {
+        lastError = error;
+        const isAccessDenied = error.message.includes('Access is denied') || 
+                               error.message.includes('permission denied');
+        
+        if (isAccessDenied && attempt < MAX_RETRIES) {
+          console.log(`Access denied (attempt ${attempt}/${MAX_RETRIES}). Waiting ${RETRY_DELAY/1000} seconds before retrying...`);
+          await sleep(RETRY_DELAY);
+          attempt++;
+        } else {
+          throw error;
+        }
+      }
+    }
     
     // Create a README file explaining how to fix the icon on Windows
     const readmePath = path.join(path.dirname(exePath), 'FIX-ICON-README.txt');
@@ -141,8 +174,7 @@ Alternatively, you can:
 `;
     fs.writeFileSync(readmePath, readmeContent);
     
-    console.log(`Successfully applied icon to ${exePath}`);
-    return true;
+    return success;
   } catch (error) {
     console.error(`Failed to apply icon to ${exePath}:`, error.message);
     return false;
@@ -172,6 +204,10 @@ async function main() {
       }
     }
   }
+  
+  // Wait a moment before trying the installer file to give it time to be released
+  console.log("Waiting 5 seconds before attempting to process installer files...");
+  await sleep(5000);
   
   // Also check for NSIS installer if generated
   const installerPattern = /FE Infinity-Setup-.*\.exe$/;

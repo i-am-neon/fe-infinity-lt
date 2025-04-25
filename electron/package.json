@@ -19,8 +19,7 @@
     "verify-client-build": "node -e \"const fs=require('fs');const path=require('path');const distDir=path.join(__dirname,'../client/dist');const indexFile=path.join(distDir,'index.html');const assetsDir=path.join(distDir,'assets');if(!fs.existsSync(distDir)||!fs.existsSync(indexFile)||!fs.existsSync(assetsDir)){console.error('React build not found or incomplete. Run build:client first.');process.exit(1);}console.log('React build verified:');console.log('- dist directory:', fs.existsSync(distDir));console.log('- index.html:', fs.existsSync(indexFile));console.log('- assets directory:', fs.existsSync(assetsDir));\"",
     "package": "npm run build:client && npm run verify-client-build && electron-builder --dir && node -e \"const fs=require('fs');const path=require('path');console.log('Output directory contents:');const outputDir=path.join(__dirname,'release/mac-arm64/FE Infinity.app/Contents/Resources/client/dist');if(fs.existsSync(outputDir)){console.log(fs.readdirSync(outputDir));}else{console.log('Output directory not found:',outputDir);}\" && electron-builder",
     "package:mac": "npm run clean:release && npm run build:client && npm run verify-client-build && electron-builder --mac",
-    "package:win": "npm run build:client && npm run verify-client-build && node scripts/prepare-windows-icons.js && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --win --config.win.signAndEditExecutable=false --config.win.forceCodeSigning=false && node scripts/fix-windows-icon-rcedit-bin.js",
-    "package:win:full": "node scripts/build-windows.js",
+    "package:win": "node scripts/build-windows.js",
     "package:linux": "npm run build:client && npm run verify-client-build && electron-builder --linux",
     "fix-win-icon": "node scripts/fix-windows-icon.js",
     "fix-win-icon:direct": "node scripts/fix-windows-icon-rcedit-bin.js",
@@ -77,7 +76,10 @@
       "!bin/python/prefix/**/*"
     ],
     "extraFiles": [
-      "node_modules/readdir-glob/**/*"
+      {
+        "from": "node_modules/readdir-glob",
+        "to": "node_modules/readdir-glob"
+      }
     ],
     "executableName": "FE Infinity",
     "icon": "icons/icons/win/icon.ico",
@@ -143,6 +145,23 @@
     "directories": {
       "output": "release"
     },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": false,
+      "include": "scripts/installer-post-fix.nsh",
+      "runAfterFinish": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "deleteAppDataOnUninstall": true,
+      "warningsAsErrors": false,
+      "installerIcon": "icons/icons/win/icon.ico",
+      "uninstallerIcon": "icons/icons/win/icon.ico"
+    },
+    "nsisWeb": {
+      "appPackageUrl": null,
+      "artifactName": "${productName}-Web-Setup-${version}.${ext}"
+    },
     "mac": {
       "target": [
         "dmg"
@@ -164,26 +183,7 @@
       "publisherName": null,
       "forceCodeSigning": false,
       "artifactName": "${productName}-Setup-${version}.${ext}",
-      "executableName": "FE Infinity",
-      "extraResources": [
-        {
-          "from": "icons/icons/win/icon.ico",
-          "to": "app.ico"
-        }
-      ],
-      "nsis": {
-        "oneClick": true,
-        "perMachine": false,
-        "allowToChangeInstallationDirectory": false,
-        "include": "scripts/installer-post-fix.nsh",
-        "runAfterFinish": true,
-        "createDesktopShortcut": true,
-        "createStartMenuShortcut": true,
-        "closeOnQuit": true,
-        "deleteAppDataOnUninstall": true,
-        "killProcessesDelay": 5000,
-        "processName": "FE Infinity.exe"
-      }
+      "executableName": "FE Infinity"
     },
     "linux": {
       "target": [

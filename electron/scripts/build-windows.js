@@ -13,6 +13,11 @@ console.log('=== FE Infinity Windows Build Process ===');
 const electronDir = path.resolve(__dirname, '..');
 const iconPath = path.join(electronDir, 'icons', 'icons', 'win', 'icon.ico');
 
+// Sleep function for delays
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 // Step 1: Ensure all necessary dependencies are installed
 console.log('\nStep 1: Installing dependencies...');
 try {
@@ -84,21 +89,33 @@ try {
   process.exit(1);
 }
 
-// Step 6: Fix the Windows icon post-build
-console.log('\nStep 6: Applying icon fix post-build...');
-try {
-  execSync('node scripts/fix-windows-icon-rcedit-bin.js', {
-    cwd: electronDir,
-    stdio: 'inherit'
-  });
-} catch (error) {
-  console.error('Icon fix failed:', error.message);
-  console.log('The application may still work, but the icon might not appear correctly.');
-}
-
-console.log('\n=== Windows Build Process Complete ===');
-console.log('Check the release directory for your Windows application:');
-console.log(`${path.join(electronDir, 'release')}`);
-console.log('\nReminder: When running on Windows, you may need to clear the icon cache:');
-console.log('1. Run: ie4uinit.exe -ClearIconCache');
-console.log('2. Or restart Windows Explorer');
+// Step 6: Wait for file handles to be released before applying icon fix
+console.log('\nStep 6: Waiting for files to be released (5 seconds)...');
+(async () => {
+  try {
+    // Wait 5 seconds to ensure all file handles are properly closed
+    await sleep(5000);
+    
+    // Step 7: Fix the Windows icon post-build
+    console.log('\nStep 7: Applying icon fix post-build...');
+    try {
+      execSync('node scripts/fix-windows-icon-rcedit-bin.js', {
+        cwd: electronDir,
+        stdio: 'inherit'
+      });
+    } catch (error) {
+      console.error('Icon fix failed:', error.message);
+      console.log('The application may still work, but the icon might not appear correctly.');
+    }
+    
+    console.log('\n=== Windows Build Process Complete ===');
+    console.log('Check the release directory for your Windows application:');
+    console.log(`${path.join(electronDir, 'release')}`);
+    console.log('\nReminder: When running on Windows, you may need to clear the icon cache:');
+    console.log('1. Run: ie4uinit.exe -ClearIconCache');
+    console.log('2. Or restart Windows Explorer');
+  } catch (err) {
+    console.error('Error in build process:', err);
+    process.exit(1);
+  }
+})();
