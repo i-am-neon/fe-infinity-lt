@@ -13,18 +13,14 @@
     "dev": "concurrently \"cd ../client && npm run dev\" \"wait-on http://localhost:5173 && electron . --dev\"",
     "install-only": "npm i --ignore-scripts",
     "postinstall": "electron-builder install-app-deps && node download-binaries.js --skip-macos-system-deps",
-    "generate-icons": "electron-icon-builder --input=./logo.png --output=icons",
-    "regenerate-icons": "node scripts/regenerate-all-icons.js",
     "build:client": "cd ../client && npm run build",
     "verify-client-build": "node -e \"const fs=require('fs');const path=require('path');const distDir=path.join(__dirname,'../client/dist');const indexFile=path.join(distDir,'index.html');const assetsDir=path.join(distDir,'assets');if(!fs.existsSync(distDir)||!fs.existsSync(indexFile)||!fs.existsSync(assetsDir)){console.error('React build not found or incomplete. Run build:client first.');process.exit(1);}console.log('React build verified:');console.log('- dist directory:', fs.existsSync(distDir));console.log('- index.html:', fs.existsSync(indexFile));console.log('- assets directory:', fs.existsSync(assetsDir));\"",
-    "package": "npm run build:client && npm run verify-client-build && electron-builder --dir && node -e \"const fs=require('fs');const path=require('path');console.log('Output directory contents:');const outputDir=path.join(__dirname,'release/mac-arm64/FE Infinity.app/Contents/Resources/client/dist');if(fs.existsSync(outputDir)){console.log(fs.readdirSync(outputDir));}else{console.log('Output directory not found:',outputDir);}\" && electron-builder",
+    "package": "npm run build:client && npm run verify-client-build && electron-builder",
     "package:mac": "npm run clean:release && npm run build:client && npm run verify-client-build && electron-builder --mac",
-    "package:win": "node scripts/build-windows.js",
+    "package:win": "npm run clean:release && npm run build:client && npm run verify-client-build && electron-builder --win",
     "package:linux": "npm run build:client && npm run verify-client-build && electron-builder --linux",
-    "fix-win-icon": "node scripts/fix-windows-icon.js",
-    "fix-win-icon:direct": "node scripts/fix-windows-icon-rcedit-bin.js",
-    "clean": "rm -rf bin",
-    "clean:release": "rm -rf release/* && mkdir -p release"
+    "clean": "node -e \"const fs=require('fs-extra');if(fs.existsSync('bin')){fs.removeSync('bin');console.log('bin directory removed');}\"",
+    "clean:release": "node -e \"const fs=require('fs-extra');const path=require('path');const releaseDir=path.join(__dirname,'release');if(fs.existsSync(releaseDir)){fs.emptyDirSync(releaseDir);console.log('release directory emptied');}else{fs.mkdirSync(releaseDir,{recursive:true});console.log('release directory created');}\""
   },
   "devDependencies": {
     "axios": "^1.6.7",
@@ -34,6 +30,7 @@
     "electron-builder": "^24.9.1",
     "electron-icon-builder": "^2.0.1",
     "extract-zip": "^2.0.1",
+    "fs-extra": "^11.3.0",
     "rcedit": "^4.0.1",
     "sharp": "^0.33.2",
     "to-ico": "^1.1.5",
@@ -46,7 +43,6 @@
     "dot-prop": "^9.0.0",
     "electron-store": "^8.2.0",
     "find-up": "^7.0.0",
-    "fs-extra": "^11.3.0",
     "is-obj": "^3.0.0",
     "json-schema-traverse": "^1.0.0",
     "locate-path": "^7.2.0",
@@ -134,18 +130,6 @@
         "filter": [
           "**/*"
         ]
-      },
-      {
-        "from": "scripts/post-install-icon-fix.js",
-        "to": "post-install-icon-fix.js"
-      },
-      {
-        "from": "tools/rcedit-x64.exe",
-        "to": "tools/rcedit-x64.exe"
-      },
-      {
-        "from": "scripts/fix-icon.bat",
-        "to": "fix-icon.bat"
       }
     ],
     "directories": {
@@ -180,16 +164,16 @@
         "nsis"
       ],
       "icon": "icons/icons/win/icon.ico",
-      "signingHashAlgorithms": null,
+      "artifactName": "${productName}-Setup-${version}.${ext}",
+      "executableName": "FE Infinity",
       "signAndEditExecutable": false,
+      "signingHashAlgorithms": null,
       "signDlls": false,
       "certificateFile": null,
       "certificatePassword": null,
       "verifyUpdateCodeSignature": false,
       "publisherName": null,
-      "forceCodeSigning": false,
-      "artifactName": "${productName}-Setup-${version}.${ext}",
-      "executableName": "FE Infinity"
+      "forceCodeSigning": false
     },
     "linux": {
       "target": [

@@ -1,43 +1,58 @@
+/**
+ * afterPack hook for electron-builder
+ * This script runs after the app is packed but before it's signed and compressed
+ */
+
 const fs = require('fs');
 const path = require('path');
+const { execSync } = require('child_process');
 
-/**
- * This script runs after electron-builder packs the application
- * It restores the original environment configuration
- */
-module.exports = async function (context) {
-    console.log('Running after-pack.js script...');
-
+module.exports = async function(context) {
+  const { appOutDir, packager, electronPlatformName, arch } = context;
+  
+  console.log(`=== After Pack Hook (${electronPlatformName}) ===`);
+  
+  // Windows-specific icon handling
+  if (electronPlatformName === 'win32') {
     try {
-        // Restore the original .env file if it was backed up
-        const serverDir = path.join(__dirname, '../../server');
-        const envBackupPath = path.join(serverDir, '.env.bak');
-        const envPath = path.join(serverDir, '.env');
-        const envBuildPath = path.join(serverDir, '.env.build');
-
-        // Restore from backup if it exists
-        if (fs.existsSync(envBackupPath)) {
-            console.log(`Restoring ${envBackupPath} to ${envPath}`);
-            fs.copyFileSync(envBackupPath, envPath);
-
-            // Remove the backup
-            console.log(`Removing backup file ${envBackupPath}`);
-            fs.unlinkSync(envBackupPath);
-        }
-
-        // Clean up build env file
-        if (fs.existsSync(envBuildPath)) {
-            console.log(`Removing build env file ${envBuildPath}`);
-            fs.unlinkSync(envBuildPath);
-        }
-
-        console.log('Environment restoration complete.');
-
-        // Add any other cleanup steps here
-
+      console.log('Running Windows icon fix...');
+      
+      // Get the executable path
+      const executableName = packager.executableName || 'FE Infinity';
+      const exePath = path.join(appOutDir, `${executableName}.exe`);
+      
+      // Check if executable exists
+      if (!fs.existsSync(exePath)) {
+        console.error(`Executable not found at: ${exePath}`);
+        return;
+      }
+      
+      // Get icon path
+      const iconPath = path.resolve(__dirname, '..', 'icons', 'icons', 'win', 'icon.ico');
+      
+      if (!fs.existsSync(iconPath)) {
+        console.error(`Icon not found at: ${iconPath}`);
+        return;
+      }
+      
+      console.log(`Setting icon for: ${exePath}`);
+      console.log(`Using icon: ${iconPath}`);
+      
+      // Try using rcedit via npx
+      try {
+        console.log('Using rcedit to set icon...');
+        execSync(`npx rcedit "${exePath}" --set-icon "${iconPath}"`, {
+          stdio: 'inherit'
+        });
+        console.log('Icon set successfully');
+      } catch (rceditError) {
+        console.error('Error using rcedit:', rceditError.message);
+        console.error('Icon may not be applied correctly');
+      }
     } catch (error) {
-        console.error('Error in after-pack script:', error);
-        // Don't throw error here, as it would fail the build
-        // Just log the error and continue
+      console.error('Error in Windows icon processing:', error);
     }
+  }
+  
+  console.log('=== After Pack Hook Complete ===');
 }; 
