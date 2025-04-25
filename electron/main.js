@@ -43,7 +43,7 @@ function createSplashWindow() {
     transparent: true,
     frame: false,
     alwaysOnTop: true,
-    icon: app.isPackaged 
+    icon: app.isPackaged
       ? path.join(process.resourcesPath, 'app.ico')
       : path.join(__dirname, '../client/public/fe-infinity-logo.png'),
     webPreferences: {
@@ -62,8 +62,8 @@ function createMainWindow() {
     width: 1200,
     height: 800,
     show: false,
-    icon: app.isPackaged 
-      ? path.join(process.resourcesPath, 'app.ico') 
+    icon: app.isPackaged
+      ? path.join(process.resourcesPath, 'app.ico')
       : path.join(__dirname, '../client/public/fe-infinity-logo.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -815,8 +815,8 @@ ipcMain.handle('getApiKey', async (event) => {
     logger.log('info', 'OpenAI API key retrieved', { hasKey: !!key });
     return key;
   } catch (error) {
-    logger.log('error', 'Error retrieving OpenAI API key', { 
-      error: error.message, 
+    logger.log('error', 'Error retrieving OpenAI API key', {
+      error: error.message,
       stack: error.stack
     });
     return null;
@@ -830,8 +830,8 @@ ipcMain.handle('setApiKey', async (event, { key }) => {
     logger.log('info', 'OpenAI API key set result', { success: result });
     return result;
   } catch (error) {
-    logger.log('error', 'Error setting OpenAI API key', { 
-      error: error.message, 
+    logger.log('error', 'Error setting OpenAI API key', {
+      error: error.message,
       stack: error.stack
     });
     return false;
@@ -845,8 +845,8 @@ ipcMain.handle('deleteApiKey', async (event) => {
     logger.log('info', 'OpenAI API key delete result', { success: result });
     return result;
   } catch (error) {
-    logger.log('error', 'Error deleting OpenAI API key', { 
-      error: error.message, 
+    logger.log('error', 'Error deleting OpenAI API key', {
+      error: error.message,
       stack: error.stack
     });
     return false;
@@ -859,8 +859,8 @@ ipcMain.handle('hasApiKey', async (event) => {
     logger.log('info', 'OpenAI API key check result', { hasKey: result });
     return result;
   } catch (error) {
-    logger.log('error', 'Error checking for OpenAI API key', { 
-      error: error.message, 
+    logger.log('error', 'Error checking for OpenAI API key', {
+      error: error.message,
       stack: error.stack
     });
     return false;
@@ -870,7 +870,9 @@ ipcMain.handle('hasApiKey', async (event) => {
 // Modify the api-call handler to include API keys from storage
 ipcMain.handle('api-call', async (event, { endpoint, method, body }) => {
   try {
-    logger.log('info', `API call to ${endpoint}`);
+    if (!endpoint.contains("game-creation-progress")) {
+      logger.log('info', `API call to ${endpoint}`);
+    }
 
     // Get API key from storage to pass to the server
     const openaiKey = apiKeyManager.getApiKey();

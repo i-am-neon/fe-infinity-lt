@@ -15,6 +15,8 @@ import modifyEquation from "@/game-engine-io/modify-equation.ts";
 import modifyItem from "@/game-engine-io/modify-item.ts";
 import { isElectronEnvironment } from "@/lib/env-detector.ts";
 import { appendTranslations } from "@/game-engine-io/write-chapter/append-translations.ts";
+import { join, normalize } from "node:path";
+import { gameRunner } from "@/lib/game-runner.ts";
 
 export default async function initializeProject(projectName: string) {
   const initProjectScriptPath = getPathWithinLtMaker("create_new_project.py");
@@ -30,21 +32,43 @@ export default async function initializeProject(projectName: string) {
   // Simplify arguments for Wine compatibility when in Electron
   // Wine has issues with complex paths and quotes, so we'll use simpler values
   const projectNid = sluggify(projectName);
+  const safeProjectName = isElectronEnvironment() ? projectName.replace(/"/g, '') : projectName;
 
   console.log(`Initializing project with paths:
     - Script: ${initProjectScriptPath}
     - LT Maker Path: ${ltMakerPath}
     - Project NID: ${projectNid}
-    - Project Title: ${projectName}
+    - Project Title: ${safeProjectName}
     - Project Path: ${normalizedProjectPath}
   `);
+
+  // In Electron, try to ensure the target directory has proper permissions
+  if (isElectronEnvironment()) {
+    try {
+      const targetDir = join(ltMakerPath, normalizedProjectPath);
+      const parentDir = normalize(join(targetDir, ".."));
+
+      console.log(`Ensuring parent directory exists with proper permissions: ${parentDir}`);
+
+      // If in Electron, use gameRunner to run a command to check/create directory
+      if (isElectronEnvironment()) {
+        await gameRunner.runPythonScript("check_directory_permissions.py", [
+          parentDir,
+          "true", // create if doesn't exist
+        ]);
+      }
+    } catch (err) {
+      console.warn(`Failed to ensure target directory permissions: ${err}`);
+      // Continue anyway as this is just a precaution
+    }
+  }
 
   // Run the Python script and capture its output for debugging
   const { output, error } = await runPythonScript({
     pathToPythonScript: initProjectScriptPath,
     args: [
       projectNid,
-      isElectronEnvironment() ? projectName.replace(/"/g, '') : projectName,
+      safeProjectName,
       ltMakerPath,
       normalizedProjectPath,
     ],
@@ -54,6 +78,19 @@ export default async function initializeProject(projectName: string) {
 
   if (error) {
     console.error(`Python script error: ${error}`);
+
+    // Try to diagnose the issue
+    console.log("Attempting to diagnose project creation issue...");
+
+    // Check if default.ltproj exists (source for copying)
+    try {
+      const defaultProjectPath = getPathWithinLtMaker("default.ltproj");
+      const defaultProjectInfo = await Deno.stat(defaultProjectPath);
+      console.log(`Default project exists: ${defaultProjectPath} (isDirectory: ${defaultProjectInfo.isDirectory})`);
+    } catch (err) {
+      console.error(`Default project not found - this may be the root cause: ${err}`);
+    }
+
     throw new Error(`Project initialization failed: Python script error: ${error}`);
   }
 

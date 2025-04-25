@@ -20,7 +20,7 @@ export function setApiKey(key: string): void {
     }
 
     currentOpenAIKey = key.trim();
-    console.log(`Using client-provided OpenAI API key`);
+    // console.log(`Using client-provided OpenAI API key`);
 }
 
 /**
