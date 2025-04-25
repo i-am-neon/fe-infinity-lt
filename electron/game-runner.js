@@ -1228,13 +1228,10 @@ async function preparePythonEnvironment() {
 const runGameWithWine = runGame;
 
 // Run a Python script with appropriate environment setup
-async function runPythonScript(scriptPath, args = [], workingDir = null) {
+async function runPythonScript(scriptPath, args = []) {
   return new Promise((resolve, reject) => {
     try {
       logger.log('info', `Running Python script: ${scriptPath} with args:`, args);
-      if (workingDir) {
-        logger.log('info', `Using working directory: ${workingDir}`);
-      }
 
       // Make sure we're using the correct path to lt-maker-fork
       const ltMakerPath = process.env.NODE_ENV === 'development'
@@ -1242,7 +1239,7 @@ async function runPythonScript(scriptPath, args = [], workingDir = null) {
         : getLtMakerPath();
 
       // Get the directory of the script
-      const scriptDir = workingDir || path.dirname(scriptPath);
+      const scriptDir = path.dirname(scriptPath);
       const scriptName = path.basename(scriptPath);
 
       // On macOS or Linux, we need to use Wine
@@ -1492,23 +1489,12 @@ fi
           ? pythonPathEnv
           : `${ltMakerPath}${path.delimiter}${pythonPathEnv}`;
 
-        // If a working directory is provided, adjust script path to be relative if needed
-        let finalScriptPath = scriptPath;
-        if (workingDir && path.isAbsolute(scriptPath)) {
-          // Check if script is within the working directory
-          if (scriptPath.toLowerCase().startsWith(workingDir.toLowerCase())) {
-            // Use relative path for better Python module imports
-            finalScriptPath = path.relative(workingDir, scriptPath);
-            logger.log('info', `Using relative script path from working directory: ${finalScriptPath}`);
-          }
-        }
-
         // Run the Python script with arguments
         const pythonProcess = spawn(
           pythonPath,
-          [finalScriptPath, ...args],
+          [scriptPath, ...args],
           {
-            cwd: scriptDir, // Use the working directory or script directory
+            cwd: scriptDir,
             detached: true,
             stdio: ['ignore', 'pipe', 'pipe'],
             env: {

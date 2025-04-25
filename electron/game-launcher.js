@@ -150,7 +150,6 @@ function startGameLauncherServer() {
               // Run Python script endpoint
               const scriptPath = parsedBody.scriptPath;
               const args = parsedBody.args || [];
-              const workingDir = parsedBody.workingDir; // Get working directory if provided
 
               if (!scriptPath) {
                 logger.log('error', 'Missing scriptPath parameter');
@@ -163,9 +162,6 @@ function startGameLauncherServer() {
               }
 
               logger.log('info', `Received request to run Python script: ${scriptPath} with args:`, args);
-              if (workingDir) {
-                logger.log('info', `Using working directory: ${workingDir}`);
-              }
 
               // In Electron, use bundled Python, properly handling asar vs asar.unpacked paths
               // Create possible Python paths, accounting for asar packaging
@@ -236,24 +232,14 @@ function startGameLauncherServer() {
               try {
                 // Use child_process.spawn directly with bundled Python
                 const { spawn } = require('child_process');
-                
-                // Use provided working directory if available, otherwise use script directory
-                const cwd = workingDir || path.dirname(scriptPath);
+                const cwd = path.dirname(scriptPath);
 
                 logger.log('info', `Attempting to run Python script with: ${pythonPath}`);
                 logger.log('info', `Working directory: ${cwd}`);
                 logger.log('info', `Script: ${scriptPath}`);
                 logger.log('info', `Arguments: ${JSON.stringify(args)}`);
 
-                // If we have a working directory, adjust the script path to be relative to it
-                let finalScriptPath = scriptPath;
-                if (workingDir && path.isAbsolute(scriptPath) && scriptPath.toLowerCase().startsWith(workingDir.toLowerCase())) {
-                  // Make script path relative to working directory
-                  finalScriptPath = path.relative(workingDir, scriptPath);
-                  logger.log('info', `Using relative script path: ${finalScriptPath}`);
-                }
-
-                const child = spawn(pythonPath, [finalScriptPath, ...args], {
+                const child = spawn(pythonPath, [scriptPath, ...args], {
                   cwd: cwd,
                   detached: true,
                   stdio: 'ignore',
@@ -275,7 +261,7 @@ function startGameLauncherServer() {
 
                 // Fall back to the normal method
                 try {
-                  await runPythonScript(scriptPath, args, workingDir);
+                  await runPythonScript(scriptPath, args);
                   logger.log('info', `Python script launched successfully via runPythonScript`);
 
                   res.statusCode = 200;

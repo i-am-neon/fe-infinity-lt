@@ -23,18 +23,11 @@ export default async function initializeProject(projectName: string) {
   const newProjectNameEndingInDotLtProj = `_${sluggify(projectName)}.ltproj`;
   const gameNid = "_" + sluggify(projectName);
 
-  // Get the lt-maker path
-  const ltMakerPath = getLtMakerPath();
-  
-  // Format paths based on platform - use native format for Windows
-  const isWindows = Deno.build.os === "windows";
-  const normalizedLtMakerPath = isWindows 
-    ? ltMakerPath 
-    : ltMakerPath.replace(/\\/g, '/');  // Convert to forward slashes only for non-Windows
-    
-  const normalizedProjectPath = isWindows
-    ? newProjectNameEndingInDotLtProj
-    : newProjectNameEndingInDotLtProj.replace(/\\/g, '/');  // Convert to forward slashes only for non-Windows
+  // Get the lt-maker path and ensure it uses forward slashes for Wine compatibility
+  const ltMakerPath = getLtMakerPath().replace(/\\/g, '/');
+
+  // Normalize the project path to use forward slashes
+  const normalizedProjectPath = newProjectNameEndingInDotLtProj.replace(/\\/g, '/');
 
   // Simplify arguments for Wine compatibility when in Electron
   // Wine has issues with complex paths and quotes, so we'll use simpler values
@@ -43,7 +36,7 @@ export default async function initializeProject(projectName: string) {
 
   console.log(`Initializing project with paths:
     - Script: ${initProjectScriptPath}
-    - LT Maker Path: ${normalizedLtMakerPath}
+    - LT Maker Path: ${ltMakerPath}
     - Project NID: ${projectNid}
     - Project Title: ${safeProjectName}
     - Project Path: ${normalizedProjectPath}
@@ -76,7 +69,7 @@ export default async function initializeProject(projectName: string) {
     args: [
       projectNid,
       safeProjectName,
-      normalizedLtMakerPath,
+      ltMakerPath,
       normalizedProjectPath,
     ],
   });
