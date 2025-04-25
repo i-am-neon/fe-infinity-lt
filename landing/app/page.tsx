@@ -126,9 +126,18 @@ export default function Home() {
                     <dd className="mt-2 text-base text-muted-foreground">
                       {feature.customDescription ? (
                         feature.name === "Free-to-Use Assets" ? (
-                          <p>
-                            FE Infinity uses free-to-use assets from the <Link href="https://github.com/Klokinator/FE-Repo" className="underline underline-offset-2 hover:text-primary" target="_blank" rel="noopener noreferrer">Fire Emblem repository</Link>, ensuring a classic feel while delivering a modern AI-driven experience.
-                          </p>
+                          <>
+                            <p>
+                              FE Infinity uses free-to-use assets from the <Link href="https://github.com/Klokinator/FE-Repo" className="underline underline-offset-2 hover:text-primary" target="_blank" rel="noopener noreferrer">Fire Emblem repository</Link>, ensuring a classic feel while delivering a modern AI-driven experience.
+                            </p>
+                            <div className="mt-2">
+                              <Link href="/attributions">
+                                <Button variant="outline" size="sm" className="gap-1">
+                                  View Attributions
+                                </Button>
+                              </Link>
+                            </div>
+                          </>
                         ) : (
                           <p>
                             Experience the tactical depth of Fire Emblem with the powerful <Link href="https://lt-maker.readthedocs.io/en/latest/index.html" className="underline underline-offset-2 hover:text-primary" target="_blank" rel="noopener noreferrer">Lex Talionis engine</Link>, enhanced with modern AI generation.
