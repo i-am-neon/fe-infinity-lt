@@ -809,22 +809,62 @@ ipcMain.handle('runGame', async (_, projectPath) => {
 
 // Handle API key management IPC calls
 ipcMain.handle('getApiKey', async (event) => {
-  logger.log('info', 'Retrieving OpenAI API key');
-  return apiKeyManager.getApiKey();
+  try {
+    logger.log('info', 'Retrieving OpenAI API key');
+    const key = apiKeyManager.getApiKey();
+    logger.log('info', 'OpenAI API key retrieved', { hasKey: !!key });
+    return key;
+  } catch (error) {
+    logger.log('error', 'Error retrieving OpenAI API key', { 
+      error: error.message, 
+      stack: error.stack
+    });
+    return null;
+  }
 });
 
 ipcMain.handle('setApiKey', async (event, { key }) => {
-  logger.log('info', 'Setting OpenAI API key');
-  return apiKeyManager.setApiKey(key);
+  try {
+    logger.log('info', 'Setting OpenAI API key');
+    const result = apiKeyManager.setApiKey(key);
+    logger.log('info', 'OpenAI API key set result', { success: result });
+    return result;
+  } catch (error) {
+    logger.log('error', 'Error setting OpenAI API key', { 
+      error: error.message, 
+      stack: error.stack
+    });
+    return false;
+  }
 });
 
 ipcMain.handle('deleteApiKey', async (event) => {
-  logger.log('info', 'Deleting OpenAI API key');
-  return apiKeyManager.deleteApiKey();
+  try {
+    logger.log('info', 'Deleting OpenAI API key');
+    const result = apiKeyManager.deleteApiKey();
+    logger.log('info', 'OpenAI API key delete result', { success: result });
+    return result;
+  } catch (error) {
+    logger.log('error', 'Error deleting OpenAI API key', { 
+      error: error.message, 
+      stack: error.stack
+    });
+    return false;
+  }
 });
 
 ipcMain.handle('hasApiKey', async (event) => {
-  return apiKeyManager.hasApiKey();
+  try {
+    const result = apiKeyManager.hasApiKey();
+    logger.log('info', 'OpenAI API key check result', { hasKey: result });
+    return result;
+  } catch (error) {
+    logger.log('error', 'Error checking for OpenAI API key', { 
+      error: error.message, 
+      stack: error.stack
+    });
+    return false;
+  }
 });
 
 // Modify the api-call handler to include API keys from storage

@@ -92,7 +92,13 @@
       "**/*.so",
       "**/*.dylib",
       "**/*.pyd",
-      "node_modules/readdir-glob/**/*"
+      "node_modules/readdir-glob/**/*",
+      "node_modules/electron-store/**/*",
+      "node_modules/conf/**/*",
+      "node_modules/dot-prop/**/*",
+      "node_modules/is-obj/**/*",
+      "node_modules/@types/is-obj/**/*",
+      "node_modules/type-fest/**/*"
     ],
     "beforePack": "./scripts/before-pack.js",
     "afterPack": "./scripts/after-pack.js",
