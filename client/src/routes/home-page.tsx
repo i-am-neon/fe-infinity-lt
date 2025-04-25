@@ -23,7 +23,8 @@ import { useNavigate } from "react-router-dom";
 import { FeInfinityTitle } from "@/components/ui/fe-infinity-title";
 import { BlurFade } from "@/components/magicui/blur-fade";
 import { BLUR_FADE_DELAY } from "@/components/ui/constants";
-const showDebugButtons = false;
+
+const showDebugButtons = true;
 
 export default function HomePage() {
   const navigate = useNavigate();
