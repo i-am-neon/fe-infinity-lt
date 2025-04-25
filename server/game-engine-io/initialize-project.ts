@@ -15,9 +15,9 @@ import modifyEquation from "@/game-engine-io/modify-equation.ts";
 import modifyItem from "@/game-engine-io/modify-item.ts";
 import { isElectronEnvironment } from "@/lib/env-detector.ts";
 import { appendTranslations } from "@/game-engine-io/write-chapter/append-translations.ts";
+import createNewProject from "@/game-engine-io/create-new-project.ts";
 
 export default async function initializeProject(projectName: string) {
-  const initProjectScriptPath = getPathWithinLtMaker("create_new_project.py");
   const newProjectNameEndingInDotLtProj = `_${sluggify(projectName)}.ltproj`;
   const gameNid = "_" + sluggify(projectName);
 
@@ -32,29 +32,27 @@ export default async function initializeProject(projectName: string) {
   const projectNid = sluggify(projectName);
 
   console.log(`Initializing project with paths:
-    - Script: ${initProjectScriptPath}
     - LT Maker Path: ${ltMakerPath}
     - Project NID: ${projectNid}
     - Project Title: ${projectName}
     - Project Path: ${normalizedProjectPath}
   `);
 
-  // Run the Python script and capture its output for debugging
-  const { output, error } = await runPythonScript({
-    pathToPythonScript: initProjectScriptPath,
-    args: [
+  try {
+    // Call our TypeScript implementation instead of Python script
+    await createNewProject(
       projectNid,
       isElectronEnvironment() ? projectName.replace(/"/g, '') : projectName,
       ltMakerPath,
-      normalizedProjectPath,
-    ],
-  });
-
-  console.log(`Python script output: ${output}`);
-
-  if (error) {
-    console.error(`Python script error: ${error}`);
-    throw new Error(`Project initialization failed: Python script error: ${error}`);
+      normalizedProjectPath
+    );
+  } catch (error: unknown) {
+    console.error(`Project initialization failed: ${error}`);
+    if (error instanceof Error) {
+      throw new Error(`Project initialization failed: ${error.message}`);
+    } else {
+      throw new Error(`Project initialization failed: ${String(error)}`);
+    }
   }
 
   // Check if the project directory was created
@@ -81,15 +79,6 @@ export default async function initializeProject(projectName: string) {
     console.log(`Successfully created metadata.json at ${metadataPath}`);
   } catch (err) {
     console.error(`Failed to find metadata.json at ${metadataPath}`, err);
-
-    // Try to inspect the create_new_project.py script to see if it's the issue
-    try {
-      const pythonScriptContent = await Deno.readTextFile(initProjectScriptPath);
-      console.log(`Python script content first 500 chars: ${pythonScriptContent.substring(0, 500)}`);
-    } catch (readErr) {
-      console.error(`Failed to read Python script: ${readErr}`);
-    }
-
     throw new Error(`Project initialization failed: metadata.json was not created for ${projectName}`);
   }
 
@@ -280,34 +269,48 @@ export default async function initializeProject(projectName: string) {
     newExpression: "MAG + 15",
   })
   // Apply staff equations to items
-  await modifyItem({
-    projectNameEndingInDotLtProj: newProjectNameEndingInDotLtProj,
-    nid: "Mend",
-    componentKey: "equation_heal",
-    newValue: "MEND",
-  })
-  await modifyItem({
-    projectNameEndingInDotLtProj: newProjectNameEndingInDotLtProj,
-    nid: "Physic",
-    componentKey: "equation_heal",
-    newValue: "PHYSIC",
-  })
+  try {
+    await modifyItem({
+      projectNameEndingInDotLtProj: newProjectNameEndingInDotLtProj,
+      nid: "Mend",
+      componentKey: "equation_heal",
+      newValue: "MEND",
+    });
+  } catch (error) {
+    console.log(`Skipping Mend item modification: ${error}`);
+  }
+
+  try {
+    await modifyItem({
+      projectNameEndingInDotLtProj: newProjectNameEndingInDotLtProj,
+      nid: "Physic",
+      componentKey: "equation_heal",
+      newValue: "PHYSIC",
+    });
+  } catch (error) {
+    console.log(`Skipping Physic item modification: ${error}`);
+  }
+
   // Make Shamshir available for thieves and rogues
-  await modifyItem({
-    projectNameEndingInDotLtProj: newProjectNameEndingInDotLtProj,
-    nid: "Shamshir",
-    componentKey: "prf_class",
-    newValue: [
-      "Myrmidon",
-      "Swordmaster",
-      "Eirika_Lord",
-      "Assassin",
-      "Sword_Bonewalker",
-      "Sword_Wight",
-      "Thief",
-      "Rogue",
-    ],
-  })
+  try {
+    await modifyItem({
+      projectNameEndingInDotLtProj: newProjectNameEndingInDotLtProj,
+      nid: "Shamshir",
+      componentKey: "prf_class",
+      newValue: [
+        "Myrmidon",
+        "Swordmaster",
+        "Eirika_Lord",
+        "Assassin",
+        "Sword_Bonewalker",
+        "Sword_Wight",
+        "Thief",
+        "Rogue",
+      ],
+    });
+  } catch (error) {
+    console.log(`Skipping Shamshir item modification: ${error}`);
+  }
 
   // remove "_attribution" from title screen
   await appendTranslations({
