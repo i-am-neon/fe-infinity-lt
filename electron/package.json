@@ -76,6 +76,9 @@
       "bin/**/*",
       "!bin/python/prefix/**/*"
     ],
+    "extraFiles": [
+      "node_modules/readdir-glob/**/*"
+    ],
     "executableName": "FE Infinity",
     "icon": "icons/icons/win/icon.ico",
     "asar": true,
@@ -86,7 +89,8 @@
       "**/*.dll",
       "**/*.so",
       "**/*.dylib",
-      "**/*.pyd"
+      "**/*.pyd",
+      "node_modules/readdir-glob/**/*"
     ],
     "beforePack": "./scripts/before-pack.js",
     "afterPack": "./scripts/after-pack.js",
