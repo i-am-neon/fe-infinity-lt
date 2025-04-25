@@ -85,8 +85,8 @@ export const weaponRankExpMap = {
 
 // Master map for class => list of weapon types
 export const classWeaponMap: Record<FE8Class, WeaponType[]> = {
-  Citizen: [],
-  Dancer: [],
+  // Citizen: [],
+  // Dancer: [],
   Myrmidon: ["Sword"],
   Mercenary: ["Sword"],
   Thief: ["Sword"],
@@ -114,7 +114,7 @@ export const classWeaponMap: Record<FE8Class, WeaponType[]> = {
   "Sword Wight": ["Sword"],
   "Bow Wight": ["Bow"],
   Mogall: ["Dark"],
-  Manakete: [],
+  // Manakete: [],
 
   // Promoted classes:
   Swordmaster: ["Sword"],

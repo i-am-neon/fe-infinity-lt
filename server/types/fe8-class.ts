@@ -27,7 +27,7 @@ export const UnpromotedFE8Classes = [
   "Sword Bonewalker",
   "Bow Bonewalker",
   "Mogall",
-  "Manakete",
+  // "Manakete", // too strong
 ] as const;
 
 export const PromotedFE8Classes = [
@@ -115,7 +115,7 @@ export const FE8ClassDescriptionMap: Record<FE8Class, string> = {
   "Sword Bonewalker": "An undead skeleton swordsman with cunning skill.",
   "Bow Bonewalker": "An undead skeleton archer specializing in ranged combat.",
   "Arch Mogall": "A highly resistant floating monster using dark magic.",
-  Manakete: "A dragonkin unit with high stats and dragonstone breath attacks.",
+  // Manakete: "A dragonkin unit with high stats and dragonstone breath attacks.",
 };
 
 export const FE8ClassToLTNidMap: Record<FE8Class, string> = {
@@ -167,6 +167,6 @@ export const FE8ClassToLTNidMap: Record<FE8Class, string> = {
   "Sword Bonewalker": "Sword_Bonewalker",
   "Bow Bonewalker": "Bow_Bonewalker",
   "Arch Mogall": "Arch_Mogall",
-  Manakete: "Manakete",
+  // Manakete: "Manakete",
 };
 

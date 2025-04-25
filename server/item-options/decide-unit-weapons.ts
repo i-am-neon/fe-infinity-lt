@@ -11,7 +11,7 @@ import getBasicWeapon from "./get-basic-weapon.ts";
 const monsterWeaponMap: Partial<Record<FE8Class, string[]>> = {
   Mogall: ["Evil_Eye"],
   "Arch Mogall": ["Crimson_Eye"],
-  Manakete: ["Dragonstone"],
+  // Manakete: ["Dragonstone"],
 };
 
 // Get appropriate claw based on level
