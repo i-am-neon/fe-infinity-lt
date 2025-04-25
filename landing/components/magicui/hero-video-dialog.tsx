@@ -86,25 +86,27 @@ export default function HeroVideoDialog({
   };
 
   return (
-    <div className={cn("relative", className)}>
+    <div className={cn("relative w-full", className)}>
       <div
-        className="group relative cursor-pointer"
+        className="group relative cursor-pointer w-full overflow-hidden"
         onClick={() => setIsVideoOpen(true)}
       >
-        <img
-          src={thumbnailSrc}
-          alt={thumbnailAlt}
-          width={1920}
-          height={1080}
-          className="w-full rounded-md border shadow-lg transition-all duration-200 ease-out group-hover:brightness-[0.8]"
-        />
+        <div className="w-full aspect-video">
+          <img
+            src={thumbnailSrc}
+            alt={thumbnailAlt}
+            width={1920}
+            height={1080}
+            className="w-full h-full object-cover rounded-md border shadow-lg transition-all duration-200 ease-out group-hover:brightness-[0.8]"
+          />
+        </div>
         <div className="absolute inset-0 flex scale-[0.9] items-center justify-center rounded-2xl transition-all duration-200 ease-out group-hover:scale-100">
-          <div className="flex size-28 items-center justify-center rounded-full bg-primary/10 backdrop-blur-md">
+          <div className="flex size-16 sm:size-20 md:size-24 lg:size-28 items-center justify-center rounded-full bg-primary/10 backdrop-blur-md">
             <div
-              className={`relative flex size-20 scale-100 items-center justify-center rounded-full bg-gradient-to-b from-primary/30 to-primary shadow-md transition-all duration-200 ease-out group-hover:scale-[1.2]`}
+              className={`relative flex size-10 sm:size-14 md:size-16 lg:size-20 scale-100 items-center justify-center rounded-full bg-gradient-to-b from-primary/30 to-primary shadow-md transition-all duration-200 ease-out group-hover:scale-[1.2]`}
             >
               <Play
-                className="size-8 scale-100 fill-white text-white transition-transform duration-200 ease-out group-hover:scale-105"
+                className="size-5 sm:size-6 md:size-7 lg:size-8 scale-100 fill-white text-white transition-transform duration-200 ease-out group-hover:scale-105"
                 style={{
                   filter:
                     "drop-shadow(0 4px 3px rgb(0 0 0 / 0.07)) drop-shadow(0 2px 2px rgb(0 0 0 / 0.06))",
@@ -126,19 +128,19 @@ export default function HeroVideoDialog({
             <motion.div
               {...selectedAnimation}
               transition={{ type: "spring", damping: 30, stiffness: 300 }}
-              className="relative mx-4 aspect-video w-full max-w-4xl md:mx-0"
+              className="relative mx-2 sm:mx-4 aspect-video w-full max-w-xl sm:max-w-2xl md:max-w-3xl lg:max-w-4xl"
               onClick={(e) => e.stopPropagation()}
             >
               <motion.button
-                className="absolute -top-16 right-0 rounded-full bg-neutral-900/50 p-2 text-xl text-white ring-1 backdrop-blur-md dark:bg-neutral-100/50 dark:text-black"
+                className="absolute -top-10 sm:-top-12 md:-top-16 right-0 rounded-full bg-neutral-900/50 p-1.5 sm:p-2 text-white ring-1 backdrop-blur-md dark:bg-neutral-100/50 dark:text-black"
                 onClick={() => setIsVideoOpen(false)}
               >
-                <XIcon className="size-5" />
+                <XIcon className="size-4 sm:size-5" />
               </motion.button>
-              <div className="relative isolate z-[1] size-full overflow-hidden rounded-2xl border-2 border-white">
+              <div className="relative isolate z-[1] size-full overflow-hidden rounded-lg sm:rounded-xl md:rounded-2xl border border-white sm:border-2">
                 <iframe
                   src={getVideoUrl()}
-                  className="size-full rounded-2xl"
+                  className="size-full"
                   allowFullScreen
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 ></iframe>

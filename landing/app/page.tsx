@@ -51,38 +51,38 @@ export default function Home() {
     <main className="flex min-h-screen flex-col items-center">
       {/* Background gradient with hero content */}
       <div className="w-full">
-        <BackgroundGradientAnimation>
+        <BackgroundGradientAnimation className="flex flex-col">
           {/* Nav bar inside gradient */}
-          <nav className="absolute top-0 left-0 right-0 flex w-full items-center justify-center px-6 py-4 z-50">
+          <nav className="absolute top-0 left-0 right-0 flex w-full items-center justify-center px-4 sm:px-6 py-3 sm:py-4 z-50">
             <BlurFade delay={BLUR_FADE_DELAY} className="ml-auto flex gap-2">
               <Link href="https://discord.gg/zkKjjRKeHk" target="_blank" rel="noopener noreferrer">
-                <Button variant="ghost" className="text-white hover:bg-white/10 gap-2">
+                <Button variant="ghost" size="sm" className="text-white hover:bg-white/10 gap-1 sm:gap-2 text-sm sm:text-base">
                   Join Discord
                 </Button>
               </Link>
               <Link href="/downloads">
-                <Button variant="ghost" className="text-white hover:bg-white/10">Downloads</Button>
+                <Button variant="ghost" size="sm" className="text-white hover:bg-white/10 text-sm sm:text-base">Downloads</Button>
               </Link>
             </BlurFade>
           </nav>
 
           {/* Hero content */}
-          <BlurFade delay={BLUR_FADE_DELAY * 2}>
-            <div className="relative z-40 flex flex-col items-center justify-center py-32 pointer-events-none">
+          <BlurFade delay={BLUR_FADE_DELAY * 2} className="flex-grow">
+            <div className="relative z-40 flex flex-col items-center justify-center min-h-[calc(100vh-8rem)] md:min-h-[calc(100vh-10rem)] px-4 py-16 sm:py-20 md:py-24 pointer-events-none">
               <Image
                 src="/logo.png"
                 alt="FE Infinity Logo"
                 width={120}
                 height={120}
-                className="mb-6"
+                className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 mb-3 sm:mb-4 md:mb-6"
               />
-              <h1 className="text-5xl font-bold mb-6 text-center text-white" style={{ fontFamily: 'var(--font-metamorphous)' }}>
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-2 sm:mb-4 md:mb-6 text-center text-white" style={{ fontFamily: 'var(--font-metamorphous)' }}>
                 FE Infinity
               </h1>
-              <h2 className="text-2xl text-center mb-10 text-white">
+              <h2 className="text-lg sm:text-xl md:text-2xl text-center mb-6 sm:mb-8 md:mb-10 text-white">
                 AI Creates a Fire Emblem game as you play it
               </h2>
-              <div className="pointer-events-auto w-full max-w-4xl px-4 mt-6">
+              <div className="pointer-events-auto w-full max-w-xs sm:max-w-sm md:max-w-xl lg:max-w-3xl xl:max-w-4xl px-2 sm:px-4">
                 <HeroVideoDialog
                   videoSrc="https://www.youtube.com/embed/dQw4w9WgXcQ"
                   thumbnailSrc="/video-thumbnail.jpg"
