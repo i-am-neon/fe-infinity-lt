@@ -2,6 +2,10 @@ import { getLtMakerPath } from "@/file-io/get-path-within-lt-maker.ts";
 import { copy, ensureDir } from "https://deno.land/std@0.224.0/fs/mod.ts";
 import { join, normalize } from "https://deno.land/std@0.224.0/path/mod.ts";
 
+// These are the data types that should be serialized as single files rather than directories
+// Based on Database.save_as_chunks in the Python code
+const FOLDERS_TO_COMBINE = ["events", "items", "skills", "units", "classes", "levels"];
+
 /**
  * Creates a new LT project by copying the default project template 
  * and customizing it with the provided name and ID
@@ -33,6 +37,9 @@ export default async function createNewProject(
         // Copy the default project to the new location
         await copy(srcPath, destPath, { overwrite: true });
 
+        // Convert directories to single JSON files (simulating what the Python serializer does)
+        await convertDirectoriesToJsonFiles(destPath);
+
         // Update the metadata.json file with new project info
         await updateMetadata(destPath, projectNid, projectTitle);
 
@@ -47,6 +54,55 @@ export default async function createNewProject(
             throw new Error(`Project initialization failed: ${error.message}`);
         } else {
             throw new Error(`Project initialization failed: ${String(error)}`);
+        }
+    }
+}
+
+/**
+ * Converts directories with multiple JSON files into single JSON files
+ * This replicates what the Python serializer does in the Database.serialize method
+ */
+async function convertDirectoriesToJsonFiles(projectPath: string): Promise<void> {
+    const gameDataPath = join(projectPath, 'game_data');
+
+    for (const folderName of FOLDERS_TO_COMBINE) {
+        const folderPath = join(gameDataPath, folderName);
+
+        try {
+            // Check if this folder exists
+            const folderInfo = await Deno.stat(folderPath);
+            if (!folderInfo.isDirectory) {
+                continue; // Skip if not a directory
+            }
+
+            // Read all JSON files in the directory
+            const allJsonData: any[] = [];
+            for await (const entry of Deno.readDir(folderPath)) {
+                if (entry.name.endsWith('.json') && entry.name !== '.orderkeys') {
+                    const filePath = join(folderPath, entry.name);
+                    const fileContent = await Deno.readTextFile(filePath);
+                    try {
+                        // Each file contains an array of objects
+                        const jsonData = JSON.parse(fileContent);
+                        allJsonData.push(...jsonData);
+                    } catch (error) {
+                        console.error(`Error parsing JSON file ${filePath}: ${error}`);
+                    }
+                }
+            }
+
+            // Create a single JSON file with all the data
+            const combinedJsonPath = join(gameDataPath, `${folderName}.json`);
+            await Deno.writeTextFile(combinedJsonPath, JSON.stringify(allJsonData, null, 2));
+
+            // Delete the original directory
+            await Deno.remove(folderPath, { recursive: true });
+
+            console.log(`Converted directory ${folderPath} to file ${combinedJsonPath}`);
+        } catch (error) {
+            if (!(error instanceof Deno.errors.NotFound)) {
+                console.error(`Error processing folder ${folderPath}: ${error}`);
+            }
         }
     }
 }
