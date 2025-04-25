@@ -178,7 +178,11 @@
         "include": "scripts/installer-post-fix.nsh",
         "runAfterFinish": true,
         "createDesktopShortcut": true,
-        "createStartMenuShortcut": true
+        "createStartMenuShortcut": true,
+        "closeOnQuit": true,
+        "deleteAppDataOnUninstall": true,
+        "killProcessesDelay": 5000,
+        "processName": "FE Infinity.exe"
       }
     },
     "linux": {
