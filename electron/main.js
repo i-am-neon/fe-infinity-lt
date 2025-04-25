@@ -874,15 +874,6 @@ ipcMain.handle('api-call', async (event, { endpoint, method, body }) => {
       logger.log('info', `API call to ${endpoint}`);
     }
 
-    // Check if server is ready before proceeding
-    if (!isServerReady()) {
-      logger.log('warn', `API call to ${endpoint} attempted before server is ready`);
-      return { 
-        success: false, 
-        error: "Server is still initializing. Please try again in a moment." 
-      };
-    }
-
     // Get API key from storage to pass to the server
     const openaiKey = apiKeyManager.getApiKey();
 
@@ -916,23 +907,7 @@ ipcMain.handle('api-call', async (event, { endpoint, method, body }) => {
     }
 
     const response = await fetch(finalUrl, options);
-    
-    // Handle non-JSON responses (can happen during server startup)
-    let data;
-    try {
-      data = await response.json();
-    } catch (jsonError) {
-      logger.log('error', `API call to ${endpoint} received non-JSON response`, { 
-        error: jsonError.message,
-        status: response.status,
-        statusText: response.statusText
-      });
-      
-      return { 
-        success: false, 
-        error: `Server returned invalid response. It may still be starting up.`
-      };
-    }
+    const data = await response.json();
 
     if (!response.ok) {
       return {

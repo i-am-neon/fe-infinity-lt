@@ -18,66 +18,36 @@ export default function GamesGrid() {
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [retryCount, setRetryCount] = useState(0);
 
   const fetchGames = async () => {
     try {
-      // Use enhanced apiCall with automatic retries
       const response = await apiCall<{
         success: boolean;
         games: Game[];
         error?: string;
-      }>("games", {
-        // Enable automatic retries with exponential backoff for the initial page load
-        retry: retryCount < 3, 
-        retryDelay: 100 * Math.pow(2, retryCount), // Exponential backoff: 1s, 2s, 4s
-        maxRetries: 3
-      });
+      }>("games");
 
       if (response.success && response.games) {
         setGames(response.games);
-        setError(null);
       } else if (response.error) {
         setError(response.error);
       }
     } catch (err) {
+      setError("Failed to fetch games");
       console.error("Error fetching games:", err);
-      
-      // Only show error if we've already retried a few times
-      if (retryCount >= 2) {
-        setError("Failed to fetch games");
-      }
-      
-      // Increment retry count for tracking purposes
-      setRetryCount(prev => prev + 1);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    // Add initial delay before first fetch to ensure server is ready
-    const initialDelay = setTimeout(() => {
-      fetchGames();
-    }, 1500); // Increased delay to give server more time to initialize
-
-    // Set up regular polling after initial fetch
+    fetchGames();
     const interval = setInterval(fetchGames, 5000);
-    
-    return () => {
-      clearTimeout(initialDelay);
-      clearInterval(interval);
-    };
+    return () => clearInterval(interval);
   }, []);
 
   if (loading) {
-    // Return invisible placeholder items to maintain grid width during loading
-    return (
-      <div className="grid w-full max-w-[600px] grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="invisible h-[240px]"></div>
-        <div className="invisible h-[240px]"></div>
-      </div>
-    );
+    return <></>;
   }
 
   if (error) {

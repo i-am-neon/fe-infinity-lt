@@ -491,22 +491,19 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* Games section with fixed width container */}
-        <div className="w-full max-w-[600px] mx-auto">
+        <div className="max-w-5xl">
           <BlurFade delay={BLUR_FADE_DELAY * 3}>
-            <div className="w-full max-w-[600px] mx-auto">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl font-semibold">Your Games</h2>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setHelpDialogOpen(true)}
-                  className="ml-2"
-                >
-                  <HelpCircle className="h-5 w-5" />
-                  <span className="sr-only">Help</span>
-                </Button>
-              </div>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-semibold">Your Games</h2>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setHelpDialogOpen(true)}
+                className="ml-2"
+              >
+                <HelpCircle className="h-5 w-5" />
+                <span className="sr-only">Help</span>
+              </Button>
             </div>
           </BlurFade>
           <GamesGrid />
