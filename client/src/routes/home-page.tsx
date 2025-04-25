@@ -82,13 +82,16 @@ export default function HomePage() {
     setError(null);
 
     try {
+      // Get image generation preference from localStorage
+      const generateCustomImage = localStorage.getItem("generateCustomImages") !== "false";
+
       const res = await apiCall<{
         success: boolean;
         gameNid?: string;
         error?: string;
       }>("create-game", {
         method: "POST",
-        body: { title, description, tone },
+        body: { title, description, tone, generateCustomImage },
       });
 
       if (res.success && res.gameNid) {

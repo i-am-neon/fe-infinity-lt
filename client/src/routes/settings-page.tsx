@@ -4,14 +4,30 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, ImageIcon } from "lucide-react";
 import ApiKeySettings from "@/components/settings/api-key-settings";
 import { BlurFade } from "@/components/magicui/blur-fade";
 import { BLUR_FADE_DELAY } from "@/components/ui/constants";
+import { Switch } from "@/components/ui/switch";
+import { useEffect, useState } from "react";
 
 export default function SettingsPage() {
     const { theme } = useTheme();
     const navigate = useNavigate();
+    const [generateCustomImages, setGenerateCustomImages] = useState(true);
+
+    // Load saved preference on mount
+    useEffect(() => {
+        const savedPreference = localStorage.getItem("generateCustomImages");
+        // Default to true if not set
+        setGenerateCustomImages(savedPreference !== "false");
+    }, []);
+
+    // Save preference when changed
+    const handleToggleImageGeneration = (checked: boolean) => {
+        setGenerateCustomImages(checked);
+        localStorage.setItem("generateCustomImages", checked.toString());
+    };
 
     // Export application logs: zip and save to Downloads folder via Electron
     const handleExportLogs = async () => {
@@ -69,6 +85,7 @@ export default function SettingsPage() {
                     </Card>
                 </BlurFade>
 
+
                 <BlurFade delay={BLUR_FADE_DELAY * 3}>
                     <Card>
                         <CardHeader>
@@ -84,6 +101,47 @@ export default function SettingsPage() {
                 </BlurFade>
 
                 <BlurFade delay={BLUR_FADE_DELAY * 4}>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <ImageIcon className="h-5 w-5" />
+                                Custom Title Images
+                            </CardTitle>
+                            <CardDescription>
+                                Control whether AI generates custom title images for your games
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <div className="space-y-0.5">
+                                    <Label htmlFor="image-generation">Generate custom title images</Label>
+                                    <p className="text-sm text-muted-foreground">
+                                        Costs approximately $0.15 in OpenAI credits <span className="font-medium">per game</span> (not per chapter)
+                                    </p>
+                                </div>
+                                <div className="flex flex-col items-end gap-1">
+                                    <Switch
+                                        id="image-generation"
+                                        checked={generateCustomImages}
+                                        onCheckedChange={handleToggleImageGeneration}
+                                    />
+                                    <span className="text-xs font-medium text-muted-foreground">
+                                        {generateCustomImages ? "Enabled" : "Disabled"}
+                                    </span>
+                                </div>
+                            </div>
+                            <div className={`p-3 rounded-md mt-2 ${generateCustomImages ? "bg-emerald-100 dark:bg-emerald-900/20 text-emerald-800 dark:text-emerald-200" : "bg-amber-100 dark:bg-amber-900/20 text-amber-800 dark:text-amber-200"}`}>
+                                {generateCustomImages ? (
+                                    <p className="text-sm">AI will generate a unique custom title image for each new game you create. (Recommended)</p>
+                                ) : (
+                                    <p className="text-sm">Default title image will be used for all new games to save on API costs.</p>
+                                )}
+                            </div>
+                        </CardContent>
+                    </Card>
+                </BlurFade>
+
+                <BlurFade delay={BLUR_FADE_DELAY * 5}>
                     <Card>
                         <CardHeader>
                             <CardTitle>Export Logs</CardTitle>

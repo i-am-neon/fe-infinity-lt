@@ -11,6 +11,7 @@ import runGame from "@/run-game.ts";
 import { Game } from "@/types/game.ts";
 import { insertGame } from "../db/games.ts";
 import genAndSaveTitleImage from "../ai/gen-and-save-title-image.ts";
+import saveDefaultTitleImage from "../game-engine-io/save-default-title-image.ts";
 
 // Game creation steps indices (matching the UI steps)
 const GAME_CREATION_STEPS = {
@@ -48,6 +49,7 @@ export async function handleCreateGame(req: Request): Promise<Response> {
       title?: string;
       description?: string;
       tone?: string;
+      generateCustomImage?: boolean;
     };
     if (!body.title || !body.description || !body.tone) {
       return new Response(
@@ -65,6 +67,8 @@ export async function handleCreateGame(req: Request): Promise<Response> {
     const projectName = body.title;
     const description = body.description;
     const tone = body.tone;
+    // Default to true if not specified
+    const generateCustomImage = body.generateCustomImage !== false;
 
     // 1) remove existing game if it exists, initialize project to get gameNid
     await removeExistingGame(projectName);
@@ -177,13 +181,23 @@ export async function handleCreateGame(req: Request): Promise<Response> {
         });
         logger.info(`Game creation progress: Creating first chapter (step ${GAME_CREATION_STEPS.CREATE_FIRST_CHAPTER})`);
 
-        const [_, chapterResult] = await Promise.all([
-          genAndSaveTitleImage({
+        logger.info("generateCustomImage", { generateCustomImage });
+
+        // Generate title image and chapter in parallel
+        // Use the appropriate image generation method based on user preference
+        const imagePromise = generateCustomImage
+          ? genAndSaveTitleImage({
             gameTitle: projectName,
             worldSummary,
             initialGameIdea,
             projectNameEndingInDotLtProj
-          }),
+          })
+          : saveDefaultTitleImage({
+            projectNameEndingInDotLtProj
+          });
+
+        const [_, chapterResult] = await Promise.all([
+          imagePromise,
           genChapter({
             worldSummary,
             initialGameIdea,

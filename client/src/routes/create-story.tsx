@@ -209,6 +209,9 @@ export default function CreateStoryPage() {
     setError(null);
     setIsCreateLoading(true);
     try {
+      // Get image generation preference from localStorage
+      const generateCustomImage = localStorage.getItem("generateCustomImages") !== "false";
+
       const res = await apiCall<{ success: boolean; gameId?: string; gameNid?: string; error?: string; message?: string }>(
         "create-game",
         {
@@ -216,7 +219,8 @@ export default function CreateStoryPage() {
           body: {
             title: generated.title,
             description: generated.description,
-            tone: generated.tone
+            tone: generated.tone,
+            generateCustomImage
           },
         }
       );
