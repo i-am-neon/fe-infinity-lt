@@ -6,11 +6,13 @@ import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
 import ApiKeySettings from "@/components/settings/api-key-settings";
+import { BlurFade } from "@/components/magicui/blur-fade";
+import { BLUR_FADE_DELAY } from "@/components/ui/constants";
 
 export default function SettingsPage() {
     const { theme } = useTheme();
     const navigate = useNavigate();
-    
+
     // Export application logs: zip and save to Downloads folder via Electron
     const handleExportLogs = async () => {
         if (!window.electron) {
@@ -31,62 +33,71 @@ export default function SettingsPage() {
 
     return (
         <div className="container mx-auto py-10">
-            <Button
-                variant="ghost"
-                className="mb-2 flex items-center gap-1 pl-0"
-                onClick={() => navigate(-1)}
-            >
-                <ChevronLeft className="h-4 w-4" />
-                Back
-            </Button>
+            <BlurFade>
+                <Button
+                    variant="ghost"
+                    className="mb-2 flex items-center gap-1 pl-0"
+                    onClick={() => navigate(-1)}
+                >
+                    <ChevronLeft className="h-4 w-4" />
+                    Back
+                </Button>
 
-            <h1 className="text-3xl font-bold my-6">Settings</h1>
+                <h1 className="text-3xl font-bold my-6">Settings</h1>
+            </BlurFade>
 
             <div className="grid gap-6">
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Appearance</CardTitle>
-                        <CardDescription>
-                            Customize how the application looks on your device.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="theme">Theme</Label>
-                            <div className="flex items-center gap-2">
-                                <span className="text-sm text-muted-foreground">
-                                    Current theme: {theme.charAt(0).toUpperCase() + theme.slice(1)}
-                                </span>
-                                <ModeToggle />
+                <BlurFade delay={BLUR_FADE_DELAY * 2}>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Appearance</CardTitle>
+                            <CardDescription>
+                                Customize how the application looks on your device.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="theme">Theme</Label>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-sm text-muted-foreground">
+                                        Current theme: {theme.charAt(0).toUpperCase() + theme.slice(1)}
+                                    </span>
+                                    <ModeToggle />
+                                </div>
                             </div>
-                        </div>
-                    </CardContent>
-                </Card>
+                        </CardContent>
+                    </Card>
+                </BlurFade>
 
-                <Card>
-                    <CardHeader>
-                        <CardTitle>AI Provider Settings</CardTitle>
-                        <CardDescription>
-                            Configure your AI provider API keys for OpenAI.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <ApiKeySettings />
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Export Logs</CardTitle>
-                        <CardDescription>
-                            Zip all application logs and save to your Downloads folder.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <Button variant="secondary" onClick={handleExportLogs}>
-                            Export Logs
-                        </Button>
-                    </CardContent>
-                </Card>
+                <BlurFade delay={BLUR_FADE_DELAY * 3}>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>AI Provider Settings</CardTitle>
+                            <CardDescription>
+                                Configure your AI provider API keys for OpenAI.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <ApiKeySettings />
+                        </CardContent>
+                    </Card>
+                </BlurFade>
+
+                <BlurFade delay={BLUR_FADE_DELAY * 4}>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Export Logs</CardTitle>
+                            <CardDescription>
+                                Zip all application logs and save to your Downloads folder.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <Button variant="secondary" onClick={handleExportLogs}>
+                                Export Logs
+                            </Button>
+                        </CardContent>
+                    </Card>
+                </BlurFade>
             </div>
         </div>
     );

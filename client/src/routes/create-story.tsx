@@ -20,6 +20,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { toast, Toaster } from "sonner";
+import { BlurFade } from "@/components/magicui/blur-fade";
+import { BLUR_FADE_DELAY } from "@/components/ui/constants";
 
 interface StoryIdea {
   title: string;
@@ -247,199 +249,207 @@ export default function CreateStoryPage() {
     <div className="max-w-6xl mx-auto p-6">
       <Toaster position="top-right" />
 
-      <div className="flex items-center justify-between mb-4">
-        <Button
-          variant="ghost"
-          className="inline-flex items-center"
-          onClick={() => navigate("/")}
-        >
-          <ChevronLeft className="w-4 h-4 mr-1" />
-          Back
-        </Button>
-
-        {hasUserMadeChoices && (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleReset}
-                  aria-label="Reset"
-                >
-                  <RefreshCw className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Reset</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        )}
-      </div>
-
-      <header className="mb-6">
-        <h1 className="text-2xl font-bold">Create New Story</h1>
-      </header>
-
-      <section className="mb-8">
-        <h2 className="text-lg font-semibold mb-4">Presets</h2>
-        <div className="relative px-12">
-          <Carousel
-            opts={{
-              align: "start",
-            }}
-            className="w-full"
+      <BlurFade>
+        <div className="flex items-center justify-between mb-4">
+          <Button
+            variant="ghost"
+            className="inline-flex items-center"
+            onClick={() => navigate("/")}
           >
-            <CarouselContent className="-ml-4">
-              {presets.map((p) => (
-                <CarouselItem key={p.title} className="pl-4 md:basis-1/2 lg:basis-1/3">
-                  <div
-                    className="cursor-pointer h-full p-1"
-                    onClick={() => {
-                      setSelectedPreset(p.title);
-                      setGenerated(p);
-                    }}
+            <ChevronLeft className="w-4 h-4 mr-1" />
+            Back
+          </Button>
+
+          {hasUserMadeChoices && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleReset}
+                    aria-label="Reset"
                   >
-                    <GlowCard className={selectedPreset === p.title ? "bg-muted" : ""}>
-                      <h3 className="font-bold">{p.title}</h3>
-                      <p className="text-sm mt-2">{p.description}</p>
-                      <p className="mt-2 italic text-xs">Tone: {p.tone}</p>
-                    </GlowCard>
-                  </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious className="-left-10" />
-            <CarouselNext className="-right-10" />
-          </Carousel>
+                    <RefreshCw className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Reset</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
         </div>
-      </section>
 
-      {generated && (
-        <section className="mt-8 max-w-4xl">
-          <h2 className="text-lg font-semibold mb-2">Your Story Idea</h2>
-          <div className="p-6 border rounded-lg">
-            <h3 className="font-bold text-xl">{generated.title}</h3>
-            <p className="mt-2">{generated.description}</p>
-            <p className="mt-1 italic">Tone: {generated.tone}</p>
+        <header className="mb-6">
+          <h1 className="text-2xl font-bold">Create New Story</h1>
+        </header>
+      </BlurFade>
 
-            <div className="mt-6 flex gap-4">
-              <Button
-                variant="outline"
-                onClick={() => setShowTweakOptions(!showTweakOptions)}
-                className="flex-1"
-              >
-                <Wand2 className="mr-2 h-4 w-4" />
-                {showTweakOptions ? "Hide Tweak Options" : "Tweak"}
-              </Button>
-
-              <Button
-                onClick={handleCreateStory}
-                disabled={isCreateLoading || isTweakLoading}
-                className="flex-1"
-              >
-                {isCreateLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Create Game
-              </Button>
-            </div>
-
-            {showTweakOptions && (
-              <div className="mt-6 border-t pt-6">
-                <h4 className="font-semibold mb-2">Feedback / Tweak</h4>
-                <Textarea
-                  placeholder="Enter feedback about what you'd like to change..."
-                  value={feedback}
-                  onChange={(e) => setFeedback(e.target.value)}
-                  className="mb-4 w-full"
-                />
-                <Button onClick={handleTweak} disabled={isTweakLoading || isCreateLoading}>
-                  {isTweakLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Apply Tweaks
-                </Button>
-                {error && <p className="text-red-500 mt-2">{error}</p>}
-              </div>
-            )}
+      <BlurFade delay={BLUR_FADE_DELAY * 2}>
+        <section className="mb-8">
+          <h2 className="text-lg font-semibold mb-4">Presets</h2>
+          <div className="relative px-12">
+            <Carousel
+              opts={{
+                align: "start",
+              }}
+              className="w-full"
+            >
+              <CarouselContent className="-ml-4">
+                {presets.map((p) => (
+                  <CarouselItem key={p.title} className="pl-4 md:basis-1/2 lg:basis-1/3">
+                    <div
+                      className="cursor-pointer h-full p-1"
+                      onClick={() => {
+                        setSelectedPreset(p.title);
+                        setGenerated(p);
+                      }}
+                    >
+                      <GlowCard className={selectedPreset === p.title ? "bg-muted" : ""}>
+                        <h3 className="font-bold">{p.title}</h3>
+                        <p className="text-sm mt-2">{p.description}</p>
+                        <p className="mt-2 italic text-xs">Tone: {p.tone}</p>
+                      </GlowCard>
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="-left-10" />
+              <CarouselNext className="-right-10" />
+            </Carousel>
           </div>
         </section>
+      </BlurFade>
+
+      {generated && (
+        <BlurFade delay={BLUR_FADE_DELAY * 3}>
+          <section className="mt-8 max-w-4xl">
+            <h2 className="text-lg font-semibold mb-2">Your Story Idea</h2>
+            <div className="p-6 border rounded-lg">
+              <h3 className="font-bold text-xl">{generated.title}</h3>
+              <p className="mt-2">{generated.description}</p>
+              <p className="mt-1 italic">Tone: {generated.tone}</p>
+
+              <div className="mt-6 flex gap-4">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowTweakOptions(!showTweakOptions)}
+                  className="flex-1"
+                >
+                  <Wand2 className="mr-2 h-4 w-4" />
+                  {showTweakOptions ? "Hide Tweak Options" : "Tweak"}
+                </Button>
+
+                <Button
+                  onClick={handleCreateStory}
+                  disabled={isCreateLoading || isTweakLoading}
+                  className="flex-1"
+                >
+                  {isCreateLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Create Game
+                </Button>
+              </div>
+
+              {showTweakOptions && (
+                <div className="mt-6 border-t pt-6">
+                  <h4 className="font-semibold mb-2">Feedback / Tweak</h4>
+                  <Textarea
+                    placeholder="Enter feedback about what you'd like to change..."
+                    value={feedback}
+                    onChange={(e) => setFeedback(e.target.value)}
+                    className="mb-4 w-full"
+                  />
+                  <Button onClick={handleTweak} disabled={isTweakLoading || isCreateLoading}>
+                    {isTweakLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Apply Tweaks
+                  </Button>
+                  {error && <p className="text-red-500 mt-2">{error}</p>}
+                </div>
+              )}
+            </div>
+          </section>
+        </BlurFade>
       )}
 
       {!generated && (
         <>
           <hr className="my-6" />
-          <section>
-            <h2 className="text-lg font-semibold mb-2">Or, Create Your Own</h2>
-            <p className="text-muted-foreground mb-6">
-              Select tags from each category below to influence your story idea. You can choose multiple tags, a single tag, or no tags from any category—it's completely optional. Add a brief concept if you wish, then click "Generate Story." After the AI creates your idea, you can further tweak and refine it to your liking.
-            </p>
+          <BlurFade delay={BLUR_FADE_DELAY * 3}>
+            <section>
+              <h2 className="text-lg font-semibold mb-2">Or, Create Your Own</h2>
+              <p className="text-muted-foreground mb-6">
+                Select tags from each category below to influence your story idea. You can choose multiple tags, a single tag, or no tags from any category—it's completely optional. Add a brief concept if you wish, then click "Generate Story." After the AI creates your idea, you can further tweak and refine it to your liking.
+              </p>
 
-            <div className="space-y-6">
-              {/* Genre Tags */}
-              <div>
-                <h3 className="text-sm font-medium mb-2">Genre</h3>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {tagCategories.genre.map((tag) => (
-                    <Button
-                      key={tag}
-                      size="sm"
-                      variant={selectedTags.includes(tag) ? "secondary" : "outline"}
-                      onClick={() => toggleTag(tag)}
-                    >
-                      {tag}
-                    </Button>
-                  ))}
+              <div className="space-y-6">
+                {/* Genre Tags */}
+                <div>
+                  <h3 className="text-sm font-medium mb-2">Genre</h3>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {tagCategories.genre.map((tag) => (
+                      <Button
+                        key={tag}
+                        size="sm"
+                        variant={selectedTags.includes(tag) ? "secondary" : "outline"}
+                        onClick={() => toggleTag(tag)}
+                      >
+                        {tag}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Tone Tags */}
+                <div>
+                  <h3 className="text-sm font-medium mb-2">Tone</h3>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {tagCategories.tone.map((tag) => (
+                      <Button
+                        key={tag}
+                        size="sm"
+                        variant={selectedTags.includes(tag) ? "secondary" : "outline"}
+                        onClick={() => toggleTag(tag)}
+                      >
+                        {tag}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Setting Tags */}
+                <div>
+                  <h3 className="text-sm font-medium mb-2">Setting</h3>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {tagCategories.setting.map((tag) => (
+                      <Button
+                        key={tag}
+                        size="sm"
+                        variant={selectedTags.includes(tag) ? "secondary" : "outline"}
+                        onClick={() => toggleTag(tag)}
+                      >
+                        {tag}
+                      </Button>
+                    ))}
+                  </div>
                 </div>
               </div>
 
-              {/* Tone Tags */}
-              <div>
-                <h3 className="text-sm font-medium mb-2">Tone</h3>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {tagCategories.tone.map((tag) => (
-                    <Button
-                      key={tag}
-                      size="sm"
-                      variant={selectedTags.includes(tag) ? "secondary" : "outline"}
-                      onClick={() => toggleTag(tag)}
-                    >
-                      {tag}
-                    </Button>
-                  ))}
-                </div>
+              <div className="mt-6">
+                <h3 className="text-sm font-medium mb-2">Concept (Optional)</h3>
+                <Textarea
+                  placeholder="Describe your story concept in a few words..."
+                  value={blurb}
+                  onChange={(e) => setBlurb(e.target.value)}
+                  className="mb-4 w-1/2"
+                />
+                <Button onClick={handleGenerate} disabled={isTweakLoading}>
+                  {isTweakLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Generate Story
+                </Button>
+                {error && <p className="text-red-500 mt-2">{error}</p>}
               </div>
-
-              {/* Setting Tags */}
-              <div>
-                <h3 className="text-sm font-medium mb-2">Setting</h3>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {tagCategories.setting.map((tag) => (
-                    <Button
-                      key={tag}
-                      size="sm"
-                      variant={selectedTags.includes(tag) ? "secondary" : "outline"}
-                      onClick={() => toggleTag(tag)}
-                    >
-                      {tag}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-6">
-              <h3 className="text-sm font-medium mb-2">Concept (Optional)</h3>
-              <Textarea
-                placeholder="Describe your story concept in a few words..."
-                value={blurb}
-                onChange={(e) => setBlurb(e.target.value)}
-                className="mb-4 w-1/2"
-              />
-              <Button onClick={handleGenerate} disabled={isTweakLoading}>
-                {isTweakLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Generate Story
-              </Button>
-              {error && <p className="text-red-500 mt-2">{error}</p>}
-            </div>
-          </section>
+            </section>
+          </BlurFade>
         </>
       )}
     </div>
