@@ -45,8 +45,9 @@ class GameRunner {
    * Run a Python script using the appropriate method based on environment
    * @param scriptPath The path to the Python script to run
    * @param args Optional arguments to pass to the Python script
+   * @param workingDir Optional working directory to run the script from
    */
-  async runPythonScript(scriptPath: string, args: string[] = []): Promise<void> {
+  async runPythonScript(scriptPath: string, args: string[] = [], workingDir?: string): Promise<void> {
     // In Electron environment, use HTTP to communicate with main process
     if (isElectronEnvironment()) {
       const response = await fetch("http://localhost:8989/run-python", {
@@ -54,7 +55,11 @@ class GameRunner {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ scriptPath, args }),
+        body: JSON.stringify({ 
+          scriptPath, 
+          args, 
+          workingDir // Pass working directory to Electron process
+        }),
       });
 
       if (!response.ok) {
@@ -69,6 +74,12 @@ class GameRunner {
     // Save the current directory
     const originalDir = Deno.cwd();
     try {
+      // Change to working directory if provided
+      if (workingDir) {
+        console.log(`Changing to working directory: ${workingDir}`);
+        Deno.chdir(workingDir);
+      }
+
       // Run the Python script directly with appropriate system command
       if (Deno.build.os === "windows") {
         // Windows
@@ -77,6 +88,8 @@ class GameRunner {
           args: [scriptPath, ...args],
           stdout: "inherit",
           stderr: "inherit",
+          // Use working directory if provided, otherwise use default behavior
+          cwd: workingDir,
         });
         await runCommand.output();
       } else {
@@ -87,7 +100,8 @@ class GameRunner {
           args: [scriptPath, ...args],
           stdout: "inherit",
           stderr: "inherit",
-          cwd: dirname(scriptPath), // Run in the same directory as the script
+          // Use working directory if provided, otherwise use script directory
+          cwd: workingDir || dirname(scriptPath),
         });
         await runCommand.output();
       }
