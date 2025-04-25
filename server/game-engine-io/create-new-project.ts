@@ -1,6 +1,7 @@
 import { getLtMakerPath } from "@/file-io/get-path-within-lt-maker.ts";
 import { copy, ensureDir } from "https://deno.land/std@0.224.0/fs/mod.ts";
 import { join, normalize } from "https://deno.land/std@0.224.0/path/mod.ts";
+import runPythonScript from "@/lib/run-python-script.ts";
 
 // These are the data types that should be serialized as single files rather than directories
 // Based on Database.save_as_chunks in the Python code
@@ -9,6 +10,13 @@ const FOLDERS_TO_COMBINE = ["events", "items", "skills", "units", "classes", "le
 /**
  * Creates a new LT project by copying the default project template 
  * and customizing it with the provided name and ID
+ * 
+ * 
+ * @param projectNid The unique identifier for the project
+ * @param projectTitle The display title for the project
+ * @param ltMakerPath The path to the LT Maker directory
+ * @param newProjectRelativePath The path where the new project should be created, relative to ltMakerPath
+ * @returns The full path to the created project
  */
 export default async function createNewProject(
     projectNid: string,
@@ -45,6 +53,24 @@ export default async function createNewProject(
 
         // Update game_nid and title in constants.json
         await updateConstants(destPath, projectNid, projectTitle);
+
+        // Call the Python script to properly serialize the database
+        console.log("Calling Python script to properly serialize the database...");
+        try {
+            const result = await runPythonScript({
+                pathToPythonScript: "serialize_project_db.py",
+                args: [destPath, projectNid, projectTitle],
+            });
+
+            if (result.error) {
+                console.warn(`Warning during database serialization: ${result.error}`);
+            } else {
+                console.log(`Database serialization successful: ${result.output}`);
+            }
+        } catch (error) {
+            console.error(`Error running database serialization script: ${error}`);
+            // Continue with project creation even if serialization fails
+        }
 
         console.log(`Project initialized at ${destPath}`);
         return destPath;
