@@ -53,9 +53,9 @@ export default async function runGame(
     let pythonArgs: string[];
 
     if (Deno.build.os === "windows") {
-      // Windows - use native Python directly
-      pythonCommand = "..\\bin\\python\\python.exe";
-      pythonArgs = ["run_engine_for_project.py", normalizedProjectPath];
+      // Windows - use embedded Python with our wrapper script
+      pythonCommand = "..\\electron\\bin\\python\\python_embed\\python.exe";
+      pythonArgs = ["run_with_embedded_python.py", normalizedProjectPath];
     } else {
       // macOS/Linux - use local Python in dev environments
       // Using local Python directly when in development

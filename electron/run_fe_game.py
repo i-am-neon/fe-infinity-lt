@@ -26,8 +26,8 @@ try:
     print("Successfully imported run_engine_for_project")
     
     # Run the game
-    print("Running game:", r'testing_proj.ltproj')
-    run_engine_for_project.main('testing_proj.ltproj')
+    print("Running game:", r'_blades-of-crestwind.ltproj')
+    run_engine_for_project.main('_blades-of-crestwind.ltproj')
 except ImportError as e:
     print("ERROR: Failed to import run_engine_for_project:", e)
     print("Python sys.path:", sys.path)
