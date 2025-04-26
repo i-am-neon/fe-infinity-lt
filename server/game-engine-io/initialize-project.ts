@@ -8,7 +8,7 @@ import { sluggify } from "@/lib/sluggify.ts";
 import removeWithinLtMaker from "@/file-io/remove-within-lt-maker.ts";
 import copyTilesetsToProject from "@/file-io/copy-tilesets-to-project.ts";
 import appendAllTilesetsData from "@/game-engine-io/write-chapter/append-all-tilesets-data.ts";
-import modifyConstant from "@/game-engine-io/modify-constant.ts";
+import modifyConstant, { updateProjectConstants } from "@/game-engine-io/modify-constant.ts";
 import { copyMusicAndUpdateJson } from "@/game-engine-io/write-chapter/copy-music.ts";
 import copyGenericPortraitsToProject from "@/file-io/copy-generic-portraits-to-project.ts";
 import modifyEquation from "@/game-engine-io/modify-equation.ts";
@@ -21,6 +21,13 @@ export default async function initializeProject(projectName: string) {
   const newProjectNameEndingInDotLtProj = `_${sluggify(projectName)}.ltproj`;
   const gameNid = "_" + sluggify(projectName);
 
+  console.log(`Initializing project:
+    Project Name: ${projectName}
+    Slugified Name: ${sluggify(projectName)}
+    Project Path: ${newProjectNameEndingInDotLtProj}
+    Game NID: ${gameNid}
+  `);
+
   // Get the lt-maker path and ensure it uses forward slashes for Wine compatibility
   const ltMakerPath = getLtMakerPath().replace(/\\/g, '/');
 
@@ -31,10 +38,15 @@ export default async function initializeProject(projectName: string) {
   // Wine has issues with complex paths and quotes, so we'll use simpler values
   const projectNid = sluggify(projectName);
 
+  // Remove special characters and quotes from the title for safety in Windows Electron
+  const sanitizedTitle = isElectronEnvironment() && Deno.build.os === "windows" 
+    ? projectName.replace(/["']/g, '').trim() 
+    : projectName;
+
   console.log(`Initializing project with paths:
     - LT Maker Path: ${ltMakerPath}
     - Project NID: ${projectNid}
-    - Project Title: ${projectName}
+    - Project Title: ${sanitizedTitle}
     - Project Path: ${normalizedProjectPath}
   `);
 
@@ -42,10 +54,19 @@ export default async function initializeProject(projectName: string) {
     // Call our TypeScript implementation instead of Python script
     await createNewProject(
       projectNid,
-      isElectronEnvironment() ? projectName.replace(/"/g, '') : projectName,
+      sanitizedTitle,
       ltMakerPath,
       normalizedProjectPath
     );
+
+    // Directly update the constants.json file with our new function
+    // This is a more reliable approach than using the Python serialization
+    console.log("Directly updating game_nid and title in constants.json...");
+    await updateProjectConstants({
+      projectNameEndingInDotLtProj: newProjectNameEndingInDotLtProj,
+      gameNid: projectNid,
+      title: sanitizedTitle,
+    });
   } catch (error: unknown) {
     console.error(`Project initialization failed: ${error}`);
     if (error instanceof Error) {
@@ -80,6 +101,41 @@ export default async function initializeProject(projectName: string) {
   } catch (err) {
     console.error(`Failed to find metadata.json at ${metadataPath}`, err);
     throw new Error(`Project initialization failed: metadata.json was not created for ${projectName}`);
+  }
+
+  // Verify game_nid and title were correctly set in constants.json
+  const constantsPath = getPathWithinLtMaker(`${normalizedProjectPath}/game_data/constants.json`);
+  try {
+    const constantsText = await Deno.readTextFile(constantsPath);
+    const constants = JSON.parse(constantsText) as Array<[string, any]>;
+    
+    let foundGameNid;
+    let foundTitle;
+    
+    for (const [key, value] of constants) {
+      if (key === "game_nid") {
+        foundGameNid = value;
+      } else if (key === "title") {
+        foundTitle = value;
+      }
+    }
+    
+    console.log(`Constants verification:
+      Found game_nid: ${foundGameNid} (expected: ${projectNid})
+      Found title: ${foundTitle} (expected: ${sanitizedTitle})
+    `);
+    
+    // If values don't match, update them again as a fallback
+    if (foundGameNid !== projectNid || foundTitle !== sanitizedTitle) {
+      console.warn(`Constants verification failed! Attempting to update constants again...`);
+      await updateProjectConstants({
+        projectNameEndingInDotLtProj: newProjectNameEndingInDotLtProj,
+        gameNid: projectNid,
+        title: sanitizedTitle,
+      });
+    }
+  } catch (err) {
+    console.error(`Error verifying constants.json: ${err}`);
   }
 
   // Empty levels.json and events.json
