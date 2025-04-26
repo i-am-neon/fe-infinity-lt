@@ -1097,7 +1097,7 @@ except Exception as e:
         // Use this script instead of the command line approach for better error handling
         const pythonProcess = spawn(
           pythonPath,
-          [runScriptPath],
+          [runScriptPath, projectNameEndingInDotLtProj],
           {
             cwd: ltMakerPath,
             detached: true,

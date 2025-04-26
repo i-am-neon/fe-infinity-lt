@@ -129,6 +129,6 @@ async function findSystemWine(): Promise<string | null> {
 }
 
 if (import.meta.main) {
-  const projectName = "_new.ltproj";
+  const projectName = "testing_proj.ltproj";
   await runGame(projectName);
 }
