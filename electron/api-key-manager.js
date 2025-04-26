@@ -247,8 +247,8 @@ const apiKeyManager = {
      */
     hasApiKey() {
         try {
-            const hasKey = store.has('openai');
-            return hasKey;
+            const key = store.get('openai');
+            return store.has('openai') && key && key.trim() !== '';
         } catch (error) {
             logger.log('error', 'Error checking for OpenAI API key', { error: error.message });
             return false;
