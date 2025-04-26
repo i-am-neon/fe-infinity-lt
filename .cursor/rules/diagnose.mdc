@@ -5,4 +5,4 @@ alwaysApply: false
 ---
 I want you to diagnose the problem, don't write code.
 
-Search as much of the codebase as you need to gather information and think harder.
+Take your time to search as much of the codebase as you need to gather information and think harder.
