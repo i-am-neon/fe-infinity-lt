@@ -1,5 +1,5 @@
 import apiCall from "@/lib/api-call";
-import { AlertCircle, ChevronLeft, Loader2, X } from "lucide-react";
+import { AlertCircle, ChevronLeft, Loader2, Pencil, X, Wrench, RefreshCw } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
@@ -21,6 +21,14 @@ import { AnimatePresence, motion } from "framer-motion";
 import { getTitleImagePath } from "@/lib/asset-path";
 import { BlurFade } from "@/components/magicui/blur-fade";
 import { BLUR_FADE_DELAY } from "@/components/ui/constants";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const showDebugButtons = false;
 
@@ -40,7 +48,7 @@ export default function GameDetailPage() {
   const [creationError, setCreationError] = useState<string | null>(null);
 
   const [loadingAction, setLoadingAction] = useState<
-    "play" | "generate" | "delete" | "test" | "regenerate" | null
+    "play" | "generate" | "delete" | "test" | "regenerate" | "editor" | null
   >(null);
 
   const isNew = searchParams.get("new") === "true";
@@ -53,6 +61,7 @@ export default function GameDetailPage() {
   const [generationError, setGenerationError] = useState<string | null>(null);
   const [oldChapterCount, setOldChapterCount] = useState<number | null>(null);
   const [deletingFailedGame, setDeletingFailedGame] = useState(false);
+  const [fixGameBugsModalOpen, setFixGameBugsModalOpen] = useState(false);
 
   const generationProgress = useGenerationProgress(
     nid,
@@ -383,6 +392,33 @@ export default function GameDetailPage() {
     }
   }, [nid, data, navigate]);
 
+  const handleOpenInEditor = useCallback(async () => {
+    if (!data?.game) return;
+
+    setLoadingAction("editor");
+    try {
+      await apiCall("run-editor", {
+        method: "POST",
+        body: { projectName: data.game.directory },
+      });
+
+      // Add a 5-second delay before removing the loading state
+      setTimeout(() => {
+        setLoadingAction(null);
+      }, 5000);
+
+      // Close the modal if it was open
+      setFixGameBugsModalOpen(false);
+    } catch (error) {
+      console.error("Error opening game in editor:", error);
+      setLoadingAction(null);
+    }
+  }, [data]);
+
+  const handleFixGameBugs = useCallback(() => {
+    setFixGameBugsModalOpen(true);
+  }, []);
+
   const disabled = loadingAction !== null || deletingFailedGame;
 
   return (
@@ -458,6 +494,7 @@ export default function GameDetailPage() {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleConfirmRegenerate}>
+              <RefreshCw className="mr-2 h-4 w-4" />
               Regenerate Chapter
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -563,6 +600,79 @@ export default function GameDetailPage() {
         )}
       </AnimatePresence>
 
+      {/* Fix Game Bugs Dialog */}
+      <Dialog open={fixGameBugsModalOpen} onOpenChange={setFixGameBugsModalOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Fix Game Issues</DialogTitle>
+            <DialogDescription>
+              Sometimes the AI may generate content that causes issues in your game. You have two options:
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="py-4">
+            <div className="space-y-4">
+              <div className="rounded-md bg-muted p-4">
+                <h3 className="font-medium mb-2">Option 1: Regenerate the current chapter</h3>
+                <p className="text-sm mb-3">
+                  This will completely overwrite your current chapter with a new AI-generated version. This is useful if the current chapter has serious issues.
+                </p>
+                <Button
+                  variant="default"
+                  onClick={() => {
+                    setFixGameBugsModalOpen(false);
+                    setConfirmRegenerateOpen(true);
+                  }}
+                  disabled={loadingAction !== null}
+                >
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Regenerate Chapter
+                </Button>
+              </div>
+
+              <div className="rounded-md bg-muted p-4">
+                <h3 className="font-medium mb-2">Option 2: Edit the game manually</h3>
+                <p className="text-sm mb-4">
+                  Open the game in the Lex Talionis Editor to make specific changes yourself.
+                  <br />
+                  <a
+                    href="https://lt-maker.readthedocs.io/en/latest/source/getting_started/Getting-Started.html#level-editor"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs underline underline-offset-2 hover:text-primary"
+                  >
+                    View Lex Talionis Editor Documentation
+                  </a>
+                </p>
+                <div className="flex flex-col gap-3">
+                  <Button
+                    variant="default"
+                    onClick={handleOpenInEditor}
+                    disabled={loadingAction !== null}
+                    className="w-fit"
+                  >
+                    {loadingAction === "editor" && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    <Pencil className="mr-2 h-4 w-4" />
+                    Open in Editor
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setFixGameBugsModalOpen(false)}
+            >
+              Cancel
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <div className="p-6 space-y-4 max-w-4xl mx-auto">
         <BlurFade>
           <Button
@@ -664,13 +774,14 @@ export default function GameDetailPage() {
 
                 <Button
                   variant="outline"
-                  onClick={() => setConfirmRegenerateOpen(true)}
+                  onClick={handleFixGameBugs}
                   disabled={disabled}
                 >
                   {loadingAction === "regenerate" && (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   )}
-                  Re-generate Current Chapter
+                  <Wrench className="mr-2 h-4 w-4" />
+                  Fix Game Bugs
                 </Button>
 
                 {/* Debug button for testing chapter generation */}

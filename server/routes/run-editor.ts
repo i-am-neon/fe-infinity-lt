@@ -1,16 +1,24 @@
-import { join } from "node:path";
-import { gameRunner } from "@/lib/game-runner.ts";
-import { getLtMakerPath } from "@/file-io/get-path-within-lt-maker.ts";
+import runEditor from "@/run-editor.ts";
 
-export async function handleRunEditor(_req: Request): Promise<Response> {
+export async function handleRunEditor(req: Request): Promise<Response> {
   try {
-    const ltMakerPath = getLtMakerPath();
-    const editorPythonPath = join(ltMakerPath, "run_editor.py");
+    let projectName: string | null = null;
 
-    console.log(`Attempting to run LT Maker editor from: ${editorPythonPath}`);
-    
-    // Run the Python script to start the editor
-    await gameRunner.runPythonScript(editorPythonPath);
+    // Check if a project name was provided in the request
+    if (req.method === "POST") {
+      try {
+        const requestData = await req.json();
+        if (requestData.projectName) {
+          projectName = requestData.projectName;
+          console.log(`Project name provided: ${projectName}`);
+        }
+      } catch (e) {
+        // No JSON body or invalid JSON - continue without a project name
+      }
+    }
+
+    // Run the editor with or without a project
+    await runEditor(projectName || undefined);
 
     return new Response(JSON.stringify({ success: true }), {
       headers: { "Content-Type": "application/json" },
@@ -40,7 +48,13 @@ export async function handleRunEditor(_req: Request): Promise<Response> {
 if (import.meta.main) {
   // Example usage
   const mockRequest = new Request("https://example.com/run-editor", {
-    method: "POST"
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      projectName: "testing_proj"
+    }),
   });
   handleRunEditor(mockRequest).then(async (res) => {
     console.log("Response:", await res.json());
