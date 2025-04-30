@@ -108,6 +108,7 @@ export default function CreateStoryPage() {
   const [isCreateLoading, setIsCreateLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showTweakOptions, setShowTweakOptions] = useState(false);
+  const [isUserGenerated, setIsUserGenerated] = useState(false);
 
   // Determine if user has made any choices
   const hasUserMadeChoices = selectedPreset !== null ||
@@ -128,6 +129,7 @@ export default function CreateStoryPage() {
     setFeedback("");
     setGenerated(null);
     setError(null);
+    setIsUserGenerated(false);
   };
 
   const handleGenerate = async () => {
@@ -143,6 +145,7 @@ export default function CreateStoryPage() {
       );
       if (res.success && res.title && res.description && res.tone) {
         setGenerated({ title: res.title, description: res.description, tone: res.tone });
+        setIsUserGenerated(true);
       } else {
         const errorMessage = res.error || "Failed to generate story";
         setError(errorMessage);
@@ -271,7 +274,10 @@ export default function CreateStoryPage() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={handleReset}
+                    onClick={() => {
+                      handleReset();
+                      setIsUserGenerated(false);
+                    }}
                     aria-label="Reset"
                   >
                     <RefreshCw className="h-4 w-4" />
@@ -290,41 +296,44 @@ export default function CreateStoryPage() {
         </header>
       </BlurFade>
 
-      <BlurFade delay={BLUR_FADE_DELAY * 2}>
-        <section className="mb-8">
-          <h2 className="text-lg font-semibold mb-4">Presets</h2>
-          <div className="relative px-12">
-            <Carousel
-              opts={{
-                align: "start",
-              }}
-              className="w-full"
-            >
-              <CarouselContent className="-ml-4">
-                {presets.map((p) => (
-                  <CarouselItem key={p.title} className="pl-4 md:basis-1/2 lg:basis-1/3">
-                    <div
-                      className="cursor-pointer h-full p-1"
-                      onClick={() => {
-                        setSelectedPreset(p.title);
-                        setGenerated(p);
-                      }}
-                    >
-                      <GlowCard className={selectedPreset === p.title ? "bg-muted" : ""}>
-                        <h3 className="font-bold">{p.title}</h3>
-                        <p className="text-sm mt-2">{p.description}</p>
-                        <p className="mt-2 italic text-xs">Tone: {p.tone}</p>
-                      </GlowCard>
-                    </div>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious className="-left-10" />
-              <CarouselNext className="-right-10" />
-            </Carousel>
-          </div>
-        </section>
-      </BlurFade>
+      {!isUserGenerated && (
+        <BlurFade delay={BLUR_FADE_DELAY * 2}>
+          <section className="mb-8">
+            <h2 className="text-lg font-semibold mb-4">Presets</h2>
+            <div className="relative px-12">
+              <Carousel
+                opts={{
+                  align: "start",
+                }}
+                className="w-full"
+              >
+                <CarouselContent className="-ml-4">
+                  {presets.map((p) => (
+                    <CarouselItem key={p.title} className="pl-4 md:basis-1/2 lg:basis-1/3">
+                      <div
+                        className="cursor-pointer h-full p-1"
+                        onClick={() => {
+                          setSelectedPreset(p.title);
+                          setGenerated(p);
+                          setIsUserGenerated(false);
+                        }}
+                      >
+                        <GlowCard className={selectedPreset === p.title ? "bg-muted" : ""}>
+                          <h3 className="font-bold">{p.title}</h3>
+                          <p className="text-sm mt-2">{p.description}</p>
+                          <p className="mt-2 italic text-xs">Tone: {p.tone}</p>
+                        </GlowCard>
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious className="-left-10" />
+                <CarouselNext className="-right-10" />
+              </Carousel>
+            </div>
+          </section>
+        </BlurFade>
+      )}
 
       {generated && (
         <BlurFade delay={BLUR_FADE_DELAY * 3}>
