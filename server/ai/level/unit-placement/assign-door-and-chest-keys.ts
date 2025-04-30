@@ -123,7 +123,7 @@ export default function assignDoorAndChestKeys(
   } catch (error) {
     logger.error(`Error getting door regions for map ${originalMapName}:`, { error: String(error) });
     // Fall back to original method
-    logger.info(`Falling back to grouping door cells by adjacency for ${allDoorCells.length} cells`);
+    // logger.info(`Falling back to grouping door cells by adjacency for ${allDoorCells.length} cells`);
     groupedDoors = groupDoorCells(allDoorCells);
   }
 
@@ -472,23 +472,23 @@ export default function assignDoorAndChestKeys(
   logger.info("Assigned door and chest keys to enemies", {
     originalMapName,
     enemiesWithKeys: newEnemies.filter((e) => unitHasItem(e, "Door_Key") || unitHasItem(e, "Chest_Key")),
-    allDoorCells,
-    chestCells,
-    enemies,
-    terrainGrid,
-    doorGroupsCount: groupedDoors.length,
-    doorsWithAssignedKeys: groupedDoors.map(doorGroup => {
-      const centerX = doorGroup.reduce((sum, cell) => sum + cell.x, 0) / doorGroup.length;
-      const centerY = doorGroup.reduce((sum, cell) => sum + cell.y, 0) / doorGroup.length;
-      const hasAssignedKey = newEnemies.some(e =>
-        unitHasItem(e, "Door_Key") &&
-        getManhattanDist(centerX, centerY, e.x, e.y) < 20
-      );
-      return {
-        doorCells: doorGroup,
-        hasAssignedKey,
-      };
-    }),
+    // allDoorCells,
+    // chestCells,
+    // enemies,
+    // terrainGrid,
+    // doorGroupsCount: groupedDoors.length,
+    // doorsWithAssignedKeys: groupedDoors.map(doorGroup => {
+    //   const centerX = doorGroup.reduce((sum, cell) => sum + cell.x, 0) / doorGroup.length;
+    //   const centerY = doorGroup.reduce((sum, cell) => sum + cell.y, 0) / doorGroup.length;
+    //   const hasAssignedKey = newEnemies.some(e =>
+    //     unitHasItem(e, "Door_Key") &&
+    //     getManhattanDist(centerX, centerY, e.x, e.y) < 20
+    //   );
+    //   return {
+    //     doorCells: doorGroup,
+    //     hasAssignedKey,
+    //   };
+    // }),
   });
 
   return newEnemies;

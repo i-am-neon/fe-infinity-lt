@@ -47,14 +47,15 @@ export default async function getLevelUnits({
   const units: Level["units"] = [];
 
   // Add player units
-  existingPlayerUnitDatas.forEach((ud) => {
+  existingPlayerUnitDatas.forEach((ud, index) => {
     units.push({
       nid: ud.nid,
       team: "player",
       ai: "None",
       roam_ai: null,
       ai_group: null,
-      starting_position: null,
+      // For prologue units must be discretely placed, otherwise null and the game will let you place the characters in the pre-battle
+      starting_position: chapterNumber === 0 ? [playerUnitCoords[index].x, playerUnitCoords[index].y] : null,
       starting_traveler: null,
       generic: false,
     });

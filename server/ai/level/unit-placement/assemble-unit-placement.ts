@@ -5,6 +5,7 @@ import { TerrainGrid } from "@/types/maps/terrain-grid.ts";
 import genBossAndPlayerAndRecruitableUnitCoords from "./gen-boss-and-player-and-recruitable-unit-coords.ts";
 import getGenericEnemies from "./get-generic-enemies.ts";
 import getPlayerUnitPlacement from "@/ai/level/unit-placement/get-player-unit-placement.ts";
+import { getCurrentLogger } from "@/lib/current-logger.ts";
 
 export default async function assembleUnitPlacement({
   terrainGrid,
@@ -61,6 +62,14 @@ export default async function assembleUnitPlacement({
     fromY: playerRegion.fromY,
     toX: playerRegion.toX,
     toY: playerRegion.toY,
+  })
+
+  const logger = getCurrentLogger();
+  logger.info("assembleUnitPlacement result", {
+    bossCoords: nonGenericUnitPlacementResult.boss.coords,
+    playerUnitCoords,
+    genericEnemies,
+    recruitableUnits: nonGenericUnitPlacementResult.recruitableUnits,
   })
 
   return {
