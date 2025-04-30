@@ -1,18 +1,41 @@
 import { ChapterIdea } from "@/ai/types/chapter-idea.ts";
 import { ValidationResult } from "@/ai/lib/generator-checker.ts";
+import { InitialGameIdea } from "@/ai/types/initial-game-idea.ts";
 
 /**
  * Validates that all new characters with firstSeenAs = "ally" are mentioned in the intro text.
+ * For the prologue chapter, this excludes characters defined in the initialGameIdea.
  */
-export function validatePlayerInIntro(chapterIdea: ChapterIdea): ValidationResult {
+export function validatePlayerInIntro(
+    chapterIdea: ChapterIdea,
+    chapterNumber?: number,
+    initialGameIdea?: InitialGameIdea
+): ValidationResult {
     const errors: string[] = [];
 
     // Get all new playable units with firstSeenAs = "ally"
     const newPlayerUnits = (chapterIdea.newPlayableUnits || [])
         .filter(unit => unit.firstSeenAs === "ally");
 
+    // If this is the prologue (chapter 0) and we have initialGameIdea
+    const isPrologue = chapterNumber === 0 && initialGameIdea;
+
+    // For prologue, exclude characters that are defined in the initialGameIdea
+    let unitsToCheck = newPlayerUnits;
+    if (isPrologue && initialGameIdea) {
+        // Get list of character first names from initialGameIdea
+        const initialGameCharacterNames = initialGameIdea.characterIdeas.map(
+            char => char.firstName
+        );
+
+        // Filter out units that are already defined in initialGameIdea
+        unitsToCheck = newPlayerUnits.filter(
+            unit => !initialGameCharacterNames.includes(unit.firstName)
+        );
+    }
+
     // Check if each player character's firstName is mentioned in the intro section
-    for (const character of newPlayerUnits) {
+    for (const character of unitsToCheck) {
         const isNameMentionedInIntro = chapterIdea.intro.includes(character.firstName);
 
         if (!isNameMentionedInIntro) {

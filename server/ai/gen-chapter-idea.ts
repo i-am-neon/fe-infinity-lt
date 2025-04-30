@@ -205,7 +205,7 @@ If all good => fixText="None". Otherwise => fix instructions.`;
     validators: [
       validateCharacterMentions,
       validateDistinctNewCharacters,
-      validatePlayerInIntro,
+      (chapterIdea) => validatePlayerInIntro(chapterIdea, chapterNumber, initialGameIdea),
       (chapterIdea) => validateNoReintroducedCharacters(chapterIdea, previousChapterIdeas)
     ],
   });
