@@ -36,8 +36,6 @@ export default async function assembleUnitPlacement({
 
   const playerUnitCoords = getPlayerUnitPlacement({
     terrainGrid,
-    // TODO: don't hardcode
-    numUnits: 8,
     fromX: playerRegion.fromX,
     fromY: playerRegion.fromY,
     toX: playerRegion.toX,

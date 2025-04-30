@@ -4175,33 +4175,6 @@
     ]
   },
   {
-    "nid": "Summon",
-    "name": "Summon",
-    "desc": "Summons a phantom.",
-    "icon_nid": "Skills",
-    "icon_index": [9, 0],
-    "components": [
-      ["min_range", 1],
-      ["max_range", 1],
-      ["target_tile", null],
-      ["spell", null],
-      ["empty_tile_target_restrict", null],
-      ["event_on_hit", "Global Summon Phantom"]
-    ]
-  },
-  {
-    "nid": "Summon_Soldier",
-    "name": "Summon",
-    "desc": "Summons soldiers.",
-    "icon_nid": "Skills",
-    "icon_index": [9, 0],
-    "components": [
-      ["spell", null],
-      ["event_on_hit", "Global Summon Soldiers"],
-      ["target_ally", null]
-    ]
-  },
-  {
     "nid": "Sear",
     "name": "Sear",
     "desc": "Attack up to three units.",

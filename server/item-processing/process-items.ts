@@ -1,5 +1,6 @@
 import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
 import generateAndStoreVector from "@/vector-db/generate-and-store-vector.ts";
+import { ensureDir } from "https://deno.land/std/fs/mod.ts";
 
 // shape of objects in assets/items/items.json
 interface Item {
@@ -9,7 +10,13 @@ interface Item {
   components: [string, unknown][];
 }
 
-export async function processAllItems(): Promise<void> {
+interface ItemVectorData {
+  id: string;
+  text: string;
+  metadata: Record<string, unknown>;
+}
+
+export async function processAllItems(): Promise<ItemVectorData[]> {
   console.log("Processing items for vector DB");
 
   // Read the items.json file
@@ -18,6 +25,8 @@ export async function processAllItems(): Promise<void> {
   const items = JSON.parse(itemsContent) as Item[];
 
   console.log(`Found ${items.length} items to process`);
+
+  const itemVectors: ItemVectorData[] = [];
 
   // Process each item and store its vector
   for (const item of items) {
@@ -58,6 +67,13 @@ export async function processAllItems(): Promise<void> {
         vectorType: "items",
       });
 
+      // Also add to our array for saving to disk
+      itemVectors.push({
+        id: item.nid,
+        text,
+        metadata,
+      });
+
       console.log(`Processed item ${item.nid}`);
     } catch (error) {
       console.error(`Error processing item ${item.nid}`, { error });
@@ -65,14 +81,32 @@ export async function processAllItems(): Promise<void> {
   }
 
   console.log("✅ Completed processing all items");
+  return itemVectors;
+}
+
+export async function saveItemVectorsToFile(itemVectors: ItemVectorData[]): Promise<void> {
+  // Ensure the directories exist
+  await ensureDir(getPathWithinServer("vector-db/seed-data"));
+  await ensureDir(getPathWithinServer("vector-db/data"));
+
+  // Save to seed data directory
+  const seedPath = getPathWithinServer("vector-db/seed-data/items.json");
+  await Deno.writeTextFile(seedPath, JSON.stringify(itemVectors, null, 2));
+
+  // Save to data directory
+  const dataPath = getPathWithinServer("vector-db/data/items.json");
+  await Deno.writeTextFile(dataPath, JSON.stringify(itemVectors, null, 2));
+
+  console.log(`Saved ${itemVectors.length} item vectors to disk`);
 }
 
 export async function saveVectorsForItems(): Promise<void> {
-  await processAllItems();
+  const itemVectors = await processAllItems();
+  await saveItemVectorsToFile(itemVectors);
 }
 
 if (import.meta.main) {
-  processAllItems().then(() => {
+  saveVectorsForItems().then(() => {
     console.log("Finished processing all items");
   });
 }
