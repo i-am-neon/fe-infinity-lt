@@ -18,34 +18,14 @@ export default async function assembleUnitPlacement({
   mapMetadata: MapMetadata;
   chapterNumber: number;
 }) {
+  const logger = getCurrentLogger();
   const nonGenericUnitPlacementResult = await genBossAndPlayerAndRecruitableUnitCoords({
     terrainGrid,
     chapterIdea,
     mapMetadata,
-  })
-  const originalGenericEnemies = await getGenericEnemies({
-    terrainGrid,
-    chapterIdea,
-    mapMetadata,
-    chapterNumber,
-    nonGenericUnitPlacementResult,
-  })
-
-  // Collect existing positions (boss, player, and recruitable units)
-  const existingPositions = [
-    // boss
-    nonGenericUnitPlacementResult.boss.coords,
-    // enemy generics
-    ...originalGenericEnemies.map((unit) => ({ x: unit.x, y: unit.y })),
-  ];
-
-  // Correct enemy positions to avoid overlap with player units and boss
-  const genericEnemies = correctUnitPlacement({
-    terrainGrid,
-    units: originalGenericEnemies,
-    existingPositions,
   });
 
+  // Get player unit positions first
   const playerRegion = mapMetadata.distinctRegions.find(
     (region) =>
       region.name === nonGenericUnitPlacementResult.playerUnits.regions[0]
@@ -62,15 +42,39 @@ export default async function assembleUnitPlacement({
     fromY: playerRegion.fromY,
     toX: playerRegion.toX,
     toY: playerRegion.toY,
-  })
+  });
 
-  const logger = getCurrentLogger();
+  const originalGenericEnemies = await getGenericEnemies({
+    terrainGrid,
+    chapterIdea,
+    mapMetadata,
+    chapterNumber,
+    nonGenericUnitPlacementResult,
+  });
+
+  // Collect existing positions (boss, player, and recruitable units)
+  const existingPositions = [
+    // boss
+    nonGenericUnitPlacementResult.boss.coords,
+    // player units (important for prologue where players have fixed positions)
+    ...(chapterNumber === 0 ? playerUnitCoords : []),
+    // recruitable units
+    ...nonGenericUnitPlacementResult.recruitableUnits.map(unit => unit.coords),
+  ];
+
+  // Correct enemy positions to avoid overlap with player units and boss
+  const genericEnemies = correctUnitPlacement({
+    terrainGrid,
+    units: originalGenericEnemies,
+    existingPositions,
+  });
+
   logger.info("assembleUnitPlacement result", {
     bossCoords: nonGenericUnitPlacementResult.boss.coords,
     playerUnitCoords,
     genericEnemies,
     recruitableUnits: nonGenericUnitPlacementResult.recruitableUnits,
-  })
+  });
 
   return {
     bossCoords: nonGenericUnitPlacementResult.boss.coords,
