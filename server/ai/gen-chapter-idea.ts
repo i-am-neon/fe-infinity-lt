@@ -65,6 +65,12 @@ CRITICAL REQUIREMENTS:
   * Minor unit deaths should be referenced in the story, but will likely only alter the next chapter slightly.
   * When referencing dead boss characters, make sure to never refer to them as part of the player party.
 - Must not reuse a previous boss from earlier chapters
+- CRITICAL: The intro MUST clearly establish the context for the battle. A few examples (although there are many other possibilities):
+  * If characters are being attacked, show signs of the attack or characters discussing an imminent threat
+  * If characters are planning to attack, show their preparations and motivations
+  * If there's a diplomatic scenario that breaks down, show the escalation of tensions
+  * The connection between intro and battle must be logical and compelling - players should understand exactly why the battle is happening
+  * The intro should foreshadow or directly introduce the conflict, even if the boss isn't directly introduced
 ${newlyDeadPlayers.length > 0 ? `- MUST introduce at least ${newlyDeadPlayers.length} new playable unit(s) to replace those lost in the previous chapter
   * If ${newlyDeadPlayers.length > 1 ? 'multiple units' : 'a unit'} died in the previous chapter, provide a mix of new player units that start as: player units, allied NPCs, and/or recruitable enemy units
   * Choose unit classes that complement the existing team composition, avoiding duplicate classes when possible to ensure a balanced party` : ''}
