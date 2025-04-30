@@ -616,6 +616,8 @@ export default function GameDetailPage() {
                 <h3 className="font-medium mb-2">Option 1: Regenerate the current chapter</h3>
                 <p className="text-sm mb-3">
                   This will completely overwrite your current chapter with a new AI-generated version. This is useful if the current chapter has serious issues.
+                  <br />
+                  <i>This does not work if the current chapter is the prologue. In that case, you must delete the game and start over.</i>
                 </p>
                 <Button
                   variant="default"
