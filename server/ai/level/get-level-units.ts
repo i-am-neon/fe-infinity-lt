@@ -48,6 +48,9 @@ export default async function getLevelUnits({
 
   // Add player units
   existingPlayerUnitDatas.forEach((ud, index) => {
+    if (chapterNumber === 0) {
+      logger.debug("adding player unit data with discrete coords for prologue", { index, coords: playerUnitCoords[index] })
+    }
     units.push({
       nid: ud.nid,
       team: "player",

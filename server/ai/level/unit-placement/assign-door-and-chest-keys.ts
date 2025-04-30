@@ -9,6 +9,7 @@ import { getChestsForMap } from "@/map-region-processing/get-chests-for-map.ts";
 import { getDoorsForMap } from "@/map-region-processing/get-doors-for-map.ts";
 import { TerrainType } from "@/types/maps/terrain-type.ts";
 import { join } from "https://deno.land/std@0.224.0/path/mod.ts";
+import { getPathWithinServer } from "@/file-io/get-path-within-server.ts";
 
 
 function unitHasItem(
@@ -63,14 +64,13 @@ export default function assignDoorAndChestKeys(
 
   // Get door regions from getDoorsForMap
   try {
-    const mapsDir = join(Deno.cwd(), "server", "assets", "maps");
-    const filePath = join(mapsDir, `${originalMapName}.json`);
+    const filePath = getPathWithinServer(`assets/maps/${originalMapName}.json`);
 
     // Check if the file exists before trying to access it
     try {
-      const fileInfo = Deno.statSync(filePath);
+      Deno.statSync(filePath);
     } catch (fileError) {
-      logger.warn(`Map file does not exist: ${filePath}`, { error: String(fileError) });
+      logger.error(`Map file does not exist: ${filePath}`, { error: String(fileError) });
       // If file doesn't exist, fall back to basic grouping
       groupedDoors = groupDoorCells(allDoorCells);
       // Don't attempt to read the non-existent file
