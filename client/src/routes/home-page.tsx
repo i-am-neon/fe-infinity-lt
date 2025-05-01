@@ -24,7 +24,7 @@ import { FeInfinityTitle } from "@/components/ui/fe-infinity-title";
 import { BlurFade } from "@/components/magicui/blur-fade";
 import { BLUR_FADE_DELAY } from "@/components/ui/constants";
 
-const showDebugButtons = true;
+const showDebugButtons = false;
 
 export default function HomePage() {
   const navigate = useNavigate();
