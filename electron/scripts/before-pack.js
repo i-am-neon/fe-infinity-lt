@@ -14,31 +14,37 @@ module.exports = async function (context) {
   console.log('Running before-pack.js script...');
 
   try {
-    // Copy .env.example to .env for the build
+    // Copy .env.example to .env.build
     const serverDir = path.join(__dirname, '../../server');
     const envExamplePath = path.join(serverDir, '.env.example');
     const envBuildPath = path.join(serverDir, '.env.build');
+    const envPath = path.join(serverDir, '.env');
+
+    // Check if we're in production build mode
+    const isProduction = process.env.BUILD_ENV === 'production';
 
     // First check if the example file exists
     if (fs.existsSync(envExamplePath)) {
       console.log(`Copying ${envExamplePath} to ${envBuildPath}`);
       fs.copyFileSync(envExamplePath, envBuildPath);
 
-      // Rename .env.build to .env for the build process
-      const envPath = path.join(serverDir, '.env');
+      // Only modify the actual .env file in production builds
+      if (isProduction) {
+        // If there's an existing .env, back it up
+        if (fs.existsSync(envPath)) {
+          const envBackupPath = path.join(serverDir, '.env.bak');
+          console.log(`Backing up ${envPath} to ${envBackupPath}`);
+          fs.copyFileSync(envPath, envBackupPath);
+        }
 
-      // If there's an existing .env, back it up
-      if (fs.existsSync(envPath)) {
-        const envBackupPath = path.join(serverDir, '.env.bak');
-        console.log(`Backing up ${envPath} to ${envBackupPath}`);
-        fs.copyFileSync(envPath, envBackupPath);
+        // Now copy our build env to .env
+        console.log(`Copying ${envBuildPath} to ${envPath}`);
+        fs.copyFileSync(envBuildPath, envPath);
+
+        console.log('Environment setup complete for production build.');
+      } else {
+        console.log('Skipping .env replacement for local development.');
       }
-
-      // Now copy our build env to .env
-      console.log(`Copying ${envBuildPath} to ${envPath}`);
-      fs.copyFileSync(envBuildPath, envPath);
-
-      console.log('Environment setup complete.');
     } else {
       console.warn(`Warning: ${envExamplePath} doesn't exist!`);
     }

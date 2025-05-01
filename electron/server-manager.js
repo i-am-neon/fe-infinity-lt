@@ -3,9 +3,12 @@ const path = require('path');
 const { spawn } = require('child_process');
 const { app } = require('electron');
 const logger = require('./logger');
+const http = require('http');
 
 let denoProcess = null;
 let serverReady = false;
+let healthCheckAttempts = 0;
+const MAX_HEALTH_CHECK_ATTEMPTS = 5;
 
 // Get user data directory for storing databases
 const getDataDir = () => {
@@ -260,12 +263,18 @@ const startDenoServer = () => {
       logger.log('info', `Deno server output: ${output}`);
       console.log(`Deno server: ${output}`);
 
-      // Only set serverReady to true when server explicitly indicates it's listening
-      if (output.includes('Server listening on') || output.includes('Server running at')) {
-        serverReady = true;
-        logger.log('info', 'Deno server is now ready to accept requests');
-        console.log('Deno server is now ready to accept requests');
-        resolve();
+      // Attempt to detect when server is ready to accept requests
+      if (output.includes('Server listening on') ||
+        output.includes('Server running at') ||
+        output.includes('Listening on http://localhost')) {
+
+        logger.log('info', 'Deno server appears to be listening, verifying health...');
+
+        // Short delay to ensure the server has fully initialized
+        setTimeout(async () => {
+          await setServerReady();
+          resolve();
+        }, 500);
       }
     });
 
@@ -273,7 +282,13 @@ const startDenoServer = () => {
       const error = data.toString();
       logger.log('error', `Deno server error: ${error}`);
       console.error(`Deno server error: ${error}`);
+
       // Don't reject on stderr, as Deno might output warnings here
+      // But check for critical errors
+      if (error.includes('Error') || error.includes('error:') || error.includes('Failed')) {
+        // Don't abort startup for non-critical errors, but log them
+        logger.log('warn', `Deno server reported error but will continue startup: ${error}`);
+      }
     });
 
     denoProcess.on('error', (err) => {
@@ -443,12 +458,18 @@ const startDenoServerFallback = (serverPath, resolve, reject) => {
     logger.log('info', `Deno server (bundled fallback) output: ${output}`);
     console.log(`Deno server (bundled fallback): ${output}`);
 
-    // Only set serverReady to true when server explicitly indicates it's listening
-    if (output.includes('Server listening on') || output.includes('Server running at')) {
-      serverReady = true;
-      logger.log('info', 'Deno server (fallback) is now ready to accept requests');
-      console.log('Deno server (fallback) is now ready to accept requests');
-      resolve();
+    // Attempt to detect when server is ready to accept requests
+    if (output.includes('Server listening on') ||
+      output.includes('Server running at') ||
+      output.includes('Listening on http://localhost')) {
+
+      logger.log('info', 'Deno server (fallback) appears to be listening, verifying health...');
+
+      // Short delay to ensure the server has fully initialized
+      setTimeout(async () => {
+        await setServerReady();
+        resolve();
+      }, 500);
     }
   });
 
@@ -456,6 +477,12 @@ const startDenoServerFallback = (serverPath, resolve, reject) => {
     const error = data.toString();
     logger.log('error', `Deno server error (bundled fallback): ${error}`);
     console.error(`Deno server error (bundled fallback): ${error}`);
+
+    // Check for critical errors
+    if (error.includes('Error') || error.includes('error:') || error.includes('Failed')) {
+      // Don't abort startup for non-critical errors, but log them
+      logger.log('warn', `Deno server reported error but will continue startup: ${error}`);
+    }
   });
 
   denoProcess.on('error', (err) => {
@@ -667,6 +694,65 @@ async function execCommand(command, args, options = {}) {
     childProcess.on('error', reject);
   });
 }
+
+// Add a health check function to verify server is truly ready
+const checkServerHealth = () => {
+  return new Promise((resolve) => {
+    http.get('http://localhost:8000/health', (res) => {
+      let data = '';
+
+      res.on('data', (chunk) => {
+        data += chunk;
+      });
+
+      res.on('end', () => {
+        if (res.statusCode === 200) {
+          logger.log('info', 'Server health check successful');
+          resolve(true);
+        } else {
+          logger.log('error', `Server health check failed with status: ${res.statusCode}`);
+          resolve(false);
+        }
+      });
+    }).on('error', (err) => {
+      logger.log('error', `Server health check failed: ${err.message}`);
+      resolve(false);
+    });
+  });
+};
+
+// Function to set server as ready after verifying health
+const setServerReady = async () => {
+  // Reset health check attempts
+  healthCheckAttempts = 0;
+
+  // Do a health check to confirm server is truly ready
+  const tryHealthCheck = async () => {
+    const isHealthy = await checkServerHealth();
+
+    if (isHealthy) {
+      serverReady = true;
+      logger.log('info', 'Server verified as healthy and ready');
+      return true;
+    } else {
+      healthCheckAttempts++;
+
+      if (healthCheckAttempts < MAX_HEALTH_CHECK_ATTEMPTS) {
+        // Wait and try again
+        logger.log('info', `Health check attempt ${healthCheckAttempts} failed, retrying...`);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        return tryHealthCheck();
+      } else {
+        logger.log('error', 'Max health check attempts reached, server considered unhealthy');
+        // Still mark as ready but log the issue
+        serverReady = true;
+        return false;
+      }
+    }
+  };
+
+  return tryHealthCheck();
+};
 
 // Start all required services
 const startServer = async () => {

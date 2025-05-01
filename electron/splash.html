@@ -27,9 +27,10 @@
           rgba(102, 94, 158, 0.9)
         );
         border-radius: 12px;
-        padding: 30px 30px 80px 30px;
+        padding: 30px 30px 40px 30px;
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         width: 400px;
+        position: relative;
       }
 
       .logo {
@@ -63,18 +64,23 @@
           transform: rotate(360deg);
         }
       }
+
+      .status {
+        margin-top: 30px;
+        font-size: 12px;
+        opacity: 0.8;
+        min-height: 40px;
+      }
     </style>
   </head>
   <body>
     <div class="container">
-      <img
-        src="logo.png"
-        class="logo"
-        alt="FE Infinity Logo"
-      />
+      <img src="logo.png" class="logo" alt="FE Infinity Logo" />
       <h1>FE Infinity</h1>
       <p>Starting up...</p>
       <div class="spinner"></div>
+      <div class="status"></div>
     </div>
   </body>
 </html>
+

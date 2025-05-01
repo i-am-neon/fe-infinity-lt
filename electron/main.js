@@ -40,7 +40,7 @@ let serverReadyCheckInterval = null;
 function createSplashWindow() {
   splashWindow = new BrowserWindow({
     width: 500,
-    height: 300,
+    height: 500,
     transparent: true,
     frame: false,
     alwaysOnTop: true,
@@ -308,10 +308,65 @@ function createMainWindow() {
     // Initial check
     checkServerReady();
 
-    // If not ready immediately, set up interval to check
+    // If not ready immediately, set up interval to check with a timeout
     if (!isServerReady()) {
       logger.log('info', 'Setting up interval to check server readiness');
-      serverReadyCheckInterval = setInterval(checkServerReady, 500);
+
+      // Add a timeout to prevent infinite waiting - 15 seconds max wait time
+      const maxWaitTimeMs = 15000;
+      const startTime = Date.now();
+
+      serverReadyCheckInterval = setInterval(() => {
+        // Check if server is ready
+        if (isServerReady()) {
+          logger.log('info', 'Server is ready, showing main window');
+          if (splashWindow && !splashWindow.isDestroyed()) {
+            splashWindow.close();
+          }
+          mainWindow.show();
+          clearInterval(serverReadyCheckInterval);
+          serverReadyCheckInterval = null;
+          return;
+        }
+
+        // Check if we've exceeded the max wait time
+        if (Date.now() - startTime > maxWaitTimeMs) {
+          logger.log('error', 'Timed out waiting for server to be ready');
+          clearInterval(serverReadyCheckInterval);
+          serverReadyCheckInterval = null;
+
+          // Show error message
+          if (splashWindow && !splashWindow.isDestroyed()) {
+            splashWindow.webContents.executeJavaScript(`
+              document.querySelector('.status').innerHTML = 
+              'Error: Server failed to initialize properly.<br>Please restart the application.';
+              document.querySelector('.status').style.color = '#ff6b6b';
+            `).catch(err => {
+              logger.log('error', 'Failed to update splash screen with error', { error: err.message });
+            });
+
+            // Give user time to read the message before showing main window
+            setTimeout(() => {
+              if (splashWindow && !splashWindow.isDestroyed()) {
+                splashWindow.close();
+              }
+              mainWindow.show();
+
+              // Show error dialog
+              dialog.showErrorBox(
+                'Server Initialization Failed',
+                'The server failed to initialize properly. Some features may not work correctly.\n\nCheck the application logs for more details.'
+              );
+            }, 3000);
+          } else {
+            mainWindow.show();
+            dialog.showErrorBox(
+              'Server Initialization Failed',
+              'The server failed to initialize properly. Some features may not work correctly.\n\nCheck the application logs for more details.'
+            );
+          }
+        }
+      }, 500);
     }
   } else {
     // Server failed to start, show main window with error message
