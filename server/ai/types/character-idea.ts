@@ -3,10 +3,10 @@ import { z } from "zod";
 
 export const FirstSeenAsSchema = z
   .union([
-    z.literal("ally"),
-    z.literal("allied NPC"),
-    z.literal("enemy non-boss"),
-    z.literal("boss"),
+    z.literal("ally").describe('starts as a blue unit - a playable character that starts in the player\'s party'),
+    z.literal("allied NPC").describe('starts as a green unit - a non-playable character that fights alongside the player'),
+    z.literal("enemy non-boss").describe('starts as a red unit - a non-playable character that starts in the enemy\'s party'),
+    z.literal("boss").describe('The chapter\'s enemy boss'),
     z.literal("non-playable character").describe("Choose this when the character is part of the `newNonBattleCharacters` of the chapter idea"),
   ])
   .describe("the type of unit the character is first seen as");

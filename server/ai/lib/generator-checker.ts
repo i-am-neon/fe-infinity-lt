@@ -112,10 +112,28 @@ No additional commentary or text outside these JSON objects.`;
 
         candidate = generatedCandidate;
       } catch (genError) {
-        logger.warn(
-          `[genAndCheck: ${fnBaseName}] Generation error on attempt ${attempt}`,
-          { error: (genError as Error).message }
-        );
+        // Log more detailed error information for AI_NoObjectGeneratedError
+        if (genError instanceof Error && genError.message.includes('AI_NoObjectGeneratedError')) {
+          // Extract and log the detailed error information
+          const errorDetails = {
+            message: genError.message,
+            rawText: (genError as any).text || 'No text available',
+            cause: (genError as any).cause || 'No cause available',
+            finishReason: (genError as any).finishReason,
+            usage: (genError as any).usage,
+            response: (genError as any).response
+          };
+
+          logger.warn(
+            `[genAndCheck: ${fnBaseName}] AI_NoObjectGeneratedError on attempt ${attempt}`,
+            { error: genError.message, errorDetails }
+          );
+        } else {
+          logger.warn(
+            `[genAndCheck: ${fnBaseName}] Generation error on attempt ${attempt}`,
+            { error: (genError as Error).message }
+          );
+        }
 
         // If this is the last attempt, throw the error
         if (attempt === maxAttempts) {
@@ -198,8 +216,8 @@ No additional commentary or text outside these JSON objects.`;
         const checkerPromptWithValidations =
           Object.keys(validationResults).length > 0
             ? `${checkerResult}\n\nValidation Results: ${JSON.stringify(
-                validationResults
-              )}`
+              validationResults
+            )}`
             : checkerResult;
 
         const rawFixCheck = await generateStructuredData({
@@ -348,8 +366,7 @@ No additional commentary or text outside these JSON objects.`;
               finalCheckResult.fixText === "None"
             ) {
               logger.info(
-                `[genAndCheck: ${fnBaseName}] Last-chance additional fix succeeded on attempt ${
-                  attempt + 0.5
+                `[genAndCheck: ${fnBaseName}] Last-chance additional fix succeeded on attempt ${attempt + 0.5
                 }`
               );
               return lastChanceFixedCandidate;
@@ -362,10 +379,28 @@ No additional commentary or text outside these JSON objects.`;
           }
         }
       } catch (checkError) {
-        logger.warn(
-          `[genAndCheck: ${fnBaseName}] Check error on attempt ${attempt}`,
-          { error: (checkError as Error).message }
-        );
+        // Log more detailed error information for AI_NoObjectGeneratedError
+        if (checkError instanceof Error && checkError.message.includes('AI_NoObjectGeneratedError')) {
+          // Extract and log the detailed error information
+          const errorDetails = {
+            message: checkError.message,
+            rawText: (checkError as any).text || 'No text available',
+            cause: (checkError as any).cause || 'No cause available',
+            finishReason: (checkError as any).finishReason,
+            usage: (checkError as any).usage,
+            response: (checkError as any).response
+          };
+
+          logger.warn(
+            `[genAndCheck: ${fnBaseName}] AI_NoObjectGeneratedError during check on attempt ${attempt}`,
+            { error: checkError.message, errorDetails }
+          );
+        } else {
+          logger.warn(
+            `[genAndCheck: ${fnBaseName}] Check error on attempt ${attempt}`,
+            { error: (checkError as Error).message }
+          );
+        }
 
         // If this is the last attempt, store the candidate
         if (attempt === maxAttempts) {
@@ -454,10 +489,28 @@ Return only the fixed JSON object with no additional commentary.`;
 
     return fixedCandidate;
   } catch (error) {
-    logger.warn(
-      `[fixCandidate: ${fnBaseName}] Fixer failed on attempt ${attemptNumber}`,
-      { error: (error as Error).message }
-    );
+    // Log more detailed error information for AI_NoObjectGeneratedError
+    if (error instanceof Error && error.message.includes('AI_NoObjectGeneratedError')) {
+      // Extract and log the detailed error information
+      const errorDetails = {
+        message: error.message,
+        rawText: (error as any).text || 'No text available',
+        cause: (error as any).cause || 'No cause available',
+        finishReason: (error as any).finishReason,
+        usage: (error as any).usage,
+        response: (error as any).response
+      };
+
+      logger.warn(
+        `[fixCandidate: ${fnBaseName}] AI_NoObjectGeneratedError during fix on attempt ${attemptNumber}`,
+        { error: error.message, errorDetails }
+      );
+    } else {
+      logger.warn(
+        `[fixCandidate: ${fnBaseName}] Fixer failed on attempt ${attemptNumber}`,
+        { error: (error as Error).message }
+      );
+    }
 
     // If there's a fixObject, return candidate merged with fixObject
     if (hasFixObject) {

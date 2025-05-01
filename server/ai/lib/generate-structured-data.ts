@@ -1,6 +1,6 @@
 import { getCurrentLogger } from "@/lib/current-logger.ts";
 import { openai } from "@ai-sdk/openai";
-import { generateObject } from "ai";
+import { generateObject, NoObjectGeneratedError } from "ai";
 import "jsr:@std/dotenv/load";
 import { z, ZodSchema } from "zod";
 import { getOpenAIApiKey } from "@/lib/api-key-manager.ts";
@@ -91,23 +91,51 @@ export default async function generateStructuredData<T>({
       } catch (error) {
         const attemptDuration = performance.now() - startTime;
 
-        logResults &&
-          logger.warn(
-            `[generateStructuredData: ${fnName}] Attempt ${attempt} failed`,
-            {
-              model: _model.modelId,
-              error,
-              duration_ms: Math.round(attemptDuration),
-            }
-          );
+        // Enhanced error logging for NoObjectGeneratedError
+        if (NoObjectGeneratedError.isInstance && NoObjectGeneratedError.isInstance(error)) {
+          logResults &&
+            logger.warn(
+              `[generateStructuredData: ${fnName}] Attempt ${attempt} failed with NoObjectGeneratedError`,
+              {
+                model: _model.modelId,
+                errorMessage: error.message,
+                rawText: error.text || "No text available",
+                cause: error.cause,
+                finishReason: error.finishReason,
+                usage: error.usage,
+                response: error.response,
+                duration_ms: Math.round(attemptDuration),
+              }
+            );
+        } else {
+          logResults &&
+            logger.warn(
+              `[generateStructuredData: ${fnName}] Attempt ${attempt} failed`,
+              {
+                model: _model.modelId,
+                error,
+                duration_ms: Math.round(attemptDuration),
+              }
+            );
+        }
 
         lastError = error;
         if (attempt === 3) {
           const totalDuration = performance.now() - startTime;
 
-          const message = `[generateStructuredData: ${fnName}] All 3 attempts failed: ${String(
-            lastError
-          )}`;
+          // Enhanced error details in the final error message
+          const errorDetails = NoObjectGeneratedError.isInstance && NoObjectGeneratedError.isInstance(lastError)
+            ? {
+              message: lastError.message,
+              rawText: lastError.text || "No text available",
+              cause: lastError.cause,
+              finishReason: lastError.finishReason,
+              usage: lastError.usage
+            }
+            : String(lastError);
+
+          const message = `[generateStructuredData: ${fnName}] All 3 attempts failed: ${typeof errorDetails === 'string' ? errorDetails : JSON.stringify(errorDetails)
+            }`;
 
           logResults &&
             logger.error(
@@ -115,6 +143,16 @@ export default async function generateStructuredData<T>({
               {
                 model: _model.modelId,
                 error: lastError,
+                errorDetails: NoObjectGeneratedError.isInstance && NoObjectGeneratedError.isInstance(lastError)
+                  ? {
+                    message: lastError.message,
+                    rawText: lastError.text,
+                    cause: lastError.cause,
+                    finishReason: lastError.finishReason,
+                    usage: lastError.usage,
+                    response: lastError.response
+                  }
+                  : undefined,
                 duration_ms: Math.round(totalDuration),
               }
             );
