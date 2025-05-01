@@ -88,6 +88,10 @@ The event must also:
 - you may only give speaking roles to characters mentioned in the intro, not any other characters
 - you must have characters speak to each other in the scene
 
+WRITING STYLE - AVOIDING CLICHÉS:
+- Avoid overused mystery phrases like "The X holds more than just Y..." or "There's more to this than meets the eye"
+- Instead, try these more creative approaches for building tension and mystery
+
 Important continuity rules for dead characters:
 - Any dead characters must remain dead and not reappear in any dialogue.
 - Living player characters might reference the deaths of dead player characters, highlighting the relationship between them and the deceased.

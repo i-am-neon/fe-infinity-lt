@@ -69,6 +69,10 @@ The event should:
 - you can use "give_money" to have characters receive or find money as part of the story resolution (e.g., "give_money;1000")
 - you can use "give_item" to have characters receive, find, or obtain items as rewards or plot elements (e.g., "give_item;Iron_Sword")
 
+WRITING STYLE - AVOIDING CLICHÉS:
+- Avoid overused mystery phrases like "The X holds more than just Y..." or "There's more to this than meets the eye"
+- Instead, try these more creative approaches for building tension and mystery about future chapters
+
 We want one AIEvent object strictly matching the AIEvent schema. Return only JSON, no commentary.
 If the outro references a 'boss', 'newPlayableUnits', or 'newNonBattleCharacters', ensure they appear if it makes sense.`;
 
