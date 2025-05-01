@@ -60,6 +60,8 @@
   "build": {
     "appId": "com.fe-infinity.app",
     "productName": "FE Infinity",
+    "generateUpdatesFilesForAllChannels": false,
+    "buildDependenciesFromSource": true,
     "files": [
       "*.js",
       "*.html",
