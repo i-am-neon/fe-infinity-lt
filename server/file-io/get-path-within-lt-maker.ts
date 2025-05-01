@@ -20,6 +20,22 @@ export function getLtMakerPath(): string {
   if (isElectronEnvironment()) {
     debugPaths.push("Running in Electron environment");
 
+    // Check for user data directory path first (set by Electron main process)
+    const userLtMakerPath = Deno.env.get("USER_LT_MAKER_PATH");
+    if (userLtMakerPath) {
+      try {
+        const stat = Deno.statSync(userLtMakerPath);
+        if (stat.isDirectory) {
+          console.log(`[Path Resolver] Using user data lt-maker-fork at: ${userLtMakerPath}`);
+          cachedLtMakerPath = userLtMakerPath;
+          return userLtMakerPath;
+        }
+      } catch (e) {
+        console.warn(`[Path Resolver] User data lt-maker-fork path exists in env but not accessible: ${userLtMakerPath}`);
+        // Continue to other paths
+      }
+    }
+
     // Try multiple approaches to find lt-maker-fork
     const possiblePaths = [
       // From app root env var

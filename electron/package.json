@@ -31,7 +31,6 @@
     "electron-builder": "^24.9.1",
     "electron-icon-builder": "^2.0.1",
     "extract-zip": "^2.0.1",
-    "fs-extra": "^11.3.0",
     "rcedit": "^4.0.1",
     "sharp": "^0.33.2",
     "to-ico": "^1.1.5",
@@ -44,6 +43,7 @@
     "dot-prop": "^9.0.0",
     "electron-store": "^8.2.0",
     "find-up": "^7.0.0",
+    "fs-extra": "^11.3.0",
     "is-obj": "^3.0.0",
     "json-schema-traverse": "^1.0.0",
     "locate-path": "^7.2.0",
@@ -60,8 +60,6 @@
   "build": {
     "appId": "com.fe-infinity.app",
     "productName": "FE Infinity",
-    "generateUpdatesFilesForAllChannels": false,
-    "buildDependenciesFromSource": true,
     "files": [
       "*.js",
       "*.html",
@@ -137,6 +135,9 @@
     "directories": {
       "output": "release"
     },
+    "dmg": {
+      "writeUpdateInfo": false
+    },
     "nsis": {
       "oneClick": false,
       "perMachine": false,
@@ -156,7 +157,12 @@
     },
     "mac": {
       "target": [
-        "dmg"
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64"
+          ]
+        }
       ],
       "category": "public.app-category.games",
       "icon": "icons/icons/mac/icon.icns"
@@ -183,7 +189,8 @@
       ],
       "category": "Game",
       "icon": "icons/icons/png/512x512.png"
-    }
+    },
+    "publish": null
   }
 }
 

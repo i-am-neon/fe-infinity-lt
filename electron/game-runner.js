@@ -76,12 +76,30 @@ function getWinePath() {
 
 // Get the LT maker path
 function getLtMakerPath() {
-  // For packaged apps, use resourcesPath instead of app.getAppPath()
-  // app.getAppPath() points to the asar file, but we need the Resources directory
-  if (app.isPackaged) {
-    return path.join(process.resourcesPath, 'lt-maker-fork');
+  // First check if we have a user data path set by sync-lt-maker.js
+  if (process.env.USER_LT_MAKER_PATH) {
+    const userLtMakerPath = process.env.USER_LT_MAKER_PATH;
+    try {
+      if (fs.existsSync(userLtMakerPath)) {
+        logger.log('info', `Using lt-maker-fork from user data directory: ${userLtMakerPath}`);
+        return userLtMakerPath;
+      }
+    } catch (e) {
+      logger.log('warn', `Error accessing user lt-maker-fork path: ${e.message}`);
+    }
   }
-  return path.join(app.getAppPath(), 'lt-maker-fork');
+
+  // Fall back to bundled resources path
+  if (app.isPackaged) {
+    const resourcePath = path.join(process.resourcesPath, 'lt-maker-fork');
+    logger.log('info', `Falling back to bundled lt-maker-fork path: ${resourcePath}`);
+    return resourcePath;
+  }
+
+  // In development mode
+  const devPath = path.join(app.getAppPath(), 'lt-maker-fork');
+  logger.log('info', `Using development lt-maker-fork path: ${devPath}`);
+  return devPath;
 }
 
 // Get path to Python with better error handling and fallbacks

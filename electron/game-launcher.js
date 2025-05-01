@@ -1,329 +1,166 @@
 const http = require('http');
-const { runGame, runPythonScript } = require('./game-runner');
+const { runGameWithWine, runPythonScript } = require('./game-runner');
 const logger = require('./logger');
 const { app } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
-// Create a simple HTTP server for all modes (both development and production)
-const PORT = 8989;
+/**
+ * Creates an HTTP server to handle game launching requests from the Deno server
+ * This provides a bridge between the Deno server and Electron's main process
+ */
+async function startGameLauncherServer() {
+  // Create HTTP server
+  const server = http.createServer(async (req, res) => {
+    let body = '';
+    req.on('data', chunk => {
+      body += chunk.toString();
+    });
 
-function startGameLauncherServer() {
-  return new Promise((resolve, reject) => {
-    logger.log('info', `Starting game launcher HTTP server on port ${PORT}...`);
-
-    const server = http.createServer((req, res) => {
-      // Handle POST requests to /run-game or /run-python
-      if (req.method === 'POST' && (req.url === '/run-game' || req.url === '/run-python')) {
-        // Set CORS headers
+    req.on('end', async () => {
+      try {
+        // Set CORS headers to allow requests from localhost
         res.setHeader('Access-Control-Allow-Origin', '*');
-        res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
         res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-        let body = '';
+        // Handle preflight requests
+        if (req.method === 'OPTIONS') {
+          res.writeHead(200);
+          res.end();
+          return;
+        }
 
-        // Collect request body data
-        req.on('data', (chunk) => {
-          body += chunk.toString();
+        // Log incoming request
+        logger.log('info', `Received request to ${req.url}`, {
+          body: body.length > 500 ? `${body.substring(0, 500)}...` : body
         });
 
-        // Process the request
-        req.on('end', async () => {
-          try {
-            logger.log('info', `Received request to ${req.url}`, { body });
+        if (req.url === '/run-game' && req.method === 'POST') {
+          // Parse JSON request body
+          const data = JSON.parse(body);
+          const projectPath = data.projectPath;
 
-            let parsedBody;
-            try {
-              parsedBody = JSON.parse(body);
-            } catch (parseError) {
-              logger.log('error', 'Failed to parse JSON body', {
-                error: parseError.message,
-                body
-              });
-              res.statusCode = 400;
-              res.end(JSON.stringify({
-                success: false,
-                error: 'Invalid JSON body'
-              }));
+          if (!projectPath) {
+            logger.log('error', 'Missing project path in run-game request');
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ success: false, error: 'Missing project path' }));
+            return;
+          }
+
+          try {
+            // First check if the project exists in the user data directory
+            const userDataDir = app.getPath('userData');
+            const userLtMakerPath = path.join(userDataDir, 'lt-maker-fork');
+            const userProjectPath = path.join(userLtMakerPath, projectPath);
+
+            // Check if the project exists in user directory first
+            if (fs.existsSync(userProjectPath)) {
+              logger.log('info', `Found project in user data directory: ${userProjectPath}`);
+
+              // Check metadata.json exists
+              const metadataPath = path.join(userProjectPath, 'metadata.json');
+              if (!fs.existsSync(metadataPath)) {
+                const errorMsg = `metadata.json not found in user project: ${projectPath}`;
+                logger.log('error', errorMsg);
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ success: false, error: errorMsg }));
+                return;
+              }
+
+              logger.log('info', `Launching game through Wine: ${projectPath}`);
+              await runGameWithWine(projectPath);
+              logger.log('info', `Game launch initiated successfully`);
+              res.writeHead(200, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify({ success: true }));
               return;
             }
 
-            // Handle different endpoints
-            if (req.url === '/run-game') {
-              // Run Game endpoint
-              const projectPath = parsedBody.projectPath;
+            // Fall back to resources directory if not found in user data
+            const resourcesPath = process.resourcesPath || app.getAppPath();
+            const ltMakerPath = path.join(resourcesPath, 'lt-maker-fork');
+            const projectFullPath = path.join(ltMakerPath, projectPath);
 
-              if (!projectPath) {
-                logger.log('error', 'Missing projectPath parameter');
-                res.statusCode = 400;
-                res.end(JSON.stringify({
-                  success: false,
-                  error: 'Missing projectPath parameter'
-                }));
-                return;
-              }
-
-              // Use improved path resolution logic to find lt-maker-fork directory
-              let ltMakerPath;
-              // Try multiple potential locations
-              const potentialLocations = [
-                // Development location
-                path.join(app.getAppPath(), '..', 'lt-maker-fork'),
-                // Direct from app path
-                path.join(app.getAppPath(), 'lt-maker-fork'),
-                // From resources
-                path.join(process.resourcesPath || app.getAppPath(), 'lt-maker-fork'),
-                // From resources/app
-                path.join(process.resourcesPath || app.getAppPath(), 'app', 'lt-maker-fork')
-              ];
-
-              // Find the first location that exists
-              let foundPath = false;
-              for (const location of potentialLocations) {
-                if (fs.existsSync(location)) {
-                  ltMakerPath = location;
-                  foundPath = true;
-                  logger.log('info', `Found lt-maker-fork at: ${ltMakerPath}`);
-                  break;
-                }
-              }
-
-              if (!foundPath) {
-                const errorMsg = `lt-maker-fork directory not found in any expected location`;
-                logger.log('error', errorMsg, { searchedLocations: potentialLocations });
-                res.statusCode = 404;
-                res.end(JSON.stringify({
-                  success: false,
-                  error: errorMsg
-                }));
-                return;
-              }
-
-              const projectFullPath = path.join(ltMakerPath, projectPath);
-              logger.log('info', `Looking for project at: ${projectFullPath}`);
-
-              if (!fs.existsSync(projectFullPath)) {
-                const errorMsg = `Project not found: ${projectPath} (full path: ${projectFullPath})`;
-                logger.log('error', errorMsg);
-                res.statusCode = 404;
-                res.end(JSON.stringify({
-                  success: false,
-                  error: errorMsg
-                }));
-                return;
-              }
-
-              // Check metadata.json exists
-              const metadataPath = path.join(projectFullPath, 'metadata.json');
-              if (!fs.existsSync(metadataPath)) {
-                const errorMsg = `metadata.json not found in project: ${projectPath}`;
-                logger.log('error', errorMsg);
-                res.statusCode = 404;
-                res.end(JSON.stringify({
-                  success: false,
-                  error: errorMsg
-                }));
-                return;
-              }
-
-              logger.log('info', `HTTP endpoint received request to run game: ${projectPath}`);
-
-              try {
-                await runGame(projectPath);
-                logger.log('info', `Game launch requested successfully`);
-
-                res.statusCode = 200;
-                res.end(JSON.stringify({ success: true }));
-              } catch (gameError) {
-                logger.log('error', 'Error running game', {
-                  error: gameError.message,
-                  stack: gameError.stack
-                });
-
-                res.statusCode = 500;
-                res.end(JSON.stringify({
-                  success: false,
-                  error: gameError.message || 'Failed to launch game'
-                }));
-              }
-            } else if (req.url === '/run-python') {
-              // Run Python script endpoint
-              const scriptPath = parsedBody.scriptPath;
-              const args = parsedBody.args || [];
-
-              if (!scriptPath) {
-                logger.log('error', 'Missing scriptPath parameter');
-                res.statusCode = 400;
-                res.end(JSON.stringify({
-                  success: false,
-                  error: 'Missing scriptPath parameter'
-                }));
-                return;
-              }
-
-              logger.log('info', `Received request to run Python script: ${scriptPath} with args:`, args);
-
-              // In Electron, use bundled Python, properly handling asar vs asar.unpacked paths
-              // Create possible Python paths, accounting for asar packaging
-              const appPath = app.getAppPath();
-              let basePaths = [];
-
-              if (appPath.includes('app.asar')) {
-                // In packaged app, binaries must be in .unpacked directory
-                const unpackedPath = appPath.replace('app.asar', 'app.asar.unpacked');
-                basePaths = [
-                  // First try unpacked path (which should be correct in production)
-                  unpackedPath,
-                  // Then try resources dir directly
-                  process.resourcesPath
-                ];
-              } else {
-                // In dev mode
-                basePaths = [
-                  // First try the app directory directly
-                  appPath,
-                  // Then try going one level up (common in dev setups)
-                  path.join(appPath, '..')
-                ];
-              }
-
-              logger.log('info', `Base paths for Python search: ${JSON.stringify(basePaths)}`);
-
-              // Build the full list of possible Python paths
-              const possiblePythonPaths = [];
-
-              // Add all combinations of paths
-              for (const basePath of basePaths) {
-                possiblePythonPaths.push(
-                  path.join(basePath, 'bin', 'python', 'python_embed', 'python.exe'),
-                  path.join(basePath, 'bin', 'python', 'python.exe')
-                );
-              }
-
-              logger.log('info', `Searching for Python in paths: ${JSON.stringify(possiblePythonPaths)}`);
-
-              // Try each path
-              let pythonPath = null;
-              for (const potentialPath of possiblePythonPaths) {
-                try {
-                  logger.log('info', `Checking for Python at: ${potentialPath}`);
-                  if (fs.existsSync(potentialPath)) {
-                    pythonPath = potentialPath;
-                    logger.log('info', `Found bundled Python at: ${pythonPath}`);
-                    // Also verify we can execute it
-                    try {
-                      fs.accessSync(potentialPath, fs.constants.X_OK);
-                      logger.log('info', `Python at ${pythonPath} is executable`);
-                    } catch (accessErr) {
-                      logger.log('warn', `Python at ${pythonPath} exists but may not be executable: ${accessErr.message}`);
-                    }
-                    break;
-                  }
-                } catch (checkErr) {
-                  logger.log('warn', `Error checking path ${potentialPath}: ${checkErr.message}`);
-                }
-              }
-
-              if (!pythonPath) {
-                logger.log('warning', `Could not find bundled Python, falling back to system Python`);
-                pythonPath = 'python';
-              }
-
-              try {
-                // Use child_process.spawn directly with bundled Python
-                const { spawn } = require('child_process');
-                const cwd = path.dirname(scriptPath);
-
-                logger.log('info', `Attempting to run Python script with: ${pythonPath}`);
-                logger.log('info', `Working directory: ${cwd}`);
-                logger.log('info', `Script: ${scriptPath}`);
-                logger.log('info', `Arguments: ${JSON.stringify(args)}`);
-
-                const child = spawn(pythonPath, [scriptPath, ...args], {
-                  cwd: cwd,
-                  detached: true,
-                  stdio: 'ignore',
-                  windowsHide: false
-                });
-
-                // Unref child to let it run independently
-                child.unref();
-
-                logger.log('info', `Python script launched successfully`);
-                res.statusCode = 200;
-                res.end(JSON.stringify({ success: true }));
-                return;
-              } catch (directError) {
-                logger.log('error', 'Error running Python script directly:', {
-                  error: directError.message,
-                  stack: directError.stack
-                });
-
-                // Fall back to the normal method
-                try {
-                  await runPythonScript(scriptPath, args);
-                  logger.log('info', `Python script launched successfully via runPythonScript`);
-
-                  res.statusCode = 200;
-                  res.end(JSON.stringify({ success: true }));
-                  return;
-                } catch (fallbackError) {
-                  logger.log('error', 'Error in fallback Python execution', {
-                    error: fallbackError.message,
-                    stack: fallbackError.stack
-                  });
-
-                  res.statusCode = 500;
-                  res.end(JSON.stringify({
-                    success: false,
-                    error: fallbackError.message || 'Failed to run Python script'
-                  }));
-                  return;
-                }
-              }
+            if (!fs.existsSync(projectFullPath)) {
+              const errorMsg = `Project not found in any location: ${projectPath}`;
+              logger.log('error', errorMsg, {
+                checkedPaths: [userProjectPath, projectFullPath]
+              });
+              res.writeHead(404, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify({ success: false, error: errorMsg }));
+              return;
             }
+
+            // Run the game
+            await runGameWithWine(projectPath);
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ success: true }));
           } catch (error) {
-            logger.log('error', 'Unexpected error processing request', {
+            logger.log('error', 'Error running game', {
               error: error.message,
               stack: error.stack
             });
-
-            res.statusCode = 500;
-            res.end(JSON.stringify({
-              success: false,
-              error: error.message || 'Internal server error'
-            }));
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ success: false, error: error.message }));
           }
+        } else if (req.url === '/run-python' && req.method === 'POST') {
+          // Handle Python script execution
+          const data = JSON.parse(body);
+          const { scriptPath, args = [] } = data;
+
+          if (!scriptPath) {
+            logger.log('error', 'Missing script path in run-python request');
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ success: false, error: 'Missing script path' }));
+            return;
+          }
+
+          try {
+            await runPythonScript(scriptPath, args);
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ success: true }));
+          } catch (error) {
+            logger.log('error', 'Error running Python script', {
+              error: error.message,
+              stack: error.stack
+            });
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ success: false, error: error.message }));
+          }
+        } else {
+          // Handle unknown endpoint
+          logger.log('warn', `Unknown endpoint requested: ${req.url}`);
+          res.writeHead(404, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: false, error: 'Endpoint not found' }));
+        }
+      } catch (error) {
+        logger.log('error', 'Error processing request', {
+          error: error.message,
+          stack: error.stack
         });
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, error: 'Internal server error' }));
       }
-      // Handle OPTIONS request for CORS preflight
-      else if (req.method === 'OPTIONS') {
-        res.setHeader('Access-Control-Allow-Origin', '*');
-        res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-        res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-        res.statusCode = 204;
-        res.end();
-      }
-      // Return 404 for all other requests
-      else {
-        res.statusCode = 404;
-        res.end(JSON.stringify({ success: false, error: 'Not found' }));
-      }
-    });
-
-    server.listen(PORT, () => {
-      logger.log('info', `Game launcher HTTP server running on port ${PORT}`);
-      resolve(server);
-    });
-
-    server.on('error', (err) => {
-      logger.log('error', `Failed to start game launcher server`, {
-        error: err.message,
-        code: err.code
-      });
-      reject(err);
     });
   });
+
+  // Start server on port 8989
+  await new Promise((resolve, reject) => {
+    server.listen(8989, 'localhost', () => {
+      logger.log('info', 'Game launcher HTTP server started on port 8989');
+      resolve();
+    });
+
+    server.on('error', (error) => {
+      logger.log('error', 'Failed to start game launcher HTTP server', {
+        error: error.message,
+        stack: error.stack
+      });
+      reject(error);
+    });
+  });
+
+  return server;
 }
 
 module.exports = {

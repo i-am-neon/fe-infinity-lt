@@ -8,6 +8,7 @@ const { startGameLauncherServer } = require('./game-launcher');
 const logger = require('./logger');
 const apiKeyManager = require('./api-key-manager');
 const { protocol } = require('electron');
+const { syncLtMakerFork, setEnvVars } = require('./sync-lt-maker');
 
 
 // Register the custom asset:// scheme before app readiness so that
@@ -396,6 +397,22 @@ app.whenReady().then(async () => {
     resourcesPath: process.resourcesPath || 'not available',
     userDataPath: app.getPath('userData')
   });
+
+  // Synchronize lt-maker-fork to user data directory
+  try {
+    logger.log('info', 'Synchronizing lt-maker-fork to user data directory...');
+    await syncLtMakerFork();
+
+    // Set environment variables for server
+    const { userLtMakerPath } = setEnvVars();
+    logger.log('info', `lt-maker-fork synchronized to user directory: ${userLtMakerPath}`);
+  } catch (syncError) {
+    logger.log('error', 'Failed to synchronize lt-maker-fork', {
+      error: syncError.message,
+      stack: syncError.stack
+    });
+    // We'll continue with bundled resources as fallback
+  }
 
   // Add Windows icon initialization function
   if (process.platform === 'win32') {
@@ -858,14 +875,39 @@ ipcMain.handle('runGame', async (_, projectPath) => {
       return { success: false, error: 'Missing project path' };
     }
 
-    // Verify the project exists before attempting to run
+    // First check if the project exists in the user data directory
+    const userDataDir = app.getPath('userData');
+    const userLtMakerPath = path.join(userDataDir, 'lt-maker-fork');
+    const userProjectPath = path.join(userLtMakerPath, projectPath);
+
+    // Check if the project exists in user directory first
+    if (fs.existsSync(userProjectPath)) {
+      logger.log('info', `Found project in user data directory: ${userProjectPath}`);
+
+      // Check metadata.json exists
+      const metadataPath = path.join(userProjectPath, 'metadata.json');
+      if (!fs.existsSync(metadataPath)) {
+        const errorMsg = `metadata.json not found in user project: ${projectPath}`;
+        logger.log('error', errorMsg);
+        return { success: false, error: errorMsg };
+      }
+
+      logger.log('info', `Launching game through Wine: ${projectPath}`);
+      await runGameWithWine(projectPath);
+      logger.log('info', `Game launch initiated successfully`);
+      return { success: true };
+    }
+
+    // Fall back to resources directory if not found in user data
     const resourcesPath = process.resourcesPath || app.getAppPath();
     const ltMakerPath = path.join(resourcesPath, 'lt-maker-fork');
     const projectFullPath = path.join(ltMakerPath, projectPath);
 
     if (!fs.existsSync(projectFullPath)) {
-      const errorMsg = `Project not found: ${projectPath} (full path: ${projectFullPath})`;
-      logger.log('error', errorMsg);
+      const errorMsg = `Project not found in any location: ${projectPath}`;
+      logger.log('error', errorMsg, {
+        checkedPaths: [userProjectPath, projectFullPath]
+      });
       return { success: false, error: errorMsg };
     }
 
