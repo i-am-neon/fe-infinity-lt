@@ -30,6 +30,7 @@ import { Event } from "@/types/events/event.ts";
 import { LevelRegion } from "@/types/level.ts";
 import { Tilemap } from "@/types/maps/tilemap.ts";
 import genRecruitmentEvents from "@/ai/level/gen-recruitment-events.ts";
+import { UnitData } from "@/types/character/unit-data.ts";
 
 /**
  * Creates the next chapter based on the given data.
@@ -240,6 +241,71 @@ export default async function genChapter({
       portraitMetadata: pm,
     };
   });
+
+  // Add non-battle characters that don't have unit data
+  const nonBattleChars = (chapterIdea.newNonBattleCharacters ?? []).filter(
+    nbChar => !newCharacterUnitDatas.some(ud => ud.nid === nbChar.firstName)
+  );
+
+  for (const nbChar of nonBattleChars) {
+    const portraitNid = portraitMap[nbChar.firstName];
+    if (!portraitNid) {
+      logger.warn("No portrait assigned for non-battle character", { characterName: nbChar.firstName });
+      continue;
+    }
+
+    const pm = allPortraitOptions.find((p) => p.originalName === portraitNid);
+    if (!pm) {
+      logger.warn("Could not find portrait metadata for non-battle character", { portraitNid, characterName: nbChar.firstName });
+      continue;
+    }
+
+    // Create a minimal unit data entry for the non-battle character
+    const dummyUnitData: UnitData = {
+      nid: nbChar.firstName,
+      name: nbChar.firstName,
+      desc: nbChar.personality || "",
+      variant: nbChar.gender === "female" ? "Female" : null,
+      level: 1,
+      klass: "Civilian", // Non-battle character class
+      tags: [],
+      bases: {
+        HP: 1, STR: 0, MAG: 0, SKL: 0, SPD: 0,
+        LCK: 0, DEF: 0, RES: 0, CON: 0, MOV: 0
+      },
+      growths: {
+        HP: 0, STR: 0, MAG: 0, SKL: 0, SPD: 0,
+        LCK: 0, DEF: 0, RES: 0, CON: 0, MOV: 0
+      },
+      stat_cap_modifiers: {},
+      starting_items: [],
+      learned_skills: [],
+      unit_notes: [],
+      wexp_gain: {
+        Sword: [false, 0, 251],
+        Lance: [false, 0, 251],
+        Axe: [false, 0, 251],
+        Bow: [false, 0, 251],
+        Staff: [false, 0, 251],
+        Light: [false, 0, 251],
+        Anima: [false, 0, 251],
+        Dark: [false, 0, 251],
+        Default: [false, 0, 251]
+      },
+      alternate_classes: [],
+      portrait_nid: nbChar.firstName,
+      affinity: nbChar.affinity || null,
+      fields: []
+    };
+
+    newCharacters.push({
+      characterIdea: nbChar,
+      unitData: dummyUnitData,
+      portraitMetadata: pm,
+    });
+
+    logger.info("Added non-battle character to newCharacters", { characterName: nbChar.firstName });
+  }
 
   // For living player characters, filter out the dead
   const allLivingPlayerCharacterIdeas = [
