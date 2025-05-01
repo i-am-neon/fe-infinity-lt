@@ -34,6 +34,7 @@ app.setName("FE Infinity");
 let mainWindow = null;
 let splashWindow = null;
 let serverStarted = false;
+let serverReadyCheckInterval = null;
 
 // Create splash screen
 function createSplashWindow() {
@@ -43,7 +44,7 @@ function createSplashWindow() {
     transparent: true,
     frame: false,
     alwaysOnTop: true,
-    icon: app.isPackaged 
+    icon: app.isPackaged
       ? path.join(process.resourcesPath, 'app.ico')
       : path.join(__dirname, '../client/public/fe-infinity-logo.png'),
     webPreferences: {
@@ -62,8 +63,8 @@ function createMainWindow() {
     width: 1200,
     height: 800,
     show: false,
-    icon: app.isPackaged 
-      ? path.join(process.resourcesPath, 'app.ico') 
+    icon: app.isPackaged
+      ? path.join(process.resourcesPath, 'app.ico')
       : path.join(__dirname, '../client/public/fe-infinity-logo.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -286,10 +287,45 @@ function createMainWindow() {
     mainWindow = null;
   });
 
-  mainWindow.once('ready-to-show', () => {
-    splashWindow.close();
-    mainWindow.show();
-  });
+  // Wait for server to be ready before showing main window
+  if (serverStarted) {
+    const checkServerReady = () => {
+      if (isServerReady()) {
+        logger.log('info', 'Server is ready, showing main window');
+        if (splashWindow && !splashWindow.isDestroyed()) {
+          splashWindow.close();
+        }
+        mainWindow.show();
+        if (serverReadyCheckInterval) {
+          clearInterval(serverReadyCheckInterval);
+          serverReadyCheckInterval = null;
+        }
+      } else {
+        logger.log('info', 'Server not yet ready, waiting...');
+      }
+    };
+
+    // Initial check
+    checkServerReady();
+
+    // If not ready immediately, set up interval to check
+    if (!isServerReady()) {
+      logger.log('info', 'Setting up interval to check server readiness');
+      serverReadyCheckInterval = setInterval(checkServerReady, 500);
+    }
+  } else {
+    // Server failed to start, show main window with error message
+    mainWindow.once('ready-to-show', () => {
+      if (splashWindow && !splashWindow.isDestroyed()) {
+        splashWindow.close();
+      }
+      mainWindow.show();
+      dialog.showErrorBox(
+        'Server Not Running',
+        'Server components failed to initialize. The application may not function correctly.'
+      );
+    });
+  }
 }
 
 // Initialize application
@@ -815,8 +851,8 @@ ipcMain.handle('getApiKey', async (event) => {
     logger.log('info', 'OpenAI API key retrieved', { hasKey: !!key });
     return key;
   } catch (error) {
-    logger.log('error', 'Error retrieving OpenAI API key', { 
-      error: error.message, 
+    logger.log('error', 'Error retrieving OpenAI API key', {
+      error: error.message,
       stack: error.stack
     });
     return null;
@@ -830,8 +866,8 @@ ipcMain.handle('setApiKey', async (event, { key }) => {
     logger.log('info', 'OpenAI API key set result', { success: result });
     return result;
   } catch (error) {
-    logger.log('error', 'Error setting OpenAI API key', { 
-      error: error.message, 
+    logger.log('error', 'Error setting OpenAI API key', {
+      error: error.message,
       stack: error.stack
     });
     return false;
@@ -845,8 +881,8 @@ ipcMain.handle('deleteApiKey', async (event) => {
     logger.log('info', 'OpenAI API key delete result', { success: result });
     return result;
   } catch (error) {
-    logger.log('error', 'Error deleting OpenAI API key', { 
-      error: error.message, 
+    logger.log('error', 'Error deleting OpenAI API key', {
+      error: error.message,
       stack: error.stack
     });
     return false;
@@ -859,8 +895,8 @@ ipcMain.handle('hasApiKey', async (event) => {
     logger.log('info', 'OpenAI API key check result', { hasKey: result });
     return result;
   } catch (error) {
-    logger.log('error', 'Error checking for OpenAI API key', { 
-      error: error.message, 
+    logger.log('error', 'Error checking for OpenAI API key', {
+      error: error.message,
       stack: error.stack
     });
     return false;
@@ -877,9 +913,9 @@ ipcMain.handle('api-call', async (event, { endpoint, method, body }) => {
     // Check if server is ready before proceeding
     if (!isServerReady()) {
       logger.log('warn', `API call to ${endpoint} attempted before server is ready`);
-      return { 
-        success: false, 
-        error: "Server is still initializing. Please try again in a moment." 
+      return {
+        success: false,
+        error: "Server is still initializing. Please try again in a moment."
       };
     }
 
@@ -916,20 +952,20 @@ ipcMain.handle('api-call', async (event, { endpoint, method, body }) => {
     }
 
     const response = await fetch(finalUrl, options);
-    
+
     // Handle non-JSON responses (can happen during server startup)
     let data;
     try {
       data = await response.json();
     } catch (jsonError) {
-      logger.log('error', `API call to ${endpoint} received non-JSON response`, { 
+      logger.log('error', `API call to ${endpoint} received non-JSON response`, {
         error: jsonError.message,
         status: response.status,
         statusText: response.statusText
       });
-      
-      return { 
-        success: false, 
+
+      return {
+        success: false,
         error: `Server returned invalid response. It may still be starting up.`
       };
     }

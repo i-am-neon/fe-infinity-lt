@@ -259,8 +259,14 @@ const startDenoServer = () => {
       const output = data.toString();
       logger.log('info', `Deno server output: ${output}`);
       console.log(`Deno server: ${output}`);
-      serverReady = true;
-      resolve();
+
+      // Only set serverReady to true when server explicitly indicates it's listening
+      if (output.includes('Server listening on') || output.includes('Server running at')) {
+        serverReady = true;
+        logger.log('info', 'Deno server is now ready to accept requests');
+        console.log('Deno server is now ready to accept requests');
+        resolve();
+      }
     });
 
     denoProcess.stderr.on('data', (data) => {
@@ -284,12 +290,11 @@ const startDenoServer = () => {
       reject(err);
     });
 
-    // Resolve after timeout to not block app startup
+    // Resolve after timeout to not block app startup, but don't set serverReady
     setTimeout(() => {
       if (!serverReady) {
-        logger.log('info', 'Timeout waiting for Deno server output, assuming it started');
-        console.log('Timeout waiting for Deno server output, assuming it started');
-        serverReady = true;
+        logger.log('info', 'Timeout waiting for Deno server output, proceeding but server may not be ready');
+        console.log('Timeout waiting for Deno server output, proceeding but server may not be ready');
         resolve();
       }
     }, 5000);
@@ -437,8 +442,14 @@ const startDenoServerFallback = (serverPath, resolve, reject) => {
     const output = data.toString();
     logger.log('info', `Deno server (bundled fallback) output: ${output}`);
     console.log(`Deno server (bundled fallback): ${output}`);
-    serverReady = true;
-    resolve();
+
+    // Only set serverReady to true when server explicitly indicates it's listening
+    if (output.includes('Server listening on') || output.includes('Server running at')) {
+      serverReady = true;
+      logger.log('info', 'Deno server (fallback) is now ready to accept requests');
+      console.log('Deno server (fallback) is now ready to accept requests');
+      resolve();
+    }
   });
 
   denoProcess.stderr.on('data', (data) => {
