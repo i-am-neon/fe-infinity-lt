@@ -9,7 +9,7 @@ export const FirstSeenAsSchema = z
     z.literal("boss").describe('The chapter\'s enemy boss'),
     z.literal("non-playable character").describe("Choose this when the character is part of the `newNonBattleCharacters` of the chapter idea"),
   ])
-  .describe("the type of unit the character is first seen as");
+  .describe("IMPORTANT: Must be exactly one of these five literal values - DO NOT use class names like 'Brigand' or 'Mage'. This field defines the character's initial relationship to the player, not their class.");
 
 export type FirstSeenAs = z.infer<typeof FirstSeenAsSchema>;
 

@@ -54,6 +54,13 @@ CRITICAL REQUIREMENTS:
   * Show personality traits from their character description in their dialogue/actions
   * MUST mention EACH CHARACTER BY NAME explicitly in intro, battle, or outro text
   * Choose classes that round out the team compared to player units that are still alive, avoiding too many duplicate classes when possible
+- CRITICAL: For each character's "firstSeenAs" field, you MUST use ONLY one of these exact values:
+  * "ally" - starts as a blue unit (playable character in player's party)
+  * "allied NPC" - starts as a green unit (non-playable but fighting alongside player)
+  * "enemy non-boss" - starts as a red unit (enemy but not boss)
+  * "boss" - the chapter's enemy boss
+  * "non-playable character" - for characters not involved in battle
+  * DO NOT use class names like "Brigand" or "Sword User" for the firstSeenAs field
 - IMPORTANT: Characters with firstSeenAs = "ally" MUST be mentioned in the intro section
 - IMPORTANT: ONLY USE newPlayableUnits and newNonBattleCharacters arrays for COMPLETELY NEW characters who have NEVER been introduced in any previous chapter
 - IMPORTANT: ANY supporting character who appears in the narrative (e.g., a messenger, villager, or temporary character) MUST be added to the newNonBattleCharacters array with a complete character profile
