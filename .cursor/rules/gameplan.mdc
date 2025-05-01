@@ -5,4 +5,4 @@ alwaysApply: false
 ---
 I want you to make a game plan including a high level overview of the solution, don't make edits to the code.
 
-Take your time to search as much of the codebase as you need to gather information and think harder.
+Even if the user provides some files as context, take your time to search as much of the codebase as you need to gather information and think harder.

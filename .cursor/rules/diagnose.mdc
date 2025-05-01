@@ -5,4 +5,4 @@ alwaysApply: false
 ---
 I want you to diagnose the problem, don't write code.
 
-Take your time to search as much of the codebase as you need to gather information and think harder.
+Even if the user provides some files as context, take your time to search as much of the codebase as you need to gather information and think harder.
