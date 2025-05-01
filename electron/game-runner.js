@@ -1775,6 +1775,10 @@ fi
           ? pythonPathEnv
           : `${ltMakerPath}${path.delimiter}${pythonPathEnv}`;
 
+        // Initialize stdout/stderr capture variables
+        let stdoutData = '';
+        let stderrData = '';
+
         // Run the Python script with arguments
         const pythonProcess = spawn(
           pythonPath,
@@ -1796,11 +1800,13 @@ fi
 
         pythonProcess.stdout.on('data', (data) => {
           const output = data.toString().trim();
+          stdoutData += output + '\n';
           logger.log('info', `Python script stdout: ${output}`);
         });
 
         pythonProcess.stderr.on('data', (data) => {
           const output = data.toString().trim();
+          stderrData += output + '\n';
           logger.log('error', `Python script stderr: ${output}`);
         });
 
