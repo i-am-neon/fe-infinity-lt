@@ -1,16 +1,7 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
-// Add global electronAPI for Deno processes
-if (typeof global !== 'undefined') {
-  global.electronAPI = {
-    runGame: (projectPath) => ipcRenderer.invoke('runGame', projectPath)
-  };
-}
-
-// Log preload script execution to help with debugging
-console.log('Preload script executing');
-
-contextBridge.exposeInMainWorld('electron', {
+// Define all APIs first before exposing them
+const electronAPI = {
   ipcRenderer: {
     send: (channel, data) => {
       const validChannels = ['toMain', 'checkServer', 'runGame'];
@@ -36,7 +27,10 @@ contextBridge.exposeInMainWorld('electron', {
         'setApiKey',
         'deleteApiKey',
         'hasApiKey',
-        'exportLogs'
+        'exportLogs',
+        // Add user assets channels
+        'user-assets:get-path',
+        'user-assets:has-asset'
       ];
       if (validChannels.includes(channel)) {
         return ipcRenderer.invoke(channel, data);
@@ -59,8 +53,29 @@ contextBridge.exposeInMainWorld('electron', {
     set: (key) => ipcRenderer.invoke('setApiKey', { key }),
     delete: () => ipcRenderer.invoke('deleteApiKey'),
     has: () => ipcRenderer.invoke('hasApiKey')
+  },
+  // Add user assets API - ensure we properly await the promises
+  userAssets: {
+    getUserAssetPath: async (assetPath) => {
+      try {
+        // Important: await the promise to get the actual string value
+        return await ipcRenderer.invoke('user-assets:get-path', assetPath);
+      } catch (error) {
+        console.error(`Error getting path for ${assetPath}:`, error);
+        throw error;
+      }
+    },
+    hasUserAsset: async (assetPath) => {
+      try {
+        // Important: await the promise to get the actual boolean value
+        return await ipcRenderer.invoke('user-assets:has-asset', assetPath);
+      } catch (error) {
+        console.error(`Error checking if asset exists for ${assetPath}:`, error);
+        return false;
+      }
+    }
   }
-});
+};
 
-// Log that preload script is complete
-console.log('Preload script completed');
+// Expose the API to the renderer
+contextBridge.exposeInMainWorld('electron', electronAPI);

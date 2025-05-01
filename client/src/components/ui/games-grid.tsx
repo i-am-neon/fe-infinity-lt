@@ -9,7 +9,7 @@ import apiCall from "@/lib/api-call";
 import { getTitleImagePath } from "@/lib/asset-path";
 import { Game } from "@/types/game";
 import { Plus } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { BlurFade } from "@/components/magicui/blur-fade";
 import { BLUR_FADE_DELAY } from "./constants";
@@ -19,6 +19,8 @@ export default function GamesGrid() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
+  // Add ref to track images that need to be updated
+  const imageRefs = useRef<Record<string, HTMLImageElement>>({});
 
   const fetchGames = async () => {
     try {
@@ -29,7 +31,7 @@ export default function GamesGrid() {
         error?: string;
       }>("games", {
         // Enable automatic retries with exponential backoff for the initial page load
-        retry: retryCount < 3, 
+        retry: retryCount < 3,
         retryDelay: 100 * Math.pow(2, retryCount), // Exponential backoff: 1s, 2s, 4s
         maxRetries: 3
       });
@@ -42,18 +44,43 @@ export default function GamesGrid() {
       }
     } catch (err) {
       console.error("Error fetching games:", err);
-      
+
       // Only show error if we've already retried a few times
       if (retryCount >= 2) {
         setError("Failed to fetch games");
       }
-      
+
       // Increment retry count for tracking purposes
       setRetryCount(prev => prev + 1);
     } finally {
       setLoading(false);
     }
   };
+
+  // Handle user asset loaded events
+  useEffect(() => {
+    const handleUserAssetLoaded = (event: Event) => {
+      const { gameDirectory, path } = (event as CustomEvent).detail;
+
+      // If we have a ref for this image, update its src
+      if (imageRefs.current[gameDirectory]) {
+        console.log(`[Games Grid] Updating image for ${gameDirectory} to ${path}`);
+        const img = imageRefs.current[gameDirectory];
+        img.src = path;
+
+        // If the image was hidden due to a previous error, show it again
+        if (img.style.display === 'none') {
+          img.style.display = '';
+        }
+      }
+    };
+
+    window.addEventListener('user-asset-loaded', handleUserAssetLoaded);
+
+    return () => {
+      window.removeEventListener('user-asset-loaded', handleUserAssetLoaded);
+    };
+  }, []);
 
   useEffect(() => {
     // Add initial delay before first fetch to ensure server is ready
@@ -63,7 +90,7 @@ export default function GamesGrid() {
 
     // Set up regular polling after initial fetch
     const interval = setInterval(fetchGames, 5000);
-    
+
     return () => {
       clearTimeout(initialDelay);
       clearInterval(interval);
@@ -118,6 +145,9 @@ export default function GamesGrid() {
             <GlowCard className="hover:bg-accent/50 transition-colors duration-200 overflow-hidden">
               <div className="w-full aspect-[3/2] overflow-hidden bg-black/10 rounded-t-md">
                 <img
+                  ref={el => {
+                    if (el) imageRefs.current[game.directory] = el;
+                  }}
                   src={getTitleImagePath(game.directory)}
                   alt={game.title}
                   className="w-full h-full object-cover"

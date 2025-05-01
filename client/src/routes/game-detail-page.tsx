@@ -1,6 +1,6 @@
 import apiCall from "@/lib/api-call";
 import { AlertCircle, ChevronLeft, Loader2, Pencil, X, Wrench, RefreshCw } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
   AlertDialog,
@@ -72,6 +72,8 @@ export default function GameDetailPage() {
     nid,
     isNew && newGameModalOpen
   );
+
+  const titleImageRef = useRef<HTMLImageElement>(null);
 
   // Watch for generation errors
   useEffect(() => {
@@ -421,6 +423,32 @@ export default function GameDetailPage() {
 
   const disabled = loadingAction !== null || deletingFailedGame;
 
+  useEffect(() => {
+    if (!data?.game?.directory) return;
+
+    const handleUserAssetLoaded = (event: Event) => {
+      const { gameDirectory, path } = (event as CustomEvent).detail;
+
+      // If our game's directory matches the updated one and we have a ref
+      if (data.game?.directory === gameDirectory && titleImageRef.current) {
+        console.log(`[Game Detail] Updating title image for ${gameDirectory} to ${path}`);
+        const img = titleImageRef.current;
+        img.src = path;
+
+        // If the image was hidden due to a previous error, show it again
+        if (img.style.display === 'none') {
+          img.style.display = '';
+        }
+      }
+    };
+
+    window.addEventListener('user-asset-loaded', handleUserAssetLoaded);
+
+    return () => {
+      window.removeEventListener('user-asset-loaded', handleUserAssetLoaded);
+    };
+  }, [data?.game?.directory]);
+
   return (
     <>
       {/* New Game Creation - Direct DOM implementation */}
@@ -718,6 +746,7 @@ export default function GameDetailPage() {
                   <div className="md:col-span-1">
                     <div className="rounded-md overflow-hidden shadow-lg">
                       <img
+                        ref={titleImageRef}
                         src={getTitleImagePath(data.game.directory)}
                         alt={`${data.game.title} title image`}
                         className="w-full aspect-[3/2] object-contain bg-black/10"

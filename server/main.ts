@@ -6,6 +6,7 @@ import { initVectorDbForElectron } from "@/vector-db/init-electron.ts";
 import { handleGenerateNextChapter } from "@/routes/generate-next-chapter.ts";
 import { handleGetChapterGenerationProgress, handleGetGameCreationProgress } from "@/routes/generation-progress.ts";
 import { handleTestChapterGeneration } from "@/routes/test-chapter-generation.ts";
+import { join } from "node:path";
 
 async function checkEnvironment() {
   console.log("=== Environment Verification ===");
@@ -75,6 +76,13 @@ async function checkEnvironment() {
   } catch (error) {
     console.error("Path resolution failed:", error);
   }
+}
+
+// Set user data directory in development mode
+if (!Deno.env.get("USER_DATA_DIR")) {
+  const cwd = Deno.cwd();
+  Deno.env.set("USER_DATA_DIR", join(cwd, "dev-user-data"));
+  console.log(`Set USER_DATA_DIR to ${Deno.env.get("USER_DATA_DIR")}`);
 }
 
 if (import.meta.main) {

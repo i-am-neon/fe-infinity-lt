@@ -3,11 +3,11 @@ import { WorldSummary } from "@/ai/types/world-summary.ts";
 import { InitialGameIdea } from "@/ai/types/initial-game-idea.ts";
 import { testInitialGameIdea, testWorldSummary } from "@/ai/test-data/prologueTestData.ts";
 import { getPathWithinLtMaker } from "@/file-io/get-path-within-lt-maker.ts";
-import { getPathWithinClient } from "@/file-io/get-path-within-client.ts";
 import { dirname } from "node:path";
 import { ensureDirSync } from "https://deno.land/std/fs/mod.ts";
 import { getCurrentLogger } from "@/lib/current-logger.ts";
 import saveDefaultTitleImage from "@/game-engine-io/save-default-title-image.ts";
+import { getGameTitleImagePath } from "@/file-io/get-path-within-user-data.ts";
 
 export default async function genAndSaveTitleImage({ gameTitle, worldSummary, initialGameIdea, projectNameEndingInDotLtProj }: { gameTitle: string; worldSummary: WorldSummary; initialGameIdea: InitialGameIdea; projectNameEndingInDotLtProj: string; }) {
     try {
@@ -27,26 +27,26 @@ export default async function genAndSaveTitleImage({ gameTitle, worldSummary, in
         // Path for LT Maker
         const ltMakerFilePath = getPathWithinLtMaker(`${projectNameEndingInDotLtProj}/resources/panoramas/title_background.png`);
 
-        // Get project name without the .ltproj extension for use in the client path
+        // Get project name without the .ltproj extension for use in the user data path
         const projectName = projectNameEndingInDotLtProj.replace(/\.ltproj$/, "");
 
-        // Path for client public folder
-        const clientFilePath = getPathWithinClient(`public/images/title-images/${projectName}.png`);
+        // Path for user data folder
+        const userDataFilePath = getGameTitleImagePath(projectName);
 
-        // Ensure the client directory exists
-        ensureDirSync(dirname(clientFilePath));
+        // Ensure the user data directory exists
+        ensureDirSync(dirname(userDataFilePath));
 
         // Generate and save the image to LT Maker
         await genImage({ prompt, filePath: ltMakerFilePath });
 
-        // Copy the file to the client directory
-        await Deno.copyFile(ltMakerFilePath, clientFilePath);
+        // Copy the file to the user data directory
+        await Deno.copyFile(ltMakerFilePath, userDataFilePath);
     } catch (error) {
         const logger = getCurrentLogger();
         logger.error("Error generating and saving title image. Defaulting to default title image.", { error: (error as Error).message });
         await saveDefaultTitleImage({ projectNameEndingInDotLtProj });
     }
-};
+}
 
 if (import.meta.main) {
     const gameTitle = "Celestial Vanguard";

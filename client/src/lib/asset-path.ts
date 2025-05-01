@@ -1,60 +1,9 @@
-// Define the Electron process interface
-interface ElectronProcess {
-    versions: {
-        electron?: string;
-        [key: string]: string | undefined;
-    };
-}
-
 /**
- * Interface for Electron's exposed API
- */
-interface ElectronAPI {
-    fileExists?: (path: string) => boolean;
-    [key: string]: unknown;
-}
-
-/**
- * Detect if we're running in an Electron environment
- * Uses multiple detection methods for reliability
+ * Check if we're running in Electron
  */
 export function isElectron(): boolean {
-    // Check multiple Electron presence indicators
-    const checks = [
-        // Check process.versions.electron (traditional method)
-        typeof window !== 'undefined' &&
-        !!(window as Window & { process?: ElectronProcess })?.process?.versions?.electron,
-
-        // Check for window.electronAPI that would be injected by preload scripts
-        typeof window !== 'undefined' && !!(window as Window & { electronAPI?: ElectronAPI })?.electronAPI,
-
-        // Check for Electron in the user agent (might not be reliable in all versions)
-        typeof navigator !== 'undefined' &&
-        (navigator.userAgent.indexOf('Electron') >= 0)
-    ];
-
-    // Consider it Electron if ANY check passes
-    const isElectronEnv = checks.some(check => !!check);
-
-    console.log(`[Electron Detection] isElectron checks:`, checks);
-    console.log(`[Electron Detection] Final result: ${isElectronEnv}`);
-
-    if (isElectronEnv) {
-        console.log('[Electron Detection] Running in Electron environment', {
-            process: (window as Window & { process?: ElectronProcess })?.process?.versions,
-            electronAPI: !!(window as Window & { electronAPI?: ElectronAPI })?.electronAPI,
-            userAgent: navigator.userAgent
-        });
-    }
-
-    return isElectronEnv;
-}
-
-/**
- * Check if we have access to the Electron API for checking file existence
- */
-function hasElectronFs(): boolean {
-    return isElectron() && !!(window as Window & { electronAPI?: ElectronAPI })?.electronAPI?.fileExists;
+    // Check if the window object and electron global exist
+    return typeof window !== 'undefined' && !!window.electron;
 }
 
 /**
@@ -71,21 +20,6 @@ export function getAssetPath(path: string): string {
     // In Electron, use our custom protocol
     if (isElectron()) {
         const electronPath = `asset://${cleanPath}`;
-        console.log(`[Asset Path Debug] Using Electron path: ${electronPath} for ${cleanPath}`);
-
-        // Check if the file exists in Electron if the API is available
-        if (hasElectronFs()) {
-            try {
-                const electronAPI = (window as Window & { electronAPI?: ElectronAPI })?.electronAPI;
-                if (electronAPI?.fileExists) {
-                    const exists = electronAPI.fileExists(cleanPath);
-                    console.log(`[Asset Path Debug] File exists check for ${cleanPath}: ${exists}`);
-                }
-            } catch (err) {
-                console.error(`[Asset Path Debug] Error checking if file exists:`, err);
-            }
-        }
-
         return electronPath;
     }
 
@@ -100,10 +34,11 @@ export function getAssetPath(path: string): string {
  * @returns The correct image path to use in the current environment
  */
 export function getImagePath(imagePath: string): string {
-    const path = getAssetPath(`images/${imagePath}`);
-    console.log(`[Image Path Debug] Resolving image: ${imagePath} to: ${path}, isElectron: ${isElectron()}`);
-    return path;
+    return getAssetPath(`images/${imagePath}`);
 }
+
+// Import the user asset path utility
+import { getUserTitleImagePath } from './user-asset-path';
 
 /**
  * Gets the title image path for a game
@@ -112,9 +47,28 @@ export function getImagePath(imagePath: string): string {
  * @returns The path to the title image
  */
 export function getTitleImagePath(gameDirectory: string): string {
-    // Remove .ltproj extension if present
+    // For user assets, we need to use a fallback approach since we can't make this function async
+    // without changing all components that use it.
+    // User assets will be loaded asynchronously after initial render
+
+    // Trigger async load but don't wait for it
+    getUserTitleImagePath(gameDirectory).then(userPath => {
+        if (userPath) {
+            // If we find a user asset, we'll update the image src dynamically via a custom event
+            const event = new CustomEvent('user-asset-loaded', {
+                detail: {
+                    gameDirectory,
+                    path: userPath
+                }
+            });
+            window.dispatchEvent(event);
+        }
+    }).catch(err => {
+        console.error(`Error fetching user asset: ${err}`);
+    });
+
+    // Return a standard path as the initial value
     const cleanName = gameDirectory.replace(/\.ltproj$/, "");
     const titleImagePath = getImagePath(`title-images/${cleanName}.png`);
-    console.log(`[Title Image Debug] Game directory: ${gameDirectory}, Clean name: ${cleanName}, Path: ${titleImagePath}`);
     return titleImagePath;
 } 

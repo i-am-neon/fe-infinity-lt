@@ -9,6 +9,7 @@ const logger = require('./logger');
 const apiKeyManager = require('./api-key-manager');
 const { protocol } = require('electron');
 const { syncLtMakerFork, setEnvVars } = require('./sync-lt-maker');
+const userAssetsManager = require('./user-assets-manager');
 
 
 // Register the custom asset:// scheme before app readiness so that
@@ -71,6 +72,9 @@ function createMainWindow() {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
       contextIsolation: true,
+      sandbox: false,
+      webSecurity: true,
+      additionalArguments: ['--enable-features=SharedArrayBuffer'],
     },
   });
 
@@ -838,6 +842,12 @@ app.whenReady().then(async () => {
     // Create main window after server starts (or fails)
     createMainWindow();
     logger.log('info', 'Main window created');
+
+    // Register the user-asset protocol
+    userAssetsManager.registerUserAssetProtocol(protocol);
+
+    // Register user assets handlers
+    userAssetsManager.registerUserAssetsHandlers();
   } catch (error) {
     logger.log('error', 'Initialization error', { error: error.message, stack: error.stack });
     dialog.showErrorBox(
