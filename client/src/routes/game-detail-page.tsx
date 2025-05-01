@@ -181,11 +181,6 @@ export default function GameDetailPage() {
         method: "POST",
         body: { directory: data.game.directory },
       });
-
-      // Add a 5-second delay before removing the loading state
-      setTimeout(() => {
-        setLoadingAction(null);
-      }, 5000);
     } catch (error) {
       console.error("Error running game:", error);
       setLoadingAction(null);
