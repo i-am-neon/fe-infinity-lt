@@ -447,6 +447,14 @@ export default function GameDetailPage() {
                     <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
                     <p>{creationError}</p>
                   </div>
+                  <div className="border border-muted p-3 rounded-md mx-6 mt-2 bg-muted/40">
+                    <p className="text-sm font-medium">To report this bug:</p>
+                    <ol className="text-sm list-decimal ml-4 mt-1 space-y-1">
+                      <li>Go to Settings</li>
+                      <li>Click the "Export Logs" button</li>
+                      <li>Send the logs file to the <a href="https://discord.gg/zkKjjRKeHk" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">#bugs channel</a> in the FE Infinity Discord</li>
+                    </ol>
+                  </div>
                   <div className="flex justify-end mt-6 mx-6 gap-2">
                     <Button
                       onClick={handleReturnHomeAndDeleteGame}
@@ -561,6 +569,14 @@ export default function GameDetailPage() {
                   <div className="flex items-start gap-2 p-3 bg-destructive/10 rounded-md text-destructive border border-destructive mx-6">
                     <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
                     <p>{generationError}</p>
+                  </div>
+                  <div className="border border-muted p-3 rounded-md mx-6 mt-2 bg-muted/40">
+                    <p className="text-sm font-medium">To report this bug:</p>
+                    <ol className="text-sm list-decimal ml-4 mt-1 space-y-1">
+                      <li>Go to Settings</li>
+                      <li>Click the "Export Logs" button</li>
+                      <li>Send the logs file to the <a href="https://discord.gg/zkKjjRKeHk" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">#bugs channel</a> in the FE Infinity Discord</li>
+                    </ol>
                   </div>
                   <div className="flex justify-end mt-6 mx-6">
                     <Button
