@@ -244,7 +244,7 @@ export default async function genChapter({
   // For living player characters, filter out the dead
   const allLivingPlayerCharacterIdeas = [
     ...(initialGameIdea?.characterIdeas ?? []),
-    ...existingCharacters.map((c) => c.characterIdea),
+    ...existingCharacters.map((c) => c.characterIdea.firstSeenAs !== "non-playable character" ? c.characterIdea : null).filter((c) => c !== null),
     ...newCharacterIdeas,
   ]
     .filter(

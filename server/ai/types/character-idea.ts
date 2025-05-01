@@ -7,6 +7,7 @@ export const FirstSeenAsSchema = z
     z.literal("allied NPC"),
     z.literal("enemy non-boss"),
     z.literal("boss"),
+    z.literal("non-playable character").describe("Choose this when the character is part of the `newNonBattleCharacters` of the chapter idea"),
   ])
   .describe("the type of unit the character is first seen as");
 

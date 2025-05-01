@@ -18,12 +18,15 @@ export default async function createUnitDatas({
   const start = Date.now();
   const datas = await Promise.all(
     characterIdeas.map((idea) =>
-      createUnitData({ characterIdea: idea, chapterNumber })
+      // Don't create unit data for non-playable characters
+      idea.firstSeenAs !== "non-playable character"
+        ? createUnitData({ characterIdea: idea, chapterNumber })
+        : null
     )
   );
   const duration = Date.now() - start;
   logger.info("createUnitDatas completed", { duration, count: datas.length });
-  return datas;
+  return datas.filter((data) => data !== null);
 }
 
 if (import.meta.main) {
