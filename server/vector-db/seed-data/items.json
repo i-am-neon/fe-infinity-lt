@@ -1,1 +1,1531 @@
-[]
+[
+  {
+    "id": "Iron_Sword",
+    "text": "Iron Sword: ",
+    "metadata": {
+      "nid": "Iron_Sword",
+      "name": "Iron Sword",
+      "description": "",
+      "weapon_type": "Sword",
+      "weapon_rank": "E"
+    }
+  },
+  {
+    "id": "Slim_Sword",
+    "text": "Slim Sword: ",
+    "metadata": {
+      "nid": "Slim_Sword",
+      "name": "Slim Sword",
+      "description": "",
+      "weapon_type": "Sword",
+      "weapon_rank": "E"
+    }
+  },
+  {
+    "id": "Steel_Sword",
+    "text": "Steel Sword: ",
+    "metadata": {
+      "nid": "Steel_Sword",
+      "name": "Steel Sword",
+      "description": "",
+      "weapon_type": "Sword",
+      "weapon_rank": "D"
+    }
+  },
+  {
+    "id": "Silver_Sword",
+    "text": "Silver Sword: ",
+    "metadata": {
+      "nid": "Silver_Sword",
+      "name": "Silver Sword",
+      "description": "",
+      "weapon_type": "Sword",
+      "weapon_rank": "A"
+    }
+  },
+  {
+    "id": "Iron_Blade",
+    "text": "Iron Blade: ",
+    "metadata": {
+      "nid": "Iron_Blade",
+      "name": "Iron Blade",
+      "description": "",
+      "weapon_type": "Sword",
+      "weapon_rank": "D"
+    }
+  },
+  {
+    "id": "Steel_Blade",
+    "text": "Steel Blade: ",
+    "metadata": {
+      "nid": "Steel_Blade",
+      "name": "Steel Blade",
+      "description": "",
+      "weapon_type": "Sword",
+      "weapon_rank": "C"
+    }
+  },
+  {
+    "id": "Silver_Blade",
+    "text": "Silver Blade: ",
+    "metadata": {
+      "nid": "Silver_Blade",
+      "name": "Silver Blade",
+      "description": "",
+      "weapon_type": "Sword",
+      "weapon_rank": "A"
+    }
+  },
+  {
+    "id": "Poison_Sword",
+    "text": "Poison Sword: Poisons on contact.",
+    "metadata": {
+      "nid": "Poison_Sword",
+      "name": "Poison Sword",
+      "description": "Poisons on contact.",
+      "weapon_type": "Sword",
+      "weapon_rank": "D"
+    }
+  },
+  {
+    "id": "Killing_Edge",
+    "text": "Killing Edge: ",
+    "metadata": {
+      "nid": "Killing_Edge",
+      "name": "Killing Edge",
+      "description": "",
+      "weapon_type": "Sword",
+      "weapon_rank": "C"
+    }
+  },
+  {
+    "id": "Armorslayer",
+    "text": "Armorslayer: Effective against armored units",
+    "metadata": {
+      "nid": "Armorslayer",
+      "name": "Armorslayer",
+      "description": "Effective against armored units",
+      "weapon_type": "Sword",
+      "weapon_rank": "D"
+    }
+  },
+  {
+    "id": "Wyrmslayer",
+    "text": "Wyrmslayer: Effective against dragon units.",
+    "metadata": {
+      "nid": "Wyrmslayer",
+      "name": "Wyrmslayer",
+      "description": "Effective against dragon units.",
+      "weapon_type": "Sword",
+      "weapon_rank": "C"
+    }
+  },
+  {
+    "id": "Zanbato",
+    "text": "Zanbato: Effective against horseback units.",
+    "metadata": {
+      "nid": "Zanbato",
+      "name": "Zanbato",
+      "description": "Effective against horseback units.",
+      "weapon_type": "Sword",
+      "weapon_rank": "D"
+    }
+  },
+  {
+    "id": "Lancereaver",
+    "text": "Lancereaver: Reverses the weapon triangle.",
+    "metadata": {
+      "nid": "Lancereaver",
+      "name": "Lancereaver",
+      "description": "Reverses the weapon triangle.",
+      "weapon_type": "Sword",
+      "weapon_rank": "C"
+    }
+  },
+  {
+    "id": "Brave_Sword",
+    "text": "Brave Sword: Allows 2 consecutive hits.",
+    "metadata": {
+      "nid": "Brave_Sword",
+      "name": "Brave Sword",
+      "description": "Allows 2 consecutive hits.",
+      "weapon_type": "Sword",
+      "weapon_rank": "B"
+    }
+  },
+  {
+    "id": "Shamshir",
+    "text": "Shamshir: For light swordfighters only",
+    "metadata": {
+      "nid": "Shamshir",
+      "name": "Shamshir",
+      "description": "For light swordfighters only",
+      "weapon_type": "Sword",
+      "weapon_rank": "D"
+    }
+  },
+  {
+    "id": "Light_Brand",
+    "text": "Light Brand: Uses MAG to determine damage.",
+    "metadata": {
+      "nid": "Light_Brand",
+      "name": "Light Brand",
+      "description": "Uses MAG to determine damage.",
+      "weapon_type": "Sword",
+      "weapon_rank": "C"
+    }
+  },
+  {
+    "id": "Runesword",
+    "text": "Runesword: Uses MAG to determine damage. Drains HP from enemy",
+    "metadata": {
+      "nid": "Runesword",
+      "name": "Runesword",
+      "description": "Uses MAG to determine damage. Drains HP from enemy",
+      "weapon_type": "Sword",
+      "weapon_rank": "A"
+    }
+  },
+  {
+    "id": "Wind_Sword",
+    "text": "Wind Sword: Uses MAG to determine damage. Effective against fliers.",
+    "metadata": {
+      "nid": "Wind_Sword",
+      "name": "Wind Sword",
+      "description": "Uses MAG to determine damage. Effective against fliers.",
+      "weapon_type": "Sword",
+      "weapon_rank": "B"
+    }
+  },
+  {
+    "id": "Audhulma",
+    "text": "Audhulma: Resistance +5. Effective against monsters",
+    "metadata": {
+      "nid": "Audhulma",
+      "name": "Audhulma",
+      "description": "Resistance +5. Effective against monsters",
+      "weapon_type": "Sword",
+      "weapon_rank": "S"
+    }
+  },
+  {
+    "id": "Iron_Lance",
+    "text": "Iron Lance: ",
+    "metadata": {
+      "nid": "Iron_Lance",
+      "name": "Iron Lance",
+      "description": "",
+      "weapon_type": "Lance",
+      "weapon_rank": "E"
+    }
+  },
+  {
+    "id": "Slim_Lance",
+    "text": "Slim Lance: ",
+    "metadata": {
+      "nid": "Slim_Lance",
+      "name": "Slim Lance",
+      "description": "",
+      "weapon_type": "Lance",
+      "weapon_rank": "E"
+    }
+  },
+  {
+    "id": "Steel_Lance",
+    "text": "Steel Lance: ",
+    "metadata": {
+      "nid": "Steel_Lance",
+      "name": "Steel Lance",
+      "description": "",
+      "weapon_type": "Lance",
+      "weapon_rank": "D"
+    }
+  },
+  {
+    "id": "Silver_Lance",
+    "text": "Silver Lance: ",
+    "metadata": {
+      "nid": "Silver_Lance",
+      "name": "Silver Lance",
+      "description": "",
+      "weapon_type": "Lance",
+      "weapon_rank": "A"
+    }
+  },
+  {
+    "id": "Toxin_Lance",
+    "text": "Toxin Lance: Poisons on contact",
+    "metadata": {
+      "nid": "Toxin_Lance",
+      "name": "Toxin Lance",
+      "description": "Poisons on contact",
+      "weapon_type": "Lance",
+      "weapon_rank": "E"
+    }
+  },
+  {
+    "id": "Killer_Lance",
+    "text": "Killer Lance: ",
+    "metadata": {
+      "nid": "Killer_Lance",
+      "name": "Killer Lance",
+      "description": "",
+      "weapon_type": "Lance",
+      "weapon_rank": "C"
+    }
+  },
+  {
+    "id": "Javelin",
+    "text": "Javelin: ",
+    "metadata": {
+      "nid": "Javelin",
+      "name": "Javelin",
+      "description": "",
+      "weapon_type": "Lance",
+      "weapon_rank": "E"
+    }
+  },
+  {
+    "id": "Short_Spear",
+    "text": "Short Spear: ",
+    "metadata": {
+      "nid": "Short_Spear",
+      "name": "Short Spear",
+      "description": "",
+      "weapon_type": "Lance",
+      "weapon_rank": "C"
+    }
+  },
+  {
+    "id": "Spear",
+    "text": "Spear: ",
+    "metadata": {
+      "nid": "Spear",
+      "name": "Spear",
+      "description": "",
+      "weapon_type": "Lance",
+      "weapon_rank": "B"
+    }
+  },
+  {
+    "id": "Brave_Lance",
+    "text": "Brave Lance: Allows two consecutive hits.",
+    "metadata": {
+      "nid": "Brave_Lance",
+      "name": "Brave Lance",
+      "description": "Allows two consecutive hits.",
+      "weapon_type": "Lance",
+      "weapon_rank": "B"
+    }
+  },
+  {
+    "id": "Horseslayer",
+    "text": "Horseslayer: Effective against horseback units",
+    "metadata": {
+      "nid": "Horseslayer",
+      "name": "Horseslayer",
+      "description": "Effective against horseback units",
+      "weapon_type": "Lance",
+      "weapon_rank": "D"
+    }
+  },
+  {
+    "id": "Heavy_Spear",
+    "text": "Heavy Spear: Effective against armored units",
+    "metadata": {
+      "nid": "Heavy_Spear",
+      "name": "Heavy Spear",
+      "description": "Effective against armored units",
+      "weapon_type": "Lance",
+      "weapon_rank": "D"
+    }
+  },
+  {
+    "id": "Dragonspear",
+    "text": "Dragonspear: Effective against dragon units",
+    "metadata": {
+      "nid": "Dragonspear",
+      "name": "Dragonspear",
+      "description": "Effective against dragon units",
+      "weapon_type": "Lance",
+      "weapon_rank": "C"
+    }
+  },
+  {
+    "id": "Axereaver",
+    "text": "Axereaver: Reverses the weapon triangle.",
+    "metadata": {
+      "nid": "Axereaver",
+      "name": "Axereaver",
+      "description": "Reverses the weapon triangle.",
+      "weapon_type": "Lance",
+      "weapon_rank": "C"
+    }
+  },
+  {
+    "id": "Vidofnir",
+    "text": "Vidofnir: Defence +5. Effective against monsters",
+    "metadata": {
+      "nid": "Vidofnir",
+      "name": "Vidofnir",
+      "description": "Defence +5. Effective against monsters",
+      "weapon_type": "Lance",
+      "weapon_rank": "S"
+    }
+  },
+  {
+    "id": "Iron_Axe",
+    "text": "Iron Axe: ",
+    "metadata": {
+      "nid": "Iron_Axe",
+      "name": "Iron Axe",
+      "description": "",
+      "weapon_type": "Axe",
+      "weapon_rank": "E"
+    }
+  },
+  {
+    "id": "Steel_Axe",
+    "text": "Steel Axe: ",
+    "metadata": {
+      "nid": "Steel_Axe",
+      "name": "Steel Axe",
+      "description": "",
+      "weapon_type": "Axe",
+      "weapon_rank": "E"
+    }
+  },
+  {
+    "id": "Silver_Axe",
+    "text": "Silver Axe: ",
+    "metadata": {
+      "nid": "Silver_Axe",
+      "name": "Silver Axe",
+      "description": "",
+      "weapon_type": "Axe",
+      "weapon_rank": "A"
+    }
+  },
+  {
+    "id": "Poison_Axe",
+    "text": "Poison Axe: Poisons on contact",
+    "metadata": {
+      "nid": "Poison_Axe",
+      "name": "Poison Axe",
+      "description": "Poisons on contact",
+      "weapon_type": "Axe",
+      "weapon_rank": "D"
+    }
+  },
+  {
+    "id": "Hatchet",
+    "text": "Hatchet: ",
+    "metadata": {
+      "nid": "Hatchet",
+      "name": "Hatchet",
+      "description": "",
+      "weapon_type": "Axe",
+      "weapon_rank": "E"
+    }
+  },
+  {
+    "id": "Hand_Axe",
+    "text": "Hand Axe: ",
+    "metadata": {
+      "nid": "Hand_Axe",
+      "name": "Hand Axe",
+      "description": "",
+      "weapon_type": "Axe",
+      "weapon_rank": "E"
+    }
+  },
+  {
+    "id": "Tomahawk",
+    "text": "Tomahawk: ",
+    "metadata": {
+      "nid": "Tomahawk",
+      "name": "Tomahawk",
+      "description": "",
+      "weapon_type": "Axe",
+      "weapon_rank": "A"
+    }
+  },
+  {
+    "id": "Killer_Axe",
+    "text": "Killer Axe: ",
+    "metadata": {
+      "nid": "Killer_Axe",
+      "name": "Killer Axe",
+      "description": "",
+      "weapon_type": "Axe",
+      "weapon_rank": "C"
+    }
+  },
+  {
+    "id": "Halberd",
+    "text": "Halberd: Effective against horseback units",
+    "metadata": {
+      "nid": "Halberd",
+      "name": "Halberd",
+      "description": "Effective against horseback units",
+      "weapon_type": "Axe",
+      "weapon_rank": "D"
+    }
+  },
+  {
+    "id": "Hammer",
+    "text": "Hammer: Effective against armored units",
+    "metadata": {
+      "nid": "Hammer",
+      "name": "Hammer",
+      "description": "Effective against armored units",
+      "weapon_type": "Axe",
+      "weapon_rank": "D"
+    }
+  },
+  {
+    "id": "Dragon_Axe",
+    "text": "Dragon Axe: Effective against dragon units",
+    "metadata": {
+      "nid": "Dragon_Axe",
+      "name": "Dragon Axe",
+      "description": "Effective against dragon units",
+      "weapon_type": "Axe",
+      "weapon_rank": "C"
+    }
+  },
+  {
+    "id": "Devil_Axe",
+    "text": "Devil Axe: User may damage themselves",
+    "metadata": {
+      "nid": "Devil_Axe",
+      "name": "Devil Axe",
+      "description": "User may damage themselves",
+      "weapon_type": "Axe",
+      "weapon_rank": "D"
+    }
+  },
+  {
+    "id": "Swordreaver",
+    "text": "Swordreaver: Reverses the weapon triangle.",
+    "metadata": {
+      "nid": "Swordreaver",
+      "name": "Swordreaver",
+      "description": "Reverses the weapon triangle.",
+      "weapon_type": "Axe",
+      "weapon_rank": "C"
+    }
+  },
+  {
+    "id": "Swordslayer",
+    "text": "Swordslayer: Reverses the weapon triangle. Effective against sword fighters",
+    "metadata": {
+      "nid": "Swordslayer",
+      "name": "Swordslayer",
+      "description": "Reverses the weapon triangle. Effective against sword fighters",
+      "weapon_type": "Axe",
+      "weapon_rank": "C"
+    }
+  },
+  {
+    "id": "Brave_Axe",
+    "text": "Brave Axe: Allows two consecutive hits.",
+    "metadata": {
+      "nid": "Brave_Axe",
+      "name": "Brave Axe",
+      "description": "Allows two consecutive hits.",
+      "weapon_type": "Axe",
+      "weapon_rank": "B"
+    }
+  },
+  {
+    "id": "Battle_Axe",
+    "text": "Battle Axe: ",
+    "metadata": {
+      "nid": "Battle_Axe",
+      "name": "Battle Axe",
+      "description": "",
+      "weapon_type": "Axe",
+      "weapon_rank": "B"
+    }
+  },
+  {
+    "id": "Garm",
+    "text": "Garm: Speed +5. Effective against monsters",
+    "metadata": {
+      "nid": "Garm",
+      "name": "Garm",
+      "description": "Speed +5. Effective against monsters",
+      "weapon_type": "Axe",
+      "weapon_rank": "S"
+    }
+  },
+  {
+    "id": "Iron_Bow",
+    "text": "Iron Bow: ",
+    "metadata": {
+      "nid": "Iron_Bow",
+      "name": "Iron Bow",
+      "description": "",
+      "weapon_type": "Bow",
+      "weapon_rank": "E"
+    }
+  },
+  {
+    "id": "Steel_Bow",
+    "text": "Steel Bow: ",
+    "metadata": {
+      "nid": "Steel_Bow",
+      "name": "Steel Bow",
+      "description": "",
+      "weapon_type": "Bow",
+      "weapon_rank": "D"
+    }
+  },
+  {
+    "id": "Silver_Bow",
+    "text": "Silver Bow: ",
+    "metadata": {
+      "nid": "Silver_Bow",
+      "name": "Silver Bow",
+      "description": "",
+      "weapon_type": "Bow",
+      "weapon_rank": "A"
+    }
+  },
+  {
+    "id": "Poison_Bow",
+    "text": "Poison Bow: Poisons on contact.",
+    "metadata": {
+      "nid": "Poison_Bow",
+      "name": "Poison Bow",
+      "description": "Poisons on contact.",
+      "weapon_type": "Bow",
+      "weapon_rank": "D"
+    }
+  },
+  {
+    "id": "Killer_Bow",
+    "text": "Killer Bow: ",
+    "metadata": {
+      "nid": "Killer_Bow",
+      "name": "Killer Bow",
+      "description": "",
+      "weapon_type": "Bow",
+      "weapon_rank": "C"
+    }
+  },
+  {
+    "id": "Brave_Bow",
+    "text": "Brave Bow: Allows two consecutive hits.",
+    "metadata": {
+      "nid": "Brave_Bow",
+      "name": "Brave Bow",
+      "description": "Allows two consecutive hits.",
+      "weapon_type": "Bow",
+      "weapon_rank": "B"
+    }
+  },
+  {
+    "id": "Short_Bow",
+    "text": "Short Bow: ",
+    "metadata": {
+      "nid": "Short_Bow",
+      "name": "Short Bow",
+      "description": "",
+      "weapon_type": "Bow",
+      "weapon_rank": "D"
+    }
+  },
+  {
+    "id": "Longbow",
+    "text": "Longbow: ",
+    "metadata": {
+      "nid": "Longbow",
+      "name": "Longbow",
+      "description": "",
+      "weapon_type": "Bow",
+      "weapon_rank": "D"
+    }
+  },
+  {
+    "id": "Nidhogg",
+    "text": "Nidhogg: Luck +5. Effective against monsters",
+    "metadata": {
+      "nid": "Nidhogg",
+      "name": "Nidhogg",
+      "description": "Luck +5. Effective against monsters",
+      "weapon_type": "Bow",
+      "weapon_rank": "S"
+    }
+  },
+  {
+    "id": "Ballista",
+    "text": "Ballista: ",
+    "metadata": {
+      "nid": "Ballista",
+      "name": "Ballista",
+      "description": "",
+      "weapon_type": "Bow",
+      "weapon_rank": "E"
+    }
+  },
+  {
+    "id": "Long_Ballista",
+    "text": "Long Ballista: ",
+    "metadata": {
+      "nid": "Long_Ballista",
+      "name": "Long Ballista",
+      "description": "",
+      "weapon_type": "Bow",
+      "weapon_rank": "E"
+    }
+  },
+  {
+    "id": "Killer_Ballista",
+    "text": "Killer Ballis: ",
+    "metadata": {
+      "nid": "Killer_Ballista",
+      "name": "Killer Ballis",
+      "description": "",
+      "weapon_type": "Bow",
+      "weapon_rank": "E"
+    }
+  },
+  {
+    "id": "Heal",
+    "text": "Heal: Restores (User's MAG + 10) HP.",
+    "metadata": {
+      "nid": "Heal",
+      "name": "Heal",
+      "description": "Restores (User's MAG + 10) HP.",
+      "weapon_type": "Staff",
+      "weapon_rank": "E"
+    }
+  },
+  {
+    "id": "Mend",
+    "text": "Mend: Restores (User's MAG + 20) HP.",
+    "metadata": {
+      "nid": "Mend",
+      "name": "Mend",
+      "description": "Restores (User's MAG + 20) HP.",
+      "weapon_type": "Staff",
+      "weapon_rank": "D"
+    }
+  },
+  {
+    "id": "Recover",
+    "text": "Recover: Fully restore's an ally's HP",
+    "metadata": {
+      "nid": "Recover",
+      "name": "Recover",
+      "description": "Fully restore's an ally's HP",
+      "weapon_type": "Staff",
+      "weapon_rank": "C"
+    }
+  },
+  {
+    "id": "Physic",
+    "text": "Physic: Restores an ally's HP from afar.",
+    "metadata": {
+      "nid": "Physic",
+      "name": "Physic",
+      "description": "Restores an ally's HP from afar.",
+      "weapon_type": "Staff",
+      "weapon_rank": "B"
+    }
+  },
+  {
+    "id": "Fortify",
+    "text": "Fortify: Restores (User's Magic + 10) HP to all allies within range.",
+    "metadata": {
+      "nid": "Fortify",
+      "name": "Fortify",
+      "description": "Restores (User's Magic + 10) HP to all allies within range.",
+      "weapon_type": "Staff",
+      "weapon_rank": "A"
+    }
+  },
+  {
+    "id": "Trade",
+    "text": "Trade: Trade with a far away ally.",
+    "metadata": {
+      "nid": "Trade",
+      "name": "Trade",
+      "description": "Trade with a far away ally.",
+      "weapon_type": "Staff",
+      "weapon_rank": "E"
+    }
+  },
+  {
+    "id": "Unlock",
+    "text": "Unlock: Opens locks.",
+    "metadata": {
+      "nid": "Unlock",
+      "name": "Unlock",
+      "description": "Opens locks.",
+      "weapon_type": "Staff",
+      "weapon_rank": "D"
+    }
+  },
+  {
+    "id": "Restore",
+    "text": "Restore: Removes all temporary statuses.",
+    "metadata": {
+      "nid": "Restore",
+      "name": "Restore",
+      "description": "Removes all temporary statuses.",
+      "weapon_type": "Staff",
+      "weapon_rank": "C"
+    }
+  },
+  {
+    "id": "Silence",
+    "text": "Silence: Enemy is rendered unable to use magic.",
+    "metadata": {
+      "nid": "Silence",
+      "name": "Silence",
+      "description": "Enemy is rendered unable to use magic.",
+      "weapon_type": "Staff",
+      "weapon_rank": "B"
+    }
+  },
+  {
+    "id": "Sleep",
+    "text": "Sleep: Enemy cannot move or attack.",
+    "metadata": {
+      "nid": "Sleep",
+      "name": "Sleep",
+      "description": "Enemy cannot move or attack.",
+      "weapon_type": "Staff",
+      "weapon_rank": "B"
+    }
+  },
+  {
+    "id": "Berserk",
+    "text": "Berserk: Enemy becomes berserk.",
+    "metadata": {
+      "nid": "Berserk",
+      "name": "Berserk",
+      "description": "Enemy becomes berserk.",
+      "weapon_type": "Staff",
+      "weapon_rank": "B"
+    }
+  },
+  {
+    "id": "Hammerne",
+    "text": "Hammerne: Repair an item to full uses.",
+    "metadata": {
+      "nid": "Hammerne",
+      "name": "Hammerne",
+      "description": "Repair an item to full uses.",
+      "weapon_type": "Staff",
+      "weapon_rank": "C"
+    }
+  },
+  {
+    "id": "Thief",
+    "text": "Thief: Steal items from enemies.",
+    "metadata": {
+      "nid": "Thief",
+      "name": "Thief",
+      "description": "Steal items from enemies.",
+      "weapon_type": "Staff",
+      "weapon_rank": "C"
+    }
+  },
+  {
+    "id": "Barrier",
+    "text": "Barrier: Raises ally's resistance.",
+    "metadata": {
+      "nid": "Barrier",
+      "name": "Barrier",
+      "description": "Raises ally's resistance.",
+      "weapon_type": "Staff",
+      "weapon_rank": "C"
+    }
+  },
+  {
+    "id": "Rescue",
+    "text": "Rescue: Bring an ally to a space adjacent to the user",
+    "metadata": {
+      "nid": "Rescue",
+      "name": "Rescue",
+      "description": "Bring an ally to a space adjacent to the user",
+      "weapon_type": "Staff",
+      "weapon_rank": "B"
+    }
+  },
+  {
+    "id": "Rescue1",
+    "text": "Rescue: Rescues an ally.",
+    "metadata": {
+      "nid": "Rescue1",
+      "name": "Rescue",
+      "description": "Rescues an ally."
+    }
+  },
+  {
+    "id": "Rescue2",
+    "text": "Rescue: Rescues an ally.",
+    "metadata": {
+      "nid": "Rescue2",
+      "name": "Rescue",
+      "description": "Rescues an ally."
+    }
+  },
+  {
+    "id": "Warp",
+    "text": "Warp: Move an ally to another square.",
+    "metadata": {
+      "nid": "Warp",
+      "name": "Warp",
+      "description": "Move an ally to another square.",
+      "weapon_type": "Staff",
+      "weapon_rank": "A"
+    }
+  },
+  {
+    "id": "Warp1",
+    "text": "Warp: Warps an ally.",
+    "metadata": {
+      "nid": "Warp1",
+      "name": "Warp",
+      "description": "Warps an ally."
+    }
+  },
+  {
+    "id": "Warp2",
+    "text": "Warp: Warps an ally.",
+    "metadata": {
+      "nid": "Warp2",
+      "name": "Warp",
+      "description": "Warps an ally."
+    }
+  },
+  {
+    "id": "Latona",
+    "text": "Latona: Restores HP and condition of all allied units",
+    "metadata": {
+      "nid": "Latona",
+      "name": "Latona",
+      "description": "Restores HP and condition of all allied units",
+      "weapon_type": "Staff",
+      "weapon_rank": "S"
+    }
+  },
+  {
+    "id": "Lightning",
+    "text": "Lightning: ",
+    "metadata": {
+      "nid": "Lightning",
+      "name": "Lightning",
+      "description": "",
+      "weapon_type": "Light",
+      "weapon_rank": "E"
+    }
+  },
+  {
+    "id": "Shine",
+    "text": "Shine: ",
+    "metadata": {
+      "nid": "Shine",
+      "name": "Shine",
+      "description": "",
+      "weapon_type": "Light",
+      "weapon_rank": "D"
+    }
+  },
+  {
+    "id": "Divine",
+    "text": "Divine: ",
+    "metadata": {
+      "nid": "Divine",
+      "name": "Divine",
+      "description": "",
+      "weapon_type": "Light",
+      "weapon_rank": "C"
+    }
+  },
+  {
+    "id": "Purge",
+    "text": "Purge: ",
+    "metadata": {
+      "nid": "Purge",
+      "name": "Purge",
+      "description": "",
+      "weapon_type": "Light",
+      "weapon_rank": "B"
+    }
+  },
+  {
+    "id": "Aura",
+    "text": "Aura: ",
+    "metadata": {
+      "nid": "Aura",
+      "name": "Aura",
+      "description": "",
+      "weapon_type": "Light",
+      "weapon_rank": "A"
+    }
+  },
+  {
+    "id": "Ivaldi",
+    "text": "Ivaldi: Defense +5. Effective against monsters",
+    "metadata": {
+      "nid": "Ivaldi",
+      "name": "Ivaldi",
+      "description": "Defense +5. Effective against monsters",
+      "weapon_type": "Light",
+      "weapon_rank": "S"
+    }
+  },
+  {
+    "id": "Fire",
+    "text": "Fire: ",
+    "metadata": {
+      "nid": "Fire",
+      "name": "Fire",
+      "description": "",
+      "weapon_type": "Anima",
+      "weapon_rank": "E"
+    }
+  },
+  {
+    "id": "Thunder",
+    "text": "Thunder: ",
+    "metadata": {
+      "nid": "Thunder",
+      "name": "Thunder",
+      "description": "",
+      "weapon_type": "Anima",
+      "weapon_rank": "D"
+    }
+  },
+  {
+    "id": "Elfire",
+    "text": "Elfire: ",
+    "metadata": {
+      "nid": "Elfire",
+      "name": "Elfire",
+      "description": "",
+      "weapon_type": "Anima",
+      "weapon_rank": "C"
+    }
+  },
+  {
+    "id": "Bolting",
+    "text": "Bolting: ",
+    "metadata": {
+      "nid": "Bolting",
+      "name": "Bolting",
+      "description": "",
+      "weapon_type": "Anima",
+      "weapon_rank": "B"
+    }
+  },
+  {
+    "id": "Fimbulvetr",
+    "text": "Fimbulvetr: ",
+    "metadata": {
+      "nid": "Fimbulvetr",
+      "name": "Fimbulvetr",
+      "description": "",
+      "weapon_type": "Anima",
+      "weapon_rank": "A"
+    }
+  },
+  {
+    "id": "Excalibur",
+    "text": "Excalibur: Speed +5. Effective against monsters",
+    "metadata": {
+      "nid": "Excalibur",
+      "name": "Excalibur",
+      "description": "Speed +5. Effective against monsters",
+      "weapon_type": "Anima",
+      "weapon_rank": "S"
+    }
+  },
+  {
+    "id": "Flux",
+    "text": "Flux: ",
+    "metadata": {
+      "nid": "Flux",
+      "name": "Flux",
+      "description": "",
+      "weapon_type": "Dark",
+      "weapon_rank": "D"
+    }
+  },
+  {
+    "id": "Luna",
+    "text": "Luna: Ignore's enemy resistance",
+    "metadata": {
+      "nid": "Luna",
+      "name": "Luna",
+      "description": "Ignore's enemy resistance",
+      "weapon_type": "Dark",
+      "weapon_rank": "C"
+    }
+  },
+  {
+    "id": "Nosferatu",
+    "text": "Nosferatu: User recovers HP equal to damage dealt.",
+    "metadata": {
+      "nid": "Nosferatu",
+      "name": "Nosferatu",
+      "description": "User recovers HP equal to damage dealt.",
+      "weapon_type": "Dark",
+      "weapon_rank": "C"
+    }
+  },
+  {
+    "id": "Eclipse",
+    "text": "Eclipse: Halve's the enemy's current HP",
+    "metadata": {
+      "nid": "Eclipse",
+      "name": "Eclipse",
+      "description": "Halve's the enemy's current HP",
+      "weapon_type": "Dark",
+      "weapon_rank": "B"
+    }
+  },
+  {
+    "id": "Fenrir",
+    "text": "Fenrir: ",
+    "metadata": {
+      "nid": "Fenrir",
+      "name": "Fenrir",
+      "description": "",
+      "weapon_type": "Dark",
+      "weapon_rank": "A"
+    }
+  },
+  {
+    "id": "Gleipnir",
+    "text": "Gleipnir: ",
+    "metadata": {
+      "nid": "Gleipnir",
+      "name": "Gleipnir",
+      "description": "",
+      "weapon_type": "Dark",
+      "weapon_rank": "S"
+    }
+  },
+  {
+    "id": "Naglfar",
+    "text": "Naglfar: ",
+    "metadata": {
+      "nid": "Naglfar",
+      "name": "Naglfar",
+      "description": "",
+      "weapon_type": "Dark",
+      "weapon_rank": "S"
+    }
+  },
+  {
+    "id": "Wretched_Air",
+    "text": "Wretched Air: Ignore's enemy defence.",
+    "metadata": {
+      "nid": "Wretched_Air",
+      "name": "Wretched Air",
+      "description": "Ignore's enemy defence."
+    }
+  },
+  {
+    "id": "Nightmare",
+    "text": "Nightmare: Sends all enemies in range 3 to sleep",
+    "metadata": {
+      "nid": "Nightmare",
+      "name": "Nightmare",
+      "description": "Sends all enemies in range 3 to sleep",
+      "weapon_type": "Staff"
+    }
+  },
+  {
+    "id": "Demon_Light",
+    "text": "Demon Light: ",
+    "metadata": {
+      "nid": "Demon_Light",
+      "name": "Demon Light",
+      "description": ""
+    }
+  },
+  {
+    "id": "Ravager",
+    "text": "Ravager: ",
+    "metadata": {
+      "nid": "Ravager",
+      "name": "Ravager",
+      "description": ""
+    }
+  },
+  {
+    "id": "Demon_Surge",
+    "text": "Demon Surge: ",
+    "metadata": {
+      "nid": "Demon_Surge",
+      "name": "Demon Surge",
+      "description": "",
+      "weapon_type": "Dark"
+    }
+  },
+  {
+    "id": "Shadowshot",
+    "text": "Shadowshot: ",
+    "metadata": {
+      "nid": "Shadowshot",
+      "name": "Shadowshot",
+      "description": "",
+      "weapon_type": "Dark"
+    }
+  },
+  {
+    "id": "Sharp_Claw",
+    "text": "Sharp Claw: ",
+    "metadata": {
+      "nid": "Sharp_Claw",
+      "name": "Sharp Claw",
+      "description": ""
+    }
+  },
+  {
+    "id": "Rotten_Claw",
+    "text": "Rotten Claw: ",
+    "metadata": {
+      "nid": "Rotten_Claw",
+      "name": "Rotten Claw",
+      "description": ""
+    }
+  },
+  {
+    "id": "Fetid_Claw",
+    "text": "Fetid Claw: ",
+    "metadata": {
+      "nid": "Fetid_Claw",
+      "name": "Fetid Claw",
+      "description": ""
+    }
+  },
+  {
+    "id": "Poison_Claw",
+    "text": "Poison Claw: Poisons on contact",
+    "metadata": {
+      "nid": "Poison_Claw",
+      "name": "Poison Claw",
+      "description": "Poisons on contact"
+    }
+  },
+  {
+    "id": "Lethal_Talon",
+    "text": "Lethal Talon: Poisons on contact",
+    "metadata": {
+      "nid": "Lethal_Talon",
+      "name": "Lethal Talon",
+      "description": "Poisons on contact"
+    }
+  },
+  {
+    "id": "Fiery_Fang",
+    "text": "Fiery Fang: ",
+    "metadata": {
+      "nid": "Fiery_Fang",
+      "name": "Fiery Fang",
+      "description": ""
+    }
+  },
+  {
+    "id": "Hellfang",
+    "text": "Hellfang: ",
+    "metadata": {
+      "nid": "Hellfang",
+      "name": "Hellfang",
+      "description": ""
+    }
+  },
+  {
+    "id": "Evil_Eye",
+    "text": "Evil Eye: ",
+    "metadata": {
+      "nid": "Evil_Eye",
+      "name": "Evil Eye",
+      "description": "",
+      "weapon_type": "Dark"
+    }
+  },
+  {
+    "id": "Crimson_Eye",
+    "text": "Crimson Eye: ",
+    "metadata": {
+      "nid": "Crimson_Eye",
+      "name": "Crimson Eye",
+      "description": "",
+      "weapon_type": "Dark"
+    }
+  },
+  {
+    "id": "Stone",
+    "text": "Stone: Petrifies on hit",
+    "metadata": {
+      "nid": "Stone",
+      "name": "Stone",
+      "description": "Petrifies on hit",
+      "weapon_type": "Dark"
+    }
+  },
+  {
+    "id": "Vulnerary",
+    "text": "Vulnerary: Restores 10 HP.",
+    "metadata": {
+      "nid": "Vulnerary",
+      "name": "Vulnerary",
+      "description": "Restores 10 HP."
+    }
+  },
+  {
+    "id": "Elixir",
+    "text": "Elixir: Fully recovers HP.",
+    "metadata": {
+      "nid": "Elixir",
+      "name": "Elixir",
+      "description": "Fully recovers HP."
+    }
+  },
+  {
+    "id": "Pure_Water",
+    "text": "Pure Water: Temporarily raises resistance.",
+    "metadata": {
+      "nid": "Pure_Water",
+      "name": "Pure Water",
+      "description": "Temporarily raises resistance."
+    }
+  },
+  {
+    "id": "Antitoxin",
+    "text": "Antitoxin: Cures poison.",
+    "metadata": {
+      "nid": "Antitoxin",
+      "name": "Antitoxin",
+      "description": "Cures poison."
+    }
+  },
+  {
+    "id": "Lockpick",
+    "text": "Lockpick: Opens chests and doors.",
+    "metadata": {
+      "nid": "Lockpick",
+      "name": "Lockpick",
+      "description": "Opens chests and doors."
+    }
+  },
+  {
+    "id": "Chest_Key",
+    "text": "Chest Key: Opens chests.",
+    "metadata": {
+      "nid": "Chest_Key",
+      "name": "Chest Key",
+      "description": "Opens chests."
+    }
+  },
+  {
+    "id": "Door_Key",
+    "text": "Door Key: Opens doors.",
+    "metadata": {
+      "nid": "Door_Key",
+      "name": "Door Key",
+      "description": "Opens doors."
+    }
+  },
+  {
+    "id": "Torch",
+    "text": "Torch: Increases user's sight range in fog of war",
+    "metadata": {
+      "nid": "Torch",
+      "name": "Torch",
+      "description": "Increases user's sight range in fog of war"
+    }
+  },
+  {
+    "id": "Dragonstone",
+    "text": "Dragonstone: Effective against monsters",
+    "metadata": {
+      "nid": "Dragonstone",
+      "name": "Dragonstone",
+      "description": "Effective against monsters"
+    }
+  },
+  {
+    "id": "Angelic_Robe",
+    "text": "Angelic Robe: Permanently raises maximum HP by 7 points.",
+    "metadata": {
+      "nid": "Angelic_Robe",
+      "name": "Angelic Robe",
+      "description": "Permanently raises maximum HP by 7 points."
+    }
+  },
+  {
+    "id": "Energy_Ring",
+    "text": "Energy Ring: Permanently raises Strength/Magic by 2 points.",
+    "metadata": {
+      "nid": "Energy_Ring",
+      "name": "Energy Ring",
+      "description": "Permanently raises Strength/Magic by 2 points."
+    }
+  },
+  {
+    "id": "Secret_Book",
+    "text": "Secret Book: Permanently raises Skill by 2 points.",
+    "metadata": {
+      "nid": "Secret_Book",
+      "name": "Secret Book",
+      "description": "Permanently raises Skill by 2 points."
+    }
+  },
+  {
+    "id": "Speedwing",
+    "text": "Speedwing: Permanently raises Speed by 2 points.",
+    "metadata": {
+      "nid": "Speedwing",
+      "name": "Speedwing",
+      "description": "Permanently raises Speed by 2 points."
+    }
+  },
+  {
+    "id": "Goddess_Icon",
+    "text": "Goddess Icon: Permanently raises Luck by 2 points.",
+    "metadata": {
+      "nid": "Goddess_Icon",
+      "name": "Goddess Icon",
+      "description": "Permanently raises Luck by 2 points."
+    }
+  },
+  {
+    "id": "Dragonshield",
+    "text": "Dragonshield: Permanently raises Defense by 2 points.",
+    "metadata": {
+      "nid": "Dragonshield",
+      "name": "Dragonshield",
+      "description": "Permanently raises Defense by 2 points."
+    }
+  },
+  {
+    "id": "Talisman",
+    "text": "Talisman: Permanently raises Resistance by 2 points.",
+    "metadata": {
+      "nid": "Talisman",
+      "name": "Talisman",
+      "description": "Permanently raises Resistance by 2 points."
+    }
+  },
+  {
+    "id": "Swiftsole",
+    "text": "Swiftsole: Permanently raises Movement by 2 points.",
+    "metadata": {
+      "nid": "Swiftsole",
+      "name": "Swiftsole",
+      "description": "Permanently raises Movement by 2 points."
+    }
+  },
+  {
+    "id": "Body_Ring",
+    "text": "Body Ring: Permanently raises Constitution by 2 points.",
+    "metadata": {
+      "nid": "Body_Ring",
+      "name": "Body Ring",
+      "description": "Permanently raises Constitution by 2 points."
+    }
+  },
+  {
+    "id": "Master_Seal",
+    "text": "Master Seal: Promotes all normal classes",
+    "metadata": {
+      "nid": "Master_Seal",
+      "name": "Master Seal",
+      "description": "Promotes all normal classes"
+    }
+  },
+  {
+    "id": "Metis_s_Tome",
+    "text": "Metis's Tome: Permanently raises all of the user's growth rates by 5.",
+    "metadata": {
+      "nid": "Metis_s_Tome",
+      "name": "Metis's Tome",
+      "description": "Permanently raises all of the user's growth rates by 5."
+    }
+  },
+  {
+    "id": "Fili_Shield",
+    "text": "Fili Shield: Negates effective bonus of bows and wind magic toward user.",
+    "metadata": {
+      "nid": "Fili_Shield",
+      "name": "Fili Shield",
+      "description": "Negates effective bonus of bows and wind magic toward user."
+    }
+  },
+  {
+    "id": "Hoplon_Guard",
+    "text": "Hoplon Guard: User is immune to critical attacks.",
+    "metadata": {
+      "nid": "Hoplon_Guard",
+      "name": "Hoplon Guard",
+      "description": "User is immune to critical attacks."
+    }
+  },
+  {
+    "id": "Red_Gem",
+    "text": "Red Gem: An expensive gem worth 2500 gold.",
+    "metadata": {
+      "nid": "Red_Gem",
+      "name": "Red Gem",
+      "description": "An expensive gem worth 2500 gold."
+    }
+  },
+  {
+    "id": "Blue_Gem",
+    "text": "Blue Gem: An expensive gem worth 5000 gold.",
+    "metadata": {
+      "nid": "Blue_Gem",
+      "name": "Blue Gem",
+      "description": "An expensive gem worth 5000 gold."
+    }
+  },
+  {
+    "id": "White_Gem",
+    "text": "White Gem: An expensive gem worth 10000 gold.",
+    "metadata": {
+      "nid": "White_Gem",
+      "name": "White Gem",
+      "description": "An expensive gem worth 10000 gold."
+    }
+  },
+  {
+    "id": "Steal",
+    "text": "Steal: Steal items from enemies.",
+    "metadata": {
+      "nid": "Steal",
+      "name": "Steal",
+      "description": "Steal items from enemies."
+    }
+  },
+  {
+    "id": "Refresh",
+    "text": "Refresh: Unit can move again.",
+    "metadata": {
+      "nid": "Refresh",
+      "name": "Refresh",
+      "description": "Unit can move again."
+    }
+  },
+  {
+    "id": "Sear",
+    "text": "Sear: Attack up to three units.",
+    "metadata": {
+      "nid": "Sear",
+      "name": "Sear",
+      "description": "Attack up to three units.",
+      "weapon_type": "Anima",
+      "weapon_rank": "C"
+    }
+  }
+]
