@@ -8,7 +8,7 @@ const http = require('http');
 let denoProcess = null;
 let serverReady = false;
 let healthCheckAttempts = 0;
-const MAX_HEALTH_CHECK_ATTEMPTS = 5;
+const HEALTH_CHECK_TIMEOUT_MS = 60000;
 
 // Get user data directory for storing databases
 const getDataDir = () => {
@@ -304,15 +304,6 @@ const startDenoServer = () => {
       console.error('Failed to start Deno server - not attempting fallback');
       reject(err);
     });
-
-    // Resolve after timeout to not block app startup, but don't set serverReady
-    setTimeout(() => {
-      if (!serverReady) {
-        logger.log('info', 'Timeout waiting for Deno server output, proceeding but server may not be ready');
-        console.log('Timeout waiting for Deno server output, proceeding but server may not be ready');
-        resolve();
-      }
-    }, 5000);
   });
 };
 
@@ -723,8 +714,11 @@ const checkServerHealth = () => {
 
 // Function to set server as ready after verifying health
 const setServerReady = async () => {
-  // Reset health check attempts
+  // Reset health check attempts for logging purposes
   healthCheckAttempts = 0;
+
+  // Track start time for timeout
+  const startTime = Date.now();
 
   // Do a health check to confirm server is truly ready
   const tryHealthCheck = async () => {
@@ -737,13 +731,14 @@ const setServerReady = async () => {
     } else {
       healthCheckAttempts++;
 
-      if (healthCheckAttempts < MAX_HEALTH_CHECK_ATTEMPTS) {
+      // Check if we've exceeded the timeout
+      if (Date.now() - startTime < HEALTH_CHECK_TIMEOUT_MS) {
         // Wait and try again
         logger.log('info', `Health check attempt ${healthCheckAttempts} failed, retrying...`);
         await new Promise(resolve => setTimeout(resolve, 1000));
         return tryHealthCheck();
       } else {
-        logger.log('error', 'Max health check attempts reached, server considered unhealthy');
+        logger.log('error', `Health check timeout after ${HEALTH_CHECK_TIMEOUT_MS / 1000} seconds, server considered unhealthy`);
         // Still mark as ready but log the issue
         serverReady = true;
         return false;

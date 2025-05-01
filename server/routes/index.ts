@@ -3,7 +3,11 @@ import { handleCreateGame } from "@/routes/create-game.ts";
 import { Context } from "https://deno.land/x/oak@v12.6.1/context.ts";
 import { Status } from "https://deno.land/std@0.192.0/http/http_status.ts";
 import { setApiKey } from "@/lib/api-key-manager.ts";
-import { handleGetMapsList, handleGetTerrainGrid, handleUnitPlacement } from "@/routes/test-unit-placement.ts";
+import {
+  handleGetMapsList,
+  handleGetTerrainGrid,
+  handleUnitPlacement,
+} from "@/routes/test-unit-placement.ts";
 
 // Process API keys from the request
 async function processApiKeys(ctx: Context, next: () => Promise<unknown>) {
@@ -37,6 +41,19 @@ async function processApiKeys(ctx: Context, next: () => Promise<unknown>) {
   await next();
 }
 
+// Simple health check handler
+function handleHealthCheck(): Response {
+  return new Response(JSON.stringify({ status: "ok" }), {
+    status: 200,
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+    },
+  });
+}
+
 export async function handleRequest(req: Request): Promise<Response> {
   const url = new URL(req.url);
 
@@ -59,9 +76,9 @@ export async function handleRequest(req: Request): Promise<Response> {
       const openaiApiKey = url.searchParams.get("openaiApiKey");
 
       if (openaiApiKey) {
-        if (openaiApiKey.trim() === '') {
+        if (openaiApiKey.trim() === "") {
           // If empty string is passed, treat as reset request
-          setApiKey('');
+          setApiKey("");
         } else {
           setApiKey(openaiApiKey);
         }
@@ -91,9 +108,9 @@ export async function handleRequest(req: Request): Promise<Response> {
           if ("openaiApiKey" in body) {
             const openaiApiKey = body.openaiApiKey;
             if (typeof openaiApiKey === "string") {
-              if (openaiApiKey.trim() === '') {
+              if (openaiApiKey.trim() === "") {
                 // If empty string is passed, treat as reset request
-                setApiKey('');
+                setApiKey("");
               } else {
                 setApiKey(openaiApiKey);
               }
@@ -110,12 +127,22 @@ export async function handleRequest(req: Request): Promise<Response> {
   // Process the request and get the response
   let response: Response;
 
-  // Handle unit placement test routes
-  if (req.method === "GET" && url.pathname === "/test-unit-placement/maps") {
+  // Add health check endpoint
+  if (req.method === "GET" && url.pathname === "/health") {
+    response = handleHealthCheck();
+  } else if (
+    req.method === "GET" && url.pathname === "/test-unit-placement/maps"
+  ) {
     response = await handleGetMapsList(req);
-  } else if (req.method === "GET" && url.pathname.startsWith("/test-unit-placement/terrain/")) {
+  } else if (
+    req.method === "GET" &&
+    url.pathname.startsWith("/test-unit-placement/terrain/")
+  ) {
     response = await handleGetTerrainGrid(req);
-  } else if (req.method === "POST" && url.pathname === "/test-unit-placement/unit-placement") {
+  } else if (
+    req.method === "POST" &&
+    url.pathname === "/test-unit-placement/unit-placement"
+  ) {
     response = await handleUnitPlacement(req);
   } else if (req.method === "GET" && url.pathname === "/ping") {
     // "Ping" route
@@ -127,9 +154,13 @@ export async function handleRequest(req: Request): Promise<Response> {
     // GET /games/<nid> for a single game
     const { handleGetGame } = await import("./get-game.ts");
     response = await handleGetGame(req);
-  } else if (req.method === "GET" && url.pathname === "/test-similarity-search") {
+  } else if (
+    req.method === "GET" && url.pathname === "/test-similarity-search"
+  ) {
     // Test similarity search route
-    const { handleTestSimilaritySearch } = await import("./test-similarity-search.ts");
+    const { handleTestSimilaritySearch } = await import(
+      "./test-similarity-search.ts"
+    );
     response = await handleTestSimilaritySearch(req);
   } else if (req.method === "POST" && url.pathname === "/test-api-key") {
     // Test OpenAI API key route
@@ -149,13 +180,19 @@ export async function handleRequest(req: Request): Promise<Response> {
   } else if (req.method === "POST" && url.pathname === "/run-game") {
     const { handleRunGame } = await import("./run-game.ts");
     response = await handleRunGame(req);
-  } else if (req.method === "POST" && url.pathname === "/generate-next-chapter") {
+  } else if (
+    req.method === "POST" && url.pathname === "/generate-next-chapter"
+  ) {
     const { handleGenerateNextChapter } = await import(
       "./generate-next-chapter.ts"
     );
     response = await handleGenerateNextChapter(req);
-  } else if (req.method === "POST" && url.pathname === "/regenerate-current-chapter") {
-    const { handleRegenerateCurrentChapter } = await import("./regenerate-current-chapter.ts");
+  } else if (
+    req.method === "POST" && url.pathname === "/regenerate-current-chapter"
+  ) {
+    const { handleRegenerateCurrentChapter } = await import(
+      "./regenerate-current-chapter.ts"
+    );
     response = await handleRegenerateCurrentChapter(req);
   } else if (req.method === "POST" && url.pathname === "/delete-game") {
     const { handleDeleteGame } = await import("./delete-game.ts");
@@ -164,13 +201,23 @@ export async function handleRequest(req: Request): Promise<Response> {
     const { handleRunEditor } = await import("./run-editor.ts");
     response = await handleRunEditor(req);
   } else if (req.method === "GET" && url.pathname === "/generation-progress") {
-    const { handleGetChapterGenerationProgress } = await import("./generation-progress.ts");
+    const { handleGetChapterGenerationProgress } = await import(
+      "./generation-progress.ts"
+    );
     response = await handleGetChapterGenerationProgress(req);
-  } else if (req.method === "GET" && url.pathname === "/game-creation-progress") {
-    const { handleGetGameCreationProgress } = await import("./generation-progress.ts");
+  } else if (
+    req.method === "GET" && url.pathname === "/game-creation-progress"
+  ) {
+    const { handleGetGameCreationProgress } = await import(
+      "./generation-progress.ts"
+    );
     response = await handleGetGameCreationProgress(req);
-  } else if (req.method === "POST" && url.pathname === "/test-chapter-generation") {
-    const { handleTestChapterGeneration } = await import("./test-chapter-generation.ts");
+  } else if (
+    req.method === "POST" && url.pathname === "/test-chapter-generation"
+  ) {
+    const { handleTestChapterGeneration } = await import(
+      "./test-chapter-generation.ts"
+    );
     response = await handleTestChapterGeneration(req);
   } else {
     // Default route
@@ -182,14 +229,17 @@ export async function handleRequest(req: Request): Promise<Response> {
 
   // Add CORS headers to the response
   headers.set("Access-Control-Allow-Origin", "*");
-  headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  headers.set(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, OPTIONS",
+  );
   headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
   // Return a new response with the same body, status, and updated headers
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,
-    headers
+    headers,
   });
 }
 

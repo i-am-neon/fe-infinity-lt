@@ -40,8 +40,8 @@ let serverReadyCheckInterval = null;
 // Create splash screen
 function createSplashWindow() {
   splashWindow = new BrowserWindow({
-    width: 500,
-    height: 500,
+    width: 700,
+    height: 700,
     transparent: true,
     frame: false,
     alwaysOnTop: true,
