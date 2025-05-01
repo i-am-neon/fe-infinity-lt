@@ -15,6 +15,7 @@ import {
   NonClosableDialogHeader,
   NonClosableDialogTitle,
 } from "@/components/ui/non-closable-dialog";
+import UpdateNotification from "@/components/update-notification";
 import apiCall from "@/lib/api-call";
 import { getAssetPath } from "@/lib/asset-path";
 import { HelpCircle, KeyIcon, Loader2, Map, Settings } from "lucide-react";
@@ -297,6 +298,11 @@ export default function HomePage() {
             <FeInfinityTitle size="lg" />
           </div>
         </div>
+      </BlurFade>
+
+      {/* Update Notification */}
+      <BlurFade delay={BLUR_FADE_DELAY * 1.5}>
+        <UpdateNotification />
       </BlurFade>
 
       {/* API Key Notice */}

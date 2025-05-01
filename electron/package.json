@@ -21,7 +21,8 @@
     "package:linux": "npm run build:client && npm run verify-client-build && electron-builder --linux",
     "clean": "node -e \"const fs=require('fs-extra');if(fs.existsSync('bin')){fs.removeSync('bin');console.log('bin directory removed');}\"",
     "clean:release": "node -e \"const fs=require('fs-extra');const path=require('path');const releaseDir=path.join(__dirname,'release');if(fs.existsSync(releaseDir)){fs.emptyDirSync(releaseDir);console.log('release directory emptied');}else{fs.mkdirSync(releaseDir,{recursive:true});console.log('release directory created');}\"",
-    "reset:env": "powershell -Command \"Write-Host '[Environment Reset] Resetting environment...' -ForegroundColor Cyan; $currDir = Get-Location; Set-Location ..; ./reset-environment.ps1; Set-Location $currDir\""
+    "reset:env": "powershell -Command \"Write-Host '[Environment Reset] Resetting environment...' -ForegroundColor Cyan; $currDir = Get-Location; Set-Location ..; ./reset-environment.ps1; Set-Location $currDir\"",
+    "bump-version": "node bump-version.js"
   },
   "devDependencies": {
     "axios": "^1.6.7",

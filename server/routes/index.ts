@@ -147,6 +147,10 @@ export async function handleRequest(req: Request): Promise<Response> {
   } else if (req.method === "GET" && url.pathname === "/ping") {
     // "Ping" route
     response = await handlePing();
+  } else if (req.method === "GET" && url.pathname === "/check-update") {
+    // Add check-update route
+    const { handleCheckUpdate } = await import("./check-update.ts");
+    response = await handleCheckUpdate(req);
   } else if (req.method === "GET" && url.pathname === "/games") {
     const { handleListGames } = await import("./list-games.ts");
     response = await handleListGames(req);

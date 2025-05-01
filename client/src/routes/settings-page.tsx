@@ -4,12 +4,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft, ImageIcon } from "lucide-react";
+import { ChevronLeft, ImageIcon, InfoIcon } from "lucide-react";
 import ApiKeySettings from "@/components/settings/api-key-settings";
 import { BlurFade } from "@/components/magicui/blur-fade";
 import { BLUR_FADE_DELAY } from "@/components/ui/constants";
 import { Switch } from "@/components/ui/switch";
 import { useEffect, useState } from "react";
+import VersionDisplay from "@/components/version-display";
 
 export default function SettingsPage() {
     const { theme } = useTheme();
@@ -153,6 +154,39 @@ export default function SettingsPage() {
                             <Button variant="secondary" onClick={handleExportLogs}>
                                 Export Logs
                             </Button>
+                        </CardContent>
+                    </Card>
+                </BlurFade>
+
+                <BlurFade delay={BLUR_FADE_DELAY * 6}>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <InfoIcon className="h-5 w-5" />
+                                About FE Infinity
+                            </CardTitle>
+                            <CardDescription>
+                                Application version and information
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <VersionDisplay />
+                            <div className="mt-4 text-sm text-muted-foreground">
+                                <p>
+                                    FE Infinity is an AI system that creates Fire Emblem games as you play them.
+                                    New chapters are generated based on your decisions and battle outcomes.
+                                </p>
+                                <div className="mt-2">
+                                    <a
+                                        href="https://feinfinity.vercel.app"
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="text-primary hover:underline"
+                                    >
+                                        Visit Website
+                                    </a>
+                                </div>
+                            </div>
                         </CardContent>
                     </Card>
                 </BlurFade>
