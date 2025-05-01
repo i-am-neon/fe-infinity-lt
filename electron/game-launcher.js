@@ -1,5 +1,5 @@
 const http = require('http');
-const { runGameWithWine, runPythonScript } = require('./game-runner');
+const { runGameWithWine, runPythonScript, runEditor } = require('./game-runner');
 const logger = require('./logger');
 const { app } = require('electron');
 const path = require('path');
@@ -97,6 +97,58 @@ async function startGameLauncherServer() {
             res.end(JSON.stringify({ success: true }));
           } catch (error) {
             logger.log('error', 'Error running game', {
+              error: error.message,
+              stack: error.stack
+            });
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ success: false, error: error.message }));
+          }
+        } else if (req.url === '/run-editor' && req.method === 'POST') {
+          // Handle editor launch requests
+          try {
+            // Parse JSON request body
+            const data = JSON.parse(body);
+            const projectPath = data.projectPath; // This can be undefined if just opening editor
+
+            // First check if the project exists (if a project was specified)
+            if (projectPath) {
+              const userDataDir = app.getPath('userData');
+              const userLtMakerPath = path.join(userDataDir, 'lt-maker-fork');
+              const userProjectPath = path.join(userLtMakerPath, projectPath);
+
+              // Check in user directory first
+              if (fs.existsSync(userProjectPath)) {
+                logger.log('info', `Found project for editor in user data directory: ${userProjectPath}`);
+                await runEditor(projectPath);
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ success: true }));
+                return;
+              }
+
+              // Fall back to resources directory if not found in user data
+              const resourcesPath = process.resourcesPath || app.getAppPath();
+              const ltMakerPath = path.join(resourcesPath, 'lt-maker-fork');
+              const projectFullPath = path.join(ltMakerPath, projectPath);
+
+              if (!fs.existsSync(projectFullPath)) {
+                const errorMsg = `Project not found for editor in any location: ${projectPath}`;
+                logger.log('error', errorMsg, {
+                  checkedPaths: [userProjectPath, projectFullPath]
+                });
+                res.writeHead(404, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ success: false, error: errorMsg }));
+                return;
+              }
+            }
+
+            // Run the editor with or without a project
+            logger.log('info', `Launching editor${projectPath ? ` with project: ${projectPath}` : ''}`);
+            await runEditor(projectPath);
+            logger.log('info', 'Editor launch initiated successfully');
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ success: true }));
+          } catch (error) {
+            logger.log('error', 'Error running editor', {
               error: error.message,
               stack: error.stack
             });

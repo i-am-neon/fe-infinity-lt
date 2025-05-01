@@ -3,7 +3,7 @@ import {
     getPathWithinLtMaker,
 } from "./file-io/get-path-within-lt-maker.ts";
 import { isElectronEnvironment } from "./lib/env-detector.ts";
-import { sendToElectron, gameRunner } from "./lib/game-runner.ts";
+import { sendEditorToElectron, gameRunner } from "./lib/game-runner.ts";
 import { join } from "node:path";
 
 export default async function runEditor(
@@ -36,13 +36,12 @@ export default async function runEditor(
         }
     }
 
-    // In Electron environment, use sendToElectron to communicate with the main process
+    // In Electron environment, use sendEditorToElectron to communicate with the main process
     if (isElectronEnvironment()) {
         console.log(`Running editor in Electron environment${normalizedProjectPath ? `: ${normalizedProjectPath}` : ''}`);
 
-        // For now, we use the same sendToElectron function as running a game
-        // Ideally, we might want to modify the Electron part to handle editor specifically
-        const result = await sendToElectron(normalizedProjectPath || "editor");
+        // Use the dedicated editor function that sends to the /run-editor endpoint
+        const result = await sendEditorToElectron(normalizedProjectPath);
 
         if (!result.success) {
             throw new Error(`Failed to run editor: ${result.error || 'Unknown error'}`);
@@ -68,7 +67,7 @@ export default async function runEditor(
         if (Deno.build.os === "windows") {
             // Windows - use embedded Python with our wrapper script
             pythonCommand = "..\\electron\\bin\\python\\python_embed\\python.exe";
-            pythonArgs = [pythonScript];
+            pythonArgs = ["run_editor_with_embedded_python.py", pythonScript];
             if (normalizedProjectPath) {
                 pythonArgs.push(normalizedProjectPath);
             }

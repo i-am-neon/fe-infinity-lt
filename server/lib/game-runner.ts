@@ -42,6 +42,42 @@ class GameRunner {
   }
 
   /**
+   * Send a command to the Electron main process to run the editor
+   * @param projectPath The path to the project to open, or undefined to open the editor without a project
+   * @returns A promise that resolves when the editor is running
+   */
+  async sendEditorToElectron(
+    projectPath?: string
+  ): Promise<{ success: boolean; error?: string }> {
+    try {
+      console.log(`Attempting to open editor${projectPath ? ` with project: ${projectPath}` : ''}`);
+
+      // In Electron, use HTTP to communicate with game launcher service
+      const response = await fetch("http://localhost:8989/run-editor", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ projectPath }),
+      });
+
+      // Parse the response
+      const result = await response.json();
+
+      return {
+        success: result.success === true,
+        error: result.error,
+      };
+    } catch (error) {
+      console.error("Error in sendEditorToElectron:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+      };
+    }
+  }
+
+  /**
    * Run a Python script using the appropriate method based on environment
    * @param scriptPath The path to the Python script to run
    * @param args Optional arguments to pass to the Python script
@@ -166,6 +202,9 @@ export const gameRunner = new GameRunner();
 
 // Re-export the sendToElectron function for backward compatibility
 export const sendToElectron = gameRunner.sendToElectron.bind(gameRunner);
+
+// Export the new sendEditorToElectron function
+export const sendEditorToElectron = gameRunner.sendEditorToElectron.bind(gameRunner);
 
 if (import.meta.main) {
   const projectPath = "default.ltproj";

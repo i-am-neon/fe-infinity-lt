@@ -1242,6 +1242,279 @@ async function preparePythonEnvironment() {
   });
 }
 
+// Run the LT Maker Editor with an optional project
+async function runEditor(projectNameEndingInDotLtProj) {
+  return new Promise((resolve, reject) => {
+    try {
+      // Add logging for app paths and environment
+      logger.log('info', `Running editor on platform: ${process.platform}`, {
+        projectPath: projectNameEndingInDotLtProj || 'none',
+        appPath: app.getAppPath(),
+        resourcesPath: process.resourcesPath,
+        platform: process.platform,
+        arch: process.arch
+      });
+
+      // Make sure we're using the correct path to lt-maker-fork
+      const ltMakerPath = process.env.NODE_ENV === 'development'
+        ? path.join(app.getAppPath(), '..', 'lt-maker-fork')
+        : getLtMakerPath();
+
+      // Log the paths for debugging
+      logger.log('info', 'Path resolution for editor launcher', {
+        appPath: app.getAppPath(),
+        ltMakerPath: ltMakerPath
+      });
+
+      // Verify the LT Maker directory exists
+      if (!fs.existsSync(ltMakerPath)) {
+        const errorMsg = `LT Maker directory not found at: ${ltMakerPath}`;
+        logger.log('error', errorMsg);
+        reject(new Error(errorMsg));
+        return;
+      }
+
+      // Enhanced platform detection logging
+      logger.log('info', `Platform detection: process.platform = ${process.platform}`);
+
+      // Determine which Python script to run based on whether a project was specified
+      const pythonScript = projectNameEndingInDotLtProj
+        ? "run_editor_for_project.py"
+        : "run_editor.py";
+
+      logger.log('info', `Using Python script: ${pythonScript}`);
+
+      // On macOS or Linux, we always use Wine
+      if (process.platform === 'darwin' || process.platform === 'linux') {
+        logger.log('info', 'Using Wine-based execution path for macOS/Linux');
+        let winePath;
+        try {
+          winePath = getWinePath();
+          logger.log('info', `Using Wine at: ${winePath}`);
+        } catch (wineError) {
+          logger.log('error', 'Fatal Wine error', { error: wineError.message });
+          reject(wineError);
+          return;
+        }
+
+        if (!winePath) {
+          const error = new Error('Wine is not available');
+          logger.log('error', 'Wine not available on system');
+          reject(error);
+          return;
+        }
+
+        // Normalize project path for Wine and ensure it uses forward slashes
+        let normalizedProjectPath = '';
+        if (projectNameEndingInDotLtProj) {
+          normalizedProjectPath = projectNameEndingInDotLtProj.replace(/\\/g, '/');
+
+          // If the project name doesn't end with .ltproj, add it
+          if (!normalizedProjectPath.endsWith(".ltproj")) {
+            normalizedProjectPath += ".ltproj";
+          }
+
+          logger.log('info', `Running editor with normalized path: ${normalizedProjectPath}`);
+        }
+
+        // Get the environment for Python with Wine
+        const pythonEnv = getWinePythonEnv();
+
+        // Prepare the Wine command to run Python with the LT Maker script
+        const pythonExe = getBundledPythonPath();
+
+        // Convert paths for Wine usage
+        const toWinePath = (unixPath) => {
+          let cleanPath = unixPath.replace(/"/g, '');
+          if (cleanPath.startsWith('/')) {
+            return 'Z:' + cleanPath.replace(/\//g, '\\');
+          }
+          return cleanPath.replace(/\//g, '\\');
+        };
+
+        // Convert LT Maker path to Wine format
+        const wineLtMakerPath = toWinePath(ltMakerPath);
+
+        // Create arguments array for the Python command
+        const pythonArgs = [pythonScript];
+        if (normalizedProjectPath) {
+          pythonArgs.push(normalizedProjectPath);
+        }
+
+        // Create an improved shell script for running Wine
+        const shellScriptPath = path.join(app.getPath('temp'), 'run-editor-wine.sh');
+        const shellScriptContent = `#!/bin/bash
+# Run Wine with Python to launch editor
+cd "${ltMakerPath}"
+export WINEDEBUG=${pythonEnv.WINEDEBUG || '-all'}
+export WINEPREFIX=${pythonEnv.WINEPREFIX || '~/.wine'}
+
+# Set Python environment variables
+export PYTHONIOENCODING=utf-8
+export PYTHONUNBUFFERED=1
+export PYTHONPATH="${ltMakerPath}"
+
+echo "Running editor with Wine"
+echo "Wine executable: ${winePath}"
+echo "Python executable: ${pythonExe}"
+echo "Using editor embedded Python wrapper script"
+echo "Editor script: ${pythonScript}"
+echo "Project path: ${normalizedProjectPath || 'none'}"
+echo "Working directory: ${ltMakerPath}"
+
+# Execute Python script through the editor embedded Python wrapper
+"${winePath}" "${pythonExe}" "run_editor_with_embedded_python.py" "${pythonScript}" ${normalizedProjectPath ? `"${normalizedProjectPath}"` : ''} 2>&1
+`;
+
+        fs.writeFileSync(shellScriptPath, shellScriptContent);
+        fs.chmodSync(shellScriptPath, 0o755);
+
+        logger.log('info', `Created shell script for editor at ${shellScriptPath}`);
+
+        // Launch with shell script
+        const editorProcess = spawn(
+          '/bin/bash',
+          [shellScriptPath],
+          {
+            cwd: ltMakerPath,
+            detached: true,
+            stdio: ['ignore', 'pipe', 'pipe'],
+            env: pythonEnv
+          }
+        );
+
+        // Unref the process to allow Node.js to exit
+        editorProcess.unref();
+
+        editorProcess.stdout.on('data', (data) => {
+          const output = data.toString().trim();
+          logger.log('info', `Editor stdout: ${output}`);
+        });
+
+        editorProcess.stderr.on('data', (data) => {
+          const output = data.toString().trim();
+          logger.log('error', `Editor stderr: ${output}`);
+        });
+
+        editorProcess.on('close', (code) => {
+          logger.log('info', `Editor process closed with code ${code}`);
+
+          // Clean up temp files
+          try {
+            fs.unlinkSync(shellScriptPath);
+          } catch (err) {
+            logger.log('warn', `Error cleaning up temp files: ${err.message}`);
+          }
+
+          if (code !== 0) {
+            logger.log('error', `Editor process exited with non-zero code: ${code}`);
+          }
+          resolve();
+        });
+
+        editorProcess.on('error', (err) => {
+          logger.log('error', 'Failed to start editor process', {
+            error: err.message,
+            code: err.code,
+            path: shellScriptPath
+          });
+          reject(err);
+        });
+
+        // Resolve after a short delay to unblock UI
+        setTimeout(() => {
+          logger.log('info', 'Resolving editor process promise to unblock UI');
+          resolve();
+        }, 2000);
+      } else {
+        // On Windows, we run Python directly
+        logger.log('info', 'Using Windows-native execution path for editor');
+
+        // Get the Python path
+        const pythonPath = getBundledPythonPath();
+        logger.log('info', `Using bundled Python on Windows: ${pythonPath}`);
+
+        // Verify Python exists
+        if (!fs.existsSync(pythonPath)) {
+          const errorMsg = `Critical error: Python executable not found at ${pythonPath}`;
+          logger.log('error', errorMsg);
+          reject(new Error(errorMsg));
+          return;
+        }
+
+        // Create args array for the Python process with the embedded Python wrapper
+        const pythonArgs = ['run_editor_with_embedded_python.py', pythonScript];
+
+        // Add project path if specified
+        if (projectNameEndingInDotLtProj) {
+          // Ensure it ends with .ltproj
+          let normalizedPath = projectNameEndingInDotLtProj;
+          if (!normalizedPath.endsWith('.ltproj')) {
+            normalizedPath += '.ltproj';
+          }
+          pythonArgs.push(normalizedPath);
+        }
+
+        logger.log('info', `Running editor with command: ${pythonPath} ${pythonArgs.join(' ')}`);
+
+        // Launch the Python process
+        const pythonProcess = spawn(
+          pythonPath,
+          pythonArgs,
+          {
+            cwd: ltMakerPath,
+            detached: true,
+            stdio: ['ignore', 'pipe', 'pipe'],
+            env: {
+              ...process.env,
+              PYTHONPATH: `${ltMakerPath}${path.delimiter}${process.env.PYTHONPATH || ''}`,
+              PYTHONUNBUFFERED: '1'
+            }
+          }
+        );
+
+        // Unref to allow Node.js to exit
+        pythonProcess.unref();
+
+        pythonProcess.stdout.on('data', (data) => {
+          const output = data.toString().trim();
+          logger.log('info', `Editor stdout: ${output}`);
+        });
+
+        pythonProcess.stderr.on('data', (data) => {
+          const output = data.toString().trim();
+          logger.log('error', `Editor stderr: ${output}`);
+        });
+
+        pythonProcess.on('close', (code) => {
+          logger.log('info', `Editor process closed with code ${code}`);
+          resolve();
+        });
+
+        pythonProcess.on('error', (err) => {
+          logger.log('error', 'Failed to start editor process', {
+            error: err.message,
+            stack: err.stack
+          });
+          reject(err);
+        });
+
+        // Resolve after a short delay to unblock UI
+        setTimeout(() => {
+          logger.log('info', 'Resolving editor process promise to unblock UI');
+          resolve();
+        }, 2000);
+      }
+    } catch (error) {
+      logger.log('error', 'Unexpected error in runEditor', {
+        error: error.message,
+        stack: error.stack
+      });
+      reject(error);
+    }
+  });
+}
+
 // Alias for backward compatibility
 const runGameWithWine = runGame;
 
@@ -1404,7 +1677,6 @@ export PYTHONIOENCODING=utf-8
 export PYTHONUNBUFFERED=1
 export PYTHONPATH="${ltMakerPath}"
 
-# Debug info to help diagnose path issues
 echo "Running Python script with Wine"
 echo "Wine executable: ${winePath}"
 echo "Python script: ${tempScriptPath}"
@@ -1462,18 +1734,14 @@ fi
           try {
             fs.unlinkSync(tempScriptPath);
             fs.unlinkSync(shellScriptPath);
-          } catch (cleanupErr) {
-            logger.log('warn', `Error cleaning up temporary files: ${cleanupErr.message}`);
+          } catch (err) {
+            logger.log('warn', `Error cleaning up temp files: ${err.message}`);
           }
 
           if (code !== 0) {
             logger.log('error', `Wine process exited with non-zero code: ${code}`);
-            logger.log('error', `Wine process stderr: ${stderrData}`);
-            reject(new Error(`Python script exited with code ${code}: ${stderrData}`));
-          } else {
-            logger.log('info', `Python script execution successful: ${stdoutData}`);
-            resolve(stdoutData);
           }
+          resolve(stdoutData);
         });
 
         wineProcess.on('error', (err) => {
@@ -1523,34 +1791,22 @@ fi
           }
         );
 
-        // Unref the child to allow the Node.js event loop to exit
+        // Unref to allow Node.js to exit
         pythonProcess.unref();
-
-        let stdoutData = '';
-        let stderrData = '';
 
         pythonProcess.stdout.on('data', (data) => {
           const output = data.toString().trim();
-          stdoutData += output + '\n';
           logger.log('info', `Python script stdout: ${output}`);
         });
 
         pythonProcess.stderr.on('data', (data) => {
           const output = data.toString().trim();
-          stderrData += output + '\n';
           logger.log('error', `Python script stderr: ${output}`);
         });
 
         pythonProcess.on('close', (code) => {
           logger.log('info', `Python script process closed with code ${code}`);
-          if (code !== 0) {
-            logger.log('error', `Python process exited with non-zero code: ${code}`);
-            logger.log('error', `Python process stderr: ${stderrData}`);
-            reject(new Error(`Python script exited with code ${code}: ${stderrData}`));
-          } else {
-            logger.log('info', `Python script execution successful: ${stdoutData}`);
-            resolve(stdoutData);
-          }
+          resolve(stdoutData);
         });
 
         pythonProcess.on('error', (err) => {
@@ -1560,6 +1816,12 @@ fi
           });
           reject(err);
         });
+
+        // Resolve after a short delay to unblock UI
+        setTimeout(() => {
+          logger.log('info', 'Resolving Python process promise to unblock UI');
+          resolve(stdoutData);
+        }, 2000);
       }
     } catch (error) {
       logger.log('error', 'Unexpected error in runPythonScript', {
@@ -1573,7 +1835,8 @@ fi
 
 module.exports = {
   runGame,
-  runGameWithWine, // Keeping for backward compatibility
+  runGameWithWine,
   preparePythonEnvironment,
-  runPythonScript
+  runPythonScript,
+  runEditor
 };
