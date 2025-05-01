@@ -58,9 +58,17 @@ export function validateAiEventPortraits(
       // Clean the speaker name for comparison
       const rawSpeaker = obj.args[0];
       const speakerName = rawSpeaker.replace(/\(.*?\)/g, "").trim();
+
+      // Check if the character has been added at all
       if (!addedCharacters.has(speakerName)) {
         errors.push(
           `Speaker '${rawSpeaker}' does not have a prior add_portrait command.`
+        );
+      }
+      // Check if the character is currently visible
+      else if (!visibleCharacters.has(speakerName)) {
+        errors.push(
+          `Speaker '${rawSpeaker}' speaks after their portrait was removed.`
         );
       }
     }
