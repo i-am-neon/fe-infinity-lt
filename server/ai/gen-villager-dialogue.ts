@@ -28,6 +28,10 @@ The dialogue should:
 5. End with mentioning they're giving the player an item
 6. Be written in a natural, conversational tone
 
+WRITING STYLE - AVOIDING CLICHÉS:
+- Avoid overused mystery phrases like "The X holds more than just Y..." or "There's more to this than meets the eye"
+- Instead, try these more creative approaches for building tension and mystery
+
 Consider the context of the villager's location, the events happening around them, and what would make sense for them to know or care about.`;
 
   const { dialogue } = await generateStructuredData({
