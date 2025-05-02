@@ -94,18 +94,18 @@ function registerUserAssetsHandlers() {
             const fullPath = path.join(app.getPath('userData'), assetPath);
             const exists = fs.existsSync(fullPath);
 
-            logger.log('info', `Checking if user asset exists: ${assetPath} (${exists ? 'exists' : 'does not exist'})`);
+            // logger.log('info', `Checking if user asset exists: ${assetPath} (${exists ? 'exists' : 'does not exist'})`);
 
             if (exists) {
                 // If it exists, log the file size for debugging
                 const stats = fs.statSync(fullPath);
-                logger.log('info', `Asset file size: ${stats.size} bytes`);
+                // logger.log('info', `Asset file size: ${stats.size} bytes`);
             } else {
                 // If it doesn't exist, list all title images to help debug
                 const titleImagesDir = getTitleImagesDir();
                 if (fs.existsSync(titleImagesDir)) {
                     const files = fs.readdirSync(titleImagesDir);
-                    logger.log('info', `Available title images: ${files.join(', ') || 'none'}`);
+                    // logger.log('info', `Available title images: ${files.join(', ') || 'none'}`);
                 }
             }
 

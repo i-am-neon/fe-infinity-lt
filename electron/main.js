@@ -1013,7 +1013,7 @@ ipcMain.handle('hasApiKey', async (event) => {
 // Modify the api-call handler to include API keys from storage
 ipcMain.handle('api-call', async (event, { endpoint, method, body }) => {
   try {
-    if (!endpoint.includes('game-creation-progress')) {
+    if (!endpoint.includes('game-creation-progress') && !endpoint.includes('generation-progress')) {
       logger.log('info', `API call to ${endpoint}`);
     }
 
