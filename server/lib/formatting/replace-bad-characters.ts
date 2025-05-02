@@ -1,6 +1,7 @@
 export default function replaceBadCharacters(input: string): string {
   const replacements: { [key: string]: string } = {
     "—": "-",
+    "–": "-",
     "’": "'",
     "‘": "'",
     ";": ",",

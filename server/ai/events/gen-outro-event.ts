@@ -53,7 +53,17 @@ This is CRITICAL for gameplay mechanics - if an item is mentioned, the "give_ite
 The event should:
 - use the Chapter Idea's outro as the basis for the event
 - ensure that any character who speaks has an "add_portrait" command somewhere earlier in the event script
-- CRITICAL: EVERY character MUST have an "add_portrait" command BEFORE they speak for the first time
+- CRITICAL FOR CHARACTER ENTRY TIMING (STRICT REQUIREMENT):
+  - DO NOT add portraits for ALL characters at the beginning of the scene
+  - ONLY add portraits for characters who are IMMEDIATELY present in the scene
+  - Characters who enter the scene later MUST ONLY have their portrait added when they actually enter
+  - INCORRECT EXAMPLE TO AVOID:
+    * Adding "Character X" at the beginning when X doesn't appear until later
+    * Then having to remove X's portrait, then re-add it when they actually enter
+  - CORRECT APPROACH:
+    * Only add the portraits for characters present in the initial scene
+    * Add other character portraits exactly when they first enter the scene
+  - This timing is absolutely critical for scene immersion and flow
 - CRITICAL: Characters CANNOT speak after "remove_portrait" has been called on them, unless an "add_portrait" command is used again
 - CRITICAL - PORTRAIT MANAGEMENT:
   - Never have more than 6 character portraits visible at once in a scene

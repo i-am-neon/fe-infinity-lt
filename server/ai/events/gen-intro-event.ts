@@ -76,6 +76,17 @@ The event must also:
   - For characters who enter the scene later, place the "add_portrait" command EXACTLY at the moment they enter
   - NEVER add all character portraits at the beginning if some characters are meant to enter later
   - This timing is critical for proper scene flow - incorrectly timed portraits break immersion
+- CRITICAL FOR CHARACTER ENTRY TIMING (STRICT REQUIREMENT):
+  - DO NOT add portraits for ALL characters at the beginning of the scene
+  - ONLY add portraits for characters who are IMMEDIATELY present in the scene
+  - Characters who enter the scene later MUST ONLY have their portrait added when they actually enter
+  - INCORRECT EXAMPLE TO AVOID:
+    * Adding "Character X" at the beginning when X doesn't appear until later
+    * Then having to remove X's portrait, then re-add it when they actually enter
+  - CORRECT APPROACH:
+    * Only add the portraits for characters present in the initial scene
+    * Add other character portraits exactly when they first enter the scene
+  - This timing is absolutely critical for scene immersion and flow
 - CRITICAL - PORTRAIT MANAGEMENT:
   - Never have more than 6 character portraits visible at once in a scene
   - If more than 6 characters are in a conversation, use "remove_portrait" for less important characters before adding new ones
