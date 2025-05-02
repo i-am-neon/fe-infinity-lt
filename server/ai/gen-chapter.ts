@@ -572,7 +572,7 @@ export default async function genChapter({
   const newCharacterDeathEvents: Event[] = newCharacters.map((ch) => ({
     name: `Death${ch.unitData.nid}`,
     trigger: "unit_death",
-    level_nid: chapterNumber.toString(),
+    level_nid: null, // global event
     condition: `unit.nid == '${ch.unitData.nid}'`,
     commands: [],
     only_once: false,
