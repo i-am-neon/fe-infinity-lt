@@ -50,7 +50,7 @@ export default async function getChapterResults({
     const jsonLines = lines.filter(line => line.trim().startsWith('{') && line.trim().endsWith('}'));
     const lastJsonLine = jsonLines.length > 0 ? jsonLines[jsonLines.length - 1].trim() : lines[lines.length - 1].trim();
 
-    logger.info("Parsing JSON line", { jsonLine: lastJsonLine });
+    // logger.info("Parsing JSON line", { jsonLine: lastJsonLine });
 
     // parse the JSON line
     const parsed = JSON.parse(lastJsonLine);
