@@ -96,7 +96,7 @@ export default function SettingsPage() {
                                 <span>Configure your AI provider API keys for OpenAI.</span>
                                 <span
                                     className="mt-2 underline underline-offset-2 hover:text-primary cursor-pointer w-fit"
-                                    onClick={() => openExternalLink("https://www.youtube.com/watch?v=dQw4w9WgXcQ")}
+                                    onClick={() => openExternalLink("https://youtu.be/8Oq-E6JTVzo")}
                                 >
                                     How-To Video <ExternalLink className="inline h-3 w-3" />
                                 </span>

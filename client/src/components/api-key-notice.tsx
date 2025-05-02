@@ -50,7 +50,7 @@ export default function ApiKeyNotice() {
                 <span className="mb-3">You need to provide an OpenAI API key to use this application.</span>
                 <span
                     className="mb-3 underline underline-offset-2 hover:text-primary cursor-pointer"
-                    onClick={() => openExternalLink("https://www.youtube.com/watch?v=dQw4w9WgXcQ")}
+                    onClick={() => openExternalLink("https://youtu.be/8Oq-E6JTVzo")}
                 >
                     How-To Video <ExternalLink className="inline h-3 w-3" />
                 </span>
