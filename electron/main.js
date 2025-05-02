@@ -1120,6 +1120,16 @@ ipcMain.handle('exportLogs', async () => {
   }
 });
 
+// Handle opening external links in default browser
+ipcMain.on('openExternal', (_, url) => {
+  try {
+    logger.log('info', `Opening external URL: ${url}`);
+    require('electron').shell.openExternal(url);
+  } catch (error) {
+    logger.log('error', 'Error opening external URL', { error: error.message, url });
+  }
+});
+
 app.on('before-quit', () => {
   logger.log('info', 'Application shutting down');
   stopServer();

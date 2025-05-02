@@ -4,7 +4,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 const electronAPI = {
   ipcRenderer: {
     send: (channel, data) => {
-      const validChannels = ['toMain', 'checkServer', 'runGame'];
+      const validChannels = ['toMain', 'checkServer', 'runGame', 'openExternal'];
       if (validChannels.includes(channel)) {
         ipcRenderer.send(channel, data);
       }

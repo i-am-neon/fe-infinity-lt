@@ -11,6 +11,7 @@ import { BLUR_FADE_DELAY } from "@/components/ui/constants";
 import { Switch } from "@/components/ui/switch";
 import { useEffect, useState } from "react";
 import VersionDisplay from "@/components/version-display";
+import { openExternalLink } from "@/lib/utils";
 
 export default function SettingsPage() {
     const { theme } = useTheme();
@@ -178,9 +179,11 @@ export default function SettingsPage() {
                                 </p>
                                 <div className="mt-2">
                                     <a
-                                        href="https://feinfinity.vercel.app"
-                                        target="_blank"
-                                        rel="noreferrer"
+                                        href="#"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            openExternalLink('https://feinfinity.vercel.app');
+                                        }}
                                         className="text-primary hover:underline"
                                     >
                                         Visit Website
