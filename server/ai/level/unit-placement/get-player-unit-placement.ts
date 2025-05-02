@@ -189,7 +189,8 @@ function countValidTiles(
 }
 
 /**
- * Returns all valid tiles for player unit placement within the specified boundary
+ * Returns valid tiles for player unit placement within the boundary
+ * If fewer than 8 tiles are found, it will expand search beyond the boundary
  */
 export default function getPlayerUnitPlacement({
     terrainGrid,
@@ -206,6 +207,7 @@ export default function getPlayerUnitPlacement({
 }): Array<{ x: number; y: number }> {
     const logger = getCurrentLogger();
     const validPositions: Array<{ x: number; y: number }> = [];
+    const minDesiredPositions = 8;
 
     // Scan the entire boundary for valid positions
     for (let y = fromY; y <= toY; y++) {
@@ -222,29 +224,125 @@ export default function getPlayerUnitPlacement({
         boundaryTo: { x: toX, y: toY },
     });
 
+    // If we found fewer than 8 valid positions, expand the search area
+    if (validPositions.length < minDesiredPositions) {
+        logger.info(`Found fewer than ${minDesiredPositions} valid tiles, expanding search area`);
+
+        // Get the grid size to know the boundaries
+        const { width, height } = getTerrainGridSize(terrainGrid);
+
+        // Start with a slightly expanded boundary
+        let expandedFromX = Math.max(0, fromX - 1);
+        let expandedFromY = Math.max(0, fromY - 1);
+        let expandedToX = Math.min(width - 1, toX + 1);
+        let expandedToY = Math.min(height - 1, toY + 1);
+        let expansionSteps = 1;
+
+        // Keep expanding the boundary until we find enough positions or hit the map edge
+        while (
+            validPositions.length < minDesiredPositions &&
+            (expandedFromX > 0 || expandedFromY > 0 || expandedToX < width - 1 || expandedToY < height - 1) &&
+            expansionSteps < 10  // Safety limit to prevent infinite loops
+        ) {
+            // Scan the new boundary perimeter only
+            // Top and bottom edges
+            for (let x = expandedFromX; x <= expandedToX; x++) {
+                // Top edge
+                let y = expandedFromY;
+                let key = `${x},${y}`;
+                if (
+                    terrainGrid[key] &&
+                    isTileValidForPlayer(terrainGrid[key]) &&
+                    !isPositionOccupied(x, y, validPositions)
+                ) {
+                    validPositions.push({ x, y });
+                }
+
+                // Bottom edge
+                y = expandedToY;
+                key = `${x},${y}`;
+                if (
+                    terrainGrid[key] &&
+                    isTileValidForPlayer(terrainGrid[key]) &&
+                    !isPositionOccupied(x, y, validPositions)
+                ) {
+                    validPositions.push({ x, y });
+                }
+            }
+
+            // Left and right edges (excluding corners which were already checked)
+            for (let y = expandedFromY + 1; y < expandedToY; y++) {
+                // Left edge
+                let x = expandedFromX;
+                let key = `${x},${y}`;
+                if (
+                    terrainGrid[key] &&
+                    isTileValidForPlayer(terrainGrid[key]) &&
+                    !isPositionOccupied(x, y, validPositions)
+                ) {
+                    validPositions.push({ x, y });
+                }
+
+                // Right edge
+                x = expandedToX;
+                key = `${x},${y}`;
+                if (
+                    terrainGrid[key] &&
+                    isTileValidForPlayer(terrainGrid[key]) &&
+                    !isPositionOccupied(x, y, validPositions)
+                ) {
+                    validPositions.push({ x, y });
+                }
+            }
+
+            // Expand boundary for next iteration
+            expandedFromX = Math.max(0, expandedFromX - 1);
+            expandedFromY = Math.max(0, expandedFromY - 1);
+            expandedToX = Math.min(width - 1, expandedToX + 1);
+            expandedToY = Math.min(height - 1, expandedToY + 1);
+            expansionSteps++;
+        }
+
+        logger.info(`After expansion, found ${validPositions.length} valid tiles for player unit placement`, {
+            originalBoundary: { fromX, fromY, toX, toY },
+            expandedBoundary: { fromX: expandedFromX, fromY: expandedFromY, toX: expandedToX, toY: expandedToY },
+        });
+    }
+
     return validPositions;
 }
 
 if (import.meta.main) {
-    // Test with boundary constraints
-    const testBoundary = getPlayerUnitPlacement({
+    // // Test with boundary constraints
+    // const testBoundary = getPlayerUnitPlacement({
+    //     terrainGrid: ch4TerrainGrid,
+    //     fromX: 0,
+    //     fromY: 0,
+    //     toX: 5,
+    //     toY: 5,
+    // });
+
+    // console.log(`Found ${testBoundary.length} valid tiles within boundary (0,0)-(5,5):`, testBoundary);
+
+    // // Test with another boundary
+    // const testAnotherBoundary = getPlayerUnitPlacement({
+    //     terrainGrid: ch4TerrainGrid,
+    //     fromX: 0,
+    //     fromY: 2,
+    //     toX: 3,
+    //     toY: 6,
+    // });
+
+    // console.log(`Found ${testAnotherBoundary.length} valid tiles within boundary (0,2)-(3,6):`, testAnotherBoundary);
+
+    // small area should still make 8 valid positions
+    const testSmallArea = getPlayerUnitPlacement({
         terrainGrid: ch4TerrainGrid,
         fromX: 0,
         fromY: 0,
-        toX: 5,
-        toY: 5,
+        toX: 1,
+        toY: 1,
     });
 
-    console.log(`Found ${testBoundary.length} valid tiles within boundary (0,0)-(5,5):`, testBoundary);
-
-    // Test with another boundary
-    const testAnotherBoundary = getPlayerUnitPlacement({
-        terrainGrid: ch4TerrainGrid,
-        fromX: 0,
-        fromY: 2,
-        toX: 3,
-        toY: 6,
-    });
-
-    console.log(`Found ${testAnotherBoundary.length} valid tiles within boundary (0,2)-(3,6):`, testAnotherBoundary);
+    console.log(`Found ${testSmallArea.length} valid tiles within boundary (0,0)-(1,1):`, testSmallArea);
 } 
