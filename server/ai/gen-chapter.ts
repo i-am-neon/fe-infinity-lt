@@ -311,7 +311,7 @@ export default async function genChapter({
   const allLivingPlayerCharacterIdeas = [
     ...(initialGameIdea?.characterIdeas ?? []),
     ...existingCharacters.map((c) => c.characterIdea.firstSeenAs !== "non-playable character" ? c.characterIdea : null).filter((c) => c !== null),
-    ...newCharacterIdeas,
+    ...newCharacterIdeas.filter(nc => nc.firstSeenAs !== "non-playable character"),
   ]
     .filter(
       (idea, index, self) =>
