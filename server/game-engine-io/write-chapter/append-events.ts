@@ -22,14 +22,14 @@ export async function appendEvents({
   };
 
   const validatedEvents = newEvents.map((event) => {
-    if (!event.name || !event.trigger || !event.level_nid) {
+    if (!event.name || !event.trigger) {
       throw new Error("Each event requires name, trigger, and level_nid");
     }
     return {
       ...defaultEvent,
       name: event.name,
       trigger: event.trigger,
-      level_nid: event.level_nid,
+      level_nid: event.level_nid ?? null,
       ...event,
     } satisfies Event;
   });
