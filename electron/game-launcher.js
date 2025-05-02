@@ -168,9 +168,9 @@ async function startGameLauncherServer() {
           }
 
           try {
-            await runPythonScript(scriptPath, args);
+            const output = await runPythonScript(scriptPath, args);
             res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ success: true }));
+            res.end(JSON.stringify({ success: true, output }));
           } catch (error) {
             logger.log('error', 'Error running Python script', {
               error: error.message,

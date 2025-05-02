@@ -45,11 +45,9 @@ export default async function runPythonScript({
     });
 
     try {
-      // Note: Need to update gameRunner.runPythonScript in game-runner.ts to accept args
-      // This assumes the implementation has been updated to accept args
-      // If it hasn't been updated, this will still work but args will be ignored
-      await gameRunner.runPythonScript(scriptPath, args);
-      return { output: "", error: null };
+      // Call the runPythonScript method from gameRunner which returns the stdout data
+      const output = await gameRunner.runPythonScript(scriptPath, args);
+      return { output, error: null };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       logger.error("Error running Python script in Electron", { error: errorMessage });

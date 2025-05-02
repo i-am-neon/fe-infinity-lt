@@ -81,8 +81,9 @@ class GameRunner {
    * Run a Python script using the appropriate method based on environment
    * @param scriptPath The path to the Python script to run
    * @param args Optional arguments to pass to the Python script
+   * @returns The stdout output from the script
    */
-  async runPythonScript(scriptPath: string, args: string[] = []): Promise<void> {
+  async runPythonScript(scriptPath: string, args: string[] = []): Promise<string> {
     // In Electron environment, use HTTP to communicate with main process
     if (isElectronEnvironment()) {
       const response = await fetch("http://localhost:8989/run-python", {
@@ -98,7 +99,9 @@ class GameRunner {
         throw new Error(`Failed to run Python script: ${error}`);
       }
 
-      return;
+      // Parse the response to get the output
+      const result = await response.json();
+      return result.output || "";
     }
 
     // Direct execution for non-Electron environments
@@ -111,21 +114,23 @@ class GameRunner {
         const pythonCommand = "python";
         const runCommand = new Deno.Command(pythonCommand, {
           args: [scriptPath, ...args],
-          stdout: "inherit",
-          stderr: "inherit",
+          stdout: "piped",
+          stderr: "piped",
         });
-        await runCommand.output();
+        const { stdout } = await runCommand.output();
+        return new TextDecoder().decode(stdout);
       } else {
         // macOS/Linux - use local Python directly when in development mode
         console.log("Using local Python for development");
         const pythonCommand = "python";
         const runCommand = new Deno.Command(pythonCommand, {
           args: [scriptPath, ...args],
-          stdout: "inherit",
-          stderr: "inherit",
+          stdout: "piped",
+          stderr: "piped",
           cwd: dirname(scriptPath), // Run in the same directory as the script
         });
-        await runCommand.output();
+        const { stdout } = await runCommand.output();
+        return new TextDecoder().decode(stdout);
       }
     } finally {
       // Restore original directory

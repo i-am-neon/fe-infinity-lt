@@ -81,7 +81,7 @@ export default async function createNextChapter({
   logger.debug("chapter results", {
     lastChoice,
     deadCharacters,
-    finishedChapterNumber: existingGame.chapters.length,
+    finishedChapterNumber: existingGame.chapters.length - 1, // we start at 0
   });
 
   // Reviewing previous chapter
