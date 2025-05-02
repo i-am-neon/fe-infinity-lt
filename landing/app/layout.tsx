@@ -18,7 +18,7 @@ const montserrat = Montserrat({
 
 export const metadata: Metadata = {
   title: "FE Infinity",
-  description: "Create a Fire Emblem game as you play it",
+  description: "AI creates a Fire Emblem game as you play it",
 };
 
 export default function RootLayout({
