@@ -2,50 +2,12 @@
 import { FC, useState, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { GAME_IDEAS } from "@/lib/game-ideas";
 
 interface GameIdeaSelectorProps {
   onChange: (idea: string) => void;
   selected?: string;
 }
-
-const gameIdeas = [
-  {
-    title: "Revenant Oath",
-    description:
-      "A once-feared warlord reawakens, determined to reclaim a lost empire. As the undead legions grow, every choice teeters between redemption and eternal damnation.",
-    tone: "dark fantasy, vengeful",
-  },
-  {
-    title: "The Grand Tourney",
-    description:
-      "Once a year, the kingdom hosts a grand festival where duels, wits, and whispers decide the fates of nobles and commoners alike. Every move in the arena or the court can forge alliances or fuel rivalries.",
-    tone: "whimsical, light-hearted, comedy",
-  },
-  {
-    title: "Fractured Bonds",
-    description:
-      "A crumbling kingdom is torn by rival factions vying for the throne. Trust is a fragile currency in this world of spies, shifting loyalties, and high-stakes diplomacy.",
-    tone: "political intrigue, strategic",
-  },
-  {
-    title: "Celestial Ruin",
-    description:
-      "The sacred relics that upheld an empire’s power are fading. A desperate pilgrimage begins to either restore the divine or shatter the cycle forever.",
-    tone: "grand adventure, epic",
-  },
-  {
-    title: "Arcane Rebellion",
-    description:
-      "A tyrannical empire has outlawed magic, forcing spellcasters into hiding. Can the player unite the warring mage factions before they destroy each other?",
-    tone: "rebellion, tense",
-  },
-  {
-    title: "Twin Fates",
-    description:
-      "Two royal siblings, separated by war, believe each other dead. As their armies march closer, a reunion seems inevitable—but will it be as family, or as enemies?",
-    tone: "bittersweet, emotional",
-  },
-];
 
 const GameIdeaSelector: FC<GameIdeaSelectorProps> = ({
   onChange,
@@ -54,17 +16,17 @@ const GameIdeaSelector: FC<GameIdeaSelectorProps> = ({
   const [startIndex, setStartIndex] = useState(0);
 
   const handleShuffle = useCallback(() => {
-    setStartIndex((prev) => (prev + 3) % gameIdeas.length);
+    setStartIndex((prev) => (prev + 3) % GAME_IDEAS.length);
     onChange("");
   }, [onChange]);
 
   const currentIdeas =
-    gameIdeas.slice(startIndex, startIndex + 3).length === 3
-      ? gameIdeas.slice(startIndex, startIndex + 3)
+    GAME_IDEAS.slice(startIndex, startIndex + 3).length === 3
+      ? GAME_IDEAS.slice(startIndex, startIndex + 3)
       : [
-          ...gameIdeas.slice(startIndex),
-          ...gameIdeas.slice(0, (startIndex + 3) % gameIdeas.length),
-        ];
+        ...GAME_IDEAS.slice(startIndex),
+        ...GAME_IDEAS.slice(0, (startIndex + 3) % GAME_IDEAS.length),
+      ];
 
   return (
     <div className="flex flex-col gap-4">

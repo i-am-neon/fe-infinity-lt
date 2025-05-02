@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import apiCall from "@/lib/api-call";
+import { GAME_IDEAS, GameIdea } from "@/lib/game-ideas";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, ChevronLeft, RefreshCw, Wand2 } from "lucide-react";
@@ -22,12 +23,6 @@ import {
 import { toast, Toaster } from "sonner";
 import { BlurFade } from "@/components/magicui/blur-fade";
 import { BLUR_FADE_DELAY } from "@/components/ui/constants";
-
-interface StoryIdea {
-  title: string;
-  description: string;
-  tone: string;
-}
 
 // Organize tags into categories
 const tagCategories = {
@@ -57,53 +52,13 @@ const tagCategories = {
   ]
 };
 
-const presets: StoryIdea[] = [
-  {
-    title: "Revenant Oath",
-    description:
-      "A once-feared warlord reawakens, determined to reclaim a lost empire. As the undead legions grow, every choice teeters between redemption and eternal damnation.",
-    tone: "dark fantasy, vengeful",
-  },
-  {
-    title: "The Grand Tourney",
-    description:
-      "Once a year, the kingdom hosts a grand festival where duels, wits, and whispers decide the fates of nobles and commoners alike. Every move in the arena or the court can forge alliances or fuel rivalries.",
-    tone: "whimsical, light-hearted, comedy",
-  },
-  {
-    title: "Fractured Bonds",
-    description:
-      "A crumbling kingdom is torn by rival factions vying for the throne. Trust is a fragile currency in this world of spies, shifting loyalties, and high-stakes diplomacy.",
-    tone: "political intrigue, strategic",
-  },
-  {
-    title: "Celestial Vanguard",
-    description:
-      "When star-beings descend from the heavens, a band of unlikely heroes must master ancient magic to save their realm. The boundary between divine and mortal blurs with each passing day.",
-    tone: "epic fantasy, mystical",
-  },
-  {
-    title: "Crimson Dynasty",
-    description:
-      "The royal family's blood magic sustains the empire, but at a terrible cost. As the power wanes and rebellion stirs, a young heir must choose between tradition and transformation.",
-    tone: "dark political, tragic",
-  },
-  {
-    title: "Nomad's Legacy",
-    description:
-      "Wandering tribes navigate a harsh world where ancient ruins hold forgotten technologies. When a mysterious artifact is discovered, it sparks a race that could lead to salvation or destruction.",
-    tone: "post-apocalyptic, adventure",
-  },
-  // Add more presets as needed
-];
-
 export default function CreateStoryPage() {
   const navigate = useNavigate();
   const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [blurb, setBlurb] = useState("");
   const [feedback, setFeedback] = useState("");
-  const [generated, setGenerated] = useState<StoryIdea | null>(null);
+  const [generated, setGenerated] = useState<GameIdea | null>(null);
   const [isTweakLoading, setIsTweakLoading] = useState(false);
   const [isCreateLoading, setIsCreateLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -308,7 +263,7 @@ export default function CreateStoryPage() {
                 className="w-full"
               >
                 <CarouselContent className="-ml-4">
-                  {presets.map((p) => (
+                  {GAME_IDEAS.map((p) => (
                     <CarouselItem key={p.title} className="pl-4 md:basis-1/2 lg:basis-1/3">
                       <div
                         className="cursor-pointer h-full p-1"
