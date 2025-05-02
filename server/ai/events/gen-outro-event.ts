@@ -62,6 +62,11 @@ The event should:
   - Prioritize newly introduced characters and those most important to the scene
   - When a character exits a scene or is no longer actively participating in the conversation, use "remove_portrait"
   - Balance the scene with appropriate add/remove commands to maintain clarity and focus
+- OFF-SCREEN CHARACTER HANDLING:
+  - Characters can be positioned "OffscreenLeft" or "OffscreenRight" in the "add_portrait" command
+  - Off-screen characters can still speak (dialog displays with speech bubble pointing off-screen)
+  - To move a character from off-screen to on-screen, first "remove_portrait" then "add_portrait" with an on-screen position
+  - Example: "add_portrait;Character;OffscreenLeft" → "remove_portrait;Character" → "add_portrait;Character;Left"
 - be sure to include the Chapter Idea's newNonBattleCharacters as characters in the event, as mentioned in the "intro" section of the Chapter Idea
 - if a character is mentioned in the outro, it must be included in the event
 - you may only give speaking roles to characters mentioned in the outro, not any other characters
