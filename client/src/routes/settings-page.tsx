@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft, ImageIcon, InfoIcon } from "lucide-react";
+import { ChevronLeft, ImageIcon, InfoIcon, ExternalLink } from "lucide-react";
 import ApiKeySettings from "@/components/settings/api-key-settings";
 import { BlurFade } from "@/components/magicui/blur-fade";
 import { BLUR_FADE_DELAY } from "@/components/ui/constants";
@@ -92,8 +92,14 @@ export default function SettingsPage() {
                     <Card>
                         <CardHeader>
                             <CardTitle>AI Provider Settings</CardTitle>
-                            <CardDescription>
-                                Configure your AI provider API keys for OpenAI.
+                            <CardDescription className="flex flex-col">
+                                <span>Configure your AI provider API keys for OpenAI.</span>
+                                <span
+                                    className="mt-2 underline underline-offset-2 hover:text-primary cursor-pointer w-fit"
+                                    onClick={() => openExternalLink("https://www.youtube.com/watch?v=dQw4w9WgXcQ")}
+                                >
+                                    How-To Video <ExternalLink className="inline h-3 w-3" />
+                                </span>
                             </CardDescription>
                         </CardHeader>
                         <CardContent>

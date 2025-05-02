@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom';
+import { openExternalLink } from "@/lib/utils";
 
 export default function ApiKeyNotice() {
     const [isElectron, setIsElectron] = useState(false);
@@ -47,6 +48,12 @@ export default function ApiKeyNotice() {
             <AlertTitle>OpenAI API Key Required</AlertTitle>
             <AlertDescription className="flex flex-col">
                 <span className="mb-3">You need to provide an OpenAI API key to use this application.</span>
+                <span
+                    className="mb-3 underline underline-offset-2 hover:text-primary cursor-pointer"
+                    onClick={() => openExternalLink("https://www.youtube.com/watch?v=dQw4w9WgXcQ")}
+                >
+                    How-To Video <ExternalLink className="inline h-3 w-3" />
+                </span>
                 <Button variant="outline" onClick={() => navigate('/settings')} className="w-fit">
                     Add API Key in Settings
                 </Button>
