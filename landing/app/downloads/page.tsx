@@ -8,6 +8,9 @@ import { Apple, Grid2x2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
+const MAC_DOWNLOAD_LINK = "https://github.com/i-am-neon/fe-infinity-lt/releases/download/ai/FE.Infinity-0.0.1-arm64.dmg";
+const WINDOWS_DOWNLOAD_LINK = "https://github.com/i-am-neon/fe-infinity-lt/releases/download/ai/FE.Infinity-Setup-0.0.1.exe";
+
 export default function DownloadsPage() {
     return (
         <main className="flex min-h-screen flex-col items-center">
@@ -44,7 +47,7 @@ export default function DownloadsPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 mb-8 sm:mb-12">
                         {/* Windows Download */}
                         <BlurFade delay={BLUR_FADE_DELAY * 3} inView>
-                            <Link href="#windows-download" className="block h-full">
+                            <Link href={WINDOWS_DOWNLOAD_LINK} className="block h-full">
                                 <GlowCard className="flex flex-col items-center justify-center text-center p-5 sm:p-8 h-full transition-transform hover:scale-105">
                                     <div className="mb-3 sm:mb-4">
                                         <Grid2x2 size={48} className="sm:w-16 sm:h-16" />
@@ -57,7 +60,7 @@ export default function DownloadsPage() {
 
                         {/* Mac Download */}
                         <BlurFade delay={BLUR_FADE_DELAY * 4} inView>
-                            <a href="https://github.com/i-am-neon/fe-infinity-lt/releases/download/ai/FE.Infinity-1.0.0-arm64.dmg" className="block h-full">
+                            <a href={MAC_DOWNLOAD_LINK} className="block h-full">
                                 <GlowCard className="flex flex-col items-center justify-center text-center p-5 sm:p-8 h-full transition-transform hover:scale-105">
                                     <div className="mb-3 sm:mb-4">
                                         <Apple size={48} className="sm:w-16 sm:h-16" />
