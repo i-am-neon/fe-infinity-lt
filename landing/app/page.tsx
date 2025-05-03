@@ -80,11 +80,11 @@ export default function Home() {
                 FE Infinity
               </h1>
               <h2 className="text-lg sm:text-xl md:text-2xl text-center mb-6 sm:mb-8 md:mb-10 text-white">
-                AI Creates a Fire Emblem game as you play it
+                AI Creates a Fire Emblem game as you play
               </h2>
               <div className="pointer-events-auto w-full max-w-xs sm:max-w-sm md:max-w-xl lg:max-w-3xl xl:max-w-4xl px-2 sm:px-4">
                 <HeroVideoDialog
-                  videoSrc="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                  videoSrc="https://www.youtube.com/embed/aNEkzWAhJCk"
                   thumbnailSrc="/video-thumbnail.jpg"
                   thumbnailAlt="FE Infinity Gameplay Demo"
                   animationStyle="fade"
