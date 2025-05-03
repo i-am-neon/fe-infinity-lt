@@ -40,7 +40,7 @@ export default function assembleLevel({
     objective: {
       simple: "Defeat boss",
       win: "Defeat boss",
-      loss: "Eirika dies",
+      loss: "Party dies",
     },
     roam: false,
     roam_unit: "Eirika",
