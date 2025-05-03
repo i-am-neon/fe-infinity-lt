@@ -1,6 +1,9 @@
 import { VERSION } from "@/constants.ts";
 
-const GITHUB_RELEASE_URL = "https://api.github.com/repos/i-am-neon/fe-infinity-lt/releases/tags/ai";
+// Change from tag-specific URL to latest releases endpoint
+const GITHUB_API_BASE = "https://api.github.com/repos/i-am-neon/fe-infinity-lt";
+const GITHUB_LATEST_RELEASE_URL = `${GITHUB_API_BASE}/releases/latest`;
+const GITHUB_RELEASES_URL = `${GITHUB_API_BASE}/releases`;
 
 /**
  * Fetches the latest version information from GitHub
@@ -14,63 +17,56 @@ export async function checkLatestVersion(): Promise<{
     const currentVersion = VERSION;
     let latestVersion = VERSION;
     let updateAvailable = false;
-    let releaseUrl = "https://github.com/i-am-neon/fe-infinity-lt/releases/tag/ai";
+    let releaseUrl = "https://github.com/i-am-neon/fe-infinity-lt/releases/latest";
 
     try {
-        const response = await fetch(GITHUB_RELEASE_URL, {
+        // First try getting the latest release
+        let response = await fetch(GITHUB_LATEST_RELEASE_URL, {
             headers: {
                 "Accept": "application/vnd.github.v3+json",
                 "User-Agent": "FE-Infinity-Update-Checker",
             },
         });
 
-        if (!response.ok) {
+        // If no latest release is found, try getting all releases and find the most recent
+        if (response.status === 404) {
+            response = await fetch(GITHUB_RELEASES_URL, {
+                headers: {
+                    "Accept": "application/vnd.github.v3+json",
+                    "User-Agent": "FE-Infinity-Update-Checker",
+                },
+            });
+
+            if (!response.ok) {
+                console.error(`GitHub API error: ${response.status} ${response.statusText}`);
+                return { currentVersion, latestVersion, updateAvailable, releaseUrl };
+            }
+
+            const releases = await response.json();
+            if (releases.length === 0) {
+                return { currentVersion, latestVersion, updateAvailable, releaseUrl };
+            }
+
+            // Get the most recent release
+            const data = releases[0];
+            if (data.html_url) {
+                releaseUrl = data.html_url;
+            }
+            latestVersion = extractVersionFromRelease(data);
+        } else if (!response.ok) {
             console.error(`GitHub API error: ${response.status} ${response.statusText}`);
             return { currentVersion, latestVersion, updateAvailable, releaseUrl };
-        }
-
-        const data = await response.json();
-
-        // Check for assets in the release (where the version is in the filename)
-        if (data.assets && data.assets.length > 0) {
-            for (const asset of data.assets) {
-                if (asset.name) {
-                    // Extract version from pattern like "FE.Infinity-1.0.0-arm64.dmg"
-                    const assetVersionMatch = asset.name.match(/FE\.?Infinity-(\d+\.\d+\.\d+)/i);
-                    if (assetVersionMatch && assetVersionMatch[1]) {
-                        latestVersion = assetVersionMatch[1];
-                        break; // Found a version, stop looking
-                    }
-                }
+        } else {
+            // We got the latest release
+            const data = await response.json();
+            if (data.html_url) {
+                releaseUrl = data.html_url;
             }
-        }
-
-        // Fallback to previous methods if no version found in assets
-        if (latestVersion === VERSION) {
-            // Extract version from GitHub release name
-            if (data.name) {
-                const versionMatch = data.name.match(/v?(\d+\.\d+\.\d+)/i);
-                if (versionMatch && versionMatch[1]) {
-                    latestVersion = versionMatch[1];
-                }
-            }
-
-            // If still no version found, check the body
-            if (latestVersion === VERSION && data.body) {
-                const bodyVersionMatch = data.body.match(/v?(\d+\.\d+\.\d+)/i);
-                if (bodyVersionMatch && bodyVersionMatch[1]) {
-                    latestVersion = bodyVersionMatch[1];
-                }
-            }
+            latestVersion = extractVersionFromRelease(data);
         }
 
         // Check if there's a newer version available
         updateAvailable = isNewerVersion(latestVersion, currentVersion);
-
-        // Get the proper release URL
-        if (data.html_url) {
-            releaseUrl = data.html_url;
-        }
 
         return {
             currentVersion,
@@ -87,6 +83,51 @@ export async function checkLatestVersion(): Promise<{
             releaseUrl
         };
     }
+}
+
+/**
+ * Extracts version information from a GitHub release object
+ */
+function extractVersionFromRelease(releaseData: any): string {
+    // First try to extract from tag name
+    if (releaseData.tag_name) {
+        const tagVersionMatch = releaseData.tag_name.match(/v?(\d+\.\d+\.\d+)/i);
+        if (tagVersionMatch && tagVersionMatch[1]) {
+            return tagVersionMatch[1];
+        }
+    }
+
+    // Check for assets in the release (where the version is in the filename)
+    if (releaseData.assets && releaseData.assets.length > 0) {
+        for (const asset of releaseData.assets) {
+            if (asset.name) {
+                // Extract version from pattern like "FE.Infinity-1.0.0-arm64.dmg"
+                const assetVersionMatch = asset.name.match(/FE\.?Infinity-(\d+\.\d+\.\d+)/i);
+                if (assetVersionMatch && assetVersionMatch[1]) {
+                    return assetVersionMatch[1];
+                }
+            }
+        }
+    }
+
+    // Extract version from GitHub release name
+    if (releaseData.name) {
+        const versionMatch = releaseData.name.match(/v?(\d+\.\d+\.\d+)/i);
+        if (versionMatch && versionMatch[1]) {
+            return versionMatch[1];
+        }
+    }
+
+    // If still no version found, check the body
+    if (releaseData.body) {
+        const bodyVersionMatch = releaseData.body.match(/v?(\d+\.\d+\.\d+)/i);
+        if (bodyVersionMatch && bodyVersionMatch[1]) {
+            return bodyVersionMatch[1];
+        }
+    }
+
+    // Return current version if no version found
+    return VERSION;
 }
 
 /**
