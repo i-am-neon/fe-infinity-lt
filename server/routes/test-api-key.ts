@@ -1,4 +1,4 @@
-import { getOpenAIApiKey, hasValidApiKey } from "@/lib/api-key-manager.ts";
+import { getAIApiKey, hasValidApiKey } from "@/lib/api-key-manager.ts";
 import { isElectronEnvironment } from "@/lib/env-detector.ts";
 import OpenAI from "openai";
 
@@ -28,7 +28,7 @@ export async function handleTestApiKey(req: Request): Promise<Response> {
         }
     }
 
-    const apiKey = getOpenAIApiKey();
+    const apiKey = getAIApiKey();
 
     // Double check that we have a key (from either user or .env)
     if (!apiKey) {

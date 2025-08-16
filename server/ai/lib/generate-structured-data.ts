@@ -1,9 +1,10 @@
 import { getCurrentLogger } from "@/lib/current-logger.ts";
 import { openai } from "@ai-sdk/openai";
+import { google } from '@ai-sdk/google';
 import { generateObject, NoObjectGeneratedError } from "ai";
 import "jsr:@std/dotenv/load";
 import { z, ZodSchema } from "zod";
-import { getOpenAIApiKey } from "@/lib/api-key-manager.ts";
+import { getAIApiKey } from "@/lib/api-key-manager.ts";
 
 export type ModelType = "nano" | "fast" | "strong";
 const LLM_PROVIDER = "openai";
@@ -30,10 +31,10 @@ export default async function generateStructuredData<T>({
   const startTime = performance.now();
 
   // Get API key from our key manager
-  const openaiKey = getOpenAIApiKey();
+  const aiKey = getAIApiKey();
 
   // Check if we have an API key
-  if (!openaiKey) {
+  if (!aiKey) {
     const error = "No OpenAI API key found. Please provide an API key in the settings.";
     logger.error(error);
     throw new Error(error);
@@ -41,18 +42,24 @@ export default async function generateStructuredData<T>({
 
   // If we have a custom key, temporarily set it as environment variable
   // This is how the AI SDK expects keys to be provided
-  let originalOpenAIKey;
-  if (openaiKey) {
-    originalOpenAIKey = Deno.env.get("OPENAI_API_KEY");
-    Deno.env.set("OPENAI_API_KEY", openaiKey);
+  let originalAIKey;
+  if (aiKey) {
+    // originalOpenAIKey = Deno.env.get("OPENAI_API_KEY");
+    originalAIKey = Deno.env.get("GOOGLE_GENERATIVE_AI_API_KEY");
+    // Deno.env.set("OPENAI_API_KEY", openaiKey);
+    Deno.env.set("GOOGLE_GENERATIVE_AI_API_KEY", aiKey);
   }
 
   try {
     // Select the appropriate model based on type
+    // const _model = model === "nano"
+    //   ? openai("gpt-4.1-nano") : model === "fast"
+    //     ? openai("gpt-4.1-mini")
+    //     : openai("gpt-4.1");
     const _model = model === "nano"
-      ? openai("gpt-4.1-nano") : model === "fast"
-        ? openai("gpt-4.1-mini")
-        : openai("gpt-4.1");
+      ? google("gemini-2.5-flash-lite") : model === "fast"
+        ? google("gemini-2.5-flash")
+        : google("gemini-2.5-pro");
 
     for (let attempt = 1; attempt <= 3; attempt++) {
       try {
@@ -164,8 +171,9 @@ export default async function generateStructuredData<T>({
     throw new Error("[generateStructuredData] This should never happen.");
   } finally {
     // Restore original environment variable
-    if (originalOpenAIKey !== undefined) {
-      Deno.env.set("OPENAI_API_KEY", originalOpenAIKey);
+    if (originalAIKey !== undefined) {
+      // Deno.env.set("OPENAI_API_KEY", originalOpenAIKey);
+      Deno.env.set("GOOGLE_GENERATIVE_AI_API_KEY", originalAIKey);
     }
   }
 }
