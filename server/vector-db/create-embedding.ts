@@ -1,6 +1,8 @@
 import OpenAI from "openai";
 import { isElectronEnvironment } from "@/lib/env-detector.ts";
-import { getOpenAIApiKey } from "@/lib/api-key-manager.ts";
+import { getAIApiKey } from "@/lib/api-key-manager.ts";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { embed } from "ai";
 
 export interface CreateEmbeddingOptions {
   text: string;
@@ -12,7 +14,7 @@ export default async function createEmbedding({
   model = "text-embedding-3-small",
 }: CreateEmbeddingOptions): Promise<number[]> {
   // Get API key from our manager which prioritizes user-provided keys
-  const apiKey = getOpenAIApiKey();
+  const apiKey = getAIApiKey();
 
   // If no key is available, throw an error
   if (!apiKey) {
@@ -21,18 +23,31 @@ export default async function createEmbedding({
     throw new Error(error);
   }
 
-  const openai = new OpenAI({
-    apiKey: apiKey,
+  // const openai = new OpenAI({
+  //   apiKey: apiKey,
+  // });
+  const google = createGoogleGenerativeAI({
+    apiKey,
   });
 
   try {
-    const response = await openai.embeddings.create({
+    // const response = await openai.embeddings.create({
+    //   model,
+    //   input: text,
+    //   encoding_format: "float",
+    // });
+    // return response.data[0].embedding as number[];
+    const model = google.textEmbedding('gemini-embedding-001')
+    const { embedding } = await embed({
       model,
-      input: text,
-      encoding_format: "float",
+      value: text,
+      providerOptions: {
+        google: {
+          taskType: 'SEMANTIC_SIMILARITY', // optional, specifies the task type for generating embeddings
+        },
+      },
     });
-
-    return response.data[0].embedding as number[];
+    return embedding;
   } catch (error) {
     console.error("Error creating embedding:", error);
     // Return a 0-dimension embedding as fallback (will be detected as invalid later)
