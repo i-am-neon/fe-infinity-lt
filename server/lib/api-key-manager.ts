@@ -15,7 +15,7 @@ export function setApiKey(key: string): void {
     // Don't set empty strings as keys
     if (!key || key.trim() === '') {
         currentOpenAIKey = null;
-        console.log('Cleared OpenAI API key');
+        console.log('Cleared AI API key');
         return;
     }
 
@@ -37,7 +37,8 @@ export function getApiKey(): string | null {
     }
 
     // Get key from environment
-    const envKey = Deno.env.get('OPENAI_API_KEY');
+    // const envKey = Deno.env.get('OPENAI_API_KEY');
+    const envKey = Deno.env.get('GOOGLE_GENERATIVE_AI_API_KEY');
 
     // Don't return empty strings as keys
     if (!envKey || envKey.trim() === '') {
@@ -68,6 +69,6 @@ export function hasValidApiKey(): boolean {
  * Get the OpenAI API key
  * @returns The OpenAI API key or null if not set
  */
-export function getOpenAIApiKey(): string | null {
+export function getAIApiKey(): string | null {
     return getApiKey();
 } 

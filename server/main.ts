@@ -33,7 +33,8 @@ async function checkEnvironment() {
     "USER_DATA_PATH",
     "APP_PATH",
     "RESOURCES_PATH",
-    "OPENAI_API_KEY"
+    // "OPENAI_API_KEY",
+    "GOOGLE_GENERATIVE_AI_API_KEY"
   ];
 
   for (const varName of envVars) {

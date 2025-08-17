@@ -115,7 +115,7 @@ export default function ApiKeySettings() {
                 hasApiKey: true
             }));
             setMessage({
-                text: 'OpenAI API key saved successfully',
+                text: 'Gemini API key saved successfully',
                 type: 'success'
             });
 
@@ -142,7 +142,7 @@ export default function ApiKeySettings() {
                 hasApiKey: false
             }));
             setMessage({
-                text: 'OpenAI API key removed',
+                text: 'Gemini API key removed',
                 type: 'success'
             });
 
@@ -162,10 +162,10 @@ export default function ApiKeySettings() {
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                     <KeyIcon className="h-5 w-5" />
-                    OpenAI API Key
+                    Gemini API Key
                 </CardTitle>
                 <CardDescription>
-                    Provide your own OpenAI API key to use with the application
+                    Provide your own Gemini API key to use with the application
                 </CardDescription>
             </CardHeader>
             <CardContent>
@@ -218,7 +218,6 @@ export default function ApiKeySettings() {
                                     id="api-key"
                                     value={state.apiKey}
                                     onChange={(e) => handleInputChange(e.target.value)}
-                                    placeholder="sk-..."
                                     className="font-mono"
                                 />
                                 <Button
@@ -232,13 +231,13 @@ export default function ApiKeySettings() {
 
                         <div className="pt-2">
                             <a
-                                href="https://youtu.be/hSVTPU-FVLI?si=I3XiUP4gatl6RnwN"
+                                href="https://aistudio.google.com/app/apikey"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors"
                             >
                                 <InfoIcon className="h-4 w-4 mr-1" />
-                                How to find your OpenAI API key
+                                Create your Gemini API key
                                 <ExternalLink className="h-3 w-3 ml-1" />
                             </a>
                         </div>
@@ -253,8 +252,8 @@ export default function ApiKeySettings() {
                     </p>
                     <ul className="list-disc pl-5 space-y-1">
                         <li>Your API key is encrypted and stored only on your device.</li>
-                        <li>This app only makes API calls directly to OpenAI and never to any other server.</li>
-                        <li>OpenAI will charge you directly for usage (each chapter costs a fraction of a penny to generate).</li>
+                        <li>This app only makes API calls directly to Gemini and never to any other server.</li>
+                        <li>Unless you upgrade, you'll be on Gemini's generous free tier, which resets daily and will be enough to generate many chapters per day.</li>
                         <li>FE Infinity doesn't take any commission or make money from your API usage.</li>
                         <li>The code is open-source, so you can verify these security practices yourself.</li>
                     </ul>

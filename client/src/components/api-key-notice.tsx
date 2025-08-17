@@ -45,14 +45,14 @@ export default function ApiKeyNotice() {
     return (
         <Alert variant="destructive" className="mb-6">
             <AlertCircle className="h-4 w-4" />
-            <AlertTitle>OpenAI API Key Required</AlertTitle>
+            <AlertTitle>AI API Key Required</AlertTitle>
             <AlertDescription className="flex flex-col">
-                <span className="mb-3">You need to provide an OpenAI API key to use this application.</span>
+                <span className="mb-3">You need to provide an AI API key to use this application.</span>
                 <span
                     className="mb-3 underline underline-offset-2 hover:text-primary cursor-pointer"
-                    onClick={() => openExternalLink("https://youtu.be/8Oq-E6JTVzo")}
+                    onClick={() => openExternalLink("https://aistudio.google.com/app/apikey")}
                 >
-                    How-To Video <ExternalLink className="inline h-3 w-3" />
+                    Get your API Key <ExternalLink className="inline h-3 w-3" />
                 </span>
                 <Button variant="outline" onClick={() => navigate('/settings')} className="w-fit">
                     Add API Key in Settings

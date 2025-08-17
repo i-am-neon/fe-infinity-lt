@@ -5,6 +5,7 @@ import {
 } from "@/ai/types/initial-game-idea.ts";
 import { WorldSummary } from "@/ai/types/world-summary.ts";
 import { testTone, testWorldSummary } from "./test-data/prologueTestData.ts";
+import generateStructuredData from "./lib/generate-structured-data.ts";
 
 export default function genInitialGameIdea({
   worldSummary,
@@ -34,27 +35,35 @@ Return only JSON.`;
 Tone: ${tone}
 `;
 
-  const checkerSystemMessage = `You are a Fire Emblem Fangame Prologue Checker (checker).
-Check constraints:
-1) Between 4-7 character ideas (inclusive)
-2) firstSeenAs field must be one of: "ally", "allied NPC", "enemy non-boss", "boss", "non-playable character"
-If valid => fixText=None. Otherwise => fix instructions as fixObject.`;
+  //   const checkerSystemMessage = `You are a Fire Emblem Fangame Prologue Checker (checker).
+  // Check constraints:
+  // 1) Between 4-7 character ideas (inclusive)
+  // 2) firstSeenAs field must be one of: "ally", "allied NPC", "enemy non-boss", "boss", "non-playable character"
+  // If valid => fixText=None. Otherwise => fix instructions as fixObject.`;
 
-  return genAndCheck<InitialGameIdea>({
-    fnBaseName: "genInitialGameIdea",
-    generatorModel: "strong",
-    generatorSystemMessage,
-    generatorPrompt: userPrompt,
-    generatorSchema: initialGameIdeaSchema,
-    checkerSystemMessage,
-    checkerPrompt: (candidate) => {
-      return `Candidate:\n${JSON.stringify(candidate, null, 2)}
-Constraints:
-- Must have between 4-7 character ideas (inclusive)
-- firstSeenAs field must be one of: "ally", "allied NPC", "enemy non-boss", "boss", "non-playable character"
-If good => fixText=None. Else => fix instructions.`;
-    },
-  });
+  //   return genAndCheck<InitialGameIdea>({
+  //     fnBaseName: "genInitialGameIdea",
+  //     generatorModel: "strong",
+  //     generatorSystemMessage,
+  //     generatorPrompt: userPrompt,
+  //     generatorSchema: initialGameIdeaSchema,
+  //     checkerSystemMessage,
+  //     checkerPrompt: (candidate) => {
+  //       return `Candidate:\n${JSON.stringify(candidate, null, 2)}
+  // Constraints:
+  // - Must have between 4-7 character ideas (inclusive)
+  // - firstSeenAs field must be one of: "ally", "allied NPC", "enemy non-boss", "boss", "non-playable character"
+  // If good => fixText=None. Else => fix instructions.`;
+  //     },
+  //   });
+
+  return generateStructuredData<InitialGameIdea>({
+    fnName: 'genInitialGameIdea',
+    schema: initialGameIdeaSchema,
+    systemMessage: generatorSystemMessage,
+    prompt: userPrompt,
+    model: "strong",
+  })
 }
 
 if (import.meta.main) {

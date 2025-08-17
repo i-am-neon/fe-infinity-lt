@@ -51,6 +51,8 @@ export async function handleCreateGame(req: Request): Promise<Response> {
       tone?: string;
       generateCustomImage?: boolean;
     };
+    // Force no custom image for gemini free tier update
+    body.generateCustomImage = false
     if (!body.title || !body.description || !body.tone) {
       return new Response(
         JSON.stringify({

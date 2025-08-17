@@ -93,13 +93,13 @@ export default function SettingsPage() {
                         <CardHeader>
                             <CardTitle>AI Provider Settings</CardTitle>
                             <CardDescription className="flex flex-col">
-                                <span>Configure your AI provider API keys for OpenAI.</span>
-                                <span
+                                <span>Configure your AI provider API keys for Gemini.</span>
+                                {/* <span
                                     className="mt-2 underline underline-offset-2 hover:text-primary cursor-pointer w-fit"
                                     onClick={() => openExternalLink("https://youtu.be/8Oq-E6JTVzo")}
                                 >
                                     How-To Video <ExternalLink className="inline h-3 w-3" />
-                                </span>
+                                </span> */}
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
@@ -108,7 +108,7 @@ export default function SettingsPage() {
                     </Card>
                 </BlurFade>
 
-                <BlurFade delay={BLUR_FADE_DELAY * 4}>
+                {/* <BlurFade delay={BLUR_FADE_DELAY * 4}>
                     <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
@@ -147,7 +147,7 @@ export default function SettingsPage() {
                             </div>
                         </CardContent>
                     </Card>
-                </BlurFade>
+                </BlurFade> */}
 
                 <BlurFade delay={BLUR_FADE_DELAY * 5}>
                     <Card>

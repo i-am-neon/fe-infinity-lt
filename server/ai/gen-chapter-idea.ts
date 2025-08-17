@@ -13,6 +13,7 @@ import { validateNoReintroducedCharacters } from "@/ai/validators/validate-no-re
 import { validatePlayerInIntro } from "@/ai/validators/validate-player-in-intro.ts";
 import { DeadCharacterRecord } from "@/types/dead-character-record.ts";
 import replaceBadCharacters from "@/lib/formatting/replace-bad-characters.ts";
+import generateStructuredData from "./lib/generate-structured-data.ts";
 
 export default async function genChapterIdea({
   worldSummary,
@@ -177,51 +178,59 @@ Tone: ${tone}`
       playerChoice,
     });
 
-  const checkerSystemMessage = `You are a Fire Emblem Fangame Chapter Idea Checker (checker).
-Check that all required fields are present and that new characters are mentioned in the text.
-Also check that the story appropriately acknowledges dead characters from previous chapters:
-- The narrative should reference the impact of these deaths on the living characters and storyline
-- Living characters should mention or react to the deaths of significant characters
-- If major characters died, the plot should reflect this change in direction
-- IMPORTANT: Dead BOSS characters must NEVER be referenced as if they were allies or part of the player's group
-Themes of resurrection, undead, etc. are perfectly fine in the story - only check that actual dead characters from previous chapters aren't brought back as active characters.
-Dramatically, language in death quotes (like "I'll rise again") is completely acceptable.
-Return { fixText: "None", fixObject: {} } if good; else fix instructions. Only JSON.`;
+  //   const checkerSystemMessage = `You are a Fire Emblem Fangame Chapter Idea Checker (checker).
+  // Check that all required fields are present and that new characters are mentioned in the text.
+  // Also check that the story appropriately acknowledges dead characters from previous chapters:
+  // - The narrative should reference the impact of these deaths on the living characters and storyline
+  // - Living characters should mention or react to the deaths of significant characters
+  // - If major characters died, the plot should reflect this change in direction
+  // - IMPORTANT: Dead BOSS characters must NEVER be referenced as if they were allies or part of the player's group
+  // Themes of resurrection, undead, etc. are perfectly fine in the story - only check that actual dead characters from previous chapters aren't brought back as active characters.
+  // Dramatically, language in death quotes (like "I'll rise again") is completely acceptable.
+  // Return { fixText: "None", fixObject: {} } if good; else fix instructions. Only JSON.`;
 
-  const chIdea = await genAndCheck<ChapterIdea>({
-    fnBaseName: "genChapterIdea",
-    generatorModel: "strong",
-    generatorSystemMessage,
-    generatorPrompt: basePrompt,
-    generatorSchema: ChapterIdeaSchema,
-    checkerSystemMessage,
-    checkerPrompt: (candidate) => {
-      return `Candidate:\n${JSON.stringify(candidate, null, 2)}
-Constraints:
-1) MUST have all required fields: title, intro, battle, outro, boss, enemyFaction. Verify each is present and properly formatted.
-2) ANY character mentioned in intro, battle, or outro must be defined in either newPlayableUnits or newNonBattleCharacters.
-3) EVERY supporting character (messenger, guide, villager, etc.) must be fully defined in newNonBattleCharacters.
-4) ONLY check that dead characters from this list: ${JSON.stringify(
-        allDeadCharacters
-      )} don't appear as active characters in the new chapter.
-  a) It is completely fine for the story to have themes of resurrection, zombies, undead, etc.
-  b) Dramatic language in death quotes (like "I will rise again" or similar) is completely acceptable.
-  c) New bosses and characters are always allowed even if they talk about resurrection themes.
-5) Only check that boss characters from previous chapters aren't reused with the same name and role.
-6) Verify that if there are dead characters (from allDeadCharacters or newlyDeadThisChapter), the chapter narrative acknowledges these deaths in some meaningful way - either through explicit mentions in dialogue, plot consequences, or character reactions.
-7) CRITICAL: Check that dead boss characters are NEVER referenced as if they were allies or part of the player's group. They should be referred to correctly as enemies who were defeated.
-${newlyDeadPlayers.length > 0 ? `8) Since ${newlyDeadPlayers.length} character(s) died in the previous chapter, verify that at least ${newlyDeadPlayers.length} new playable unit(s) are introduced in this chapter (through newPlayableUnits array).
-  a) If multiple characters died (${newlyDeadPlayers.length > 1 ? 'true in this case' : 'not applicable here'}), check that there's a mix of units starting as player units, allied NPCs, and/or recruitable enemy units.
-  b) Verify that each new character has a clear narrative reason for joining the party.` : ''}
-If all good => fixText="None". Otherwise => fix instructions.`;
-    },
-    validators: [
-      validateCharacterMentions,
-      validateDistinctNewCharacters,
-      (chapterIdea) => validatePlayerInIntro(chapterIdea, chapterNumber, initialGameIdea),
-      (chapterIdea) => validateNoReintroducedCharacters(chapterIdea, previousChapterIdeas)
-    ],
-  });
+  //   const chIdea = await genAndCheck<ChapterIdea>({
+  //     fnBaseName: "genChapterIdea",
+  //     generatorModel: "strong",
+  //     generatorSystemMessage,
+  //     generatorPrompt: basePrompt,
+  //     generatorSchema: ChapterIdeaSchema,
+  //     checkerSystemMessage,
+  //     checkerPrompt: (candidate) => {
+  //       return `Candidate:\n${JSON.stringify(candidate, null, 2)}
+  // Constraints:
+  // 1) MUST have all required fields: title, intro, battle, outro, boss, enemyFaction. Verify each is present and properly formatted.
+  // 2) ANY character mentioned in intro, battle, or outro must be defined in either newPlayableUnits or newNonBattleCharacters.
+  // 3) EVERY supporting character (messenger, guide, villager, etc.) must be fully defined in newNonBattleCharacters.
+  // 4) ONLY check that dead characters from this list: ${JSON.stringify(
+  //         allDeadCharacters
+  //       )} don't appear as active characters in the new chapter.
+  //   a) It is completely fine for the story to have themes of resurrection, zombies, undead, etc.
+  //   b) Dramatic language in death quotes (like "I will rise again" or similar) is completely acceptable.
+  //   c) New bosses and characters are always allowed even if they talk about resurrection themes.
+  // 5) Only check that boss characters from previous chapters aren't reused with the same name and role.
+  // 6) Verify that if there are dead characters (from allDeadCharacters or newlyDeadThisChapter), the chapter narrative acknowledges these deaths in some meaningful way - either through explicit mentions in dialogue, plot consequences, or character reactions.
+  // 7) CRITICAL: Check that dead boss characters are NEVER referenced as if they were allies or part of the player's group. They should be referred to correctly as enemies who were defeated.
+  // ${newlyDeadPlayers.length > 0 ? `8) Since ${newlyDeadPlayers.length} character(s) died in the previous chapter, verify that at least ${newlyDeadPlayers.length} new playable unit(s) are introduced in this chapter (through newPlayableUnits array).
+  //   a) If multiple characters died (${newlyDeadPlayers.length > 1 ? 'true in this case' : 'not applicable here'}), check that there's a mix of units starting as player units, allied NPCs, and/or recruitable enemy units.
+  //   b) Verify that each new character has a clear narrative reason for joining the party.` : ''}
+  // If all good => fixText="None". Otherwise => fix instructions.`;
+  //     },
+  //     validators: [
+  //       validateCharacterMentions,
+  //       validateDistinctNewCharacters,
+  //       (chapterIdea) => validatePlayerInIntro(chapterIdea, chapterNumber, initialGameIdea),
+  //       (chapterIdea) => validateNoReintroducedCharacters(chapterIdea, previousChapterIdeas)
+  //     ],
+  //   });
+
+  const chIdea = await generateStructuredData({
+    fnName: "genChapterIdea",
+    schema: ChapterIdeaSchema,
+    systemMessage: generatorSystemMessage,
+    prompt: basePrompt,
+    model: "strong",
+  })
   return {
     ...chIdea,
     enemyFaction: {
