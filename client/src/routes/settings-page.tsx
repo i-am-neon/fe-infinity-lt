@@ -100,12 +100,6 @@ export default function SettingsPage() {
                                 >
                                     How-To Video <ExternalLink className="inline h-3 w-3" />
                                 </span> */}
-                                <span
-                                    className="mt-2 underline underline-offset-2 hover:text-primary cursor-pointer w-fit"
-                                    onClick={() => openExternalLink("https://aistudio.google.com/app/apikey")}
-                                >
-                                    Create a Gemini API Key <ExternalLink className="inline h-3 w-3" />
-                                </span>
                             </CardDescription>
                         </CardHeader>
                         <CardContent>

@@ -214,7 +214,7 @@ export default function HomePage() {
         if (!hasKey) {
           setTestResults({
             success: false,
-            error: "No API key found. Please add your OpenAI API key in Settings."
+            error: "No API key found. Please add your AI API key in Settings."
           });
           setTestingApiKey(false);
           return;
