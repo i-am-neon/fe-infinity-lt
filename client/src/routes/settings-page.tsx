@@ -108,7 +108,7 @@ export default function SettingsPage() {
                     </Card>
                 </BlurFade>
 
-                <BlurFade delay={BLUR_FADE_DELAY * 4}>
+                {/* <BlurFade delay={BLUR_FADE_DELAY * 4}>
                     <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
@@ -147,7 +147,7 @@ export default function SettingsPage() {
                             </div>
                         </CardContent>
                     </Card>
-                </BlurFade>
+                </BlurFade> */}
 
                 <BlurFade delay={BLUR_FADE_DELAY * 5}>
                     <Card>
