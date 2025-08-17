@@ -93,12 +93,18 @@ export default function SettingsPage() {
                         <CardHeader>
                             <CardTitle>AI Provider Settings</CardTitle>
                             <CardDescription className="flex flex-col">
-                                <span>Configure your AI provider API keys for OpenAI.</span>
-                                <span
+                                <span>Configure your AI provider API keys for Gemini.</span>
+                                {/* <span
                                     className="mt-2 underline underline-offset-2 hover:text-primary cursor-pointer w-fit"
                                     onClick={() => openExternalLink("https://youtu.be/8Oq-E6JTVzo")}
                                 >
                                     How-To Video <ExternalLink className="inline h-3 w-3" />
+                                </span> */}
+                                <span
+                                    className="mt-2 underline underline-offset-2 hover:text-primary cursor-pointer w-fit"
+                                    onClick={() => openExternalLink("https://aistudio.google.com/app/apikey")}
+                                >
+                                    Create a Gemini API Key <ExternalLink className="inline h-3 w-3" />
                                 </span>
                             </CardDescription>
                         </CardHeader>
