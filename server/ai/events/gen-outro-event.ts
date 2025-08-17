@@ -89,6 +89,8 @@ WRITING STYLE - AVOIDING CLICHÉS:
 - Avoid overused mystery phrases like "The X holds more than just Y..." or "There's more to this than meets the eye"
 - Instead, try these more creative approaches for building tension and mystery about future chapters
 
+IMPORTANT: there is no such thing as "Center" position, you MUST choose one of: one of: "OffscreenLeft", "FarLeft", "Left", "MidLeft", "MidRight", "Right", "FarRight", "OffscreenRight"
+
 We want one AIEvent object strictly matching the AIEvent schema. Return only JSON, no commentary.
 If the outro references a 'boss', 'newPlayableUnits', or 'newNonBattleCharacters', ensure they appear if it makes sense.`;
 

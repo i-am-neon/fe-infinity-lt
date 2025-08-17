@@ -116,6 +116,8 @@ Important continuity rules for dead characters:
 - Minor unit deaths should be referenced in the story, but will likely only alter the next chapter slightly.
 - When referencing dead boss characters, make sure to never refer to them as part of the player party.
 
+IMPORTANT: there is no such thing as "Center" position, you MUST choose one of: one of: "OffscreenLeft", "FarLeft", "Left", "MidLeft", "MidRight", "Right", "FarRight", "OffscreenRight"
+
 We want a single AIEvent that strictly matches the AIEvent schema. Return only JSON, no extra commentary.
 If the chapter idea's intro references a 'boss', 'newPlayableUnits', or 'newNonBattleCharacters', ensure they appear. They can speak or cameo if it makes sense.`;
 
