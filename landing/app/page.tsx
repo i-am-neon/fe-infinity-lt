@@ -9,8 +9,8 @@ import { BLUR_FADE_DELAY } from "@/components/magicui/constants";
 
 const features = [
   {
-    name: "Not Free, But Very Cheap",
-    description: "Each chapter costs less than a penny to generate through OpenAI's API. OpenAI charges your credit card directly based on usage — FE Infinity takes no cut. You control your OpenAI account, so there are no hidden fees or markups.",
+    name: "Completely Free",
+    description: "Using the generous free tier of Google's Gemini API, FE Infinity is completely free to use. No payment method required.",
     icon: DollarSign,
   },
   {
