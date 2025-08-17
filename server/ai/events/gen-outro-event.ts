@@ -13,6 +13,7 @@ import { InitialGameIdea } from "@/ai/types/initial-game-idea.ts";
 import { WorldSummary } from "@/ai/types/world-summary.ts";
 import { sluggify } from "@/lib/sluggify.ts";
 import replaceBadCharacters from "@/lib/formatting/replace-bad-characters.ts";
+import generateStructuredData from "../lib/generate-structured-data.ts";
 
 /**
  * Generates an AIEvent that serves as the outro scene for the chapter, wrapping up the chapter's story.
@@ -102,75 +103,84 @@ If the outro references a 'boss', 'newPlayableUnits', or 'newNonBattleCharacters
 Chapter Idea: ${JSON.stringify(chapterIdea)}
 Tone: ${tone}`;
 
-  const checkerSystemMessage = `You are a Fire Emblem Fangame Outro Event Checker (checker).
-We have an AIEvent candidate. We must ensure:
-1) No resurrected or reintroduced actual dead characters from previous chapters.
-2) The event must only use valid commands ("add_portrait", "speak", "narrate", "give_item", "give_money", "remove_portrait").
-3) If the chapter idea's outro references a 'boss', 'newPlayableUnits', or 'newNonBattleCharacters', ensure they appear in the event.
-4) CRITICAL: Every character must have an "add_portrait" command BEFORE any "speak" command for that character.
-   A character can't speak unless they already have a portrait displayed on screen.
-5) CRITICAL: A character CANNOT speak after "remove_portrait" has been called on them, unless they have a new "add_portrait" command after the removal.
-   You must track the current state of each character's portrait throughout the event sequence.
+  //   const checkerSystemMessage = `You are a Fire Emblem Fangame Outro Event Checker (checker).
+  // We have an AIEvent candidate. We must ensure:
+  // 1) No resurrected or reintroduced actual dead characters from previous chapters.
+  // 2) The event must only use valid commands ("add_portrait", "speak", "narrate", "give_item", "give_money", "remove_portrait").
+  // 3) If the chapter idea's outro references a 'boss', 'newPlayableUnits', or 'newNonBattleCharacters', ensure they appear in the event.
+  // 4) CRITICAL: Every character must have an "add_portrait" command BEFORE any "speak" command for that character.
+  //    A character can't speak unless they already have a portrait displayed on screen.
+  // 5) CRITICAL: A character CANNOT speak after "remove_portrait" has been called on them, unless they have a new "add_portrait" command after the removal.
+  //    You must track the current state of each character's portrait throughout the event sequence.
 
-SPECIAL ITEM CHECKING - CRITICALLY IMPORTANT:
-- Read the original outro text in the Chapter Idea carefully
-- If the outro mentions characters finding, receiving, or obtaining ANY items (weapons, artifacts, etc.)
-  or money, the event MUST include the appropriate "give_item" or "give_money" command
-- Example: If outro says "...stumbles upon a Silver Blade" but no command with "give_item" and the item name exists,
-  that's an error that MUST be fixed by adding the command
-- The format can be either "give_item;item_name" or "give_item;convoy;item_name" - both are valid
+  // SPECIAL ITEM CHECKING - CRITICALLY IMPORTANT:
+  // - Read the original outro text in the Chapter Idea carefully
+  // - If the outro mentions characters finding, receiving, or obtaining ANY items (weapons, artifacts, etc.)
+  //   or money, the event MUST include the appropriate "give_item" or "give_money" command
+  // - Example: If outro says "...stumbles upon a Silver Blade" but no command with "give_item" and the item name exists,
+  //   that's an error that MUST be fixed by adding the command
+  // - The format can be either "give_item;item_name" or "give_item;convoy;item_name" - both are valid
 
-IMPORTANT NOTES:
-- Allow narrative devices like "thought dead" or "has returned" for storytelling
-- Allow characters to speak from offscreen positions
-- Allow boss characters to be introduced in whatever way makes sense for the story
-- Distinguish between actual dead characters and narrative elements
+  // IMPORTANT NOTES:
+  // - Allow narrative devices like "thought dead" or "has returned" for storytelling
+  // - Allow characters to speak from offscreen positions
+  // - Allow boss characters to be introduced in whatever way makes sense for the story
+  // - Distinguish between actual dead characters and narrative elements
 
-DETAILED CHECK PROCEDURE:
-- The fixObject should include the full fixed sourceObjects array if needed
+  // DETAILED CHECK PROCEDURE:
+  // - The fixObject should include the full fixed sourceObjects array if needed
 
-If the candidate is valid, return { "fixText": "None", "passesCheck": true }. Otherwise, provide fix instructions in fixText and the fixed sourceObjects in fixObject if possible.`;
+  // If the candidate is valid, return { "fixText": "None", "passesCheck": true }. Otherwise, provide fix instructions in fixText and the fixed sourceObjects in fixObject if possible.`;
 
-  const event = await genAndCheck<AIEvent>({
-    fnBaseName: "genOutroEvent",
-    generatorModel: "strong",
-    generatorSystemMessage,
-    generatorPrompt,
-    generatorSchema: AIEventSchema,
-    checkerSystemMessage,
-    checkerPrompt: (candidate) => {
-      return `Candidate:\n${JSON.stringify(candidate, null, 2)}
+  //   const event = await genAndCheck<AIEvent>({
+  //     fnBaseName: "genOutroEvent",
+  //     generatorModel: "strong",
+  //     generatorSystemMessage,
+  //     generatorPrompt,
+  //     generatorSchema: AIEventSchema,
+  //     checkerSystemMessage,
+  //     checkerPrompt: (candidate) => {
+  //       return `Candidate:\n${JSON.stringify(candidate, null, 2)}
 
-Constraints (apply leniently):
-1) Must not resurrect ACTUAL dead characters from previous chapters or mention them as living.
-2) Must only use valid commands ("add_portrait", "speak", "narrate", "remove_portrait").
-3) If the chapter idea's intro mentions a 'boss', 'newPlayableUnits', or 'newNonBattleCharacters', ensure they appear in the final event.
-4) PORTRAIT LIMIT CHECK: Never have more than 6 character portraits visible at once. Use remove_portrait 
-   when needed and ensure the narrative flow makes sense with characters entering and exiting at appropriate times.
-5) CRITICAL SPEAKING CHECK: Verify that EVERY character has an "add_portrait" command BEFORE their first "speak" command.
-   Characters should never speak if they don't have a portrait on screen yet.
-   - For each character that speaks, check if they had an "add_portrait" command earlier
-   - If a character speaks before they're added, that's an error that must be fixed
-6) CRITICAL PORTRAIT STATE CHECK: Verify that characters do not speak after "remove_portrait" has been called on them,
-   unless they have been re-added with "add_portrait".
-   - Track when portraits are added and removed for each character
-   - If a character speaks after being removed without being re-added, that's an error
-7) SPECIAL ITEM CHECK: If the outro text mentions items or money being found or received,
-   there MUST be a corresponding "give_item" or "give_money" command in the sourceObjects.
+  // Constraints (apply leniently):
+  // 1) Must not resurrect ACTUAL dead characters from previous chapters or mention them as living.
+  // 2) Must only use valid commands ("add_portrait", "speak", "narrate", "remove_portrait").
+  // 3) If the chapter idea's intro mentions a 'boss', 'newPlayableUnits', or 'newNonBattleCharacters', ensure they appear in the final event.
+  // 4) PORTRAIT LIMIT CHECK: Never have more than 6 character portraits visible at once. Use remove_portrait 
+  //    when needed and ensure the narrative flow makes sense with characters entering and exiting at appropriate times.
+  // 5) CRITICAL SPEAKING CHECK: Verify that EVERY character has an "add_portrait" command BEFORE their first "speak" command.
+  //    Characters should never speak if they don't have a portrait on screen yet.
+  //    - For each character that speaks, check if they had an "add_portrait" command earlier
+  //    - If a character speaks before they're added, that's an error that must be fixed
+  // 6) CRITICAL PORTRAIT STATE CHECK: Verify that characters do not speak after "remove_portrait" has been called on them,
+  //    unless they have been re-added with "add_portrait".
+  //    - Track when portraits are added and removed for each character
+  //    - If a character speaks after being removed without being re-added, that's an error
+  // 7) SPECIAL ITEM CHECK: If the outro text mentions items or money being found or received,
+  //    there MUST be a corresponding "give_item" or "give_money" command in the sourceObjects.
 
-IMPORTANT:
-- Allow storytelling with references to characters being "thought dead" or returned
-- Allow boss characters and antagonists to speak from offscreen positions
-- Allow narrative introduction of new characters
-- Only flag actual resurrections of characters in previously established dead lists
+  // IMPORTANT:
+  // - Allow storytelling with references to characters being "thought dead" or returned
+  // - Allow boss characters and antagonists to speak from offscreen positions
+  // - Allow narrative introduction of new characters
+  // - Only flag actual resurrections of characters in previously established dead lists
 
-If all is correct => fixText="None" and passesCheck=true.
-If there are issues => provide detailed fixText and set passesCheck=false.`;
-    },
-    validators: [validateAiEventPortraits],
-  });
+  // If all is correct => fixText="None" and passesCheck=true.
+  // If there are issues => provide detailed fixText and set passesCheck=false.`;
+  //     },
+  //     validators: [validateAiEventPortraits],
+  //   });
 
   // Process any item commands to use valid game item NIDs
+
+  const event = await generateStructuredData({
+    fnName: "genOutroEvent",
+    schema: AIEventSchema,
+    systemMessage: generatorSystemMessage,
+    prompt: generatorPrompt,
+    temperature: 0.8,
+    model: "strong",
+  })
   const eventWithProcessedItems: AIEvent = await processEventItems(event);
   // Add the choice event at the end. Example: `"choice;fates;Who do you side with?;Hoshido,Nohr,Smash",`
   eventWithProcessedItems.sourceObjects.push({

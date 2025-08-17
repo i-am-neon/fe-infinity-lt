@@ -70,6 +70,13 @@ export default async function generateStructuredData<T>({
           system: systemMessage,
           prompt: prompt || "no prompt provided",
           temperature,
+          providerOptions: {
+            google: {
+              thinkingConfig: {
+                thinkingBudget: model === 'strong' ? -1 : undefined, // dynamically choose thinking based on task
+              },
+            },
+          },
         });
         const attemptDuration = performance.now() - attemptStartTime;
 

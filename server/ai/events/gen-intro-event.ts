@@ -14,6 +14,7 @@ import { InitialGameIdea } from "@/ai/types/initial-game-idea.ts";
 import { WorldSummary } from "@/ai/types/world-summary.ts";
 import { Chapter } from "@/types/chapter.ts";
 import { DeadCharacterRecord } from "@/types/dead-character-record.ts";
+import generateStructuredData from "../lib/generate-structured-data.ts";
 
 /**
  * Generates an AIEvent that serves as the intro scene for the chapter, introducing the story.
@@ -141,92 +142,100 @@ Newly Dead This Chapter: ${JSON.stringify(
       2
     )}. You must NOT give these characters speaking roles in the current chapter idea! They are dead and the story can reference and change because of that, but dead characters can never show up again in any scenes.`;
 
-  const checkerSystemMessage = `You are a Fire Emblem Fangame Intro Event Checker (checker).
-We must ensure:
-1) It does not resurrect or give speaking roles to actually dead characters from previous chapters (those in allDeadCharacters list).
-2) The event uses required commands correctly ("add_portrait", "speak", "narrate", "give_item", "give_money", "remove_portrait").
-3) The event must not mention or speak for newlyDeadThisChapter.
-4) Characters can be introduced naturally in the narrative, including:
-   - Narrative references to historical/lore figures being "thought dead" or returning
-   - Characters speaking from "OffscreenLeft" or "OffscreenRight" positions
-   - Bosses and antagonists mentioned in the chapter intro
-5) CRITICAL: Every character must have an "add_portrait" command BEFORE any "speak" command for that character.
-   A character can't speak unless they already have a portrait displayed on screen.
-6) CRITICAL: A character CANNOT speak after "remove_portrait" has been called on them, unless they have a new "add_portrait" command after the removal.
-   You must track the current state of each character's portrait throughout the event sequence.
+  //   const checkerSystemMessage = `You are a Fire Emblem Fangame Intro Event Checker (checker).
+  // We must ensure:
+  // 1) It does not resurrect or give speaking roles to actually dead characters from previous chapters (those in allDeadCharacters list).
+  // 2) The event uses required commands correctly ("add_portrait", "speak", "narrate", "give_item", "give_money", "remove_portrait").
+  // 3) The event must not mention or speak for newlyDeadThisChapter.
+  // 4) Characters can be introduced naturally in the narrative, including:
+  //    - Narrative references to historical/lore figures being "thought dead" or returning
+  //    - Characters speaking from "OffscreenLeft" or "OffscreenRight" positions
+  //    - Bosses and antagonists mentioned in the chapter intro
+  // 5) CRITICAL: Every character must have an "add_portrait" command BEFORE any "speak" command for that character.
+  //    A character can't speak unless they already have a portrait displayed on screen.
+  // 6) CRITICAL: A character CANNOT speak after "remove_portrait" has been called on them, unless they have a new "add_portrait" command after the removal.
+  //    You must track the current state of each character's portrait throughout the event sequence.
 
-7) SPECIAL ITEM CHECKING - CRITICALLY IMPORTANT:
-   - Read the original intro text in the Chapter Idea carefully
-   - If the intro mentions characters finding, receiving, or obtaining ANY items (weapons, artifacts, etc.)
-     or money, the event MUST include the appropriate "give_item" or "give_money" command
-   - Example: If intro says "...stumbles upon a Silver Blade" but no command with "give_item" and the item name exists,
-     that's an error that MUST be fixed by adding the command
-   - The format can be either "give_item;item_name" or "give_item;convoy;item_name" - both are valid
+  // 7) SPECIAL ITEM CHECKING - CRITICALLY IMPORTANT:
+  //    - Read the original intro text in the Chapter Idea carefully
+  //    - If the intro mentions characters finding, receiving, or obtaining ANY items (weapons, artifacts, etc.)
+  //      or money, the event MUST include the appropriate "give_item" or "give_money" command
+  //    - Example: If intro says "...stumbles upon a Silver Blade" but no command with "give_item" and the item name exists,
+  //      that's an error that MUST be fixed by adding the command
+  //    - The format can be either "give_item;item_name" or "give_item;convoy;item_name" - both are valid
 
-IMPORTANT NOTES:
-- Allow narrative devices like "thought dead" or "has returned" for storytelling
-- Allow characters to speak from offscreen positions
-- Allow boss characters to be introduced in whatever way makes sense for the story
-- Distinguish between actual dead characters (from allDeadCharacters) and narrative elements
+  // IMPORTANT NOTES:
+  // - Allow narrative devices like "thought dead" or "has returned" for storytelling
+  // - Allow characters to speak from offscreen positions
+  // - Allow boss characters to be introduced in whatever way makes sense for the story
+  // - Distinguish between actual dead characters (from allDeadCharacters) and narrative elements
 
-If the candidate is valid, return { "fixText": "None", "passesCheck": true }. Otherwise, provide fix instructions in fixText and the fixed sourceObjects in fixObject if possible.`;
+  // If the candidate is valid, return { "fixText": "None", "passesCheck": true }. Otherwise, provide fix instructions in fixText and the fixed sourceObjects in fixObject if possible.`;
 
-  const checkerPrompt = (candidate: AIEvent) => {
-    // Let's use our algorithmic validation for portrait checking
-    const portraitValidation = validateAiEventPortraits(candidate);
+  //   const checkerPrompt = (candidate: AIEvent) => {
+  //     // Let's use our algorithmic validation for portrait checking
+  //     const portraitValidation = validateAiEventPortraits(candidate);
 
-    return `Candidate:\n${JSON.stringify(candidate, null, 2)}
-Portrait Validation Result: ${JSON.stringify(portraitValidation)}
+  //     return `Candidate:\n${JSON.stringify(candidate, null, 2)}
+  // Portrait Validation Result: ${JSON.stringify(portraitValidation)}
 
-Chapter Idea: ${JSON.stringify(chapterIdea, null, 2)}
+  // Chapter Idea: ${JSON.stringify(chapterIdea, null, 2)}
 
-Check the following constraints carefully but leniently:
-1) Must not include or resurrect ACTUAL dead characters from: ${JSON.stringify(
-      allDeadCharacters,
-      null,
-      2
-    )} or newlyDeadThisChapter: ${JSON.stringify(
-      newlyDeadThisChapter,
-      null,
-      2
-    )}.
-2) Portrait validation is now handled by the algorithm and the result is shown above.
-3) Must follow the AIEvent schema exactly and only use valid commands ("add_portrait", "speak", "narrate", "give_item", "give_money", "remove_portrait").
-4) SPECIAL ITEM CHECK: If the intro text mentions items or money being found (e.g., "stumbles upon a Silver Blade"),
-   there MUST be a corresponding "give_item" or "give_money" command in the sourceObjects.
-5) PORTRAIT LIMIT CHECK: Never have more than 6 character portraits visible at once. The validation now checks this automatically, 
-   but ensure the narrative flow makes sense with characters being added and removed at appropriate moments.
-6) CRITICAL SPEAKING CHECK: Verify that EVERY character has an "add_portrait" command BEFORE their first "speak" command.
-   Characters should never speak if they don't have a portrait on screen yet.
-   - For each character that speaks, check if they had an "add_portrait" command earlier
-   - If a character speaks before they're added, that's an error that must be fixed
-7) CRITICAL PORTRAIT STATE CHECK: Verify that characters do not speak after "remove_portrait" has been called on them,
-   unless they have been re-added with "add_portrait".
-   - Track when portraits are added and removed for each character
-   - If a character speaks after being removed without being re-added, that's an error
+  // Check the following constraints carefully but leniently:
+  // 1) Must not include or resurrect ACTUAL dead characters from: ${JSON.stringify(
+  //       allDeadCharacters,
+  //       null,
+  //       2
+  //     )} or newlyDeadThisChapter: ${JSON.stringify(
+  //       newlyDeadThisChapter,
+  //       null,
+  //       2
+  //     )}.
+  // 2) Portrait validation is now handled by the algorithm and the result is shown above.
+  // 3) Must follow the AIEvent schema exactly and only use valid commands ("add_portrait", "speak", "narrate", "give_item", "give_money", "remove_portrait").
+  // 4) SPECIAL ITEM CHECK: If the intro text mentions items or money being found (e.g., "stumbles upon a Silver Blade"),
+  //    there MUST be a corresponding "give_item" or "give_money" command in the sourceObjects.
+  // 5) PORTRAIT LIMIT CHECK: Never have more than 6 character portraits visible at once. The validation now checks this automatically, 
+  //    but ensure the narrative flow makes sense with characters being added and removed at appropriate moments.
+  // 6) CRITICAL SPEAKING CHECK: Verify that EVERY character has an "add_portrait" command BEFORE their first "speak" command.
+  //    Characters should never speak if they don't have a portrait on screen yet.
+  //    - For each character that speaks, check if they had an "add_portrait" command earlier
+  //    - If a character speaks before they're added, that's an error that must be fixed
+  // 7) CRITICAL PORTRAIT STATE CHECK: Verify that characters do not speak after "remove_portrait" has been called on them,
+  //    unless they have been re-added with "add_portrait".
+  //    - Track when portraits are added and removed for each character
+  //    - If a character speaks after being removed without being re-added, that's an error
 
-IMPORTANT:
-- Allow storytelling with references to characters being "thought dead" or returned
-- Allow boss characters and antagonists to speak from offscreen positions
-- Allow narrative introduction of new characters
-- Only flag actual resurrections of characters in the dead lists
+  // IMPORTANT:
+  // - Allow storytelling with references to characters being "thought dead" or returned
+  // - Allow boss characters and antagonists to speak from offscreen positions
+  // - Allow narrative introduction of new characters
+  // - Only flag actual resurrections of characters in the dead lists
 
-If all is correct => fixText="None" and passesCheck=true.
-If there are issues => provide detailed fixText and set passesCheck=false.
+  // If all is correct => fixText="None" and passesCheck=true.
+  // If there are issues => provide detailed fixText and set passesCheck=false.
 
-For portrait validation issues, the algorithm has already checked this for you. Only raise portrait-related issues if the algorithm detected problems (isValid=false).`;
-  };
+  // For portrait validation issues, the algorithm has already checked this for you. Only raise portrait-related issues if the algorithm detected problems (isValid=false).`;
+  //   };
 
-  const event = await genAndCheck<AIEvent>({
-    fnBaseName: "genIntroEvent",
-    generatorModel: "strong",
-    generatorSystemMessage,
-    generatorPrompt,
-    generatorSchema: AIEventSchema,
-    checkerSystemMessage,
-    checkerPrompt,
-    validators: [validateAiEventPortraits],
-  });
+  //   const event = await genAndCheck<AIEvent>({
+  //     fnBaseName: "genIntroEvent",
+  //     generatorModel: "strong",
+  //     generatorSystemMessage,
+  //     generatorPrompt,
+  //     generatorSchema: AIEventSchema,
+  //     checkerSystemMessage,
+  //     checkerPrompt,
+  //     validators: [validateAiEventPortraits],
+  //   });
+
+  const event = await generateStructuredData({
+    fnName: "genIntroEvent",
+    schema: AIEventSchema,
+    systemMessage: generatorSystemMessage,
+    prompt: generatorPrompt,
+    model: "strong",
+  })
 
   // Process any item commands to use valid game item NIDs
   return processEventItems(event);
