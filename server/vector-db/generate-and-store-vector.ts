@@ -2,6 +2,7 @@ import OpenAI from "openai";
 import createEmbedding from "./create-embedding.ts";
 import { VectorType } from "./types/vector-type.ts";
 import { generateId, storeVector } from "./vector-store.ts";
+import { getCurrentLogger } from "../lib/current-logger.ts";
 
 export interface GenerateAndStoreVectorOptions {
   id?: string;
@@ -18,21 +19,27 @@ export default async function generateAndStoreVector({
   vectorType,
   model = "text-embedding-3-small",
 }: GenerateAndStoreVectorOptions): Promise<string> {
-  // Generate embedding
-  const embedding = await createEmbedding({ text, model });
+  try {
+    // Generate embedding
+    const embedding = await createEmbedding({ text, model });
 
-  // Use provided ID or generate a new one
-  const vectorId = id || generateId();
+    // Use provided ID or generate a new one
+    const vectorId = id || generateId();
 
-  // Store the vector
-  await storeVector({
-    id: vectorId,
-    embedding,
-    metadata,
-    vectorType,
-  });
+    // Store the vector
+    await storeVector({
+      id: vectorId,
+      embedding,
+      metadata,
+      vectorType,
+    });
 
-  return vectorId;
+    return vectorId;
+  } catch (error) {
+    const logger = getCurrentLogger();
+    logger.error(`[Generate and Store Vector] Error`, { error, text, metadata, vectorType, model });
+    throw error;
+  }
 }
 
 if (import.meta.main) {
