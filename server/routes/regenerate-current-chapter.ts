@@ -7,6 +7,7 @@ import { getCurrentLogger, setCurrentLogger } from "@/lib/current-logger.ts";
 import { removeLastLevel } from "@/game-engine-io/write-chapter/remove-level.ts";
 import { removeEventsByLevelNid } from "@/game-engine-io/write-chapter/remove-events.ts";
 import runGame from "@/run-game.ts";
+import { toFriendlyError } from "@/lib/friendly-error.ts";
 
 /**
  * POST /regenerate-current-chapter
@@ -79,10 +80,11 @@ export async function handleRegenerateCurrentChapter(req: Request): Promise<Resp
         runGame(directory);
       } catch (err) {
         const logger = getCurrentLogger();
+        const friendly = toFriendlyError(err);
         logger.error("Error regenerating chapter", { error: err instanceof Error ? err.message : err });
         chapterGenerationProgress.set(gameNid, {
           step: -1,
-          message: `Error: ${err instanceof Error ? err.message : "Failed to regenerate chapter"}`,
+          message: friendly ? `${friendly.title}: ${friendly.description}` : `Error: ${err instanceof Error ? err.message : "Failed to regenerate chapter"}`,
           error: true,
         });
       }
