@@ -45,8 +45,8 @@ export default async function similaritySearch<T = Record<string, unknown>>({
     return mappedResults;
   } catch (error) {
     const logger = getCurrentLogger();
-    logger.error(`[Similarity Search] Error`, { error, vectorType, query, limit });
-    throw error;
+    logger.error(`[Similarity Search] Error. Returning empty results.`, { error, vectorType, query, limit });
+    return [];
   }
 }
 
