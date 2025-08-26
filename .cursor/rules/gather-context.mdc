@@ -1,0 +1,34 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+## Gather Context for a Named Feature
+
+The user will supply **only a feature name** (e.g., “Creative Testing”) and manually tag this rule.  
+Follow these instructions:
+
+1. **Locate the feature**  
+   • Search for directories whose names match the feature name (case-insensitive), ignoring `node_modules`, `dist`, `.next`, etc.  
+   • If nothing matches, run a full-text search for the phrase and use the containing directories.  
+
+2. **Skim key files**  
+   • Identify entry points, main modules, helpers, and in-code docs within those directories.  
+   • Note—but do not open—the presence of test files (`__tests__`, `*.test.*`, `*.spec.*`).  
+   • Skip snapshots, generated code, and migrations; no external docs.
+
+3. **Create an internal overview**  
+   • Draft a **concise, bulleted outline** capturing:  
+     - Folder hierarchy for the feature  
+     - Important files with one-line descriptions (e.g., `createExperiment.ts – REST handler to create a Creative Test`)  
+     - Any DB models or API routes involved  
+     - Front-end ↔ back-end touchpoints  
+   • Keep the list for your own context in later steps; you do **not** need to embed full file contents.  
+   • **Keep the outline to ≤ 40 lines and group entries by directory.**
+
+4. **Safety rule**  
+   • Read-only—never modify, rename, or delete code.
+
+5. **Confirmation**  
+   • Reply to the user with **only**:  
+     > I have gathered the context for the *<feature name>* feature. What changes would you like me to make to it?

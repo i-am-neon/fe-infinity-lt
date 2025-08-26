@@ -2,3 +2,4 @@ db/sqlite.db
 .env
 _logs/*
 assets/music/mp3/*
+dev-user-data/game-assets/title-images/*
