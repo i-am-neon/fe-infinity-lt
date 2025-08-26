@@ -45,7 +45,7 @@ export default async function getGenericEnemies({
     unitSquadsByRegion.flatMap((regionSquadInfo) => {
       return regionSquadInfo.placement.map(async (p) => {
         const { unitType, x, y } = p;
-        const { aiGroup, "class": unitClass } = await genGenericUnitClassAndAi(unitType);
+        const { aiGroup, "class": unitClass } = await genGenericUnitClassAndAi({ description: unitType, forceUnpromoted: enemyComposition.unpromoted === 100 });
         const unit: EnemyGenericUnit = {
           x, y, aiGroup, "class": unitClass
         };

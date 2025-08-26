@@ -2,14 +2,20 @@ import { FE8Class, FE8ClassSchema } from "@/types/fe8-class.ts";
 import { EnemyAIGroup, EnemyAIGroupSchema } from "@/ai/types/enemy-ai-group.ts";
 import generateStructuredData from "../../lib/generate-structured-data.ts";
 import { z } from "zod";
+import { availableClasses } from "./shared-prompts/available-classes.ts";
+import { getAllClassOptions } from "./get-all-class-options.ts";
 
-export default async function genGenericUnitClassAndAi(description: string): Promise<{ class: FE8Class, aiGroup: EnemyAIGroup }> {
+export default async function genGenericUnitClassAndAi({ description, forceUnpromoted = false }: { description: string; forceUnpromoted?: boolean; }): Promise<{ class: FE8Class, aiGroup: EnemyAIGroup }> {
+    const allClassOptions = getAllClassOptions();
+    const onlyUnpromotedClasses = allClassOptions.filter((option) => option.promotionLevel === 'unpromoted');
     const systemMessage = `
     You are an advanced Fire Emblem Tactician. Your task is to determine the most appropriate unit class and AI behavior group based on the provided unit description.
 
     Choose the most fitting Fire Emblem class from the established FE8 class system, and assign an appropriate AI behavior pattern from the available options.
 
     Only the following classes may be assigned the "PursueVillage" AI group to raid villages: Brigand, Pirate, Berserker, and Warrior. Do not assign "PursueVillage" to any other class.
+
+    Available classes: ${availableClasses(forceUnpromoted ? onlyUnpromotedClasses : allClassOptions)}
   `.trim();
 
     // Define the schema for the structured data
@@ -39,7 +45,7 @@ export default async function genGenericUnitClassAndAi(description: string): Pro
     }
 
     // If the unit is a staff-using unit, assign Heal AI
-    if (["Cleric", "Bishop", "Troubadour", "Valkyrie", "Sage", "Mage Knight"].includes(result.class)) {
+    if (["Cleric", "Bishop", "Troubadour", "Valkyrie"].includes(result.class)) {
         aiGroup = "Heal";
     }
 
@@ -71,7 +77,7 @@ if (import.meta.main) {
 
     for (const example of examples) {
         console.log(`Testing description: "${example}"`);
-        genGenericUnitClassAndAi(example).then(result => {
+        genGenericUnitClassAndAi({ description: example }).then(result => {
             console.log(`Result: Class = ${result.class}, AI Group = ${result.aiGroup}`);
             console.log("---");
         });

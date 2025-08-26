@@ -23,25 +23,31 @@ export default async function similaritySearch<T = Record<string, unknown>>({
   const startTime = performance.now();
 
   const vectorStore = await getVectorStore();
-  const results = await vectorStore.findSimilar(vectorType, query, limit);
+  try {
+    const results = await vectorStore.findSimilar(vectorType, query, limit);
 
-  const mappedResults = results.map((result) => ({
-    id: result.vector.id,
-    score: result.similarity,
-    metadata: transform
-      ? transform(result.vector)
-      : (result.vector.metadata as T),
-  }));
+    const mappedResults = results.map((result) => ({
+      id: result.vector.id,
+      score: result.similarity,
+      metadata: transform
+        ? transform(result.vector)
+        : (result.vector.metadata as T),
+    }));
 
-  const endTime = performance.now();
-  const logger = getCurrentLogger();
-  logger.info(
-    `[Similarity Search] "${query}" (${vectorType}): ${(
-      endTime - startTime
-    ).toFixed(2)}ms`
-  );
+    const endTime = performance.now();
+    const logger = getCurrentLogger();
+    logger.info(
+      `[Similarity Search] "${query}" (${vectorType}): ${(
+        endTime - startTime
+      ).toFixed(2)}ms`
+    );
 
-  return mappedResults;
+    return mappedResults;
+  } catch (error) {
+    const logger = getCurrentLogger();
+    logger.error(`[Similarity Search] Error. Returning empty results.`, { error, vectorType, query, limit });
+    return [];
+  }
 }
 
 if (import.meta.main) {

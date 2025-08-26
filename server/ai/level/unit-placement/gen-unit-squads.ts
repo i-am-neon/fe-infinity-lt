@@ -202,6 +202,7 @@ Non-Generic Placement: ${JSON.stringify(nonGenericUnitPlacementResult)}`;
     schema: resultSchema,
     systemMessage,
     prompt,
+    model: "strong",
   });
 
   return regionSquadInfoArray.map((info) => {

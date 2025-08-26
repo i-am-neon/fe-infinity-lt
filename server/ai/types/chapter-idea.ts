@@ -43,7 +43,7 @@ export const ChapterIdeaSchema = z.object({
       displayText: z
         .string()
         .describe(
-          "The text that will be displayed to the player. Must fit on one line going across the small screen, therefore it must be a very simple single sentence."
+          "The text that will be displayed to the player. Must fit on one line going across the small screen, therefore it must be a very simple single sentence. Maximum 5 words."
         ),
       options: z
         .array(z.string())

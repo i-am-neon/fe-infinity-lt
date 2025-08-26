@@ -1,6 +1,7 @@
-import createNextChapter, { getChapterGenerationProgress, chapterGenerationProgress } from "@/create-next-chapter.ts";
+import createNextChapter, { getChapterGenerationProgress as _getChapterGenerationProgress, chapterGenerationProgress } from "@/create-next-chapter.ts";
 import { getCurrentLogger } from "@/lib/current-logger.ts";
 import runGame from "@/run-game.ts";
+import { toFriendlyError } from "@/lib/friendly-error.ts";
 import { getGameByNid } from "../db/games.ts";
 
 export async function handleGenerateNextChapter(
@@ -67,10 +68,11 @@ export async function handleGenerateNextChapter(
         runGame(directory)
       } catch (err) {
         console.error("Error in background next chapter creation:", err);
+        const friendly = toFriendlyError(err);
         // Update the progress state with error information so the client can detect it
         chapterGenerationProgress.set(gameNid, {
           step: -1,
-          message: `Error: ${err instanceof Error ? err.message : "Failed to generate next chapter"}`,
+          message: friendly ? `${friendly.title}: ${friendly.description}` : `Error: ${err instanceof Error ? err.message : "Failed to generate next chapter"}`,
           error: true
         });
       }

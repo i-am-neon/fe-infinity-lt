@@ -11,7 +11,6 @@ export interface CreateEmbeddingOptions {
 
 export default async function createEmbedding({
   text,
-  model = "text-embedding-3-small",
 }: CreateEmbeddingOptions): Promise<number[]> {
   // Get API key from our manager which prioritizes user-provided keys
   const apiKey = getAIApiKey();
@@ -29,30 +28,24 @@ export default async function createEmbedding({
   const google = createGoogleGenerativeAI({
     apiKey,
   });
-
-  try {
-    // const response = await openai.embeddings.create({
-    //   model,
-    //   input: text,
-    //   encoding_format: "float",
-    // });
-    // return response.data[0].embedding as number[];
-    const model = google.textEmbedding('gemini-embedding-001')
-    const { embedding } = await embed({
-      model,
-      value: text,
-      providerOptions: {
-        google: {
-          taskType: 'SEMANTIC_SIMILARITY', // optional, specifies the task type for generating embeddings
-        },
+  // const response = await openai.embeddings.create({
+  //   model,
+  //   input: text,
+  //   encoding_format: "float",
+  // });
+  // return response.data[0].embedding as number[];
+  const model = google.textEmbedding('gemini-embedding-001')
+  const { embedding } = await embed({
+    model,
+    value: text,
+    providerOptions: {
+      google: {
+        taskType: 'SEMANTIC_SIMILARITY', // optional, specifies the task type for generating embeddings
       },
-    });
-    return embedding;
-  } catch (error) {
-    console.error("Error creating embedding:", error);
-    // Return a 0-dimension embedding as fallback (will be detected as invalid later)
-    return [];
-  }
+    },
+  });
+  return embedding;
+
 }
 
 if (import.meta.main) {

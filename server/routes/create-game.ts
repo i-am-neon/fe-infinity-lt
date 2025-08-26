@@ -12,6 +12,7 @@ import { Game } from "@/types/game.ts";
 import { insertGame } from "../db/games.ts";
 import genAndSaveTitleImage from "../ai/gen-and-save-title-image.ts";
 import saveDefaultTitleImage from "../game-engine-io/save-default-title-image.ts";
+import { toFriendlyError } from "@/lib/friendly-error.ts";
 
 // Game creation steps indices (matching the UI steps)
 const GAME_CREATION_STEPS = {
@@ -279,17 +280,22 @@ export async function handleCreateGame(req: Request): Promise<Response> {
       } catch (err) {
         const logger = getCurrentLogger();
         const errorMsg = err instanceof Error ? err.message : String(err);
+        const friendly = toFriendlyError(err);
         logger.error("Error creating game", { error: errorMsg });
+
+        const message = friendly
+          ? `${friendly.title}: ${friendly.description}`
+          : errorMsg;
 
         // Set error flag in progress
         gameCreationProgress.set(gameNid, {
           step: 0,
-          message: errorMsg,
+          message,
           error: true
         });
 
         // Store error in memory map for retrieval
-        gameCreationErrors.set(gameNid, errorMsg);
+        gameCreationErrors.set(gameNid, message);
       }
     })();
 

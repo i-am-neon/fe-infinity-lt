@@ -8,8 +8,8 @@ import { Apple, Grid2x2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-const MAC_DOWNLOAD_LINK = "https://github.com/i-am-neon/fe-infinity-lt/releases/download/v1.0.1/FE.Infinity-1.0.1-arm64.dmg";
-const WINDOWS_DOWNLOAD_LINK = "https://github.com/i-am-neon/fe-infinity-lt/releases/download/v1.0.1/FE.Infinity-Setup-1.0.1.exe";
+const MAC_DOWNLOAD_LINK = "https://github.com/i-am-neon/fe-infinity-lt/releases/download/v1.0.2/FE.Infinity-1.0.2-arm64.dmg";
+const WINDOWS_DOWNLOAD_LINK = "https://github.com/i-am-neon/fe-infinity-lt/releases/download/v1.0.2/FE.Infinity-Setup-1.0.2.exe";
 
 export default function DownloadsPage() {
     return (

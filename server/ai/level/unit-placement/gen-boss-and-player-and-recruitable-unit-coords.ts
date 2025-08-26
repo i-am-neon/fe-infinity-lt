@@ -97,6 +97,7 @@ Ensure region names match exactly.
     schema: regionChoiceSchema,
     systemMessage,
     prompt,
+    model: "strong",
   });
 
   // Step 2: generate boss, player, and recruitable unit coords

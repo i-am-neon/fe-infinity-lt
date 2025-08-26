@@ -78,7 +78,7 @@ function registerUserAssetsHandlers() {
             const fullPath = path.join(app.getPath('userData'), assetPath);
             const exists = fs.existsSync(fullPath);
 
-            logger.log('info', `Resolving user asset path: ${assetPath} to ${fullPath} (exists: ${exists})`);
+            // logger.log('info', `Resolving user asset path: ${assetPath} to ${fullPath} (exists: ${exists})`);
 
             // User assets are served via custom protocol
             return `user-asset://${assetPath}`;
