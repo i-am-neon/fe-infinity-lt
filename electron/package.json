@@ -5,7 +5,7 @@
     "name": "neon",
     "url": "https://www.neon.engineer/"
   },
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "FE Infinity",
   "main": "main.js",
   "scripts": {
