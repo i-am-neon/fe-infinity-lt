@@ -184,6 +184,8 @@ Tone: ${tone}`;
     model: "strong",
   })
   const eventWithProcessedItems: AIEvent = await processEventItems(event);
+  // Remove "choice" commands from the event
+  eventWithProcessedItems.sourceObjects = eventWithProcessedItems.sourceObjects.filter((sourceObject) => sourceObject.command !== "choice");
   // Add the choice event at the end. Example: `"choice;fates;Who do you side with?;Hoshido,Nohr,Smash",`
   eventWithProcessedItems.sourceObjects.push({
     command: "choice",
