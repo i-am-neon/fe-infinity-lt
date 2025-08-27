@@ -104,8 +104,8 @@ export default async function generateStructuredData<T>({
           providerOptions: {
             google: {
               thinkingConfig: {
-                // thinkingBudget: model === 'strong' ? -1 : undefined, // dynamically choose thinking based on task
-                thinkingBudget: model === 'strong' ? 32768 : undefined, // Max out thinking budget
+                thinkingBudget: model === 'strong' ? -1 : undefined, // dynamically choose thinking based on task
+                // thinkingBudget: model === 'strong' ? 32768 : undefined, // Max out thinking budget
               },
             },
           },

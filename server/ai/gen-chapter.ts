@@ -625,12 +625,6 @@ if (import.meta.main) {
     const mockWorldSummary: WorldSummary = {
       worldName: "Testland",
       description: "A test realm",
-      geography: {
-        regions: [],
-      },
-      history: "Lots of testing",
-      mythology: "",
-      factions: [],
     };
     const mockInitialGameIdea: InitialGameIdea = {
       backstory: "We are testing",
