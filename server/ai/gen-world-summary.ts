@@ -25,10 +25,8 @@ Based on their input, generate a rich and immersive setting tailored to their vi
 
 In your response, you must return these sections:
 
+- World Name
 - World Description
-- Geography with a breakdown of each region
-- Overview of world history/mythology
-- Factions: list the world's factions/nations/societies
 
 Notes:
 - The name of the world must not be "Aetheria" or anything similar. Choose something unique!
