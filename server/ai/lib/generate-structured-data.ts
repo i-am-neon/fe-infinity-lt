@@ -127,7 +127,7 @@ export default async function generateStructuredData<T>({
       } catch (error: any) {
         const attemptDuration = performance.now() - startTime;
 
-        // --- NEW: detect free-tier/quota exhaustion up-front ---
+        // --- NEW: detect free-tier/quota exhaustion and backoff/retry ---
         if (isQuotaError(error)) {
           const status =
             error?.status ?? error?.statusCode ?? error?.response?.status ?? 429;
@@ -155,7 +155,18 @@ export default async function generateStructuredData<T>({
             }
           );
 
-          // fail fast: no need to retry further attempts on hard quota
+          // wait 60s then retry, up to 3 attempts total
+          if (attempt < 3) {
+            const waitMs = 60_000;
+            logResults && logger.warn(
+              `[generateStructuredData: ${fnName}] Waiting ${waitMs / 1000}s before retry #${attempt + 1} due to quota`,
+              { model: _model.modelId, attempt, next_attempt: attempt + 1, wait_ms: waitMs }
+            );
+            await new Promise((resolve) => setTimeout(resolve, waitMs));
+            continue;
+          }
+
+          // On final attempt, surface a clear error to caller
           throw new FreeTierExceededError(message, { status, providerCode });
         }
 
